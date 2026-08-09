@@ -520,48 +520,48 @@ body.dark .studio-tab.active{color:var(--pine);}
 
     <div class="ribbon" id="ribbon">
       <div class="ribbon-quick">
-<button class="tool-btn" disabled="" id="btnUndo">Undo <kbd>Ctrl Z</kbd></button>
-<button class="tool-btn" disabled="" id="btnRedo">Redo <kbd>Ctrl Y</kbd></button>
-<button class="tool-btn danger" disabled="" id="btnReset">Reset project</button>
+<button class="tool-btn" id="btnUndo">Undo <kbd>Ctrl Z</kbd></button>
+<button class="tool-btn" id="btnRedo">Redo <kbd>Ctrl Y</kbd></button>
+<button class="tool-btn danger" id="btnReset">Reset project</button>
 </div>
       <div class="ribbon-panel active" data-studio-panel="pdf">
 <div class="tool-group">
 <h2>Add pages</h2>
 <button class="tool-btn" id="btnOpen"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v3a1 1 0 001 1h14a1 1 0 001-1v-3"></path></svg> Open / Merge (PDF or photo)</button>
-<button class="tool-btn" disabled="" id="btnInsert"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 5v14m-7-7h14"></path></svg> Insert PDF at page…</button>
+<button class="tool-btn" id="btnInsert"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 5v14m-7-7h14"></path></svg> Insert PDF at page…</button>
 </div>
 <div class="tool-group">
 <h2>Arrange</h2>
-<button class="tool-btn" disabled="" id="btnDuplicateSel"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="12" rx="1" width="12" x="8" y="8"></rect><path d="M4 16V5a1 1 0 011-1h11"></path></svg> Duplicate selected</button>
-<button class="tool-btn" disabled="" id="btnRotateSel"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 4v6h6M20 20v-6h-6"></path><path d="M5 15a9 9 0 0014 4M19 9A9 9 0 005 5"></path></svg> Rotate selected 90°</button>
-<button class="tool-btn" disabled="" id="btnReverse"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M7 7h13M7 12h13M7 17h13M3 7v10l3-3M3 7l3 3"></path></svg> Reverse page order</button>
-<button class="tool-btn danger" disabled="" id="btnDeleteSel"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg> Delete selected</button>
-<button class="tool-btn" disabled="" id="btnCrop"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 2v14a2 2 0 002 2h14M18 22V8a2 2 0 00-2-2H2"></path></svg> Crop pages…</button>
-<button class="tool-btn" disabled id="btnRemoveBlank"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M9 21v-4a2 2 0 012-2h2a2 2 0 012 2v4"></path></svg> Remove blank pages…</button>
+<button class="tool-btn" id="btnDuplicateSel"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="12" rx="1" width="12" x="8" y="8"></rect><path d="M4 16V5a1 1 0 011-1h11"></path></svg> Duplicate selected</button>
+<button class="tool-btn" id="btnRotateSel"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 4v6h6M20 20v-6h-6"></path><path d="M5 15a9 9 0 0014 4M19 9A9 9 0 005 5"></path></svg> Rotate selected 90°</button>
+<button class="tool-btn" id="btnReverse"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M7 7h13M7 12h13M7 17h13M3 7v10l3-3M3 7l3 3"></path></svg> Reverse page order</button>
+<button class="tool-btn danger" id="btnDeleteSel"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg> Delete selected</button>
+<button class="tool-btn" id="btnCrop"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 2v14a2 2 0 002 2h14M18 22V8a2 2 0 00-2-2H2"></path></svg> Crop pages…</button>
+<button class="tool-btn" id="btnRemoveBlank"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M9 21v-4a2 2 0 012-2h2a2 2 0 012 2v4"></path></svg> Remove blank pages…</button>
 </div>
 <div class="tool-group">
 <h2>Extract &amp; split</h2>
-<button class="tool-btn" disabled="" id="btnExtract"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="16" x="4" y="4"></rect><path d="M9 12h6"></path></svg> Extract selected → new PDF</button>
-<button class="tool-btn" disabled="" id="btnSplit"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="7" x="3" y="4"></rect><rect height="16" rx="1" width="7" x="14" y="4"></rect></svg> Split into files…</button>
+<button class="tool-btn" id="btnExtract"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="16" x="4" y="4"></rect><path d="M9 12h6"></path></svg> Extract selected → new PDF</button>
+<button class="tool-btn" id="btnSplit"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="7" x="3" y="4"></rect><rect height="16" rx="1" width="7" x="14" y="4"></rect></svg> Split into files…</button>
 <button class="tool-btn" id="btnPdfCompare"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="7" x="3" y="4"></rect><rect height="16" rx="1" width="7" x="14" y="4"></rect><path d="M12 4v16"></path></svg> Compare two PDFs…</button>
 </div>
 <div class="tool-group">
 <h2>Enhance</h2>
-<button class="tool-btn" disabled="" id="btnWatermark"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 4h16v16H4z"></path><path d="M8 16l8-8"></path></svg> Add watermark…</button>
-<button class="tool-btn" disabled="" id="btnPageNum"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="16" x="4" y="4"></rect><text fill="currentColor" font-size="8" stroke="none" text-anchor="middle" x="12" y="16">12</text></svg> Add page numbers…</button>
-<button class="tool-btn" disabled id="btnBates"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="16" x="4" y="4"></rect><path d="M7 16h10"></path><text fill="currentColor" font-size="6" stroke="none" text-anchor="middle" x="12" y="12">A-001</text></svg> Bates numbering…</button>
-<button class="tool-btn" disabled="" id="btnHeaderFooter"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="18" rx="2" width="18" x="3" y="3"></rect><path d="M3 7h18M3 17h18"></path></svg> Add header/footer…</button>
-<button class="tool-btn" disabled="" id="btnCompress"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 4v4H4M16 4v4h4M8 20v-4H4M16 20v-4h4"></path></svg> Compress</button>
-<button class="tool-btn" disabled="" id="btnMetadata"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"></path></svg> Metadata inspector…</button>
+<button class="tool-btn" id="btnWatermark"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 4h16v16H4z"></path><path d="M8 16l8-8"></path></svg> Add watermark…</button>
+<button class="tool-btn" id="btnPageNum"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="16" x="4" y="4"></rect><text fill="currentColor" font-size="8" stroke="none" text-anchor="middle" x="12" y="16">12</text></svg> Add page numbers…</button>
+<button class="tool-btn" id="btnBates"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="16" x="4" y="4"></rect><path d="M7 16h10"></path><text fill="currentColor" font-size="6" stroke="none" text-anchor="middle" x="12" y="12">A-001</text></svg> Bates numbering…</button>
+<button class="tool-btn" id="btnHeaderFooter"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="18" rx="2" width="18" x="3" y="3"></rect><path d="M3 7h18M3 17h18"></path></svg> Add header/footer…</button>
+<button class="tool-btn" id="btnCompress"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 4v4H4M16 4v4h4M8 20v-4H4M16 20v-4h4"></path></svg> Compress</button>
+<button class="tool-btn" id="btnMetadata"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"></path></svg> Metadata inspector…</button>
 </div>
 </div>
       <div class="ribbon-panel" data-studio-panel="ocr">
 <div class="tool-group">
 <button class="tool-btn" id="btnOcrImage"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><path d="M8 20l4-4 4 4M9 10a2 2 0 100-4 2 2 0 000 4z"></path></svg> Extract text from image…</button>
-<button class="tool-btn" disabled="" id="btnOcrPdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M8 13h8M8 17h5"></path></svg> Create searchable PDF (OCR)…</button>
+<button class="tool-btn" id="btnOcrPdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M8 13h8M8 17h5"></path></svg> Create searchable PDF (OCR)…</button>
 <button class="tool-btn" id="btnImageTable"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16M15 4v16"></path></svg> Extract table from image…</button>
 <button class="tool-btn" id="btnImagesToPdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><circle cx="8.5" cy="9.5" r="1.5"></circle><path d="M21 15l-5-5-4 4-3-3-4 4"></path></svg> Combine images into PDF…</button>
-<button class="tool-btn" disabled="" id="btnPdfToImages"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><circle cx="8.5" cy="9.5" r="1.5"></circle><path d="M21 15l-5-5-4 4-3-3-4 4"></path></svg> PDF → Images…</button>
+<button class="tool-btn" id="btnPdfToImages"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><circle cx="8.5" cy="9.5" r="1.5"></circle><path d="M21 15l-5-5-4 4-3-3-4 4"></path></svg> PDF → Images…</button>
 <button class="tool-btn" id="btnQrReader"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="7" width="7" x="3" y="3"></rect><rect height="7" width="7" x="14" y="3"></rect><rect height="7" width="7" x="3" y="14"></rect><path d="M14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM19 19h2v2h-2z"></path></svg> Read QR code…</button>
 <button class="tool-btn" id="btnQrGenerate"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="7" width="7" x="3" y="3"></rect><rect height="7" width="7" x="14" y="3"></rect><rect height="7" width="7" x="3" y="14"></rect><rect height="7" width="7" x="14" y="14"></rect></svg> Generate QR code…</button>
 </div>
@@ -570,33 +570,33 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div class="tool-group">
 <button class="tool-btn" id="btnTranslateText"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 5h9M7 3v2m0 0c0 4-1 7-4 9m4-4c1 2 2.5 3.5 4 4M14 21l4-9 4 9m-6.5-3h5"></path></svg> Translate text…</button>
 <button class="tool-btn" id="btnTranslateDoc"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M9 15l3-3 3 3M12 12v7"></path></svg> Translate a document…</button>
-<button class="tool-btn" disabled="" id="btnTranslatePdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M4 5h9M7 3v2m0 0c0 4-1 7-4 9" transform="translate(1,2) scale(0.55)"></path></svg> Translate this open PDF</button>
+<button class="tool-btn" id="btnTranslatePdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M4 5h9M7 3v2m0 0c0 4-1 7-4 9" transform="translate(1,2) scale(0.55)"></path></svg> Translate this open PDF</button>
 <button class="tool-btn" id="btnTranslateAI"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 5h9M7 3v2m0 0c0 4-1 7-4 9m4-4c1 2 2.5 3.5 4 4M14 21l4-9 4 9m-6.5-3h5"></path><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4L12 3z" transform="translate(3,-2) scale(0.4)"></path></svg> Translate via AI (higher quality)…</button>
 <p class="hint" style="padding:0 14px;margin:6px 0 0;">"Translate text/document/PDF" use a free translation service (MyMemory) — no setup needed, but quality is inconsistent, especially on longer or more formal text. "Translate via AI" uses a proper language model instead — noticeably better with grammar and context, but needs an API key. Google's Gemini API has a genuinely free tier if cost is a concern.</p>
 </div>
 </div>
       <div class="ribbon-panel" data-studio-panel="convert">
 <div class="tool-group">
-<button class="tool-btn" disabled="" id="btnPdfToWord"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M8 13h8M8 17h8"></path></svg> PDF → Word (.docx)</button>
-<button class="tool-btn" disabled="" id="btnPdfToExcel"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16"></path></svg> PDF → Excel (.xlsx)</button>
-<button class="tool-btn" disabled="" id="btnPdfToCsv"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16M15 4v16"></path></svg> PDF → CSV</button>
-<button class="tool-btn" disabled="" id="btnPdfToText"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h13"></path></svg> PDF → Text (.txt)</button>
-<button class="tool-btn" disabled="" id="btnPdfToHtml"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 3L4 12l4 9M16 3l4 9-4 9"></path></svg> PDF → HTML</button>
-<button class="tool-btn" disabled="" id="btnPdfToJson"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3a3 3 0 00-3 3v3a2 2 0 01-2 2 2 2 0 012 2v3a3 3 0 003 3M18 3a3 3 0 013 3v3a2 2 0 002 2 2 2 0 00-2 2v3a3 3 0 01-3 3"></path></svg> PDF → JSON</button>
-<button class="tool-btn" disabled id="btnPdfToXml"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 3L2 12l6 9M16 3l6 9-6 9M10 21l4-18"></path></svg> PDF → XML</button>
-<button class="tool-btn" disabled id="btnPdfToSvg"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M8 12h8M12 8v8"></path></svg> PDF → SVG…</button>
-<button class="tool-btn" disabled id="btnPdfToRtf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M8 13h8M8 17h5"></path></svg> PDF → RTF</button>
-<button class="tool-btn" disabled id="btnPdfToOdt"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M8 13h8M8 17h8"></path></svg> PDF → ODT</button>
-<button class="tool-btn" disabled id="btnPdfToOds"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16"></path></svg> PDF → ODS</button>
-<button class="tool-btn" disabled id="btnPdfToOdp"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="18" x="3" y="5"></rect><path d="M8 21h8"></path></svg> PDF → ODP</button>
-<button class="tool-btn" disabled id="btnPdfToEpub"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"></path></svg> PDF → EPUB</button>
+<button class="tool-btn" id="btnPdfToWord"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M8 13h8M8 17h8"></path></svg> PDF → Word (.docx)</button>
+<button class="tool-btn" id="btnPdfToExcel"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16"></path></svg> PDF → Excel (.xlsx)</button>
+<button class="tool-btn" id="btnPdfToCsv"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16M15 4v16"></path></svg> PDF → CSV</button>
+<button class="tool-btn" id="btnPdfToText"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h13"></path></svg> PDF → Text (.txt)</button>
+<button class="tool-btn" id="btnPdfToHtml"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 3L4 12l4 9M16 3l4 9-4 9"></path></svg> PDF → HTML</button>
+<button class="tool-btn" id="btnPdfToJson"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3a3 3 0 00-3 3v3a2 2 0 01-2 2 2 2 0 012 2v3a3 3 0 003 3M18 3a3 3 0 013 3v3a2 2 0 002 2 2 2 0 00-2 2v3a3 3 0 01-3 3"></path></svg> PDF → JSON</button>
+<button class="tool-btn" id="btnPdfToXml"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 3L2 12l6 9M16 3l6 9-6 9M10 21l4-18"></path></svg> PDF → XML</button>
+<button class="tool-btn" id="btnPdfToSvg"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M8 12h8M12 8v8"></path></svg> PDF → SVG…</button>
+<button class="tool-btn" id="btnPdfToRtf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M8 13h8M8 17h5"></path></svg> PDF → RTF</button>
+<button class="tool-btn" id="btnPdfToOdt"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M8 13h8M8 17h8"></path></svg> PDF → ODT</button>
+<button class="tool-btn" id="btnPdfToOds"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16"></path></svg> PDF → ODS</button>
+<button class="tool-btn" id="btnPdfToOdp"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="18" x="3" y="5"></rect><path d="M8 21h8"></path></svg> PDF → ODP</button>
+<button class="tool-btn" id="btnPdfToEpub"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"></path></svg> PDF → EPUB</button>
 <button class="tool-btn" id="btnFileToPdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M12 12v6m-3-3h6"></path></svg> Create PDF from file…</button>
 </div>
 </div>
       <div class="ribbon-panel" data-studio-panel="powerpoint">
 <div class="tool-group">
 <h2>Convert</h2>
-<button class="tool-btn" disabled id="btnPdfToPptx"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="18" x="3" y="5"></rect><path d="M8 21h8"></path></svg> PDF → PowerPoint (.pptx)</button>
+<button class="tool-btn" id="btnPdfToPptx"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="18" x="3" y="5"></rect><path d="M8 21h8"></path></svg> PDF → PowerPoint (.pptx)</button>
 <button class="tool-btn" id="btnPptxToPdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M12 12v6m-3-3h6"></path></svg> PowerPoint → PDF…</button>
 </div>
 <div class="tool-group">
@@ -617,13 +617,13 @@ body.dark .studio-tab.active{color:var(--pine);}
 <button class="tool-btn" id="btnAiExtractTables"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16"></path></svg> Extract tables</button>
 <button class="tool-btn" id="btnAiGenQuestions"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9.5 9a2.5 2.5 0 015 0c0 1.5-2.5 2-2.5 3.5M12 17h.01"></path><circle cx="12" cy="12" r="9"></circle></svg> Generate questions</button>
 <button class="tool-btn" id="btnAiDraftEmail"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="20" x="2" y="4"></rect><path d="M2 7l10 6 10-6"></path></svg> Draft email</button>
-<button class="tool-btn" disabled id="btnChatPdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path></svg> Chat with this PDF…</button>
+<button class="tool-btn" id="btnChatPdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path></svg> Chat with this PDF…</button>
 </div>
 <div class="tool-group">
 <h2>More &amp; document</h2>
 <button class="tool-btn" id="btnAiTools"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4L12 3z"></path><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z"></path></svg> More AI tasks…</button>
-<button class="tool-btn" disabled="" id="btnAnalyze"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.35-4.35"></path></svg> Analyze document…</button>
-<button class="tool-btn" disabled="" id="btnDupPages"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="14" rx="1" width="12" x="3" y="6"></rect><rect height="14" rx="1" width="12" x="9" y="2"></rect></svg> Detect duplicate pages</button>
+<button class="tool-btn" id="btnAnalyze"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.35-4.35"></path></svg> Analyze document…</button>
+<button class="tool-btn" id="btnDupPages"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="14" rx="1" width="12" x="3" y="6"></rect><rect height="14" rx="1" width="12" x="9" y="2"></rect></svg> Detect duplicate pages</button>
 <button class="tool-btn" id="btnVoiceToText"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"></path><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"></path></svg> Voice to text…</button>
 <button class="tool-btn" id="btnReadAloud"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19 12a4 4 0 00-2.5-3.7M22 12a7 7 0 00-4-6.3"></path></svg> Read aloud…</button>
 </div>
@@ -649,12 +649,12 @@ body.dark .studio-tab.active{color:var(--pine);}
 </div>
       <div class="ribbon-panel" data-studio-panel="security">
 <div class="tool-group">
-<button class="tool-btn" disabled="" id="btnSign"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 17c2-4 3-2 5-6s2 3 4-1 3 2 5-2M4 21h16"></path></svg> Sign PDF…</button>
-<button class="tool-btn" disabled="" id="btnFillForm"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><path d="M7 9h10M7 13h6"></path></svg> Fill form fields…</button>
-<button class="tool-btn" disabled="" id="btnFlattenForm"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><path d="M7 14l3 3 7-8"></path></svg> Flatten form</button>
+<button class="tool-btn" id="btnSign"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 17c2-4 3-2 5-6s2 3 4-1 3 2 5-2M4 21h16"></path></svg> Sign PDF…</button>
+<button class="tool-btn" id="btnFillForm"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><path d="M7 9h10M7 13h6"></path></svg> Fill form fields…</button>
+<button class="tool-btn" id="btnFlattenForm"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><path d="M7 14l3 3 7-8"></path></svg> Flatten form</button>
 <button class="tool-btn" id="btnOpenEncrypted"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 018 0v4"></path><path d="M12 15v2"></path></svg> Open password-protected PDF <span class="beta-badge">BETA</span></button>
-<button class="tool-btn" disabled id="btnEncrypt"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 018 0v4"></path></svg> Set password <span class="beta-badge">BETA</span></button>
-<button class="tool-btn" disabled id="btnRedact"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><rect x="6" y="9" width="6" height="3" fill="currentColor" stroke="none"></rect><path d="M6 15h5"></path></svg> Redact page…</button>
+<button class="tool-btn" id="btnEncrypt"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 018 0v4"></path></svg> Set password <span class="beta-badge">BETA</span></button>
+<button class="tool-btn" id="btnRedact"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><rect x="6" y="9" width="6" height="3" fill="currentColor" stroke="none"></rect><path d="M6 15h5"></path></svg> Redact page…</button>
 <p class="hint" style="padding:0 14px;margin:6px 0 0;">Password protection uses a community fork of the core PDF library, not the well-established one the rest of this app relies on — test that your protected file actually opens with the password before trusting it for anything sensitive. <strong>Not recommended for confidential or legally sensitive documents until more thoroughly validated.</strong> Cryptographic digital signatures still aren't supported; that genuinely requires a certificate authority.</p>
 </div>
 </div>
@@ -774,7 +774,7 @@ body.dark .studio-tab.active{color:var(--pine);}
     <div id="aboutStudio" class="studio-page">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Build:</strong> 2026-08-04.3 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Build:</strong> 2026-08-04.4 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -1078,15 +1078,15 @@ function fmtBytes(n){
   if(n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
   return (n/1024/1024).toFixed(2) + ' MB';
 }
-function setToolsEnabled(on){
-  ['btnInsert','btnDuplicateSel','btnRotateSel','btnReverse','btnDeleteSel','btnCrop','btnRemoveBlank','btnExtract','btnSplit',
+const PDF_REQUIRED_IDS = ['btnInsert','btnDuplicateSel','btnRotateSel','btnReverse','btnDeleteSel','btnCrop','btnRemoveBlank','btnExtract','btnSplit',
    'btnWatermark','btnPageNum','btnBates','btnHeaderFooter','btnFillForm','btnFlattenForm','btnSign','btnEncrypt','btnRedact',
    'btnCompress','btnMetadata','btnUndo','btnRedo','btnReset','btnOcrPdf',
    'btnPdfToWord','btnPdfToPptx','btnPdfToExcel','btnPdfToCsv','btnPdfToText','btnPdfToHtml','btnPdfToJson','btnPdfToImages',
    'btnPdfToXml','btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds','btnPdfToOdp','btnPdfToEpub',
-   'btnTranslatePdf','btnAnalyze','btnDupPages','btnChatPdf'].forEach(id=>{
-    $(id).disabled = !on;
-    $(id).title = on ? '' : 'Open a PDF first to use this tool';
+   'btnTranslatePdf','btnAnalyze','btnDupPages','btnChatPdf'];
+function setToolsEnabled(on){
+  PDF_REQUIRED_IDS.forEach(id=>{
+    $(id).title = on ? '' : 'Tap to open a PDF first — this tool needs one loaded.';
   });
   $('toolbar').style.display = on ? 'flex' : 'none';
   grid.classList.toggle('empty-hide', !on);
@@ -1094,6 +1094,19 @@ function setToolsEnabled(on){
   $('noPdfBanner').style.display = on ? 'none' : 'block';
   updateDashboardTilesVisibility();
 }
+// Buttons stay tappable at all times (never visually disabled) so every menu
+// always looks and feels active. This guard runs before the button's own
+// handler and, only if no PDF is loaded yet, redirects the tap into opening
+// one instead of letting a tool run with nothing to work on.
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.tool-btn');
+  if(!btn || !PDF_REQUIRED_IDS.includes(btn.id)) return;
+  if(workingBytes) return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  toast('Opening a PDF first — this tool needs one loaded.');
+  $('fileInput').click();
+}, true);
 
 /* ---------- History ---------- */
 let currentProjectId = null;
@@ -1729,7 +1742,7 @@ function getPdfDocumentSafely(bytes, password){
     loadingTask.promise.then(resolve, reject);
   });
 }
-async function collectRowsFromPdfBytes(bytes, password){
+async function collectRowsFromPdfBytes(bytes, password, gapThreshold){
   const pdf = await getPdfDocumentSafely(bytes, password);
   const rows = [];
   for(let i = 1; i <= pdf.numPages; i++){
@@ -1737,7 +1750,7 @@ async function collectRowsFromPdfBytes(bytes, password){
     const content = await page.getTextContent();
     const items = content.items.filter(it => typeof it.str === 'string')
       .map(it => ({ str: it.str, x: it.transform[4], y: it.transform[5], width: it.width || 0 }));
-    groupIntoLines(items).forEach(l => rows.push(lineToCells(l.items, 9)));
+    groupIntoLines(items).forEach(l => rows.push(lineToCells(l.items, gapThreshold || 9)));
   }
   return rows;
 }
@@ -6012,6 +6025,8 @@ $('btnChartDigitizer').addEventListener('click', () => {
 });
 
 $('btnInterestCalc').addEventListener('click', () => {
+  window.__intPdfBuf = null; window.__intPdfPassword = null; window.__intGapThreshold = null;
+  window.__intRows = null; window.__intHeaderIdx = null;
   openModal('Bank interest calculator', `
     <div class="field"><label>Source</label>
       <select id="intSource">
@@ -6071,8 +6086,10 @@ $('btnInterestCalc').addEventListener('click', () => {
     function renderColumnSelectors(rows, headerIdx){
       window.__intHeaderIdx = headerIdx;
       const headers = rows[headerIdx] || [];
+      const isPdf = !!window.__intPdfBuf;
       document.getElementById('intColumnsArea').innerHTML = `
         <div class="field"><label>Header row (auto-detected — change the number if the columns below look wrong)</label><input type="number" id="intHeaderRow" min="1" value="${headerIdx + 1}"></div>
+        ${isPdf ? `<div class="field"><label>Column sensitivity (increase if columns look merged together, like "Post Date Value" instead of separate "Post Date" and "Value")</label><div style="display:flex;gap:8px;"><input type="number" id="intGapThreshold" min="1" max="40" value="${window.__intGapThreshold || 9}" style="flex:1;"><button class="btn ghost" id="intReparse" type="button">Re-read PDF</button></div></div>` : ''}
         <div class="field row">
           <div><label>Date column</label><select id="intDateCol">${headers.map((h,i) => `<option value="${i}">${escapeXml(String(h))}</option>`).join('')}</select></div>
           <div><label>Balance column</label><select id="intBalCol">${headers.map((h,i) => `<option value="${i}" ${i === headers.length-1 ? 'selected' : ''}>${escapeXml(String(h))}</option>`).join('')}</select></div>
@@ -6083,6 +6100,21 @@ $('btnInterestCalc').addEventListener('click', () => {
         if(newIdx >= rows.length){ toast('That row number is beyond the end of the file.', true); return; }
         renderColumnSelectors(rows, newIdx);
       });
+      if(isPdf){
+        document.getElementById('intReparse').addEventListener('click', async () => {
+          const gap = parseInt(document.getElementById('intGapThreshold').value) || 9;
+          window.__intGapThreshold = gap;
+          setStatus('Re-reading statement…'); showProgress(20);
+          try{
+            const newRows = await collectRowsFromPdfBytes(window.__intPdfBuf, window.__intPdfPassword, gap);
+            if(!newRows.length){ toast('Could not read any data at this sensitivity.', true); return; }
+            window.__intRows = newRows;
+            renderColumnSelectors(newRows, detectHeaderRowIndex(newRows));
+            toast('Re-read with new column sensitivity.');
+          } catch(err){ console.error(err); toast('Could not re-read the PDF.', true); }
+          finally { showProgress(null); setStatus('Ready.'); }
+        });
+      }
     }
     function populateColumnPickers(rows){
       window.__intRows = rows;
@@ -6095,6 +6127,7 @@ $('btnInterestCalc').addEventListener('click', () => {
         if(!workingBytes){ toast('No PDF is currently open.', true); return; }
         setStatus('Reading current PDF…'); showProgress(20);
         try{
+          window.__intPdfBuf = workingBytes; window.__intPdfPassword = null;
           const rows = await collectRowsFromPdfBytes(workingBytes);
           if(!rows.length){ toast('Could not read any data from the current PDF.', true); return; }
           populateColumnPickers(rows);
@@ -6109,6 +6142,7 @@ $('btnInterestCalc').addEventListener('click', () => {
       const ext = (file.name.split('.').pop() || '').toLowerCase();
       try{
         const buf = ext === 'pdf' ? new Uint8Array(await file.arrayBuffer()) : await file.arrayBuffer();
+        if(ext === 'pdf'){ window.__intPdfBuf = buf; window.__intPdfPassword = null; } else { window.__intPdfBuf = null; }
         const rows = await loadStatementRows(buf, ext, null);
         if(!rows.length){ toast('Could not read any data from that file.', true); return; }
         document.getElementById('intPasswordField').style.display = 'none';
@@ -6126,6 +6160,7 @@ $('btnInterestCalc').addEventListener('click', () => {
             setStatus('Unlocking statement…'); showProgress(20);
             try{
               const buf2 = new Uint8Array(await file.arrayBuffer());
+              window.__intPdfBuf = buf2; window.__intPdfPassword = password;
               const rows2 = await collectRowsFromPdfBytes(buf2, password);
               if(!rows2.length){ toast('Could not read any data from that file.', true); return; }
               populateColumnPickers(rows2);
