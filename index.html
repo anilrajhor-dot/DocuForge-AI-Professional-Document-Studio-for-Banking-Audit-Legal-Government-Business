@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.2.16 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.2.17 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -6117,132 +6117,129 @@ function computeInterestFromStatement(rows, dateIdx, balanceIdx, annualRatePct, 
 }
 
 function showInterestResult(result, rate){
-  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const fmtDate = d => {
     const x=new Date(d);
     return String(x.getDate()).padStart(2,'0')+'/'+String(x.getMonth()+1).padStart(2,'0')+'/'+x.getFullYear();
   };
+  const money = n => Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  const monthlyRows = result.monthly.map(m => [
+  // Continuous periods of identical DAILY CLOSING BALANCE.
+  // Every calendar day is included, including days without transactions.
+  const periods=[];
+  for(const day of (result.daily||[])){
+    const prev=periods[periods.length-1];
+    if(prev && Number(prev.balance)===Number(day.balance)){
+      prev.toDate=new Date(day.date);
+      prev.days += 1;
+      prev.product += Number(day.balance);
+      prev.interest += Number(day.interest||0);
+    }else{
+      periods.push({
+        fromDate:new Date(day.date),
+        toDate:new Date(day.date),
+        balance:Number(day.balance),
+        days:1,
+        product:Number(day.balance),
+        interest:Number(day.interest||0)
+      });
+    }
+  }
+
+  const detailRows=periods.map((p,i)=>[
+    i+1,fmtDate(p.fromDate),fmtDate(p.toDate),
+    money(p.balance),p.days,money(p.product),money(p.interest)
+  ]);
+
+  const monthlyRows=(result.monthly||[]).map(m=>[
     `${MONTH_NAMES[m.month]} ${m.year}`,
-    m.days,
-    m.dailyProduct.toFixed(2),
-    m.closingBalance.toFixed(2),
-    m.interest.toFixed(2)
+    m.days,money(m.dailyProduct),money(m.closingBalance),money(m.interest)
   ]);
 
-  // One row for every continuous period in which the closing balance
-  // remains unchanged. Number of days and Product are immediately before
-  // the Interest column as requested.
-  const detailRows = (result.stretches || []).map(s => [
-    fmtDate(s.fromDate),
-    fmtDate(s.toDate),
-    s.balance.toFixed(2),
-    s.days,
-    s.product.toFixed(2),
-    s.interest.toFixed(2)
-  ]);
-
-  const cellRows = rows => rows.map(r =>
-    `<tr>${r.map(c => `<td style="padding:4px 6px;border:1px solid var(--line);font-size:11.5px;white-space:nowrap;">${esc(String(c))}</td>`).join('')}</tr>`
-  ).join('');
-
-  const slabSummary = (result.rateSlabs && result.rateSlabs.length)
-    ? result.rateSlabs.map((s,i) => {
-        if(i===0 && !Number.isFinite(s.upto)) return `Above: ${s.rate}%`;
-        if(i===0) return `Up to ₹${s.upto.toLocaleString('en-IN')}: ${s.rate}%`;
-        const prev=result.rateSlabs[i-1].upto;
-        return Number.isFinite(s.upto)
-          ? `₹${(prev+0.01).toLocaleString('en-IN')}–₹${s.upto.toLocaleString('en-IN')}: ${s.rate}%`
-          : `Above ₹${prev.toLocaleString('en-IN')}: ${s.rate}%`;
-      }).join(' · ')
-    : `${rate}% p.a.`;
-
-  openModal('Interest calculation', `
-    <div style="background:var(--surface-2);padding:12px;border-radius:4px;text-align:center;">
-      <div style="font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;">Total interest</div>
-      <div style="font-size:24px;font-weight:700;font-family:var(--font-mono);">${result.totalInterest.toFixed(2)}</div>
-      <div style="font-size:11px;color:var(--ink-soft);margin-top:4px;">${esc(slabSummary)}</div>
-    </div>
-
-    <h4 style="margin:16px 0 7px;">Detailed daily-product calculation</h4>
-    <p class="hint" style="margin:0 0 8px;">
-      Each row represents a continuous period for which the closing balance remained the same.
-      <strong>Product = Balance × Number of days.</strong> Interest is calculated from this product
-      using the applicable rate slab and a 365-day basis.
-    </p>
-    <div style="overflow:auto;max-height:360px;border:1px solid var(--line);border-radius:4px;">
-      <table style="border-collapse:collapse;width:100%;">
-        <tr>
-          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">From date</th>
-          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">To date</th>
-          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Balance</th>
-          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">No. of days</th>
-          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Product (Balance × Days)</th>
-          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Interest</th>
-        </tr>
-        ${cellRows(detailRows)}
+  const table=(headers,rows,cls='')=>`
+    <div class="interest-sheet-table ${cls}" style="overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface);">
+      <table style="border-collapse:collapse;width:100%;min-width:680px;">
+        <thead><tr>${headers.map(x=>`<th style="position:sticky;top:0;background:var(--surface-2);padding:8px;border:1px solid var(--line);font-size:11px;text-align:right;white-space:nowrap;">${esc(x)}</th>`).join('')}</tr></thead>
+        <tbody>${rows.map(r=>`<tr>${r.map((x,j)=>`<td style="padding:7px 8px;border:1px solid var(--line);font-size:11.5px;text-align:${j===1||j===2?'left':'right'};white-space:nowrap;">${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody>
       </table>
+    </div>`;
+
+  const slabText=(result.rateSlabs||[]).map((s,i)=>{
+    if(i===result.rateSlabs.length-1 && !Number.isFinite(s.upto)) return `Above ₹${i?Number(result.rateSlabs[i-1].upto).toLocaleString('en-IN'):0}: ${s.rate}%`;
+    return `Up to ₹${Number(s.upto).toLocaleString('en-IN')}: ${s.rate}%`;
+  }).join(' | ');
+
+  const body=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+      <div>
+        <h3 style="margin:0 0 4px;">Interest Calculation Sheet</h3>
+        <div class="hint" style="margin:0;">Daily closing balance • Balance × Number of Days = Product • Interest follows the applicable slab</div>
+      </div>
+      <div style="padding:8px 12px;border:1px solid var(--accent);border-radius:8px;text-align:right;">
+        <div style="font-size:10px;color:var(--ink-soft);">TOTAL INTEREST</div>
+        <strong style="font-size:20px;">₹${money(result.totalInterest)}</strong>
+      </div>
     </div>
+
+    <div style="padding:9px 11px;background:var(--surface-2);border-radius:7px;margin-bottom:12px;font-size:12px;line-height:1.5;">
+      <strong>Calculation method:</strong> The last balance on each calendar date is treated as that day's closing balance.
+      Where there is no transaction, the previous closing balance continues. Consecutive days having the same balance
+      are combined below so that the <strong>Number of Days</strong> and <strong>Product</strong> can be checked.
+      <br><strong>Rates:</strong> ${esc(slabText || (rate+'% p.a.'))}
+    </div>
+
+    <h4 style="margin:10px 0 7px;">Detailed daily-product calculation</h4>
+    ${table(
+      ['No.','From Date','To Date','Balance (₹)','Number of Days','Product (₹)','Interest (₹)'],
+      detailRows,
+      'interest-detail-table'
+    )}
 
     <h4 style="margin:16px 0 7px;">Monthly summary</h4>
-    <div style="overflow:auto;max-height:260px;border:1px solid var(--line);border-radius:4px;">
-      <table style="border-collapse:collapse;width:100%;">
-        <tr>
-          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Month</th>
-          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Days</th>
-          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Daily product</th>
-          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Closing balance</th>
-          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Interest</th>
-        </tr>
-        ${cellRows(monthlyRows)}
-      </table>
-    </div>
+    ${table(
+      ['Month','Number of Days','Daily Product (₹)','Closing Balance (₹)','Interest (₹)'],
+      monthlyRows,
+      'interest-monthly-table'
+    )}
 
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-      <button class="btn ghost" id="intCsv" type="button">Download detailed breakdown as CSV</button>
-      <button class="btn ghost" id="intXlsx" type="button">Download detailed breakdown as Excel</button>
+      <button class="btn ghost" id="intCsv" type="button">Download CSV</button>
+      <button class="btn ghost" id="intXlsx" type="button">Download Excel</button>
     </div>
-    <p class="hint">
-      The detailed sheet shows exactly how many days each balance remained unchanged and the
-      resulting Balance × Days product. This applies to both Excel/CSV and PDF statements.
-    </p>
-  `, async () => {});
+  `;
 
-  $('modalConfirm').style.display = 'none';
-  $('modalCancel').textContent = 'Close';
+  openModal('Interest Calculation Sheet',body,async()=>{});
+  $('modalConfirm').style.display='none';
+  $('modalCancel').textContent='Close';
 
-  setTimeout(() => {
-    const allRows = [
-      ['DETAILED DAILY-PRODUCT CALCULATION'],
-      ['From date','To date','Balance','No. of days','Product (Balance × Days)','Interest'],
+  setTimeout(()=>{
+    const allRows=[
+      ['INTEREST CALCULATION SHEET'],
+      ['No.','From Date','To Date','Balance','Number of Days','Product (Balance × Days)','Interest'],
       ...detailRows,
       [],
       ['MONTHLY SUMMARY'],
-      ['Month','Days','Daily product','Closing balance','Interest'],
+      ['Month','Number of Days','Daily Product','Closing Balance','Interest'],
       ...monthlyRows,
       [],
-      ['','','','Total interest',result.totalInterest.toFixed(2)]
+      ['TOTAL INTEREST','','','','', '',money(result.totalInterest)]
     ];
 
-    document.getElementById('intCsv').addEventListener('click', () => {
-      downloadBlob(
-        new Blob([allRows.map(r => r.map(toCsvValue).join(',')).join('\n')], {type:'text/csv'}),
-        'interest_detailed_breakdown.csv'
-      );
-    });
+    const csv=document.getElementById('intCsv');
+    if(csv) csv.onclick=()=>{
+      downloadBlob(new Blob([allRows.map(r=>r.map(toCsvValue).join(',')).join('\n')],{type:'text/csv'}),'interest_calculation_sheet.csv');
+    };
 
-    document.getElementById('intXlsx').addEventListener('click', async () => {
+    const xlsx=document.getElementById('intXlsx');
+    if(xlsx) xlsx.onclick=async()=>{
       await loadLib('xlsx');
-      const ws = XLSX.utils.aoa_to_sheet(allRows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Interest');
-      downloadBlob(
-        new Blob([XLSX.write(wb, {bookType:'xlsx', type:'array'})], {type:'application/octet-stream'}),
-        'interest_detailed_breakdown.xlsx'
-      );
-    });
-  }, 0);
+      const ws=XLSX.utils.aoa_to_sheet(allRows);
+      ws['!cols']=[{wch:7},{wch:14},{wch:14},{wch:16},{wch:15},{wch:24},{wch:16}];
+      const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,'Interest Calculation');
+      downloadBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}),'interest_calculation_sheet.xlsx');
+    };
+  },0);
 }
 async function buildChartPdf(dataUrl, title, s){
   const doc = await PDFDocument.create();
