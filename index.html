@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.1.1 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.1.2 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -557,7 +557,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.1.1</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.1.2</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -1157,10 +1157,12 @@ async function loadPdfSafely(buf){
   try{
     return await PDFDocument.load(buf);
   } catch(e){
-    if(e && e.message && /encrypt/i.test(e.message)){
-      throw new Error('This PDF is password-protected. Use Security Studio → "Open password-protected PDF" first, then try again.');
-    }
-    throw e;
+    // pdf-lib cannot decrypt encrypted PDFs. The caller will fall back to
+    // PDF.js, which supports the password callback and can rebuild the pages.
+    const err = new Error('PDF requires password/PDF.js fallback.');
+    err.code = 'PDF_PASSWORD_OR_UNSUPPORTED';
+    err.original = e;
+    throw err;
   }
 }
 async function rebuildProtectedPdfWithPdfJs(file, password){
@@ -1180,34 +1182,74 @@ async function rebuildProtectedPdfWithPdfJs(file, password){
   return out.save();
 }
 async function openProtectedPdf(file){
+  // First try PDF.js without a password. This also handles PDFs that pdf-lib
+  // cannot parse even though they are not encrypted.
+  const bytes=new Uint8Array(await file.arrayBuffer());
+  try{
+    const probe=await getPdfDocumentSafely(bytes,null);
+    const rebuilt=await rebuildProtectedPdfWithPdfJs(file,null);
+    try{ await probe.destroy(); }catch(e){}
+    toast('PDF opened using the compatible PDF reader.');
+    return rebuilt;
+  }catch(probeErr){
+    const needsPassword = probeErr && (probeErr.name === 'PasswordException' ||
+      /password|encrypted|encrypt/i.test(String(probeErr.message||'')));
+    if(!needsPassword){
+      toast('This PDF could not be opened by the available PDF readers.', true);
+      return null;
+    }
+  }
+
   return await new Promise((resolve) => {
-    openModal('Unlock password-protected PDF', `
-      <div class="field">
-        <label>PDF password</label>
-        <input type="password" id="protectedPdfPassword" autocomplete="current-password" style="width:100%;">
-      </div>
-      <p class="hint">Enter the password used to open this PDF. The password is used only in this browser session and is not saved.</p>
-      <div id="protectedPdfStatus" class="hint" style="display:none;"></div>
-    `, async () => {
-      const input=document.getElementById('protectedPdfPassword');
-      const password=input ? input.value : '';
-      if(!password){
-        toast('Enter the PDF password first.', true);
-        // Re-open the dialog so the user can enter it.
-        setTimeout(() => openProtectedPdf(file).then(resolve), 0);
-        return;
-      }
-      try{
-        toast('Unlocking protected PDF…');
-        const rebuilt=await rebuildProtectedPdfWithPdfJs(file,password);
-        toast('Password accepted. PDF opened.');
-        resolve(rebuilt);
-      }catch(err){
-        console.error('Protected PDF unlock failed:',err);
-        toast('Password was not accepted, or this encrypted PDF format is not supported.', true);
-        setTimeout(() => openProtectedPdf(file).then(resolve), 0);
-      }
-    });
+    const showPasswordDialog = () => {
+      openModal('Unlock password-protected PDF', `
+        <div class="field">
+          <label>PDF password</label>
+          <input type="password" id="protectedPdfPassword" autocomplete="off" style="width:100%;" autofocus>
+        </div>
+        <p class="hint">Enter the password used to open this PDF. It is used only in this browser session and is not saved.</p>
+        <div id="protectedPdfStatus" class="hint" style="display:none;"></div>
+      `, async () => {
+        const input=document.getElementById('protectedPdfPassword');
+        const password=input ? input.value : '';
+        if(!password){
+          toast('Enter the PDF password first.', true);
+          setTimeout(showPasswordDialog,0);
+          return;
+        }
+        try{
+          toast('Unlocking protected PDF…');
+          const unlocked=await getPdfDocumentSafely(bytes,password);
+          // Rebuild from the decrypted PDF.js pages so pdf-lib can work with it.
+          const outPdf=await PDFDocument.create();
+          for(let i=1;i<=unlocked.numPages;i++){
+            const page=await unlocked.getPage(i);
+            const viewport=page.getViewport({scale:1.5});
+            const canvas=document.createElement('canvas');
+            canvas.width=Math.ceil(viewport.width);
+            canvas.height=Math.ceil(viewport.height);
+            await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+            const dataUrl=canvas.toDataURL('image/png');
+            const bin=atob(dataUrl.split(',')[1]);
+            const png=new Uint8Array(bin.length);
+            for(let j=0;j<bin.length;j++) png[j]=bin.charCodeAt(j);
+            const img=await outPdf.embedPng(png);
+            const v=page.getViewport({scale:1});
+            const newPage=outPdf.addPage([v.width,v.height]);
+            newPage.drawImage(img,{x:0,y:0,width:v.width,height:v.height});
+          }
+          try{await unlocked.destroy();}catch(e){}
+          toast('Password accepted. PDF opened.');
+          resolve(await outPdf.save());
+        }catch(err){
+          console.error('Protected PDF unlock failed:',err);
+          toast('Incorrect password or unsupported encrypted PDF.',true);
+          setTimeout(showPasswordDialog,0);
+        }
+      });
+      setTimeout(()=>document.getElementById('protectedPdfPassword')?.focus(),50);
+    };
+    showPasswordDialog();
   });
 }
 
@@ -1226,14 +1268,9 @@ async function loadFiles(fileList){
         const firstBuf = await allFiles[0].arrayBuffer();
         try { doc = await loadPdfSafely(firstBuf); }
         catch(e) {
-          try {
-            const probe = await getPdfDocumentSafely(new Uint8Array(firstBuf), null);
-            await probe.destroy();
-            throw e;
-          } catch(probeErr) {
-            const protectedLike = /password|encrypt|encrypted|PasswordException/i.test(String((e&&e.message)||'')+' '+String((probeErr&&probeErr.message)||'')) || probeErr?.name==='PasswordException';
-            if(protectedLike){ const rebuilt=await openProtectedPdf(allFiles[0]); if(!rebuilt)return; doc=await PDFDocument.load(rebuilt); } else throw e;
-          }
+          const rebuilt=await openProtectedPdf(allFiles[0]);
+          if(!rebuilt)return;
+          doc=await PDFDocument.load(rebuilt);
         }
         startIdx = 1;
       } else {
@@ -6333,15 +6370,42 @@ $('btnInterestCalc').addEventListener('click', () => {
       return rows.map(r=>Array.isArray(r)?r:[]).filter(r=>r.some(v=>String(v??'').trim()!==''));
     }
     function detectHeaderRowIndex(rows){
-      // PDFs of bank statements often have letterhead/account-summary lines
-      // before the real table starts, and those lines extract as a single
-      // cell. Row 0 is rarely the real header — the row with the most
-      // columns usually is, so use that instead of blindly trusting row 0.
-      let bestIdx = 0, bestCount = (rows[0] || []).length;
-      const scanLimit = Math.min(rows.length, 30);
-      for(let i = 0; i < scanLimit; i++){
-        const len = (rows[i] || []).length;
-        if(len > bestCount){ bestCount = len; bestIdx = i; }
+      // Prefer a genuine transaction-table header over a title/summary row.
+      // Score the first 50 non-empty rows using common banking column labels,
+      // then use column count as a secondary signal.
+      const keywords = [
+        /date|txn.?date|trans.?date|value.?date|post.?date/i,
+        /description|narration|particular|remarks|details/i,
+        /balance|closing|available/i,
+        /debit|withdrawal|dr\.?/i,
+        /credit|deposit|cr\.?/i,
+        /amount|transaction/i,
+        /cheque|chq|reference|ref/i
+      ];
+      let bestIdx = 0, bestScore = -Infinity;
+      const scanLimit = Math.min(rows.length, 50);
+      for(let i=0;i<scanLimit;i++){
+        const row=(rows[i]||[]).map(v=>String(v??'').trim()).filter(Boolean);
+        if(!row.length) continue;
+        const text=row.join(' | ');
+        let score=0;
+        keywords.forEach((rx,idx)=>{
+          if(rx.test(text)) score += (idx<3 ? 4 : 2);
+        });
+        if(row.length >= 3) score += Math.min(row.length,8) * 0.5;
+        // Penalise obvious account-summary/title rows.
+        if(/account\s*(number|no|name)|statement\s*(period|date)|opening\s*balance/i.test(text)) score -= 3;
+        if(score > bestScore){ bestScore=score; bestIdx=i; }
+      }
+      // If no meaningful banking header was found, retain the old robust
+      // fallback: the first row among the first 30 with the most columns.
+      if(bestScore < 3){
+        let maxIdx=0, maxLen=(rows[0]||[]).length;
+        for(let i=0;i<Math.min(rows.length,30);i++){
+          const len=(rows[i]||[]).length;
+          if(len>maxLen){maxLen=len;maxIdx=i;}
+        }
+        return maxIdx;
       }
       return bestIdx;
     }
@@ -6350,7 +6414,7 @@ $('btnInterestCalc').addEventListener('click', () => {
       const headers = rows[headerIdx] || [];
       const isPdf = !!window.__intPdfBuf;
       document.getElementById('intColumnsArea').innerHTML = `
-        <div class="field"><label>Header row (auto-detected — change the number if the columns below look wrong)</label><input type="number" id="intHeaderRow" min="1" value="${headerIdx + 1}"></div>
+        <div class="field"><label>Header row <span style="font-weight:700;">(auto-detected)</span> — change only if needed</label><input type="number" id="intHeaderRow" min="1" max="${rows.length}" value="${headerIdx + 1}" inputmode="numeric"><p class="hint">The app has automatically selected row ${headerIdx + 1}. If your bank statement has headings on another row, enter that row number here and the columns will refresh automatically.</p></div>
         ${isPdf ? `<div class="field"><label>Column sensitivity (increase if columns look merged together, like "Post Date Value" instead of separate "Post Date" and "Value")</label><div style="display:flex;gap:8px;"><input type="number" id="intGapThreshold" min="1" max="40" value="${window.__intGapThreshold || 9}" style="flex:1;"><button class="btn ghost" id="intReparse" type="button">Re-read PDF</button></div></div>` : ''}
         <div class="field row">
           <div><label>Date column</label><select id="intDateCol">${headers.map((h,i) => `<option value="${i}">${escapeXml(String(h))}</option>`).join('')}</select></div>
