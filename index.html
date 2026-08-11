@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.2.24 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.2.26 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -4532,7 +4532,7 @@ on('btnFileToPdf', 'click', () => {
 on('btnTranslateText', 'click', () => {
   openModal('Translate text', `
     <div class="field"><label>Text to translate</label><textarea id="trInput" style="min-height:150px;" placeholder="Type or paste text, or choose a file/photo below."></textarea></div>
-    <div class="field"><label>Choose file / photo (optional)</label><input type="file" id="trTextFile" accept=".txt,.md,.docx,.pdf,image/*"><p class="hint">Choose a document or a photo from your device/gallery. Text is extracted locally; photos are read with the app's browser OCR.</p></div>
+    <div class="field"><label>Choose file / photo (optional)</label><input type="file" id="trTextFile" accept=".txt,.md,.docx,.pdf,image/*"><p class="hint">Choose a document or photo from your device/gallery. The extracted text is automatically placed in the text box. Scanned PDFs/photos are OCR-read automatically.</p></div>
     <div class="field row">
       <div><label>Source language</label><select id="trSource">${langOptions(true)}</select></div>
       <div><label>Target language</label><select id="trTarget">${langOptions(false).replace('<option value="hi">Hindi</option>', '<option value="hi" selected>Hindi</option>')}</select></div>
@@ -4562,6 +4562,7 @@ on('btnTranslateText', 'click', () => {
       if(!file) return;
       try{
         setStatus('Reading selected file/photo…'); showProgress(10);
+        const source = document.getElementById('trSource')?.value || 'auto';
         const text = await extractTextFromAnyFile(file, source);
         if(!text.trim()) throw new Error('No readable text was found in that file/photo.');
         document.getElementById('trInput').value = text;
@@ -7720,16 +7721,10 @@ Developed by <strong>Anil Sharma</strong> · Former General Manager, Central Ban
       window.__selectedDocumentFile=file;
       window.__selectedDocumentName=file.name;
       window.__selectedDocumentType=file.type || '';
-      // If the app has a generic main file input, mirror the selection where
-      // possible without forcing a second picker.
-      const main=document.getElementById('fileInput');
-      if(main && typeof DataTransfer!=='undefined'){
-        try{
-          const dt=new DataTransfer();
-          dt.items.add(file);
-          main.files=dt.files;
-        }catch(e){}
-      }
+      // Keep this selection scoped to the current menu only. Do NOT copy it
+      // into the global main fileInput, otherwise the file reappears when the
+      // user moves to another menu.
+      window.__selectedDocumentMenu = window.__activeDashboardMenu || '';
       const w=document.getElementById('dashboardMenuModal');
       if(w) w.style.display='none';
       if(typeof toast==='function') toast(`Selected: ${file.name}`,false);
@@ -7751,6 +7746,7 @@ Developed by <strong>Anil Sharma</strong> · Former General Manager, Central Ban
     window.__selectedDocumentType='';
     const main=document.getElementById('fileInput');
     if(main) try{ main.value=''; }catch(e){}
+    window.__selectedDocumentMenu='';
     // Clear menu-specific document state as well.
     window.__intRows=null;
     window.__intHeaderIdx=null;
@@ -7789,10 +7785,13 @@ Developed by <strong>Anil Sharma</strong> · Former General Manager, Central Ban
   function openMenu(key){
     const menu=MENUS[key];
     if(!menu) return;
+    window.__activeDashboardMenu=key;
     const w=ensureModal();
     w.querySelector('#dashboardMenuTitle').textContent=menu.icon+' '+menu.title;
-    w.querySelector('#dashboardMenuDesc').textContent=
-      menu.desc + (window.__selectedDocumentName ? `  Selected: ${window.__selectedDocumentName}` : '');
+    const selectedForThisMenu =
+      window.__selectedDocumentName && window.__selectedDocumentMenu===key
+        ? `  Selected: ${window.__selectedDocumentName}` : '';
+    w.querySelector('#dashboardMenuDesc').textContent=menu.desc + selectedForThisMenu;
     const grid=w.querySelector('#dashboardSubGrid');
     grid.innerHTML=menu.items.map(it=>`
       <button type="button" class="dash-subitem" data-sub-action="${it[2]}">
@@ -7807,6 +7806,10 @@ Developed by <strong>Anil Sharma</strong> · Former General Manager, Central Ban
   document.addEventListener('click',e=>{
     const tile=e.target.closest('#dashboardTiles .dash-tile');
     if(!tile) return;
+    const nextMenu=tile.dataset.studioLaunch || tile.dataset.tool;
+    if(window.__activeDashboardMenu && window.__activeDashboardMenu!==nextMenu){
+      clearSelectedDocument();
+    }
     e.preventDefault();
     e.stopImmediatePropagation();
     openMenu(tile.dataset.studioLaunch || tile.dataset.tool);
