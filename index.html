@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI — Intelligent Document Studio</title>
+<title>DocuForge AI <span class="app-version">v1.0.4</span> — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -499,6 +499,10 @@ body.dark .studio-tab.active{color:var(--pine);}
 .fc-tab{font-weight:700}.fc-tab.primary{background:var(--accent);color:var(--accent-ink)}
 #modalBody .totals-card{margin-top:10px}
 </style>
+<style id="v104-branding">
+.app-version{display:inline-block;margin-left:7px;padding:3px 7px;border:1px solid currentColor;border-radius:10px;font:700 10px/1 system-ui,sans-serif;vertical-align:middle;opacity:.9}
+.df-file-choice{border-color:var(--accent)!important;font-weight:700!important}
+</style>
 </head>
 <body>
 
@@ -579,7 +583,8 @@ body.dark .studio-tab.active{color:var(--pine);}
       <div class="ribbon-quick">
 <button class="tool-btn" id="btnUndo">Undo <kbd>Ctrl Z</kbd></button>
 <button class="tool-btn" id="btnRedo">Redo <kbd>Ctrl Y</kbd></button>
-<button class="tool-btn danger" id="btnReset">Reset project</button>
+<button class="tool-btn danger" id="btnReset">Reset project</button><input id="undoResetFilePicker" type="file" accept="application/pdf,image/*" capture="environment" style="display:none">
+<button class="tool-btn df-file-choice" id="btnUndoResetChoose" type="button" title="Choose PDF/photo or use camera">📷 Camera / File</button>
 <button class="tool-btn df-finance-quick" id="btnFinancialCalculatorQuick" title="Open Financial Calculator">
   <span style="font-size:18px;line-height:1;">🧮</span> Financial Calculator
 </button>
@@ -5550,8 +5555,9 @@ function openFinancialSuite(){
       <div class="field"><label>EMI rounding</label><select id="fcRound"><option value="2">2 decimals</option><option value="0">Nearest rupee</option></select></div>
       <button class="btn primary" id="fcCalc">Calculate EMI</button>`;
     else if(type==='age') body.innerHTML=`
-      <div class="field"><label>Date of birth</label><input id="fcDob" type="date"></div>
-      <div class="field"><label>Age as on</label><input id="fcAgeOn" type="date"></div>
+      <div class="field"><label>Date of birth (DD/MM/YYYY)</label><input id="fcDob" type="text" inputmode="numeric" autocomplete="bday" placeholder="DD/MM/YYYY" maxlength="10"></div>
+      <div class="field"><label>Age as on (DD/MM/YYYY)</label><input id="fcAgeOn" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" maxlength="10"></div>
+      <p class="hint" style="margin-top:4px">Enter dates as DD/MM/YYYY, for example 24/06/1959.</p>
       <button class="btn primary" id="fcCalc">Calculate Age</button>`;
     else if(type==='sip') body.innerHTML=`
       ${fcField('fcSip','Monthly SIP (₹)','number',10000,'1')}
@@ -5579,10 +5585,17 @@ function openFinancialSuite(){
       <button class="btn primary" id="fcCalc">Get Live Exchange Rate</button>
       <p class="hint">Uses a public live-rate service when internet access is available. If unavailable, enter a rate manually below.</p>
       ${fcField('fcManualRate','Manual rate (optional)','number','','0.000001')}`;
+    // Clear results whenever the calculator type changes so an EMI result
+    // can never remain visible under Age/SIP/Deposit/RDS/Currency.
+    const result=document.getElementById('fcResult');
+    if(result) result.innerHTML='';
     document.getElementById('fcCalc').onclick=()=>fcCalculate(type);
     if(type==='age'){
-      const today=new Date(), iso=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
-      document.getElementById('fcAgeOn').value=iso;
+      const today=new Date();
+      const dd=String(today.getDate()).padStart(2,'0');
+      const mm=String(today.getMonth()+1).padStart(2,'0');
+      const yyyy=today.getFullYear();
+      document.getElementById('fcAgeOn').value=`${dd}/${mm}/${yyyy}`;
     }
   };
   document.querySelectorAll('.fc-tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.fc-tab').forEach(x=>x.classList.remove('primary'));b.classList.add('primary');render(b.dataset.fc);});
@@ -5596,8 +5609,21 @@ function fcCalculate(type){
     let emi=r===0?balance/repay:balance*r*Math.pow(1+r,repay)/(Math.pow(1+r,repay)-1); const roundDigits=parseInt($('fcRound').value)||2; emi=roundDigits===0?Math.round(emi):Number(emi.toFixed(roundDigits)); const total=emi*repay+(mode==='pay'?morInt:0); const capInt=mode==='cap'?balance-P:0;
     out.innerHTML=`<div class="totals-card"><div class="totals-row"><span>EMI after moratorium</span><b>${fcMoney(emi)}</b></div><div class="totals-row"><span>Moratorium interest</span><b>${fcMoney(morInt)}</b></div><div class="totals-row"><span>Interest capitalised</span><b>${fcMoney(capInt)}</b></div><div class="totals-row"><span>Principal for EMI</span><b>${fcMoney(balance)}</b></div><div class="totals-row"><span>Total repayment</span><b>${fcMoney(total)}</b></div><div class="hint">${m} month(s) moratorium; ${mode==='cap'?'interest is added to principal':'interest is paid separately'}.</div></div>`;
   } else if(type==='age'){
-    const dob=new Date($('fcDob').value+'T00:00:00'), as=new Date($('fcAgeOn').value+'T00:00:00'); if(isNaN(dob)||isNaN(as)||as<dob){out.textContent='Enter valid dates; Age as on must not be before date of birth.';return;}
-    let y=as.getFullYear()-dob.getFullYear(), mo=as.getMonth()-dob.getMonth(), d=as.getDate()-dob.getDate(); if(d<0){mo--;d+=new Date(as.getFullYear(),as.getMonth(),0).getDate();} if(mo<0){y--;mo+=12;} out.innerHTML=`<div class="totals-card"><b>${y} years, ${mo} months, ${d} days</b></div>`;
+    function fcAgeDate(v){
+      const s=String(v||'').trim().replace(/[-.]/g,'/');
+      let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if(!m) return null;
+      const day=Number(m[1]), month=Number(m[2]), year=Number(m[3]);
+      const d=new Date(year,month-1,day);
+      if(d.getFullYear()!==year || d.getMonth()!==month-1 || d.getDate()!==day) return null;
+      return d;
+    }
+    const dob=fcAgeDate($('fcDob').value), as=fcAgeDate($('fcAgeOn').value);
+    if(!dob || !as || as<dob){out.textContent='Enter valid dates in DD/MM/YYYY format; Age as on must not be before date of birth.';return;}
+    let y=as.getFullYear()-dob.getFullYear(), mo=as.getMonth()-dob.getMonth(), d=as.getDate()-dob.getDate();
+    if(d<0){mo--;d+=new Date(as.getFullYear(),as.getMonth(),0).getDate();}
+    if(mo<0){y--;mo+=12;}
+    out.innerHTML=`<div class="totals-card"><div class="totals-row"><span>Date of birth</span><b>${$('fcDob').value}</b></div><div class="totals-row"><span>Age as on</span><b>${$('fcAgeOn').value}</b></div><div class="totals-row"><span>Exact age</span><b>${y} years, ${mo} months, ${d} days</b></div></div>`;
   } else if(type==='sip'){
     const monthly=fcNum($('fcSip').value), annual=fcNum($('fcSipRate').value)/100, years=Math.max(0,fcNum($('fcSipYears').value)), step=fcNum($('fcStep').value)/100; let corpus=0, invested=0, m=0, inst=monthly; const totalMonths=Math.round(years*12);
     for(let i=1;i<=totalMonths;i++){if((i-1)%12===0 && i>1) inst*=1+step; invested+=inst; corpus=(corpus+inst)*(1+annual/12);m++;} corpus-=0; out.innerHTML=`<div class="totals-card"><div class="totals-row"><span>Total invested</span><b>${fcMoney(invested)}</b></div><div class="totals-row"><span>Estimated corpus</span><b>${fcMoney(corpus)}</b></div><div class="totals-row"><span>Estimated gain</span><b>${fcMoney(corpus-invested)}</b></div></div>`;
@@ -6649,5 +6675,67 @@ setTimeout(() => {
 })();
 </script>
 
+<div id="developerCredit" style="text-align:center;padding:10px 12px 14px;font-size:11px;color:var(--muted);">
+Developed by <strong>Anil Sharma</strong> · Former General Manager, Central Bank of India
+</div>
+<div id="undoResetFileOverlay" style="display:none;position:fixed;inset:0;z-index:10050;background:rgba(0,0,0,.48);align-items:flex-end;justify-content:center">
+<div style="width:min(520px,100%);background:var(--surface);padding:18px;border-radius:18px 18px 0 0">
+<h3>Open a document</h3><p class="hint">Choose a PDF/photo or use the camera on supported mobile browsers.</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<button id="dfCameraChoice" type="button">📷 Camera / Photo</button>
+<button id="dfFileChoice" type="button">📁 Choose File</button>
+</div>
+<button id="dfCancelChoice" type="button" style="width:100%;margin-top:10px">Cancel</button>
+</div></div>
+<script id="v104-undo-reset-file-picker">
+(function(){
+  function q(id){return document.getElementById(id);}
+  function show(){
+    var x=q('undoResetFileOverlay');
+    if(x)x.style.display='flex';
+  }
+  function hide(){
+    var x=q('undoResetFileOverlay');
+    if(x)x.style.display='none';
+  }
+  function pick(camera){
+    var x=q('undoResetFilePicker');
+    if(!x)return;
+    if(camera)x.setAttribute('capture','environment');
+    else x.removeAttribute('capture');
+    x.click();
+    hide();
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    var undo=q('btnUndo'), reset=q('btnReset'), quick=q('btnUndoResetChoose');
+    var cam=q('dfCameraChoice'), file=q('dfFileChoice'), cancel=q('dfCancelChoice');
+    if(quick)quick.addEventListener('click',show);
+    if(cam)cam.addEventListener('click',function(){pick(true);});
+    if(file)file.addEventListener('click',function(){pick(false);});
+    if(cancel)cancel.addEventListener('click',hide);
+
+    [undo,reset].forEach(function(btn){
+      if(btn)btn.addEventListener('click',function(){setTimeout(show,120);});
+    });
+
+    var input=q('undoResetFilePicker');
+    if(input)input.addEventListener('change',function(){
+      var selected=this.files && this.files[0];
+      if(!selected)return;
+      var main=document.querySelector('input[type="file"][accept*="pdf"]');
+      if(main){
+        try{
+          var dt=new DataTransfer();
+          dt.items.add(selected);
+          main.files=dt.files;
+          main.dispatchEvent(new Event('change',{bubbles:true}));
+          return;
+        }catch(e){}
+      }
+      if(typeof toast==='function')toast('File selected. Use Open / Merge PDFs to load it.');
+    });
+  });
+})();
+</script>
 </body>
 </html>
