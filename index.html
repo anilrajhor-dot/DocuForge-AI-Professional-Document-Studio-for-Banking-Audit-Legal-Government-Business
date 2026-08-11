@@ -658,7 +658,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.2.30</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.2.31</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -806,6 +806,17 @@ body.dark .studio-tab.active{color:var(--pine);}
 <button class="tool-btn" id="btnPdfToOdp"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="18" x="3" y="5"></rect><path d="M8 21h8"></path></svg> PDF → ODP</button>
 <button class="tool-btn" id="btnPdfToEpub"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"></path></svg> PDF → EPUB</button>
 <button class="tool-btn" id="btnFileToPdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M12 12v6m-3-3h6"></path></svg> Create PDF from file…</button>
+<div class="tool-group" data-conversion-direction="to-pdf">
+<h2>Create PDF</h2>
+<button class="tool-btn" id="btnWordToPdf"><span aria-hidden="true">📄</span> Word → PDF (.docx)</button>
+<button class="tool-btn" id="btnExcelToPdf"><span aria-hidden="true">📊</span> Excel → PDF (.xlsx/.xls)</button>
+<button class="tool-btn" id="btnPowerPointToPdf"><span aria-hidden="true">📽️</span> PowerPoint → PDF (.pptx)</button>
+<button class="tool-btn" id="btnTextToPdf"><span aria-hidden="true">📝</span> Text / RTF → PDF</button>
+<button class="tool-btn" id="btnHtmlToPdf"><span aria-hidden="true">🌐</span> HTML / CSV → PDF</button>
+<button class="tool-btn" id="btnImageToPdfStudio"><span aria-hidden="true">🖼️</span> Image(s) → PDF</button>
+<button class="tool-btn" id="btnOtherToPdf"><span aria-hidden="true">📁</span> Other supported file → PDF</button>
+</div>
+
 </div>
 </div>
       <div class="ribbon-panel" data-studio-panel="powerpoint">
@@ -2355,8 +2366,35 @@ async function convertFileToPdf(file){
       const text = await file.text();
       const paragraphs = text.split(/\r?\n\s*\r?\n/).map(p => p.replace(/\r?\n/g, ' ').trim());
       bytes = await buildTextPdf(paragraphs);
+    } else if(ext === 'rtf'){
+      const raw = await file.text();
+      const plain = raw
+        .replace(/\\par[d]?/gi, '\n')
+        .replace(/\\'[0-9a-fA-F]{2}/g, '')
+        .replace(/\\[a-z]+\\d* ?/gi, '')
+        .replace(/[{}]/g, '');
+      bytes = await buildTextPdf(plain.split(/\r?\n+/).map(p => p.trim()).filter(Boolean));
+    } else if(ext === 'odt'){
+      await loadLib('jszip');
+      const zip = await JSZip.loadAsync(await file.arrayBuffer());
+      const xml = await zip.file('content.xml').async('text');
+      const plain = xml
+        .replace(/<text:tab\s*\/>/g, '\t')
+        .replace(/<text:line-break\s*\/>/g, '\n')
+        .replace(/<text:p[^>]*>/g, '\n')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+        .replace(/\n\s*\n+/g,'\n').trim();
+      bytes = await buildTextPdf(plain.split(/\n+/).map(p => p.trim()).filter(Boolean));
+    } else if(file.type && file.type.startsWith('image/')){
+      const blob = await imagesToPdfBlob([file]);
+      const name = file.name.replace(/\.[^.]+$/, '') + '.pdf';
+      downloadBlob(blob, name);
+      setStatus(`Created ${name}.`);
+      return;
     } else {
-      toast('That file type isn\u2019t supported for PDF creation yet.', true); return;
+      toast('That file type is not supported for direct browser PDF creation. Legacy .doc/.ppt files need an Office-compatible converter.', true);
+      return;
     }
     const name = file.name.replace(/\.[^.]+$/, '') + '.pdf';
     downloadBlob(new Blob([bytes], { type:'application/pdf' }), name);
@@ -4520,7 +4558,7 @@ on('btnPptxEdit', 'click', () => {
 
 on('btnFileToPdf', 'click', () => {
   openModal('Create PDF from file', `
-    <div class="field"><label>File</label><input type="file" id="c2pFile" accept=".docx,.pptx,.xlsx,.xls,.csv,.txt,.md,.html,.htm"></div>
+    <div class="field"><label>File</label><input type="file" id="c2pFile" accept=".docx,.xlsx,.xls,.pptx,.txt,.md,.rtf,.html,.htm,.csv,.odt,image/*"></div>
     <p class="hint">Word and text files are laid out as wrapped paragraphs. PowerPoint files become one page per slide (title + bullets). HTML keeps headings and bullet lists, dropping styling/layout. Spreadsheets and CSVs become a table with the first row as a header; long values are truncated to fit the column width. Markdown is treated as plain text — headings aren't styled.</p>
   `, async () => {
     const file = document.getElementById('c2pFile').files[0];
@@ -4528,6 +4566,37 @@ on('btnFileToPdf', 'click', () => {
     await convertFileToPdf(file);
   });
 });
+
+
+function openToPdfPicker(title, accept){
+  openModal(title, `
+    <div class="field"><label>Select file</label><input type="file" id="directionPdfFile" accept="${accept}"></div>
+    <p class="hint">The file is converted locally where a supported browser reader is available. Review the generated PDF before saving or sharing.</p>
+  `, async () => {
+    const file=document.getElementById('directionPdfFile')?.files?.[0];
+    if(!file){ toast('Choose a file first.', true); return; }
+    await convertFileToPdf(file);
+  });
+}
+on('btnWordToPdf','click',()=>openToPdfPicker('Word → PDF','.docx,.doc'));
+on('btnExcelToPdf','click',()=>openToPdfPicker('Excel → PDF','.xlsx,.xls'));
+on('btnPowerPointToPdf','click',()=>openToPdfPicker('PowerPoint → PDF','.pptx,.ppt'));
+on('btnTextToPdf','click',()=>openToPdfPicker('Text / RTF → PDF','.txt,.md,.rtf'));
+on('btnHtmlToPdf','click',()=>openToPdfPicker('HTML / CSV → PDF','.html,.htm,.csv'));
+on('btnImageToPdfStudio','click',()=>{
+  openModal('Image(s) → PDF', `
+    <div class="field"><label>Select one or more images</label><input type="file" id="directionImageFiles" accept="image/*" multiple></div>
+    <p class="hint">Images are placed one per A4 page.</p>
+  `, async () => {
+    const files=[...(document.getElementById('directionImageFiles')?.files||[])];
+    if(!files.length){ toast('Choose at least one image.',true); return; }
+    const blob=await imagesToPdfBlob(files);
+    const base=(files[0].name||'images').replace(/\.[^.]+$/,'');
+    downloadBlob(blob,base+'_images.pdf');
+    setStatus('Image PDF created.');
+  });
+});
+on('btnOtherToPdf','click',()=>openToPdfPicker('Create PDF from supported file','.docx,.xlsx,.xls,.pptx,.txt,.md,.rtf,.html,.htm,.csv,.odt,image/*'));
 
 on('btnTranslateText', 'click', () => {
   openModal('Translate text', `
