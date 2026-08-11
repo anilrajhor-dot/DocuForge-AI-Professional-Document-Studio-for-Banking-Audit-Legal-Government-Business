@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.2.15 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.2.16 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -6088,14 +6088,65 @@ function computeInterestFromStatement(rows, dateIdx, balanceIdx, annualRatePct, 
     m.closingBalance=day.balance;
   }
   const monthly=Array.from(monthlyMap.values()).sort((a,b)=>a.year-b.year || a.month-b.month);
+
+  // Auditable calculation: group consecutive days where the closing
+  // balance remains unchanged, showing the exact number of days and
+  // Balance × Days product used for interest.
+  const stretches=[];
+  for(const day of daily){
+    const prev=stretches[stretches.length-1];
+    if(prev && prev.balance===day.balance){
+      prev.toDate=new Date(day.date);
+      prev.days++;
+      prev.product += day.balance;
+      prev.interest += day.interest;
+    }else{
+      stretches.push({
+        fromDate:new Date(day.date),
+        toDate:new Date(day.date),
+        balance:day.balance,
+        days:1,
+        product:day.balance,
+        interest:day.interest
+      });
+    }
+  }
+
   const totalInterest=monthly.reduce((s,m)=>s+m.interest,0);
-  return {totalInterest,monthly,entries,daily,rateSlabs:slabs,slabMode};
+  return {totalInterest,monthly,stretches,entries,daily,rateSlabs:slabs,slabMode};
 }
 
 function showInterestResult(result, rate){
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const rows = result.monthly.map(m => [`${MONTH_NAMES[m.month]} ${m.year}`, m.days, m.dailyProduct.toFixed(2), m.closingBalance.toFixed(2), m.interest.toFixed(2)]);
-  const preview = rows.map(r => `<tr>${r.map(c => `<td style="padding:4px 6px;border:1px solid var(--line);font-size:11.5px;white-space:nowrap;">${esc(String(c))}</td>`).join('')}</tr>`).join('');
+  const fmtDate = d => {
+    const x=new Date(d);
+    return String(x.getDate()).padStart(2,'0')+'/'+String(x.getMonth()+1).padStart(2,'0')+'/'+x.getFullYear();
+  };
+
+  const monthlyRows = result.monthly.map(m => [
+    `${MONTH_NAMES[m.month]} ${m.year}`,
+    m.days,
+    m.dailyProduct.toFixed(2),
+    m.closingBalance.toFixed(2),
+    m.interest.toFixed(2)
+  ]);
+
+  // One row for every continuous period in which the closing balance
+  // remains unchanged. Number of days and Product are immediately before
+  // the Interest column as requested.
+  const detailRows = (result.stretches || []).map(s => [
+    fmtDate(s.fromDate),
+    fmtDate(s.toDate),
+    s.balance.toFixed(2),
+    s.days,
+    s.product.toFixed(2),
+    s.interest.toFixed(2)
+  ]);
+
+  const cellRows = rows => rows.map(r =>
+    `<tr>${r.map(c => `<td style="padding:4px 6px;border:1px solid var(--line);font-size:11.5px;white-space:nowrap;">${esc(String(c))}</td>`).join('')}</tr>`
+  ).join('');
+
   const slabSummary = (result.rateSlabs && result.rateSlabs.length)
     ? result.rateSlabs.map((s,i) => {
         if(i===0 && !Number.isFinite(s.upto)) return `Above: ${s.rate}%`;
@@ -6106,38 +6157,90 @@ function showInterestResult(result, rate){
           : `Above ₹${prev.toLocaleString('en-IN')}: ${s.rate}%`;
       }).join(' · ')
     : `${rate}% p.a.`;
+
   openModal('Interest calculation', `
     <div style="background:var(--surface-2);padding:12px;border-radius:4px;text-align:center;">
       <div style="font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;">Total interest</div>
       <div style="font-size:24px;font-weight:700;font-family:var(--font-mono);">${result.totalInterest.toFixed(2)}</div>
       <div style="font-size:11px;color:var(--ink-soft);margin-top:4px;">${esc(slabSummary)}</div>
-      <div style="font-size:24px;font-weight:700;font-family:var(--font-mono);">${result.totalInterest.toFixed(2)}</div>
     </div>
-    <div style="overflow:auto;max-height:300px;border:1px solid var(--line);border-radius:4px;">
+
+    <h4 style="margin:16px 0 7px;">Detailed daily-product calculation</h4>
+    <p class="hint" style="margin:0 0 8px;">
+      Each row represents a continuous period for which the closing balance remained the same.
+      <strong>Product = Balance × Number of days.</strong> Interest is calculated from this product
+      using the applicable rate slab and a 365-day basis.
+    </p>
+    <div style="overflow:auto;max-height:360px;border:1px solid var(--line);border-radius:4px;">
       <table style="border-collapse:collapse;width:100%;">
-        <tr><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Month</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Days</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Daily product</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Closing balance</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Interest</th></tr>
-        ${preview}
+        <tr>
+          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">From date</th>
+          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">To date</th>
+          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Balance</th>
+          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">No. of days</th>
+          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Product (Balance × Days)</th>
+          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Interest</th>
+        </tr>
+        ${cellRows(detailRows)}
       </table>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn ghost" id="intCsv" type="button">Download breakdown as CSV</button>
-      <button class="btn ghost" id="intXlsx" type="button">Download breakdown as Excel</button>
+
+    <h4 style="margin:16px 0 7px;">Monthly summary</h4>
+    <div style="overflow:auto;max-height:260px;border:1px solid var(--line);border-radius:4px;">
+      <table style="border-collapse:collapse;width:100%;">
+        <tr>
+          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Month</th>
+          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Days</th>
+          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Daily product</th>
+          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Closing balance</th>
+          <th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Interest</th>
+        </tr>
+        ${cellRows(monthlyRows)}
+      </table>
     </div>
-    <p class="hint">Interest is calculated by the daily-product method. Each day's closing balance is evaluated against the selected interest-rate slabs and only days covered by the statement are included. The daily product is the sum of all daily closing balances for the month. This is a calculation aid, not a substitute for your bank's own statement.</p>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+      <button class="btn ghost" id="intCsv" type="button">Download detailed breakdown as CSV</button>
+      <button class="btn ghost" id="intXlsx" type="button">Download detailed breakdown as Excel</button>
+    </div>
+    <p class="hint">
+      The detailed sheet shows exactly how many days each balance remained unchanged and the
+      resulting Balance × Days product. This applies to both Excel/CSV and PDF statements.
+    </p>
   `, async () => {});
+
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
+
   setTimeout(() => {
-    const allRows = [['Month','Days','Daily product','Closing balance','Interest'], ...rows, ['','','','Total', result.totalInterest.toFixed(2)]];
+    const allRows = [
+      ['DETAILED DAILY-PRODUCT CALCULATION'],
+      ['From date','To date','Balance','No. of days','Product (Balance × Days)','Interest'],
+      ...detailRows,
+      [],
+      ['MONTHLY SUMMARY'],
+      ['Month','Days','Daily product','Closing balance','Interest'],
+      ...monthlyRows,
+      [],
+      ['','','','Total interest',result.totalInterest.toFixed(2)]
+    ];
+
     document.getElementById('intCsv').addEventListener('click', () => {
-      downloadBlob(new Blob([allRows.map(r => r.map(toCsvValue).join(',')).join('\n')], {type:'text/csv'}), 'interest_breakdown.csv');
+      downloadBlob(
+        new Blob([allRows.map(r => r.map(toCsvValue).join(',')).join('\n')], {type:'text/csv'}),
+        'interest_detailed_breakdown.csv'
+      );
     });
+
     document.getElementById('intXlsx').addEventListener('click', async () => {
       await loadLib('xlsx');
       const ws = XLSX.utils.aoa_to_sheet(allRows);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Interest');
-      downloadBlob(new Blob([XLSX.write(wb, { bookType:'xlsx', type:'array' })], {type:'application/octet-stream'}), 'interest_breakdown.xlsx');
+      downloadBlob(
+        new Blob([XLSX.write(wb, {bookType:'xlsx', type:'array'})], {type:'application/octet-stream'}),
+        'interest_detailed_breakdown.xlsx'
+      );
     });
   }, 0);
 }
