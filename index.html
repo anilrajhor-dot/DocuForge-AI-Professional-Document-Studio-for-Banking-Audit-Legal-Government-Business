@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.1.5 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.1.6 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -557,7 +557,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.1.5</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.1.6</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -5415,34 +5415,68 @@ $('btnClearConversionsSettings').addEventListener('click', () => {
 function setStudio(name){
   currentStudio = name;
   document.body.setAttribute('data-active-studio', name);
-  document.body.setAttribute('data-active-studio', name);
-  document.querySelectorAll('.studio-tab').forEach(t => t.classList.toggle('active', t.dataset.studio === name));
-  document.querySelectorAll('.ribbon-panel').forEach(p => p.classList.toggle('active', p.dataset.studioPanel === name));
 
-  const integrated = (name === 'invoice' || name === 'pdftoolkit');
-  document.getElementById('ribbon').classList.toggle('dashboard-mode', name === 'dashboard');
-  document.getElementById('invoiceStudio').classList.toggle('active', name === 'invoice');
-  document.getElementById('pdftoolkitStudio').classList.toggle('active', name === 'pdftoolkit');
+  // Main menu selection.
+  document.querySelectorAll('.studio-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.studio === name);
+  });
 
-  const hasRibbonPanel = !!document.querySelector('.ribbon-panel[data-studio-panel="' + name + '"]');
-  if(name === 'dashboard' && !hasRibbonPanel){
-    document.querySelectorAll('.ribbon-panel').forEach(p => p.classList.remove('active'));
+  // The lower ribbon must ALWAYS follow the selected main menu.
+  document.querySelectorAll('.ribbon-panel').forEach(p => {
+    const active = p.dataset.studioPanel === name;
+    p.classList.toggle('active', active);
+    p.style.setProperty('display', active ? 'flex' : 'none', 'important');
+  });
+
+  const ribbon = document.getElementById('ribbon');
+  if(ribbon){
+    ribbon.classList.toggle('dashboard-mode', name === 'dashboard');
   }
 
-  $('settingsStudio').classList.toggle('active', name === 'settings');
-  $('aboutStudio').classList.toggle('active', name === 'about');
-  $('helpStudio').classList.toggle('active', name === 'help');
-  $('readerStudio').classList.toggle('active', name === 'reader');
-  $('exportStudio').style.display = name === 'export' ? 'block' : 'none';
-  $('workspaceLayout').style.display = (integrated || name === 'settings' || name === 'about' || name === 'help' || name === 'reader' || name === 'export') ? 'none' : 'flex';
+  const integrated = (name === 'invoice' || name === 'pdftoolkit');
+  const invoiceStudio = document.getElementById('invoiceStudio');
+  const pdfToolkitStudio = document.getElementById('pdftoolkitStudio');
+  if(invoiceStudio) invoiceStudio.classList.toggle('active', name === 'invoice');
+  if(pdfToolkitStudio) pdfToolkitStudio.classList.toggle('active', name === 'pdftoolkit');
+
+  const hasRibbonPanel = !!document.querySelector('.ribbon-panel[data-studio-panel="' + name + '"]');
+
+  // Dashboard/standalone pages do not need the PDF ribbon.
+  if(name === 'dashboard' || !hasRibbonPanel){
+    document.querySelectorAll('.ribbon-panel').forEach(p => {
+      p.classList.remove('active');
+      p.style.setProperty('display','none','important');
+    });
+  }
+
+  const settingsStudio = $('settingsStudio');
+  const aboutStudio = $('aboutStudio');
+  const helpStudio = $('helpStudio');
+  const readerStudio = $('readerStudio');
+  const exportStudio = $('exportStudio');
+
+  if(settingsStudio) settingsStudio.classList.toggle('active', name === 'settings');
+  if(aboutStudio) aboutStudio.classList.toggle('active', name === 'about');
+  if(helpStudio) helpStudio.classList.toggle('active', name === 'help');
+  if(readerStudio) readerStudio.classList.toggle('active', name === 'reader');
+  if(exportStudio) exportStudio.style.display = name === 'export' ? 'block' : 'none';
+
+  const workspace = $('workspaceLayout');
+  if(workspace){
+    workspace.style.display =
+      (integrated || name === 'settings' || name === 'about' || name === 'help' ||
+       name === 'reader' || name === 'export') ? 'none' : 'flex';
+  }
 
   if(integrated && typeof loadIntegratedApps === 'function') loadIntegratedApps();
 
   if(typeof setToolsEnabled === 'function'){
     const hasPdf = !!workingBytes;
-    $('noPdfBanner').style.display = (!hasPdf && name === 'pdf') ? 'block' : 'none';
+    const banner = $('noPdfBanner');
+    if(banner) banner.style.display = (!hasPdf && name === 'pdf') ? 'block' : 'none';
   }
-  updateDashboardTilesVisibility();
+
+  if(typeof updateDashboardTilesVisibility === 'function') updateDashboardTilesVisibility();
 }
 
 document.querySelectorAll('.studio-tab').forEach(t => {
@@ -6704,6 +6738,7 @@ function runDocuForgeDiagnostic(){
   return {ok: bad === 0, failed: checks.filter(x => !x[1]).map(x => x[0])};
 }
 document.addEventListener('DOMContentLoaded', () => {
+  if(typeof setStudio === 'function') setStudio(currentStudio || 'dashboard');
   document.body.setAttribute('data-active-studio', currentStudio || 'dashboard');
   const b = document.getElementById('dfRunDiagnostic');
   if(b) b.addEventListener('click', runDocuForgeDiagnostic);
