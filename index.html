@@ -444,6 +444,17 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 </style>
+
+<style id="docuforge-rectified-css">
+  .df-diagnostic{margin:18px 0 0;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+  .df-diagnostic h3{font-size:14px;margin:0 0 8px}
+  .df-diag-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:7px;margin-top:9px}
+  .df-diag-item{padding:7px 9px;border:1px solid var(--line);border-radius:4px;font-size:11.5px;background:var(--bg)}
+  .df-ok{border-left:3px solid #2f7d5b}.df-warn{border-left:3px solid var(--danger)}
+  .df-diag-btn{margin-top:10px}
+  @media(max-width:560px){.df-diag-grid{grid-template-columns:1fr}}
+</style>
+
 </head>
 <body>
 
@@ -728,6 +739,13 @@ body.dark .studio-tab.active{color:var(--pine);}
 
     <div id="helpStudio" class="studio-page" style="max-width:760px;">
       <h2>Help &amp; guidelines</h2>
+<div class="df-diagnostic">
+  <h3>Application health check</h3>
+  <p class="hint" style="margin:0;">Checks the browser capabilities and libraries required by DocuForge. If a library is blocked by a network/content filter, the affected tools can be identified here.</p>
+  <div id="dfDiagnosticGrid" class="df-diag-grid"></div>
+  <button class="btn ghost df-diag-btn" id="dfRunDiagnostic" type="button">Run check again</button>
+</div>
+
       <p>Every tool lives under a Studio tab at the top. Most PDF tools need a file open first — that's why buttons look greyed out until you do. Here's what each Studio covers:</p>
 
       <h3 style="margin-top:18px;font-size:14px;">📄 PDF Studio</h3>
@@ -6187,9 +6205,16 @@ $('btnClearAiKey').addEventListener('click', () => {
   toast('Saved AI API key cleared.');
 });
 $('btnClearAllData').addEventListener('click', () => {
-  if(confirm("Clear all saved local settings (dark mode preference, saved AI key)? This doesn't affect any PDF you're working on.")){
-    localStorage.clear();
-    toast('Local settings cleared.');
+  if(confirm("Clear DocuForge's saved local settings (theme, accessibility and saved AI provider/key)? This does not remove your PDF project snapshots or conversion history.")){
+    const appKeys = [
+      'pdfworkbench-ai-key',
+      'pdfworkbench-ai-provider',
+      'pdfworkbench-theme',
+      'pdfworkbench-high-contrast',
+      'pdfworkbench-large-text'
+    ];
+    appKeys.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
+    toast('DocuForge local settings cleared.');
   }
 });
 
@@ -6294,6 +6319,66 @@ try{
 } catch{}
 setStudio('dashboard');
 setToolsEnabled(false);
+
+/* ---------- Rectified build: dependency / capability diagnostics ---------- */
+function runDocuForgeDiagnostic(){
+  const grid = document.getElementById('dfDiagnosticGrid');
+  if(!grid) return;
+  const checks = [
+    ['PDF engine', !!window.PDFLib, 'pdf-lib'],
+    ['PDF reader', !!window.pdfjsLib, 'PDF.js'],
+    ['PDF worker', !!(window.pdfjsLib && pdfjsLib.GlobalWorkerOptions), 'PDF.js worker support'],
+    ['ZIP export', !!window.JSZip, 'JSZip'],
+    ['Drag/reorder', !!window.Sortable, 'Sortable'],
+    ['Spreadsheet tools', !!window.XLSX, 'SheetJS/XLSX'],
+    ['Charts', !!window.Chart, 'Chart.js'],
+    ['OCR', !!window.Tesseract, 'Tesseract.js'],
+    ['Image QR reader', !!window.jsQR, 'jsQR'],
+    ['DOCX import', !!window.mammoth, 'Mammoth'],
+    ['IndexedDB', 'indexedDB' in window, 'browser storage'],
+    ['File downloads', typeof Blob !== 'undefined' && typeof URL !== 'undefined', 'Blob/URL APIs']
+  ];
+  grid.innerHTML = checks.map(([label, ok, detail]) =>
+    `<div class="df-diag-item ${ok ? 'df-ok' : 'df-warn'}"><strong>${escapeXml(label)}</strong><br>${ok ? '✓ Available' : '⚠ Unavailable'} · ${escapeXml(detail)}</div>`
+  ).join('');
+  const bad = checks.filter(x => !x[1]).length;
+  if(bad){
+    toast(`${bad} browser component${bad===1?' is':'s are'} unavailable. See Help → Application health check.`, true);
+  }
+  return {ok: bad === 0, failed: checks.filter(x => !x[1]).map(x => x[0])};
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const b = document.getElementById('dfRunDiagnostic');
+  if(b) b.addEventListener('click', runDocuForgeDiagnostic);
+});
+setTimeout(() => {
+  try { runDocuForgeDiagnostic(); } catch(e) { console.warn('DocuForge diagnostic failed', e); }
+}, 1200);
+
 </script>
+<script id="docuforge-runtime-guard">
+(function(){
+  function showRuntimeError(msg){
+    try{
+      var el=document.getElementById('dfRuntimeError');
+      if(!el){
+        el=document.createElement('div');
+        el.id='dfRuntimeError';
+        el.style.cssText='position:fixed;left:12px;right:12px;bottom:48px;z-index:9999;padding:10px 12px;background:#A3341E;color:#fff;border-radius:5px;font:12px/1.45 system-ui,sans-serif;box-shadow:0 4px 18px rgba(0,0,0,.25)';
+        document.body.appendChild(el);
+      }
+      el.textContent='DocuForge encountered an unexpected error: '+msg+' — open Help → Application health check and try again.';
+    }catch(e){}
+  }
+  window.addEventListener('error',function(e){
+    if(e && e.message) showRuntimeError(e.message);
+  });
+  window.addEventListener('unhandledrejection',function(e){
+    var r=e && e.reason;
+    if(r) showRuntimeError(r.message || String(r));
+  });
+})();
+</script>
+
 </body>
 </html>
