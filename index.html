@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.1.6 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.1.8 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -557,7 +557,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.1.6</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.1.8</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -5749,61 +5749,103 @@ function parseFlexibleAmount(str){
   return isNaN(v) ? null : (negative ? -v : v);
 }
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-function computeInterestFromStatement(rows, dateIdx, balanceIdx, annualRatePct){
+function computeInterestFromStatement(rows, dateIdx, balanceIdx, annualRatePct, rateSlabs, slabMode='progressive'){
   const entries = rows.map(r => ({
     date: parseFlexibleDate(r[dateIdx]),
     balance: parseFlexibleAmount(r[balanceIdx])
   })).filter(e => e.date && e.balance !== null && !isNaN(e.date.getTime()));
 
-  // Daily-product method:
-  // Each transaction balance applies from its transaction date until the day
-  // before the next transaction. Only dates actually covered by the statement
-  // are included; the calculation never invents a balance before the first
-  // transaction or after the last transaction.
   entries.sort((a,b) => a.date-b.date);
   if(!entries.length) return {totalInterest:0,monthly:[],entries};
 
   const first=new Date(entries[0].date.getFullYear(),entries[0].date.getMonth(),entries[0].date.getDate());
   const last=new Date(entries[entries.length-1].date.getFullYear(),entries[entries.length-1].date.getMonth(),entries[entries.length-1].date.getDate());
 
-  // Keep the last balance for duplicate-date transactions, because the final
-  // posted transaction on a day is the closing balance for that day.
   const byDay=new Map();
   for(const e of entries){
     const key=`${e.date.getFullYear()}-${e.date.getMonth()}-${e.date.getDate()}`;
     byDay.set(key,e.balance);
   }
+
+  const slabs=(Array.isArray(rateSlabs)?rateSlabs:[])
+    .map(s=>({upto: Number(s.upto), rate:Number(s.rate)}))
+    .filter(s=>Number.isFinite(s.rate) && s.rate>=0 && Number.isFinite(s.upto) && s.upto>0)
+    .sort((a,b)=>a.upto-b.upto);
+
+  function interestForBalance(balance){
+    if(!Number.isFinite(balance)) return 0;
+    if(balance<=0) return 0;
+
+    // Backward-compatible single-rate calculation.
+    if(!slabs.length){
+      return balance*(Number(annualRatePct)||0)/100/365;
+    }
+
+    if(slabMode==='whole'){
+      const chosen=slabs.find(s=>balance<=s.upto) || slabs[slabs.length-1];
+      return balance*chosen.rate/100/365;
+    }
+
+    // Progressive/incremental slabs:
+    // e.g. first 100,000 at slab 1; next 200,000 at slab 2; remainder at slab 3.
+    let remaining=balance, lower=0, interest=0;
+    for(const s of slabs){
+      if(remaining<=0) break;
+      const portion=Math.max(0,Math.min(balance,s.upto)-lower);
+      if(portion>0) interest += portion*s.rate/100/365;
+      lower=s.upto;
+      remaining=balance-lower;
+    }
+    if(remaining>0){
+      const last=slabs[slabs.length-1];
+      interest += remaining*last.rate/100/365;
+    }
+    return interest;
+  }
+
   const daily=[];
   let currentBalance=null;
   for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){
     const key=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
     if(byDay.has(key)) currentBalance=byDay.get(key);
     if(currentBalance===null) continue;
-    daily.push({date:new Date(d),balance:currentBalance});
+    daily.push({date:new Date(d),balance:currentBalance,interest:interestForBalance(currentBalance)});
   }
 
   const monthlyMap=new Map();
   for(const day of daily){
-    const year=day.date.getFullYear(), month=day.date.getMonth();
-    const key=`${year}-${month}`;
+    const year=day.date.getFullYear(), month=day.date.getMonth(), key=`${year}-${month}`;
     if(!monthlyMap.has(key)) monthlyMap.set(key,{year,month,days:0,interest:0,dailyProduct:0,closingBalance:day.balance});
     const m=monthlyMap.get(key);
     m.days++;
     m.dailyProduct += day.balance;
-    m.interest += day.balance*(annualRatePct/100)/365;
+    m.interest += day.interest;
     m.closingBalance=day.balance;
   }
   const monthly=Array.from(monthlyMap.values()).sort((a,b)=>a.year-b.year || a.month-b.month);
   const totalInterest=monthly.reduce((s,m)=>s+m.interest,0);
-  return {totalInterest,monthly,entries,daily};
+  return {totalInterest,monthly,entries,daily,rateSlabs:slabs,slabMode};
 }
+
 function showInterestResult(result, rate){
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const rows = result.monthly.map(m => [`${MONTH_NAMES[m.month]} ${m.year}`, m.days, m.dailyProduct.toFixed(2), m.closingBalance.toFixed(2), m.interest.toFixed(2)]);
   const preview = rows.map(r => `<tr>${r.map(c => `<td style="padding:4px 6px;border:1px solid var(--line);font-size:11.5px;white-space:nowrap;">${esc(String(c))}</td>`).join('')}</tr>`).join('');
+  const slabSummary = (result.rateSlabs && result.rateSlabs.length)
+    ? result.rateSlabs.map((s,i) => {
+        if(i===0 && !Number.isFinite(s.upto)) return `Above: ${s.rate}%`;
+        if(i===0) return `Up to ₹${s.upto.toLocaleString('en-IN')}: ${s.rate}%`;
+        const prev=result.rateSlabs[i-1].upto;
+        return Number.isFinite(s.upto)
+          ? `₹${(prev+0.01).toLocaleString('en-IN')}–₹${s.upto.toLocaleString('en-IN')}: ${s.rate}%`
+          : `Above ₹${prev.toLocaleString('en-IN')}: ${s.rate}%`;
+      }).join(' · ')
+    : `${rate}% p.a.`;
   openModal('Interest calculation', `
     <div style="background:var(--surface-2);padding:12px;border-radius:4px;text-align:center;">
-      <div style="font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;">Total interest @ ${rate}% p.a.</div>
+      <div style="font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;">Total interest</div>
+      <div style="font-size:24px;font-weight:700;font-family:var(--font-mono);">${result.totalInterest.toFixed(2)}</div>
+      <div style="font-size:11px;color:var(--ink-soft);margin-top:4px;">${esc(slabSummary)}</div>
       <div style="font-size:24px;font-weight:700;font-family:var(--font-mono);">${result.totalInterest.toFixed(2)}</div>
     </div>
     <div style="overflow:auto;max-height:300px;border:1px solid var(--line);border-radius:4px;">
@@ -5816,7 +5858,7 @@ function showInterestResult(result, rate){
       <button class="btn ghost" id="intCsv" type="button">Download breakdown as CSV</button>
       <button class="btn ghost" id="intXlsx" type="button">Download breakdown as Excel</button>
     </div>
-    <p class="hint">Interest is calculated by the daily-product method: each day's closing balance is multiplied by the annual rate/365, and only days covered by the statement are included. The daily product is the sum of all daily closing balances for the month. This is a calculation aid, not a substitute for your bank's own statement.</p>
+    <p class="hint">Interest is calculated by the daily-product method. Each day's closing balance is evaluated against the selected interest-rate slabs and only days covered by the statement are included. The daily product is the sum of all daily closing balances for the month. This is a calculation aid, not a substitute for your bank's own statement.</p>
   `, async () => {});
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
@@ -6391,18 +6433,37 @@ $('btnInterestCalc').addEventListener('click', () => {
     <div class="field" id="intUploadField"><label>Bank statement (PDF, Excel, or CSV) — Excel rows are read from the first worksheet</label><input type="file" id="intFile" accept=".pdf,.xlsx,.xls,.csv"></div>
     <div class="field" id="intPasswordField" style="display:none;"><label>PDF password</label><div style="display:flex;gap:8px;"><input type="password" id="intPassword" style="flex:1;"><button class="btn ghost" id="intPasswordRetry" type="button">Unlock</button></div></div>
     <div id="intColumnsArea"></div>
-    <div class="field"><label>Annual interest rate (%)</label><input type="number" id="intRate" step="0.01" value="4"></div>
-    <p class="hint">Calculates interest using the daily-product method. Each transaction's closing balance applies from that date until the next transaction date; interest is balance × annual rate ÷ 365 for each covered day. No balance is assumed before the first transaction or after the last statement date.</p>
+    <div class="field">
+      <label>Interest-rate slabs <span style="font-weight:700;">(add as many slabs as required)</span></label>
+      <div id="intSlabEditor" style="display:grid;gap:8px;"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+        <button class="btn ghost" id="intAddSlab" type="button">＋ Add slab</button>
+        <button class="btn ghost" id="intRemoveSlab" type="button">− Remove last slab</button>
+      </div>
+      <p class="hint">Enter the upper limit and annual rate for each slab. The last slab can be marked <strong>Above</strong>, so there is no practical limit on the number of slabs.</p>
+    </div>
+    <div class="field">
+      <label>Slab calculation method</label>
+      <select id="intSlabMode">
+        <option value="progressive" selected>Progressive — each portion of balance gets its slab rate</option>
+        <option value="whole">Whole balance — rate determined by the slab containing the balance</option>
+      </select>
+    </div>
+    <p class="hint">The app calculates interest after the statement is uploaded. Each day's closing balance is used. You can set different rates for up to ₹1 lakh, above ₹1 lakh up to ₹3 lakh, and above ₹3 lakh. Progressive mode applies each rate only to the portion falling in that slab. Whole-balance mode applies one rate to the entire day's balance according to the slab it falls in.</p>
   `, async () => {
     const rows = window.__intRows;
     if(!rows){ toast('Choose a statement first.', true); return; }
     const dateIdx = parseInt(document.getElementById('intDateCol').value);
     const balIdx = parseInt(document.getElementById('intBalCol').value);
-    const rate = parseFloat(document.getElementById('intRate').value);
-    if(isNaN(rate)){ toast('Enter a valid interest rate.', true); return; }
+    const slabMode = document.getElementById('intSlabMode').value;
+    const rateSlabs = typeof window.__getInterestSlabs === 'function' ? window.__getInterestSlabs() : [];
+    if(!rateSlabs.length || rateSlabs.some((s,i)=>!Number.isFinite(s.rate) || s.rate<0 || (i<rateSlabs.length-1 && (!Number.isFinite(s.upto) || s.upto<=0)) || (i>0 && Number.isFinite(s.upto) && s.upto<=rateSlabs[i-1].upto))){
+      toast('Enter valid interest-rate slabs. Each upper limit must be higher than the previous slab.', true); return;
+    }
+    const firstRate=rateSlabs[0].rate;
     const headerIdx = window.__intHeaderIdx || 0;
     const body = rows.slice(headerIdx + 1);
-    const result = computeInterestFromStatement(body, dateIdx, balIdx, rate);
+    const result = computeInterestFromStatement(body, dateIdx, balIdx, firstRate, rateSlabs, slabMode);
     if(!result.monthly.length){
       const sampleDates = body.slice(0, 3).map(r => JSON.stringify(r[dateIdx])).join(', ');
       const sampleBals = body.slice(0, 3).map(r => JSON.stringify(r[balIdx])).join(', ');
@@ -6411,6 +6472,60 @@ $('btnInterestCalc').addEventListener('click', () => {
     }
     showInterestResult(result, rate);
   });
+
+  // Dynamic interest-rate slab editor: unlimited number of slabs.
+  setTimeout(() => {
+    const editor=document.getElementById('intSlabEditor');
+    const add=document.getElementById('intAddSlab');
+    const remove=document.getElementById('intRemoveSlab');
+    if(!editor || !add || !remove) return;
+
+    let slabs=[
+      {upto:100000,rate:4},
+      {upto:300000,rate:5},
+      {upto:null,rate:6}
+    ];
+
+    function renderSlabs(){
+      editor.innerHTML='';
+      slabs.forEach((s,i)=>{
+        const row=document.createElement('div');
+        row.style.cssText='display:grid;grid-template-columns:minmax(90px,1fr) minmax(90px,1fr) auto;gap:7px;align-items:end;border:1px solid var(--line);padding:8px;border-radius:7px;';
+        const label=document.createElement('div');
+        label.innerHTML=`<strong>Slab ${i+1}</strong><div class="hint" style="margin-top:3px;">${i===slabs.length-1?'Last slab / Above':'Up to'}</div>`;
+        const limit=document.createElement('label');
+        limit.innerHTML=`Up to ₹<input type="number" class="int-slab-limit" min="0" step="1" inputmode="decimal" value="${s.upto==null?'':s.upto}" ${i===slabs.length-1?'placeholder="Above previous slab"':''}>`;
+        const rate=document.createElement('label');
+        rate.innerHTML=`Rate % p.a.<input type="number" class="int-slab-rate" min="0" step="0.01" inputmode="decimal" value="${s.rate}">`;
+        row.append(label,limit,rate);
+        editor.appendChild(row);
+      });
+      editor.querySelectorAll('.int-slab-limit').forEach((el,i)=>{
+        el.addEventListener('input',()=>slabs[i].upto=el.value===''?null:Number(el.value));
+      });
+      editor.querySelectorAll('.int-slab-rate').forEach((el,i)=>{
+        el.addEventListener('input',()=>slabs[i].rate=Number(el.value));
+      });
+    }
+    window.__getInterestSlabs=()=>slabs.map(s=>({upto:s.upto===null?Infinity:Number(s.upto),rate:Number(s.rate)}));
+    add.addEventListener('click',()=>{
+      const last=slabs[slabs.length-1];
+      const prior=last.upto==null ? (slabs.length>1 ? slabs[slabs.length-2].upto : 100000) : last.upto;
+      // Turn the current unlimited last slab into a bounded slab and add a new
+      // unlimited last slab.
+      if(last.upto==null) last.upto=Math.max(Number(prior)||0,0)+100000;
+      slabs.push({upto:null,rate:last.rate});
+      renderSlabs();
+    });
+    remove.addEventListener('click',()=>{
+      if(slabs.length<=1){toast('At least one interest-rate slab is required.',true);return;}
+      slabs.pop();
+      if(slabs.length===1) slabs[0].upto=null;
+      renderSlabs();
+    });
+    renderSlabs();
+  },0);
+
   setTimeout(() => {
     async function parseXlsxBankStatementNative(buf){
       if(!window.JSZip) throw new Error('XLSX reader unavailable.');
