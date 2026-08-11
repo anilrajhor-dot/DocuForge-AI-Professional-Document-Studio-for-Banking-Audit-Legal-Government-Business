@@ -658,7 +658,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.2.32</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.2.33</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -1218,7 +1218,7 @@ function downloadBlob(blob, filename){
       <button type="button" class="icon-btn" id="convertedCloseBtn" aria-label="Close">✕</button>`;
     document.body.appendChild(bar);
 
-    bar.querySelector('#convertedViewBtn').onclick=()=>{
+    bar.querySelector('#convertedViewBtn').onclick=async()=>{
       const blob=window.__lastConvertedBlob;
       const name=window.__lastConvertedFilename||'converted-file';
       if(!blob) return;
@@ -1273,11 +1273,86 @@ function downloadBlob(blob, filename){
         img.src=url; img.style.cssText='max-width:100%;max-height:100%;object-fit:contain;margin:auto;';
         body.appendChild(img);
       }else{
-        const card=document.createElement('div');
-        card.style.cssText='margin:auto;background:#fff;border-radius:12px;padding:24px;max-width:420px;text-align:center;';
-        const safeName=String(name).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-        card.innerHTML=`<h3 style="margin-top:0">File ready</h3><p>${safeName}</p><p>This file format cannot be previewed directly in this browser. Use <b>Save</b> or <b>Share</b>.</p>`;
-        body.appendChild(card);
+        const ext=(String(name).split('.').pop()||'').toLowerCase();
+
+        // DOCX: render the actual Word document inside the app using the
+        // Mammoth library already bundled as a lazy dependency. This avoids
+        // sending the user to GitHub/another tab and gives a useful preview
+        // before Save/Share.
+        if(ext==='docx'){
+          const loading=document.createElement('div');
+          loading.style.cssText='margin:auto;background:#fff;border-radius:12px;padding:24px;max-width:420px;text-align:center;';
+          loading.innerHTML='<h3 style="margin-top:0">Preparing Word preview…</h3><p>Please wait.</p>';
+          body.appendChild(loading);
+          modal.style.display='flex';
+          try{
+            await loadLib('mammoth');
+            const result=await mammoth.convertToHtml(
+              {arrayBuffer:await blob.arrayBuffer()},
+              {
+                convertImage:mammoth.images.imgElement(function(image){
+                  return image.read("base64").then(function(imageBuffer){
+                    return {src:"data:"+image.contentType+";base64,"+imageBuffer};
+                  });
+                })
+              }
+            );
+            body.innerHTML='';
+            const paper=document.createElement('div');
+            paper.style.cssText='background:#fff;color:#111;box-sizing:border-box;width:min(900px,96%);height:100%;overflow:auto;padding:28px 34px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.55;box-shadow:0 2px 12px rgba(0,0,0,.25);';
+            paper.innerHTML=result.value || '<p><em>The Word document contains no previewable text.</em></p>';
+            paper.querySelectorAll('img').forEach(img=>{
+              img.style.maxWidth='100%';
+              img.style.height='auto';
+            });
+            body.appendChild(paper);
+          }catch(err){
+            console.error('DOCX preview failed',err);
+            body.innerHTML='';
+            const card=document.createElement('div');
+            card.style.cssText='margin:auto;background:#fff;border-radius:12px;padding:24px;max-width:460px;text-align:center;';
+            card.innerHTML='<h3 style="margin-top:0">Word preview unavailable</h3><p>The DOCX could not be previewed in this browser. The original file is still intact.</p>';
+            body.appendChild(card);
+          }
+        // XLS/XLSX: render the first worksheet as a readable table.
+        }else if(ext==='xlsx'||ext==='xls'||ext==='csv'){
+          const loading=document.createElement('div');
+          loading.style.cssText='margin:auto;background:#fff;border-radius:12px;padding:24px;max-width:420px;text-align:center;';
+          loading.innerHTML='<h3 style="margin-top:0">Preparing spreadsheet preview…</h3><p>Please wait.</p>';
+          body.appendChild(loading);
+          modal.style.display='flex';
+          try{
+            await loadLib('xlsx');
+            const wb=XLSX.read(await blob.arrayBuffer(),{type:'array',cellDates:true});
+            body.innerHTML='';
+            const wrap=document.createElement('div');
+            wrap.style.cssText='background:#fff;color:#111;width:96%;height:100%;overflow:auto;padding:18px;box-sizing:border-box;';
+            const title=document.createElement('h3');
+            title.textContent=wb.SheetNames[0]||'Worksheet';
+            title.style.margin='0 0 12px';
+            wrap.appendChild(title);
+            const table=XLSX.utils.sheet_to_html(wb.Sheets[wb.SheetNames[0]],{header:'',editable:false});
+            const holder=document.createElement('div');
+            holder.innerHTML=table;
+            holder.querySelectorAll('table').forEach(t=>{
+              t.style.cssText='border-collapse:collapse;width:max-content;min-width:100%;font-family:Arial,sans-serif;font-size:14px;';
+            });
+            holder.querySelectorAll('td,th').forEach(c=>{
+              c.style.cssText='border:1px solid #ccc;padding:6px 8px;white-space:nowrap;';
+            });
+            wrap.appendChild(holder);
+            body.appendChild(wrap);
+          }catch(err){
+            console.error('Spreadsheet preview failed',err);
+            body.innerHTML='<div style="margin:auto;background:#fff;border-radius:12px;padding:24px;text-align:center;"><h3>Spreadsheet preview unavailable</h3><p>Use Save or Share to open the original file.</p></div>';
+          }
+        }else{
+          const card=document.createElement('div');
+          card.style.cssText='margin:auto;background:#fff;border-radius:12px;padding:24px;max-width:420px;text-align:center;';
+          const safeName=String(name).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+          card.innerHTML=`<h3 style="margin-top:0">File ready</h3><p>${safeName}</p><p>This file format cannot be previewed directly in this browser. Use <b>Save</b> or <b>Share</b>.</p>`;
+          body.appendChild(card);
+        }
       }
       modal.style.display='flex';
     };
