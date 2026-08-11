@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.0.5 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.0.7 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -513,13 +513,25 @@ body.dark .studio-tab.active{color:var(--pine);}
 #developerCredit strong{font-weight:800}
 </style>
 
+
+<style id="v107-financial-nav">
+  /* Financial Calculator is accessed from Dashboard and its own Studio,
+     but is not shown as a global tab while other Studios are active. */
+  body[data-active-studio]:not([data-active-studio="dashboard"]):not([data-active-studio="interest"])
+    .studio-tab[data-studio="interest"]{display:none!important}
+  .studio-tab[data-studio="interest"]{font-weight:800}
+</style>
+
 </head>
 <body>
 
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.0.5</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.0.7</span></h1>
+    <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
+      Developed by Anil Sharma · Former General Manager, Central Bank of India
+    </div>
     <p class="tagline">Create &bull; Convert &bull; Translate &bull; Extract &bull; Protect &mdash; all your documents, one toolkit. Everything runs in your browser; your files are never uploaded anywhere.</p>
     <button class="btn-launch" id="btnLaunchEditor" type="button">Launch Editor →</button>
   </div>
@@ -1193,7 +1205,7 @@ function fmtBytes(n){
 }
 const PDF_REQUIRED_IDS = ['btnInsert','btnDuplicateSel','btnRotateSel','btnReverse','btnDeleteSel','btnCrop','btnRemoveBlank','btnExtract','btnSplit',
    'btnWatermark','btnPageNum','btnBates','btnHeaderFooter','btnFillForm','btnFlattenForm','btnSign','btnEncrypt','btnRedact',
-   'btnCompress','btnMetadata','btnUndo','btnRedo','btnReset','btnOcrPdf',
+   'btnCompress','btnMetadata','btnOcrPdf',
    'btnPdfToWord','btnPdfToPptx','btnPdfToExcel','btnPdfToCsv','btnPdfToText','btnPdfToHtml','btnPdfToJson','btnPdfToImages',
    'btnPdfToXml','btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds','btnPdfToOdp','btnPdfToEpub',
    'btnTranslatePdf','btnAnalyze','btnDupPages','btnChatPdf'];
@@ -1213,19 +1225,6 @@ function setToolsEnabled(on){
 
   updateDashboardTilesVisibility();
 }
-// Buttons stay tappable at all times (never visually disabled) so every menu
-// always looks and feels active. This guard runs before the button's own
-// handler and, only if no PDF is loaded yet, redirects the tap into opening
-// one instead of letting a tool run with nothing to work on.
-document.addEventListener('click', (e) => {
-  const btn = e.target.closest('.tool-btn');
-  if(!btn || !PDF_REQUIRED_IDS.includes(btn.id)) return;
-  if(workingBytes) return;
-  e.preventDefault();
-  e.stopImmediatePropagation();
-  toast('Opening a PDF first — this tool needs one loaded.');
-  $('fileInput').click();
-}, true);
 
 /* ---------- History ---------- */
 let currentProjectId = null;
@@ -5411,6 +5410,7 @@ $('btnClearConversionsSettings').addEventListener('click', () => {
 });
 function setStudio(name){
   currentStudio = name;
+  document.body.setAttribute('data-active-studio', name);
   document.querySelectorAll('.studio-tab').forEach(t => t.classList.toggle('active', t.dataset.studio === name));
   document.querySelectorAll('.ribbon-panel').forEach(p => p.classList.toggle('active', p.dataset.studioPanel === name));
 
@@ -6646,18 +6646,13 @@ function runDocuForgeDiagnostic(){
     `<div class="df-diag-item ${ok ? 'df-ok' : 'df-warn'}"><strong>${escapeXml(label)}</strong><br>${ok ? '✓ Available' : '⚠ Unavailable'} · ${escapeXml(detail)}</div>`
   ).join('');
   const bad = checks.filter(x => !x[1]).length;
-  if(bad){
-    toast(`${bad} browser component${bad===1?' is':'s are'} unavailable. See Help → Application health check.`, true);
-  }
   return {ok: bad === 0, failed: checks.filter(x => !x[1]).map(x => x[0])};
 }
 document.addEventListener('DOMContentLoaded', () => {
+  document.body.setAttribute('data-active-studio', currentStudio || 'dashboard');
   const b = document.getElementById('dfRunDiagnostic');
   if(b) b.addEventListener('click', runDocuForgeDiagnostic);
 });
-setTimeout(() => {
-  try { runDocuForgeDiagnostic(); } catch(e) { console.warn('DocuForge diagnostic failed', e); }
-}, 1200);
 
 </script>
 <div id="developerCredit" style="text-align:center;padding:10px 12px 14px;font-size:11px;color:var(--muted);">
