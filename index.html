@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI <span class="app-version">v1.0.4</span> — Intelligent Document Studio</title>
+<title>DocuForge AI v1.0.5 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -499,17 +499,27 @@ body.dark .studio-tab.active{color:var(--pine);}
 .fc-tab{font-weight:700}.fc-tab.primary{background:var(--accent);color:var(--accent-ink)}
 #modalBody .totals-card{margin-top:10px}
 </style>
-<style id="v104-branding">
-.app-version{display:inline-block;margin-left:7px;padding:3px 7px;border:1px solid currentColor;border-radius:10px;font:700 10px/1 system-ui,sans-serif;vertical-align:middle;opacity:.9}
-.df-file-choice{border-color:var(--accent)!important;font-weight:700!important}
+<style id="v105-branding">
+.app-version{
+  display:inline-block;
+  margin-left:8px;
+  padding:4px 8px;
+  border:1px solid currentColor;
+  border-radius:12px;
+  font:700 10px/1 system-ui,sans-serif;
+  vertical-align:middle;
+  opacity:.9;
+}
+#developerCredit strong{font-weight:800}
 </style>
+
 </head>
 <body>
 
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI</h1>
+    <h1>DocuForge AI <span class="app-version">v1.0.5</span></h1>
     <p class="tagline">Create &bull; Convert &bull; Translate &bull; Extract &bull; Protect &mdash; all your documents, one toolkit. Everything runs in your browser; your files are never uploaded anywhere.</p>
     <button class="btn-launch" id="btnLaunchEditor" type="button">Launch Editor →</button>
   </div>
@@ -583,8 +593,7 @@ body.dark .studio-tab.active{color:var(--pine);}
       <div class="ribbon-quick">
 <button class="tool-btn" id="btnUndo">Undo <kbd>Ctrl Z</kbd></button>
 <button class="tool-btn" id="btnRedo">Redo <kbd>Ctrl Y</kbd></button>
-<button class="tool-btn danger" id="btnReset">Reset project</button><input id="undoResetFilePicker" type="file" accept="application/pdf,image/*" capture="environment" style="display:none">
-<button class="tool-btn df-file-choice" id="btnUndoResetChoose" type="button" title="Choose PDF/photo or use camera">📷 Camera / File</button>
+<button class="tool-btn danger" id="btnReset">Reset project</button>
 <button class="tool-btn df-finance-quick" id="btnFinancialCalculatorQuick" title="Open Financial Calculator">
   <span style="font-size:18px;line-height:1;">🧮</span> Financial Calculator
 </button>
@@ -6651,91 +6660,8 @@ setTimeout(() => {
 }, 1200);
 
 </script>
-<script id="docuforge-runtime-guard">
-(function(){
-  function showRuntimeError(msg){
-    try{
-      var el=document.getElementById('dfRuntimeError');
-      if(!el){
-        el=document.createElement('div');
-        el.id='dfRuntimeError';
-        el.style.cssText='position:fixed;left:12px;right:12px;bottom:48px;z-index:9999;padding:10px 12px;background:#A3341E;color:#fff;border-radius:5px;font:12px/1.45 system-ui,sans-serif;box-shadow:0 4px 18px rgba(0,0,0,.25)';
-        document.body.appendChild(el);
-      }
-      el.textContent='DocuForge encountered an unexpected error: '+msg+' — open Help → Application health check and try again.';
-    }catch(e){}
-  }
-  window.addEventListener('error',function(e){
-    if(e && e.message) showRuntimeError(e.message);
-  });
-  window.addEventListener('unhandledrejection',function(e){
-    var r=e && e.reason;
-    if(r) showRuntimeError(r.message || String(r));
-  });
-})();
-</script>
-
 <div id="developerCredit" style="text-align:center;padding:10px 12px 14px;font-size:11px;color:var(--muted);">
 Developed by <strong>Anil Sharma</strong> · Former General Manager, Central Bank of India
 </div>
-<div id="undoResetFileOverlay" style="display:none;position:fixed;inset:0;z-index:10050;background:rgba(0,0,0,.48);align-items:flex-end;justify-content:center">
-<div style="width:min(520px,100%);background:var(--surface);padding:18px;border-radius:18px 18px 0 0">
-<h3>Open a document</h3><p class="hint">Choose a PDF/photo or use the camera on supported mobile browsers.</p>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-<button id="dfCameraChoice" type="button">📷 Camera / Photo</button>
-<button id="dfFileChoice" type="button">📁 Choose File</button>
-</div>
-<button id="dfCancelChoice" type="button" style="width:100%;margin-top:10px">Cancel</button>
-</div></div>
-<script id="v104-undo-reset-file-picker">
-(function(){
-  function q(id){return document.getElementById(id);}
-  function show(){
-    var x=q('undoResetFileOverlay');
-    if(x)x.style.display='flex';
-  }
-  function hide(){
-    var x=q('undoResetFileOverlay');
-    if(x)x.style.display='none';
-  }
-  function pick(camera){
-    var x=q('undoResetFilePicker');
-    if(!x)return;
-    if(camera)x.setAttribute('capture','environment');
-    else x.removeAttribute('capture');
-    x.click();
-    hide();
-  }
-  document.addEventListener('DOMContentLoaded',function(){
-    var undo=q('btnUndo'), reset=q('btnReset'), quick=q('btnUndoResetChoose');
-    var cam=q('dfCameraChoice'), file=q('dfFileChoice'), cancel=q('dfCancelChoice');
-    if(quick)quick.addEventListener('click',show);
-    if(cam)cam.addEventListener('click',function(){pick(true);});
-    if(file)file.addEventListener('click',function(){pick(false);});
-    if(cancel)cancel.addEventListener('click',hide);
-
-    [undo,reset].forEach(function(btn){
-      if(btn)btn.addEventListener('click',function(){setTimeout(show,120);});
-    });
-
-    var input=q('undoResetFilePicker');
-    if(input)input.addEventListener('change',function(){
-      var selected=this.files && this.files[0];
-      if(!selected)return;
-      var main=document.querySelector('input[type="file"][accept*="pdf"]');
-      if(main){
-        try{
-          var dt=new DataTransfer();
-          dt.items.add(selected);
-          main.files=dt.files;
-          main.dispatchEvent(new Event('change',{bubbles:true}));
-          return;
-        }catch(e){}
-      }
-      if(typeof toast==='function')toast('File selected. Use Open / Merge PDFs to load it.');
-    });
-  });
-})();
-</script>
 </body>
 </html>
