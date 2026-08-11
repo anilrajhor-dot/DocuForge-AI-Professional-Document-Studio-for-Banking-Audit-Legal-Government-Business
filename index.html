@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.2.5 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.2.6 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -571,6 +571,59 @@ body.dark .studio-tab.active{color:var(--pine);}
   @media(max-width:700px){
     .merged-app-frame{height:calc(100vh - 100px);min-height:760px;}
   }
+
+  /* v1.2.6: merged studios are exclusive views. */
+  #appView > .merged-app-studio{
+    display:none !important;
+    position:relative;
+    width:100%;
+    height:calc(100vh - 105px);
+    min-height:720px;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    z-index:20;
+  }
+  #appView > .merged-app-studio.active{
+    display:block !important;
+  }
+  #appView > .merged-app-studio .merged-app-frame{
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:720px;
+    border:0;
+    margin:0;
+    padding:0;
+    background:#fff;
+  }
+  body[data-active-studio="instantdash"] #workspaceLayout,
+  body[data-active-studio="stampit"] #workspaceLayout,
+  body[data-active-studio="instantdash"] #ribbon,
+  body[data-active-studio="stampit"] #ribbon,
+  body[data-active-studio="instantdash"] #noPdfBanner,
+  body[data-active-studio="stampit"] #noPdfBanner{
+    display:none !important;
+  }
+  body[data-active-studio="interest"] #workspaceLayout{
+    display:flex !important;
+  }
+  body[data-active-studio="interest"] #ribbon{
+    display:block !important;
+  }
+  @media(max-width:700px){
+    #appView > .merged-app-studio{
+      height:calc(100vh - 95px);
+      min-height:680px;
+    }
+    #appView > .merged-app-studio .merged-app-frame{
+      min-height:680px;
+    }
+  }
+
+  #studioTabs{overflow-x:auto !important; overflow-y:hidden !important; flex-wrap:nowrap !important; -webkit-overflow-scrolling:touch; scrollbar-width:thin;}
+  #studioTabs .studio-tab{flex:0 0 auto !important; white-space:nowrap !important;}
+  #studioTabs .financial-tab{order:2 !important;}
 </style>
 
 <style id="v122-mobile-navigation-fix">
@@ -602,7 +655,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.2.5</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.2.6</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -5547,7 +5600,30 @@ function setStudio(name){
     t.classList.toggle('active', t.dataset.studio === name);
   });
 
-  // The lower ribbon must ALWAYS follow the selected main menu.
+  const isMerged = name === 'instantdash' || name === 'stampit';
+  const integrated = name === 'invoice' || name === 'pdftoolkit' || isMerged;
+  const isInterest = name === 'interest';
+
+  // Hide every merged-app/standalone studio first; then show exactly one.
+  document.querySelectorAll('.merged-app-studio').forEach(el => {
+    el.classList.remove('active');
+    el.style.setProperty('display','none','important');
+  });
+  const selectedMerged = document.getElementById(
+    name === 'instantdash' ? 'instantdashStudio' :
+    name === 'stampit' ? 'stampitStudio' : ''
+  );
+  if(selectedMerged){
+    selectedMerged.classList.add('active');
+    selectedMerged.style.setProperty('display','block','important');
+  }
+
+  const invoiceStudio = document.getElementById('invoiceStudio');
+  const pdfToolkitStudio = document.getElementById('pdftoolkitStudio');
+  if(invoiceStudio) invoiceStudio.classList.toggle('active', name === 'invoice');
+  if(pdfToolkitStudio) pdfToolkitStudio.classList.toggle('active', name === 'pdftoolkit');
+
+  // The lower ribbon ALWAYS follows the selected main menu.
   document.querySelectorAll('.ribbon-panel').forEach(p => {
     const active = p.dataset.studioPanel === name;
     p.classList.toggle('active', active);
@@ -5557,27 +5633,20 @@ function setStudio(name){
   const ribbon = document.getElementById('ribbon');
   if(ribbon){
     ribbon.classList.toggle('dashboard-mode', name === 'dashboard');
+    ribbon.style.setProperty('display', isMerged ? 'none' : 'block', 'important');
   }
 
-  const integrated = (name === 'invoice' || name === 'pdftoolkit' || name === 'instantdash' || name === 'stampit');
-  const invoiceStudio = document.getElementById('invoiceStudio');
-  const pdfToolkitStudio = document.getElementById('pdftoolkitStudio');
-  const instantdashStudio = document.getElementById('instantdashStudio');
-  const stampitStudio = document.getElementById('stampitStudio');
-  if(invoiceStudio) invoiceStudio.classList.toggle('active', name === 'invoice');
-  if(pdfToolkitStudio) pdfToolkitStudio.classList.toggle('active', name === 'pdftoolkit');
-  if(instantdashStudio) instantdashStudio.classList.toggle('active', name === 'instantdash');
-  if(stampitStudio) stampitStudio.classList.toggle('active', name === 'stampit');
-  if(typeof mountMergedStudios === 'function') mountMergedStudios(name);
+  // Dashboard quick tools are hidden outside the normal workspace.
+  const workspace = $('workspaceLayout');
+  if(workspace){
+    const hideWorkspace = isMerged || name === 'settings' || name === 'about' ||
+      name === 'help' || name === 'reader' || name === 'export';
+    workspace.style.setProperty('display', hideWorkspace ? 'none' : 'flex', 'important');
+  }
 
-  const hasRibbonPanel = !!document.querySelector('.ribbon-panel[data-studio-panel="' + name + '"]');
-
-  // Dashboard/standalone pages do not need the PDF ribbon.
-  if(name === 'dashboard' || (!hasRibbonPanel && !integrated)){
-    document.querySelectorAll('.ribbon-panel').forEach(p => {
-      p.classList.remove('active');
-      p.style.setProperty('display','none','important');
-    });
+  const noPdfBanner = $('noPdfBanner');
+  if(noPdfBanner){
+    noPdfBanner.style.display = (!workingBytes && name === 'pdf') ? 'block' : 'none';
   }
 
   const settingsStudio = $('settingsStudio');
@@ -5585,44 +5654,43 @@ function setStudio(name){
   const helpStudio = $('helpStudio');
   const readerStudio = $('readerStudio');
   const exportStudio = $('exportStudio');
-
   if(settingsStudio) settingsStudio.classList.toggle('active', name === 'settings');
   if(aboutStudio) aboutStudio.classList.toggle('active', name === 'about');
   if(helpStudio) helpStudio.classList.toggle('active', name === 'help');
   if(readerStudio) readerStudio.classList.toggle('active', name === 'reader');
   if(exportStudio) exportStudio.style.display = name === 'export' ? 'block' : 'none';
 
-  const workspace = $('workspaceLayout');
-  if(workspace){
-    workspace.style.display =
-      (integrated || name === 'settings' || name === 'about' || name === 'help' ||
-       name === 'reader' || name === 'export') ? 'none' : 'flex';
+  // Mount merged iframe only when it is actually selected.
+  if(isMerged && typeof mountMergedStudios === 'function'){
+    mountMergedStudios(name);
   }
-  document.querySelectorAll('.merged-app-studio').forEach(el=>{
-    el.classList.toggle('active', el.id === (name === 'instantdash' ? 'instantdashStudio' : name === 'stampit' ? 'stampitStudio' : ''));
-  });
 
-  if(integrated && typeof loadIntegratedApps === 'function') loadIntegratedApps();
+  if((name === 'invoice' || name === 'pdftoolkit') && typeof loadIntegratedApps === 'function'){
+    loadIntegratedApps();
+  }
 
   if(typeof setToolsEnabled === 'function'){
-    const hasPdf = !!workingBytes;
-    const banner = $('noPdfBanner');
-    if(banner) banner.style.display = (!hasPdf && name === 'pdf') ? 'block' : 'none';
+    setToolsEnabled(!!workingBytes);
   }
 
-  if(typeof updateDashboardTilesVisibility === 'function') updateDashboardTilesVisibility();
+  if(typeof updateDashboardTilesVisibility === 'function'){
+    updateDashboardTilesVisibility();
+  }
+
+  // Financial Calculator is a real main studio: make sure its ribbon is visible
+  // and bring the calculator controls into view on mobile.
+  if(isInterest){
+    const interestPanel=document.querySelector('.ribbon-panel[data-studio-panel="interest"]');
+    if(interestPanel) setTimeout(()=>interestPanel.scrollIntoView({block:'nearest',behavior:'smooth'}),0);
+  }
 }
 
 document.querySelectorAll('.studio-tab').forEach(t => {
-  const activate = (e) => {
+  t.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
     setStudio(t.dataset.studio);
-  };
-  t.addEventListener('click', activate);
-  t.addEventListener('pointerup', (e) => {
-    if(e.pointerType === 'touch') activate(e);
-  });
+  }, {passive:false});
 });
 const financialStudioTab = document.querySelector('.studio-tab[data-studio="interest"]');
 if(financialStudioTab){
