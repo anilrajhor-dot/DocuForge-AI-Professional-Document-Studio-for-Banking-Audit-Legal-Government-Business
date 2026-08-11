@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.2.13 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.2.14 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -650,7 +650,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.2.13</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.2.14</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -6702,10 +6702,7 @@ on('btnInterestCalc', 'click', () => {
   `, async () => {
     const rows = window.__intRows;
     if(!rows){ toast('Choose a statement first.', true); return; }
-    const postDateIdx = parseInt(document.getElementById('intDateCol').value);
-    const valueDateEl = document.getElementById('intValueDateCol');
-    const selectedValueDateIdx = valueDateEl ? parseInt(valueDateEl.value) : -1;
-    const dateIdx = selectedValueDateIdx >= 0 ? selectedValueDateIdx : postDateIdx;
+    const dateIdx = parseInt(document.getElementById('intDateCol').value);
     const balIdx = parseInt(document.getElementById('intBalCol').value);
     const slabMode = document.getElementById('intSlabMode').value;
     const rateSlabs = typeof window.__getInterestSlabs === 'function' ? window.__getInterestSlabs() : [];
@@ -6719,11 +6716,11 @@ on('btnInterestCalc', 'click', () => {
     if(!result.monthly.length){
       const sampleDates = body.slice(0, 3).map(r => JSON.stringify(r[dateIdx])).join(', ');
       const sampleBals = body.slice(0, 3).map(r => JSON.stringify(r[balIdx])).join(', ');
-      toast(`Could not compute — no rows had both a valid interest date and balance. Raw dates seen: ${sampleDates}. Raw balances seen: ${sampleBals}. Check Post Date, Value Date and Balance columns.`, true);
+      toast(`Could not compute — no rows had both a valid date and balance. Raw dates seen: ${sampleDates}. Raw balances seen: ${sampleBals}. Check the Date and Balance dropdowns.`, true);
       return;
     }
     showInterestResult(result, firstRate);
-    toast(`Interest calculated using ${selectedValueDateIdx >= 0 ? 'Value Date' : 'Post / Transaction Date'} and Balance.`, false);
+    toast('Interest calculated using the selected Date and Balance columns on a daily-product basis.', false);
   });
   $('modalConfirm').textContent = 'Calculate Interest';
 
@@ -6865,15 +6862,15 @@ on('btnInterestCalc', 'click', () => {
       const isPdf = !!window.__intPdfBuf;
 
       const dateScore = h => {
-        const s=String(h ?? '').toLowerCase();
+        const s=String(h ?? '').toLowerCase().trim();
         if(/account|a\/c|reference|ref|cheque|chq|mobile|phone|code|number|no\b/.test(s)) return -10;
-        if(/value\s*date|transaction\s*date|txn\s*date|trans\s*date|post\s*date|date/.test(s)) return 100;
+        if(/transaction\s*date|txn\s*date|trans\s*date|post\s*date|value\s*date|date/.test(s)) return 100;
         return 0;
       };
       const balanceScore = h => {
-        const s=String(h ?? '').toLowerCase();
+        const s=String(h ?? '').toLowerCase().trim();
         if(/closing\s*balance|available\s*balance|running\s*balance|current\s*balance/.test(s)) return 120;
-        if(/balance/.test(s)) return 100;
+        if(/^balance$|balance/.test(s)) return 100;
         return 0;
       };
 
@@ -6886,27 +6883,18 @@ on('btnInterestCalc', 'click', () => {
 
       document.getElementById('intColumnsArea').innerHTML = `
         <div class="field"><label>Header row <span style="font-weight:700;">(auto-detected)</span> — change only if needed</label><input type="number" id="intHeaderRow" min="1" max="${rows.length}" value="${headerIdx + 1}" inputmode="numeric"><p class="hint">The app has automatically selected row ${headerIdx + 1}. If your bank statement has headings on another row, enter that row number here and the columns will refresh automatically.</p></div>
-        ${isPdf ? `<div class="field"><label>Column sensitivity (increase if columns look merged together, like "Post Date Value" instead of separate "Post Date" and "Value")</label><div style="display:flex;gap:8px;"><input type="number" id="intGapThreshold" min="1" max="40" value="${window.__intGapThreshold || 9}" style="flex:1;"><button class="btn ghost" id="intReparse" type="button">Re-read PDF</button></div></div>` : ''}
+        ${isPdf ? `<div class="field"><label>Column sensitivity (increase if PDF columns appear merged)</label><div style="display:flex;gap:8px;"><input type="number" id="intGapThreshold" min="1" max="40" value="${window.__intGapThreshold || 9}" style="flex:1;"><button class="btn ghost" id="intReparse" type="button">Re-read PDF</button></div></div>` : ''}
         <div class="field row">
           <div>
-            <label>Post / Transaction Date</label>
+            <label>Date column</label>
             <select id="intDateCol">${headers.map((h,i) => `<option value="${i}" ${i===bestDateIdx?'selected':''}>${escapeXml(String(h))}</option>`).join('')}</select>
           </div>
-          <div>
-            <label>Value Date <span class="hint-inline">(used for interest when available)</span></label>
-            <select id="intValueDateCol">
-              <option value="-1">Same as Post / Transaction Date</option>
-              ${headers.map((h,i) => `<option value="${i}" ${/value\s*date/i.test(String(h)) ? 'selected' : ''}>${escapeXml(String(h))}</option>`).join('')}
-            </select>
-          </div>
-        </div>
-        <div class="field row">
           <div>
             <label>Balance column</label>
             <select id="intBalCol">${headers.map((h,i) => `<option value="${i}" ${i===bestBalIdx?'selected':''}>${escapeXml(String(h))}</option>`).join('')}</select>
           </div>
         </div>
-        <p class="hint">For bank statements containing both <strong>Post Date</strong> and <strong>Value Date</strong>, the Value Date is used for interest calculation by default. Both dates remain available for verification.</p>
+        <p class="hint">Select the same Date and Balance columns you would select for an Excel statement. The calculation uses the selected Date column and the daily closing balance.</p>
       `;
       document.getElementById('intHeaderRow').addEventListener('change', (e) => {
         const newIdx = Math.max(0, (parseInt(e.target.value) || 1) - 1);
@@ -7057,13 +7045,8 @@ on('btnInterestCalc', 'click', () => {
         }
 
         populateColumnPickers(rows2);
-        // Password-protected statements use the same Date + Value Date + Balance
-        // calculation flow as normal PDFs. Prefer Value Date automatically.
-        const valueDateSelect = document.getElementById('intValueDateCol');
-        if(valueDateSelect){
-          const valueOption = Array.from(valueDateSelect.options).find(o => /value\s*date/i.test(o.textContent || ''));
-          if(valueOption) valueDateSelect.value = valueOption.value;
-        }
+        // Password-protected PDFs use exactly the same Date + Balance dropdowns
+        // as Excel statements. No separate PDF-only column selection is used.
         document.getElementById('intPasswordField').style.display = 'none';
         toast('Password accepted. PDF uploaded and statement rows loaded.');
       } catch(err2){
