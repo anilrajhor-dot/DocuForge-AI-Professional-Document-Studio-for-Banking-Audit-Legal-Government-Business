@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.0.9 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.1.0 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -533,13 +533,24 @@ body.dark .studio-tab.active{color:var(--pine);}
   }
 </style>
 
+
+<style id="v110-ui-context">
+  /* Undo/Redo/Reset belong only to PDF Studio. */
+  body[data-active-studio]:not([data-active-studio="pdf"]) #ribbon .ribbon-quick{
+    display:none!important;
+  }
+  body[data-active-studio="pdf"] #ribbon .ribbon-quick{
+    display:flex;
+  }
+</style>
+
 </head>
 <body>
 
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.0.9</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.1.0</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -617,9 +628,6 @@ body.dark .studio-tab.active{color:var(--pine);}
 <button class="tool-btn" id="btnUndo">Undo <kbd>Ctrl Z</kbd></button>
 <button class="tool-btn" id="btnRedo">Redo <kbd>Ctrl Y</kbd></button>
 <button class="tool-btn danger" id="btnReset">Reset project</button>
-<button class="tool-btn df-finance-quick" id="btnFinancialCalculatorQuick" title="Open Financial Calculator">
-  <span style="font-size:18px;line-height:1;">🧮</span> Financial Calculator
-</button>
 </div>
       <div class="ribbon-panel active" data-studio-panel="pdf">
 <div class="tool-group">
@@ -1296,13 +1304,35 @@ async function rebuildProtectedPdfWithPdfJs(file, password){
   return out.save();
 }
 async function openProtectedPdf(file){
-  for(let attempt=1;attempt<=3;attempt++){
-    const password=prompt(`This PDF is password-protected. Enter the PDF password (attempt ${attempt} of 3):`);
-    if(password===null) return null;
-    try{ toast('Unlocking protected PDF…'); return await rebuildProtectedPdfWithPdfJs(file,password); }
-    catch(e){ if(attempt===3) throw new Error('The PDF password was incorrect or the protected PDF could not be read.'); }
-  }
-  return null;
+  return await new Promise((resolve) => {
+    openModal('Unlock password-protected PDF', `
+      <div class="field">
+        <label>PDF password</label>
+        <input type="password" id="protectedPdfPassword" autocomplete="current-password" style="width:100%;">
+      </div>
+      <p class="hint">Enter the password used to open this PDF. The password is used only in this browser session and is not saved.</p>
+      <div id="protectedPdfStatus" class="hint" style="display:none;"></div>
+    `, async () => {
+      const input=document.getElementById('protectedPdfPassword');
+      const password=input ? input.value : '';
+      if(!password){
+        toast('Enter the PDF password first.', true);
+        // Re-open the dialog so the user can enter it.
+        setTimeout(() => openProtectedPdf(file).then(resolve), 0);
+        return;
+      }
+      try{
+        toast('Unlocking protected PDF…');
+        const rebuilt=await rebuildProtectedPdfWithPdfJs(file,password);
+        toast('Password accepted. PDF opened.');
+        resolve(rebuilt);
+      }catch(err){
+        console.error('Protected PDF unlock failed:',err);
+        toast('Password was not accepted, or this encrypted PDF format is not supported.', true);
+        setTimeout(() => openProtectedPdf(file).then(resolve), 0);
+      }
+    });
+  });
 }
 
 async function loadFiles(fileList){
@@ -1902,11 +1932,11 @@ async function collectPdfRows(){
 }
 function getPdfDocumentSafely(bytes, password){
   return new Promise((resolve, reject) => {
-    const loadingTask = pdfjsLib.getDocument({ data: bytes.slice(), password: password || undefined });
+    const loadingTask = pdfjsLib.getDocument({
+      data: bytes.slice(),
+      password: password || undefined
+    });
     loadingTask.onPassword = (updatePassword, reason) => {
-      // reason 1 = password needed, 2 = password was wrong. Either way, surface
-      // this explicitly rather than letting the task hang waiting for a retry
-      // callback we haven't wired up.
       const err = new Error(reason === 2 ? 'Incorrect password.' : 'This PDF needs a password.');
       err.name = 'PasswordException';
       err.incorrect = reason === 2;
@@ -5726,46 +5756,56 @@ function parseFlexibleAmount(str){
 }
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 function computeInterestFromStatement(rows, dateIdx, balanceIdx, annualRatePct){
-  const entries = rows.map(r => ({ date: parseFlexibleDate(r[dateIdx]), balance: parseFlexibleAmount(r[balanceIdx]) }))
-    .filter(e => e.date && e.balance !== null && !isNaN(e.date.getTime()));
-  entries.sort((a, b) => a.date - b.date);
-  if(!entries.length) return { totalInterest: 0, monthly: [], entries };
+  const entries = rows.map(r => ({
+    date: parseFlexibleDate(r[dateIdx]),
+    balance: parseFlexibleAmount(r[balanceIdx])
+  })).filter(e => e.date && e.balance !== null && !isNaN(e.date.getTime()));
 
-  // Balance in effect on any given calendar day: the most recent entry on/before
-  // that day, or the first entry's balance for any day before the statement starts.
-  function balanceOn(day){
-    let bal = entries[0].balance;
-    for(const e of entries){
-      if(e.date <= day) bal = e.balance;
-      else break;
-    }
-    return bal;
+  // Daily-product method:
+  // Each transaction balance applies from its transaction date until the day
+  // before the next transaction. Only dates actually covered by the statement
+  // are included; the calculation never invents a balance before the first
+  // transaction or after the last transaction.
+  entries.sort((a,b) => a.date-b.date);
+  if(!entries.length) return {totalInterest:0,monthly:[],entries};
+
+  const first=new Date(entries[0].date.getFullYear(),entries[0].date.getMonth(),entries[0].date.getDate());
+  const last=new Date(entries[entries.length-1].date.getFullYear(),entries[entries.length-1].date.getMonth(),entries[entries.length-1].date.getDate());
+
+  // Keep the last balance for duplicate-date transactions, because the final
+  // posted transaction on a day is the closing balance for that day.
+  const byDay=new Map();
+  for(const e of entries){
+    const key=`${e.date.getFullYear()}-${e.date.getMonth()}-${e.date.getDate()}`;
+    byDay.set(key,e.balance);
+  }
+  const daily=[];
+  let currentBalance=null;
+  for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){
+    const key=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    if(byDay.has(key)) currentBalance=byDay.get(key);
+    if(currentBalance===null) continue;
+    daily.push({date:new Date(d),balance:currentBalance});
   }
 
-  const first = entries[0].date, last = entries[entries.length - 1].date;
-  const monthly = [];
-  let totalInterest = 0;
-  let cursor = new Date(first.getFullYear(), first.getMonth(), 1);
-  const endMonth = new Date(last.getFullYear(), last.getMonth(), 1);
-
-  while(cursor <= endMonth){
-    const year = cursor.getFullYear(), month = cursor.getMonth();
-    const monthStart = new Date(year, month, 1);
-    const monthEnd = new Date(year, month + 1, 0); // last day of month, inclusive
-    let monthInterest = 0, days = 0;
-    for(let d = new Date(monthStart); d <= monthEnd; d.setDate(d.getDate() + 1)){
-      monthInterest += balanceOn(d) * (annualRatePct / 100) / 365;
-      days++;
-    }
-    monthly.push({ year, month, monthStart, monthEnd, days, interest: monthInterest, closingBalance: balanceOn(monthEnd) });
-    totalInterest += monthInterest;
-    cursor = new Date(year, month + 1, 1);
+  const monthlyMap=new Map();
+  for(const day of daily){
+    const year=day.date.getFullYear(), month=day.date.getMonth();
+    const key=`${year}-${month}`;
+    if(!monthlyMap.has(key)) monthlyMap.set(key,{year,month,days:0,interest:0,dailyProduct:0,closingBalance:day.balance});
+    const m=monthlyMap.get(key);
+    m.days++;
+    m.dailyProduct += day.balance;
+    m.interest += day.balance*(annualRatePct/100)/365;
+    m.closingBalance=day.balance;
   }
-  return { totalInterest, monthly, entries };
+  const monthly=Array.from(monthlyMap.values()).sort((a,b)=>a.year-b.year || a.month-b.month);
+  const totalInterest=monthly.reduce((s,m)=>s+m.interest,0);
+  return {totalInterest,monthly,entries,daily};
 }
 function showInterestResult(result, rate){
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const rows = result.monthly.map(m => [`${MONTH_NAMES[m.month]} ${m.year}`, m.days, m.closingBalance.toFixed(2), m.interest.toFixed(2)]);
+  const rows = result.monthly.map(m => [`${MONTH_NAMES[m.month]} ${m.year}`, m.days, m.dailyProduct.toFixed(2), m.closingBalance.toFixed(2), m.interest.toFixed(2)]);
   const preview = rows.map(r => `<tr>${r.map(c => `<td style="padding:4px 6px;border:1px solid var(--line);font-size:11.5px;white-space:nowrap;">${esc(String(c))}</td>`).join('')}</tr>`).join('');
   openModal('Interest calculation', `
     <div style="background:var(--surface-2);padding:12px;border-radius:4px;text-align:center;">
@@ -5774,7 +5814,7 @@ function showInterestResult(result, rate){
     </div>
     <div style="overflow:auto;max-height:300px;border:1px solid var(--line);border-radius:4px;">
       <table style="border-collapse:collapse;width:100%;">
-        <tr><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Month</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Days</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Closing balance</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Interest</th></tr>
+        <tr><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Month</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Days</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Daily product</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Closing balance</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Interest</th></tr>
         ${preview}
       </table>
     </div>
@@ -5782,12 +5822,12 @@ function showInterestResult(result, rate){
       <button class="btn ghost" id="intCsv" type="button">Download breakdown as CSV</button>
       <button class="btn ghost" id="intXlsx" type="button">Download breakdown as Excel</button>
     </div>
-    <p class="hint">Interest is calculated per calendar month, from the 1st through the last day of that month inclusive (e.g. a 31-day month counts all 31 days), on the daily closing balance carried forward from your statement's transactions. This is a calculation aid, not a substitute for your bank's own statement.</p>
+    <p class="hint">Interest is calculated by the daily-product method: each day's closing balance is multiplied by the annual rate/365, and only days covered by the statement are included. The daily product is the sum of all daily closing balances for the month. This is a calculation aid, not a substitute for your bank's own statement.</p>
   `, async () => {});
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
   setTimeout(() => {
-    const allRows = [['Month','Days','Closing balance','Interest'], ...rows, ['','','Total', result.totalInterest.toFixed(2)]];
+    const allRows = [['Month','Days','Daily product','Closing balance','Interest'], ...rows, ['','','','Total', result.totalInterest.toFixed(2)]];
     document.getElementById('intCsv').addEventListener('click', () => {
       downloadBlob(new Blob([allRows.map(r => r.map(toCsvValue).join(',')).join('\n')], {type:'text/csv'}), 'interest_breakdown.csv');
     });
@@ -6344,13 +6384,6 @@ $('btnChartDigitizer').addEventListener('click', () => {
     });
   }, 0);
 });
-
-$('btnFinancialCalculatorQuick').addEventListener('click', () => {
-  // This is the main Financial Calculator entry point. It must OPEN the
-  // calculator suite, not merely re-select the already-active Studio tab.
-  setStudio('interest');
-  openFinancialSuite();
-});
 $('btnInterestCalc').addEventListener('click', () => {
   window.__intPdfBuf = null; window.__intPdfPassword = null; window.__intGapThreshold = null;
   window.__intRows = null; window.__intHeaderIdx = null;
@@ -6365,7 +6398,7 @@ $('btnInterestCalc').addEventListener('click', () => {
     <div class="field" id="intPasswordField" style="display:none;"><label>PDF password</label><div style="display:flex;gap:8px;"><input type="password" id="intPassword" style="flex:1;"><button class="btn ghost" id="intPasswordRetry" type="button">Unlock</button></div></div>
     <div id="intColumnsArea"></div>
     <div class="field"><label>Annual interest rate (%)</label><input type="number" id="intRate" step="0.01" value="4"></div>
-    <p class="hint">Calculates interest month by month — from the 1st through the last day of each calendar month, inclusive — on the daily closing balance carried forward from your statement's transactions. Assumes the statement has a running balance column after each entry — most do.</p>
+    <p class="hint">Calculates interest using the daily-product method. Each transaction's closing balance applies from that date until the next transaction date; interest is balance × annual rate ÷ 365 for each covered day. No balance is assumed before the first transaction or after the last statement date.</p>
   `, async () => {
     const rows = window.__intRows;
     if(!rows){ toast('Choose a statement first.', true); return; }
