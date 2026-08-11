@@ -464,6 +464,23 @@ body.dark .studio-tab.active{color:var(--pine);}
   }
 </style>
 
+<style id="financial-calculator-mobile-fix">
+  .studio-tab.financial-tab{
+    font-weight:800!important;
+    color:var(--pine)!important;
+  }
+  .df-finance-quick{
+    border-color:var(--accent)!important;
+    font-weight:800!important;
+  }
+  .ribbon.dashboard-mode .ribbon-panel{display:none!important}
+  @media(max-width:820px){
+    .studio-tabs{padding-left:4px;padding-right:4px}
+    .studio-tab{padding-left:11px;padding-right:11px}
+    .studio-tab.financial-tab{background:var(--surface-2)}
+    .df-finance-quick{min-width:100px!important}
+  }
+</style>
 </head>
 <body>
 
@@ -516,6 +533,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 
 <div class="studio-tabs" id="studioTabs">
       <button class="studio-tab active" data-studio="dashboard"><span class="st-icon">🏠</span> Dashboard</button>
+      <button class="studio-tab financial-tab" data-studio="interest" title="Financial Calculator"><span class="st-icon">🧮</span> Financial Calculator</button>
       <button class="studio-tab" data-studio="pdf"><span class="st-icon">📄</span> PDF Studio</button>
       <button class="studio-tab" data-studio="ocr"><span class="st-icon">🖼</span> OCR Studio</button>
       <button class="studio-tab" data-studio="translate"><span class="st-icon">🌍</span> Translation Studio</button>
@@ -524,7 +542,6 @@ body.dark .studio-tab.active{color:var(--pine);}
       <button class="studio-tab" data-studio="ai"><span class="st-icon">🤖</span> AI Studio</button>
       <button class="studio-tab" data-studio="website"><span class="st-icon">🌐</span> Website Studio</button>
       <button class="studio-tab" data-studio="spreadsheet"><span class="st-icon">📊</span> Spreadsheet Studio</button>
-      <button class="studio-tab" data-studio="interest" title="Financial Calculator"><span class="st-icon">🧮</span> Financial Calculator</button>
       <button class="studio-tab" data-studio="security"><span class="st-icon">🔐</span> Security Studio</button>
       <button class="studio-tab" data-studio="batch"><span class="st-icon">📂</span> Batch Studio</button>
       <button class="studio-tab" data-studio="help"><span class="st-icon">❓</span> Help</button>
@@ -535,7 +552,7 @@ body.dark .studio-tab.active{color:var(--pine);}
     </div>
 
     <div id="noPdfBanner" style="display:none;background:var(--accent);color:var(--accent-ink);padding:8px 16px;font-size:12.5px;font-weight:600;text-align:center;">
-      📄 Most tools below need a PDF open first — tap <strong>Open / Merge PDFs</strong> in PDF Studio, or a Dashboard tile, to get started.
+      📄 PDF tools require a PDF to be open. Choose <strong>Open / Merge PDFs</strong> in PDF Studio to start a PDF project. <strong>Financial Calculator works without opening a PDF.</strong>
     </div>
 
     <div class="ribbon" id="ribbon">
@@ -1122,7 +1139,13 @@ function setToolsEnabled(on){
   $('toolbar').style.display = on ? 'flex' : 'none';
   grid.classList.toggle('empty-hide', !on);
   $('dropzone').style.display = on ? 'none' : 'block';
-  $('noPdfBanner').style.display = on ? 'none' : 'block';
+
+  // The PDF warning is only relevant while the PDF Studio is active.
+  // Dashboard and Financial Calculator are useful without a PDF and must
+  // not display a misleading "open a PDF first" warning.
+  const pdfContext = currentStudio === 'pdf';
+  $('noPdfBanner').style.display = (!on && pdfContext) ? 'block' : 'none';
+
   updateDashboardTilesVisibility();
 }
 // Buttons stay tappable at all times (never visually disabled) so every menu
@@ -5284,12 +5307,27 @@ function setStudio(name){
   currentStudio = name;
   document.querySelectorAll('.studio-tab').forEach(t => t.classList.toggle('active', t.dataset.studio === name));
   document.querySelectorAll('.ribbon-panel').forEach(p => p.classList.toggle('active', p.dataset.studioPanel === name));
+
+  // Dashboard has no ribbon panel of its own. Hide all studio panels so
+  // PDF controls cannot appear underneath the Dashboard heading.
+  const hasRibbonPanel = !!document.querySelector('.ribbon-panel[data-studio-panel="' + name + '"]');
+  document.getElementById('ribbon').classList.toggle('dashboard-mode', name === 'dashboard');
+  if(name === 'dashboard' && !hasRibbonPanel){
+    document.querySelectorAll('.ribbon-panel').forEach(p => p.classList.remove('active'));
+  }
+
   $('settingsStudio').classList.toggle('active', name === 'settings');
   $('aboutStudio').classList.toggle('active', name === 'about');
   $('helpStudio').classList.toggle('active', name === 'help');
   $('readerStudio').classList.toggle('active', name === 'reader');
   $('exportStudio').style.display = name === 'export' ? 'block' : 'none';
   $('workspaceLayout').style.display = (name === 'settings' || name === 'about' || name === 'help' || name === 'reader' || name === 'export') ? 'none' : 'flex';
+
+  // Re-evaluate the PDF warning after the active Studio changes.
+  if(typeof setToolsEnabled === 'function'){
+    const hasPdf = !!workingBytes;
+    $('noPdfBanner').style.display = (!hasPdf && name === 'pdf') ? 'block' : 'none';
+  }
   updateDashboardTilesVisibility();
 }
 document.querySelectorAll('.studio-tab').forEach(t => {
