@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.2.3 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.2.4 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -602,7 +602,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.2.3</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.2.4</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -1916,13 +1916,87 @@ function getPdfDocumentSafely(bytes, password){
 async function collectRowsFromPdfBytes(bytes, password, gapThreshold){
   const pdf = await getPdfDocumentSafely(bytes, password);
   const rows = [];
+  let textItemCount = 0;
+
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
-    const items = content.items.filter(it => typeof it.str === 'string')
-      .map(it => ({ str: it.str, x: it.transform[4], y: it.transform[5], width: it.width || 0 }));
-    groupIntoLines(items).forEach(l => rows.push(lineToCells(l.items, gapThreshold || 9)));
+    const items = content.items
+      .filter(it => typeof it.str === 'string' && it.str.trim() !== '')
+      .map(it => ({
+        str: it.str,
+        x: it.transform[4],
+        y: it.transform[5],
+        width: it.width || 0
+      }));
+
+    textItemCount += items.length;
+    groupIntoLines(items).forEach(l => {
+      const cells = lineToCells(l.items, gapThreshold || 9);
+      if(cells.some(c => String(c).trim() !== '')) rows.push(cells);
+    });
   }
+
+  // Scanned/image-only bank statements have no PDF text layer. Automatically
+  // OCR them instead of leaving the user with an empty Rows/Columns section.
+  if(textItemCount === 0 || rows.length === 0){
+    setStatus('No text layer found — OCR is reading the bank statement…');
+    showProgress(5);
+    try{
+      await loadLib('tesseract');
+      const ocrRows = [];
+
+      for(let i = 1; i <= pdf.numPages; i++){
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({scale: 2.2});
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.ceil(viewport.width);
+        canvas.height = Math.ceil(viewport.height);
+
+        await page.render({
+          canvasContext: canvas.getContext('2d'),
+          viewport
+        }).promise;
+
+        const result = await Tesseract.recognize(canvas, 'eng', {
+          logger: m => {
+            if(m.status === 'recognizing text'){
+              const pct = ((i - 1) + (m.progress || 0)) / pdf.numPages;
+              showProgress(5 + Math.round(pct * 90));
+            }
+          }
+        });
+
+        const words = (result.data && result.data.words) || [];
+        const items = words
+          .filter(w => w && String(w.text || '').trim())
+          .map(w => ({
+            str: String(w.text).trim(),
+            x: Number(w.bbox && w.bbox.x0) || 0,
+            y: Number(w.bbox && w.bbox.y0) || 0,
+            width: Math.max(
+              1,
+              (Number(w.bbox && w.bbox.x1) || 0) -
+              (Number(w.bbox && w.bbox.x0) || 0)
+            )
+          }));
+
+        groupIntoLines(items, 12).forEach(line => {
+          const cells = lineToCells(line.items, Math.max(18, gapThreshold || 18));
+          if(cells.some(c => String(c).trim() !== '')) ocrRows.push(cells);
+        });
+      }
+
+      if(ocrRows.length) return ocrRows;
+    } catch(ocrErr){
+      console.error('Bank statement OCR fallback failed:', ocrErr);
+      toast('PDF has no readable text layer and automatic OCR failed. Try OCR Studio or a clearer statement.', true);
+    } finally {
+      showProgress(null);
+      setStatus('Ready.');
+    }
+  }
+
   return rows;
 }
 
@@ -5763,15 +5837,20 @@ on('btnFinancialSuite', 'click', openFinancialSuite);
    fixed layout. */
 const MONTH_ABBR = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
 function parseFlexibleDate(str){
-  if(str instanceof Date && !isNaN(str.getTime())) return new Date(str.getFullYear(), str.getMonth(), str.getDate());
+  if(str instanceof Date && !isNaN(str.getTime()))
+    return new Date(str.getFullYear(), str.getMonth(), str.getDate());
+
   if(typeof str === 'number' && Number.isFinite(str)){
-    // Excel serial date (1900 date system). Ignore values outside a practical date range.
+    // Excel 1900-date-system serial.
     if(str > 20000 && str < 80000){
       const d = new Date(Date.UTC(1899,11,30) + Math.round(str)*86400000);
       return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
     }
+    return null;
   }
+
   str = String(str || '').trim();
+  if(!str) return null;
   if(!str) return null;
   let m = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
   if(m) return new Date(+m[1], +m[2] - 1, +m[3]);
@@ -5836,8 +5915,12 @@ function computeInterestFromStatement(rows, dateIdx, balanceIdx, annualRatePct, 
   }
 
   const slabs=(Array.isArray(rateSlabs)?rateSlabs:[])
-    .map(s=>({upto: Number(s.upto), rate:Number(s.rate)}))
-    .filter(s=>Number.isFinite(s.rate) && s.rate>=0 && Number.isFinite(s.upto) && s.upto>0)
+    .map(s=>({
+      upto:(s.upto===null || s.upto===undefined || s.upto==='' || !Number.isFinite(Number(s.upto)))
+        ? Infinity : Number(s.upto),
+      rate:Number(s.rate)
+    }))
+    .filter(s=>Number.isFinite(s.rate) && s.rate>=0 && s.upto>0)
     .sort((a,b)=>a.upto-b.upto);
 
   function interestForBalance(balance){
@@ -6553,8 +6636,9 @@ on('btnInterestCalc', 'click', () => {
       toast(`Could not compute — no rows had both a valid date and balance. Raw date values seen: ${sampleDates}. Raw balance values seen: ${sampleBals}. Check the column and header row choices.`, true);
       return;
     }
-    showInterestResult(result, rate);
+    showInterestResult(result, firstRate);
   });
+  $('modalConfirm').textContent = 'Calculate Interest';
 
   // Dynamic interest-rate slab editor: unlimited number of slabs.
   setTimeout(() => {
@@ -6692,12 +6776,33 @@ on('btnInterestCalc', 'click', () => {
       window.__intHeaderIdx = headerIdx;
       const headers = rows[headerIdx] || [];
       const isPdf = !!window.__intPdfBuf;
+
+      const dateScore = h => {
+        const s=String(h ?? '').toLowerCase();
+        if(/account|a\/c|reference|ref|cheque|chq|mobile|phone|code|number|no\b/.test(s)) return -10;
+        if(/value\s*date|transaction\s*date|txn\s*date|trans\s*date|post\s*date|date/.test(s)) return 100;
+        return 0;
+      };
+      const balanceScore = h => {
+        const s=String(h ?? '').toLowerCase();
+        if(/closing\s*balance|available\s*balance|running\s*balance|current\s*balance/.test(s)) return 120;
+        if(/balance/.test(s)) return 100;
+        return 0;
+      };
+
+      let bestDateIdx=0,bestDateScore=-1,bestBalIdx=Math.max(0,headers.length-1),bestBalScore=-1;
+      headers.forEach((head,i)=>{
+        const ds=dateScore(head), bs=balanceScore(head);
+        if(ds>bestDateScore){bestDateScore=ds;bestDateIdx=i;}
+        if(bs>bestBalScore){bestBalScore=bs;bestBalIdx=i;}
+      });
+
       document.getElementById('intColumnsArea').innerHTML = `
         <div class="field"><label>Header row <span style="font-weight:700;">(auto-detected)</span> — change only if needed</label><input type="number" id="intHeaderRow" min="1" max="${rows.length}" value="${headerIdx + 1}" inputmode="numeric"><p class="hint">The app has automatically selected row ${headerIdx + 1}. If your bank statement has headings on another row, enter that row number here and the columns will refresh automatically.</p></div>
         ${isPdf ? `<div class="field"><label>Column sensitivity (increase if columns look merged together, like "Post Date Value" instead of separate "Post Date" and "Value")</label><div style="display:flex;gap:8px;"><input type="number" id="intGapThreshold" min="1" max="40" value="${window.__intGapThreshold || 9}" style="flex:1;"><button class="btn ghost" id="intReparse" type="button">Re-read PDF</button></div></div>` : ''}
         <div class="field row">
-          <div><label>Date column</label><select id="intDateCol">${headers.map((h,i) => `<option value="${i}">${escapeXml(String(h))}</option>`).join('')}</select></div>
-          <div><label>Balance column</label><select id="intBalCol">${headers.map((h,i) => `<option value="${i}" ${i === headers.length-1 ? 'selected' : ''}>${escapeXml(String(h))}</option>`).join('')}</select></div>
+          <div><label>Date column</label><select id="intDateCol">${headers.map((h,i) => `<option value="${i}" ${i===bestDateIdx?'selected':''}>${escapeXml(String(h))}</option>`).join('')}</select></div>
+          <div><label>Balance column</label><select id="intBalCol">${headers.map((h,i) => `<option value="${i}" ${i===bestBalIdx?'selected':''}>${escapeXml(String(h))}</option>`).join('')}</select></div>
         </div>
       `;
       document.getElementById('intHeaderRow').addEventListener('change', (e) => {
@@ -6776,9 +6881,13 @@ on('btnInterestCalc', 'click', () => {
         }
 
         const rows = await loadStatementRows(buf, ext, null);
-        if(!rows.length){ toast('Could not read any data from that file.', true); return; }
+        if(!rows.length){
+          toast('No readable statement rows were found. For a scanned PDF, automatic OCR was attempted.', true);
+          return;
+        }
         document.getElementById('intPasswordField').style.display = 'none';
         populateColumnPickers(rows);
+        toast(`Statement loaded: ${rows.length} rows detected.`, false);
       } catch(err){
         console.error('Initial statement read failed:', err);
         if(ext === 'pdf'){
