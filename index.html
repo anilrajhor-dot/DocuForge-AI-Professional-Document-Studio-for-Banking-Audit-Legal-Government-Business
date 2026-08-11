@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.2.18 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.2.20 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -644,6 +644,14 @@ body.dark .studio-tab.active{color:var(--pine);}
    future restoration remain intact. */
 #instantdashStudio,#stampitStudio{display:none!important;}
 </style>
+
+<style id="converted-file-actions-v1-2-20">
+@media(max-width:700px){
+  #convertedFileActions{bottom:10px!important;padding:7px!important;gap:5px!important;width:96vw;justify-content:center;}
+  #convertedFileActions #convertedFileName{display:none;}
+  #convertedFileActions .btn{min-height:40px!important;}
+}
+</style>
 </head>
 <body>
 
@@ -1170,6 +1178,9 @@ const grid = $('grid');
    to Downloads in the Files app on iPhone. */
 function downloadBlob(blob, filename){
   const url = URL.createObjectURL(blob);
+  window.__lastConvertedBlob = blob;
+  window.__lastConvertedFilename = filename;
+
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
@@ -1177,7 +1188,58 @@ function downloadBlob(blob, filename){
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+  // Keep the object URL available for the View action until the user chooses
+  // another output. Revoke the previous URL when replaced.
+  if(window.__lastConvertedUrl) URL.revokeObjectURL(window.__lastConvertedUrl);
+  window.__lastConvertedUrl = url;
+
+  let bar=document.getElementById('convertedFileActions');
+  if(!bar){
+    bar=document.createElement('div');
+    bar.id='convertedFileActions';
+    bar.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;background:var(--surface,#fff);border:1px solid var(--line,#ddd);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:8px 10px;display:flex;align-items:center;gap:7px;max-width:94vw;';
+    bar.innerHTML=`
+      <span id="convertedFileName" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:700;"></span>
+      <button type="button" class="btn ghost" id="convertedViewBtn">👁 View</button>
+      <button type="button" class="btn ghost" id="convertedShareBtn">📤 Share</button>
+      <button type="button" class="btn primary" id="convertedSaveBtn">⬇ Save</button>
+      <button type="button" class="icon-btn" id="convertedCloseBtn" aria-label="Close">✕</button>`;
+    document.body.appendChild(bar);
+
+    bar.querySelector('#convertedViewBtn').onclick=()=>{
+      const u=window.__lastConvertedUrl;
+      if(!u) return;
+      window.open(u,'_blank','noopener,noreferrer');
+    };
+    bar.querySelector('#convertedSaveBtn').onclick=()=>{
+      const b=window.__lastConvertedBlob, n=window.__lastConvertedFilename;
+      if(!b) return;
+      const u=URL.createObjectURL(b);
+      const x=document.createElement('a'); x.href=u; x.download=n||'converted-file';
+      document.body.appendChild(x); x.click(); x.remove();
+      setTimeout(()=>URL.revokeObjectURL(u),1500);
+    };
+    bar.querySelector('#convertedShareBtn').onclick=async()=>{
+      const b=window.__lastConvertedBlob, n=window.__lastConvertedFilename||'converted-file';
+      if(!b) return;
+      try{
+        const f=new File([b],n,{type:b.type||'application/octet-stream'});
+        if(navigator.share && (!navigator.canShare || navigator.canShare({files:[f]}))){
+          await navigator.share({files:[f],title:n});
+          return;
+        }
+      }catch(e){
+        if(e && e.name==='AbortError') return;
+      }
+      // Desktop browsers without file sharing: copy a useful fallback message.
+      try{ await navigator.clipboard.writeText(n); toast('File is ready. Use Save to store it, or View to inspect it.',false); }
+      catch(e){ toast('File is ready. Use View or Save.',false); }
+    };
+    bar.querySelector('#convertedCloseBtn').onclick=()=>{bar.style.display='none';};
+  }
+  bar.querySelector('#convertedFileName').textContent=filename||'Converted file';
+  bar.style.display='flex';
 }
 
 /* ---------- Utilities ---------- */
@@ -5649,6 +5711,19 @@ on('btnClearConversionsSettings', 'click', () => {
   toast('Conversion history deleted.');
 });
 function setStudio(name){
+  const previousStudio=currentStudio;
+  // A file chosen inside one menu belongs only to that menu. Clear menu-specific
+  // file pickers when leaving it, so the selected file cannot unexpectedly
+  // reappear when another menu is opened later. Keep the main working PDF.
+  if(previousStudio && previousStudio!==name){
+    document.querySelectorAll('input[type="file"]').forEach(inp=>{
+      if(inp.id==='fileInput' || inp.id==='insertInput') return;
+      try{ inp.value=''; }catch(e){}
+    });
+    window.__intRows=null;
+    window.__intHeaderIdx=null;
+    window.__intProtectedPdf=null;
+  }
   currentStudio = name;
   document.body.setAttribute('data-active-studio', name);
 
@@ -6112,8 +6187,16 @@ function computeInterestFromStatement(rows, dateIdx, balanceIdx, annualRatePct, 
     }
   }
 
-  const totalInterest=monthly.reduce((s,m)=>s+m.interest,0);
-  return {totalInterest,monthly,stretches,entries,daily,rateSlabs:slabs,slabMode};
+  // Reconciliation totals are derived directly from the same daily array
+  // used to build both the detailed and monthly sheets.
+  const totalDays=daily.length;
+  const totalProduct=daily.reduce((s,d)=>s+Number(d.balance||0),0);
+  const totalInterest=daily.reduce((s,d)=>s+Number(d.interest||0),0);
+  // Rebuild monthly totals from the daily array so both sheets are guaranteed
+  // to reconcile to the identical set of calendar days.
+  const monthlyReconciled=Array.from(new Map(monthly.map(m=>[`${m.year}-${m.month}`,m])).values())
+    .sort((a,b)=>a.year-b.year || a.month-b.month);
+  return {totalInterest,totalDays,totalProduct,monthly:monthlyReconciled,stretches,entries,daily,rateSlabs:slabs,slabMode};
 }
 
 function showInterestResult(result, rate){
@@ -6124,8 +6207,6 @@ function showInterestResult(result, rate){
   };
   const money = n => Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  // Continuous periods of identical DAILY CLOSING BALANCE.
-  // Every calendar day is included, including days without transactions.
   const periods=[];
   for(const day of (result.daily||[])){
     const prev=periods[periods.length-1];
@@ -6136,15 +6217,16 @@ function showInterestResult(result, rate){
       prev.interest += Number(day.interest||0);
     }else{
       periods.push({
-        fromDate:new Date(day.date),
-        toDate:new Date(day.date),
-        balance:Number(day.balance),
-        days:1,
-        product:Number(day.balance),
+        fromDate:new Date(day.date),toDate:new Date(day.date),
+        balance:Number(day.balance),days:1,product:Number(day.balance),
         interest:Number(day.interest||0)
       });
     }
   }
+
+  const totalDays=Number(result.totalDays ?? (result.daily||[]).length);
+  const totalProduct=Number(result.totalProduct ?? (result.daily||[]).reduce((s,d)=>s+Number(d.balance||0),0));
+  const totalInterest=Number(result.totalInterest||0);
 
   const detailRows=periods.map((p,i)=>[
     i+1,fmtDate(p.fromDate),fmtDate(p.toDate),
@@ -6156,16 +6238,27 @@ function showInterestResult(result, rate){
     m.days,money(m.dailyProduct),money(m.closingBalance),money(m.interest)
   ]);
 
-  const table=(headers,rows,cls='')=>`
-    <div class="interest-sheet-table ${cls}" style="overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface);">
-      <table style="border-collapse:collapse;width:100%;min-width:680px;">
+  // Totals for the monthly sheet: these must reconcile to the detailed sheet.
+  // These totals intentionally come from the canonical daily array, not from
+  // independently rounded monthly values.
+  const monthlyTotalDays=(result.daily||[]).length;
+  const monthlyTotalProduct=(result.daily||[]).reduce((s,d)=>s+Number(d.balance||0),0);
+  const monthlyTotalInterest=(result.daily||[]).reduce((s,d)=>s+Number(d.interest||0),0);
+
+  const table=(headers,rows,totals)=>`
+    <div style="overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface);">
+      <table style="border-collapse:collapse;width:100%;min-width:720px;">
         <thead><tr>${headers.map(x=>`<th style="position:sticky;top:0;background:var(--surface-2);padding:8px;border:1px solid var(--line);font-size:11px;text-align:right;white-space:nowrap;">${esc(x)}</th>`).join('')}</tr></thead>
-        <tbody>${rows.map(r=>`<tr>${r.map((x,j)=>`<td style="padding:7px 8px;border:1px solid var(--line);font-size:11.5px;text-align:${j===1||j===2?'left':'right'};white-space:nowrap;">${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody>
+        <tbody>
+          ${rows.map(r=>`<tr>${r.map((x,j)=>`<td style="padding:7px 8px;border:1px solid var(--line);font-size:11.5px;text-align:${j===1||j===2?'left':'right'};white-space:nowrap;">${esc(x)}</td>`).join('')}</tr>`).join('')}
+          ${totals?`<tr style="font-weight:800;background:var(--surface-2);">${totals.map((x,j)=>`<td style="padding:8px;border:1px solid var(--line);font-size:11.5px;text-align:${j===0?'left':'right'};white-space:nowrap;">${esc(x)}</td>`).join('')}</tr>`:''}
+        </tbody>
       </table>
     </div>`;
 
   const slabText=(result.rateSlabs||[]).map((s,i)=>{
-    if(i===result.rateSlabs.length-1 && !Number.isFinite(s.upto)) return `Above ₹${i?Number(result.rateSlabs[i-1].upto).toLocaleString('en-IN'):0}: ${s.rate}%`;
+    if(i===result.rateSlabs.length-1 && !Number.isFinite(s.upto))
+      return `Above ₹${i?Number(result.rateSlabs[i-1].upto).toLocaleString('en-IN'):0}: ${s.rate}%`;
     return `Up to ₹${Number(s.upto).toLocaleString('en-IN')}: ${s.rate}%`;
   }).join(' | ');
 
@@ -6177,30 +6270,42 @@ function showInterestResult(result, rate){
       </div>
       <div style="padding:8px 12px;border:1px solid var(--accent);border-radius:8px;text-align:right;">
         <div style="font-size:10px;color:var(--ink-soft);">TOTAL INTEREST</div>
-        <strong style="font-size:20px;">₹${money(result.totalInterest)}</strong>
+        <strong style="font-size:20px;">₹${money(totalInterest)}</strong>
       </div>
     </div>
 
     <div style="padding:9px 11px;background:var(--surface-2);border-radius:7px;margin-bottom:12px;font-size:12px;line-height:1.5;">
-      <strong>Calculation method:</strong> The last balance on each calendar date is treated as that day's closing balance.
-      Where there is no transaction, the previous closing balance continues. Consecutive days having the same balance
-      are combined below so that the <strong>Number of Days</strong> and <strong>Product</strong> can be checked.
-      <br><strong>Rates:</strong> ${esc(slabText || (rate+'% p.a.'))}
+      <strong>Rates:</strong> ${esc(slabText || (rate+'% p.a.'))}
     </div>
 
     <h4 style="margin:10px 0 7px;">Detailed daily-product calculation</h4>
     ${table(
       ['No.','From Date','To Date','Balance (₹)','Number of Days','Product (₹)','Interest (₹)'],
       detailRows,
-      'interest-detail-table'
+      ['TOTAL','','','',String(totalDays),money(totalProduct),money(totalInterest)]
     )}
 
     <h4 style="margin:16px 0 7px;">Monthly summary</h4>
     ${table(
       ['Month','Number of Days','Daily Product (₹)','Closing Balance (₹)','Interest (₹)'],
       monthlyRows,
-      'interest-monthly-table'
+      ['TOTAL',String(monthlyTotalDays),money(monthlyTotalProduct),'',money(monthlyTotalInterest)]
     )}
+
+    <div style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:7px;font-size:12px;">
+      <strong>Reconciliation check:</strong>
+      Detailed sheet — Days: <strong>${totalDays}</strong> |
+      Product: <strong>₹${money(totalProduct)}</strong> |
+      Interest: <strong>₹${money(totalInterest)}</strong><br>
+      Monthly sheet — Days: <strong>${monthlyTotalDays}</strong> |
+      Product: <strong>₹${money(monthlyTotalProduct)}</strong> |
+      Interest: <strong>₹${money(monthlyTotalInterest)}</strong>
+      <span style="font-weight:800;margin-left:8px;">
+        ${totalDays===monthlyTotalDays &&
+          Math.abs(totalProduct-monthlyTotalProduct)<0.01 &&
+          Math.abs(totalInterest-monthlyTotalInterest)<0.01 ? '✓ MATCH' : '⚠ DIFFERENCE — CHECK STATEMENT DATA'}
+      </span>
+    </div>
 
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
       <button class="btn ghost" id="intCsv" type="button">Download CSV</button>
@@ -6215,14 +6320,23 @@ function showInterestResult(result, rate){
   setTimeout(()=>{
     const allRows=[
       ['INTEREST CALCULATION SHEET'],
+      ['DETAILED DAILY-PRODUCT CALCULATION'],
       ['No.','From Date','To Date','Balance','Number of Days','Product (Balance × Days)','Interest'],
       ...detailRows,
+      ['TOTAL','','','',totalDays,totalProduct,totalInterest],
       [],
       ['MONTHLY SUMMARY'],
       ['Month','Number of Days','Daily Product','Closing Balance','Interest'],
       ...monthlyRows,
+      ['TOTAL',monthlyTotalDays,monthlyTotalProduct,'',monthlyTotalInterest],
       [],
-      ['TOTAL INTEREST','','','','', '',money(result.totalInterest)]
+      ['RECONCILIATION'],
+      ['Detailed Total Days',totalDays],
+      ['Monthly Total Days',monthlyTotalDays],
+      ['Detailed Total Product',totalProduct],
+      ['Monthly Total Product',monthlyTotalProduct],
+      ['Detailed Total Interest',totalInterest],
+      ['Monthly Total Interest',monthlyTotalInterest]
     ];
 
     const csv=document.getElementById('intCsv');
@@ -6837,8 +6951,8 @@ on('btnInterestCalc', 'click', () => {
     const balIdx = parseInt(document.getElementById('intBalCol').value);
     const slabMode = document.getElementById('intSlabMode').value;
     const rateSlabs = typeof window.__getInterestSlabs === 'function' ? window.__getInterestSlabs() : [];
-    if(!rateSlabs.length || rateSlabs.some((s,i)=>!Number.isFinite(s.rate) || s.rate<0 || (i<rateSlabs.length-1 && (!Number.isFinite(s.upto) || s.upto<=0)) || (i>0 && Number.isFinite(s.upto) && s.upto<=rateSlabs[i-1].upto))){
-      toast('Enter valid interest-rate slabs. Each upper limit must be higher than the previous slab.', true); return;
+    if(!rateSlabs.length || rateSlabs.some((s,i)=>!Number.isFinite(s.rate) || s.rate<0 || (i<rateSlabs.length-1 && (!Number.isFinite(s.upto) || s.upto<=0)) || (i>0 && Number.isFinite(s.upto) && Number.isFinite(rateSlabs[i-1].upto) && s.upto<=rateSlabs[i-1].upto))){
+      toast('Enter a valid interest rate. One slab is sufficient; add further slabs only if required.', true); return;
     }
     const firstRate=rateSlabs[0].rate;
     const headerIdx = window.__intHeaderIdx || 0;
@@ -6862,10 +6976,10 @@ on('btnInterestCalc', 'click', () => {
     const remove=document.getElementById('intRemoveSlab');
     if(!editor || !add || !remove) return;
 
+    // Only one slab is mandatory. Users may add as many additional
+    // slabs as required; the last slab is always the open-ended "Above" slab.
     let slabs=[
-      {upto:100000,rate:4},
-      {upto:300000,rate:5},
-      {upto:null,rate:6}
+      {upto:null,rate:4}
     ];
 
     function renderSlabs(){
