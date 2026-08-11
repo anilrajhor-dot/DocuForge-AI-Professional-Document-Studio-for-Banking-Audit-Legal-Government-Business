@@ -658,7 +658,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.2.31</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.2.32</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -1219,9 +1219,67 @@ function downloadBlob(blob, filename){
     document.body.appendChild(bar);
 
     bar.querySelector('#convertedViewBtn').onclick=()=>{
-      const u=window.__lastConvertedUrl;
-      if(!u) return;
-      window.open(u,'_blank','noopener,noreferrer');
+      const blob=window.__lastConvertedBlob;
+      const name=window.__lastConvertedFilename||'converted-file';
+      if(!blob) return;
+
+      // Keep viewing inside the app. window.open() on iPhone/iPad can return
+      // to the GitHub Pages document instead of displaying the blob URL.
+      let modal=document.getElementById('convertedFileViewer');
+      if(!modal){
+        modal=document.createElement('div');
+        modal.id='convertedFileViewer';
+        modal.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.78);display:flex;flex-direction:column;';
+        modal.innerHTML=`
+          <div style="height:54px;flex:0 0 54px;background:#fff;display:flex;align-items:center;gap:8px;padding:8px 12px;">
+            <strong id="convertedViewerName" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></strong>
+            <button type="button" id="convertedViewerDownload" class="btn primary">⬇ Save</button>
+            <button type="button" id="convertedViewerClose" class="btn ghost">✕ Close</button>
+          </div>
+          <div id="convertedViewerBody" style="flex:1;min-height:0;background:#666;display:flex;align-items:stretch;justify-content:center;"></div>`;
+        document.body.appendChild(modal);
+        modal.querySelector('#convertedViewerClose').onclick=()=>{
+          modal.style.display='none';
+          if(modal.dataset.viewerUrl){URL.revokeObjectURL(modal.dataset.viewerUrl);modal.dataset.viewerUrl='';}
+        };
+        modal.querySelector('#convertedViewerDownload').onclick=()=>{
+          const b=window.__lastConvertedBlob,n=window.__lastConvertedFilename||'converted-file';
+          if(!b)return;
+          const u=URL.createObjectURL(b),a=document.createElement('a');
+          a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();
+          setTimeout(()=>URL.revokeObjectURL(u),2000);
+        };
+      }
+
+      const body=modal.querySelector('#convertedViewerBody');
+      body.innerHTML='';
+      modal.querySelector('#convertedViewerName').textContent=name;
+      if(modal.dataset.viewerUrl) URL.revokeObjectURL(modal.dataset.viewerUrl);
+      const url=URL.createObjectURL(blob);
+      modal.dataset.viewerUrl=url;
+
+      if((blob.type||'').toLowerCase().includes('pdf')){
+        const obj=document.createElement('object');
+        obj.data=url; obj.type='application/pdf';
+        obj.style.cssText='width:100%;height:100%;border:0;background:#fff;';
+        const fallback=document.createElement('div');
+        fallback.style.cssText='margin:auto;background:#fff;padding:24px;text-align:center;';
+        fallback.innerHTML='<p>PDF preview is not available in this browser.</p><button type="button" class="btn primary">⬇ Save PDF</button>';
+        fallback.querySelector('button').onclick=()=>modal.querySelector('#convertedViewerDownload').click();
+        obj.appendChild(fallback);
+        body.appendChild(obj);
+      }else if((blob.type||'').startsWith('image/')){
+        const img=document.createElement('img');
+        img.src=url; img.style.cssText='max-width:100%;max-height:100%;object-fit:contain;margin:auto;';
+        body.appendChild(img);
+      }else{
+        const card=document.createElement('div');
+        card.style.cssText='margin:auto;background:#fff;border-radius:12px;padding:24px;max-width:420px;text-align:center;';
+        const safeName=String(name).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+        card.innerHTML=`<h3 style="margin-top:0">File ready</h3><p>${safeName}</p><p>This file format cannot be previewed directly in this browser. Use <b>Save</b> or <b>Share</b>.</p>`;
+        body.appendChild(card);
+      }
+      modal.style.display='flex';
     };
     bar.querySelector('#convertedSaveBtn').onclick=()=>{
       const b=window.__lastConvertedBlob, n=window.__lastConvertedFilename;
