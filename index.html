@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.2.14 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.2.15 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -3442,7 +3442,38 @@ ${navPoints}
     const lines = groupIntoLines(p.items).map(lineToText);
     const bodyHtml = lines.map(l => `<p>${esc(l) || '&#160;'}</p>`).join('\n');
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title></head>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
+<style id="dashboard-submenu-v1-2-15">
+#dashboardTiles .dash-tile{
+  cursor:pointer;position:relative;
+  transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;
+}
+#dashboardTiles .dash-tile::after{
+  content:"☰  Sub-menu";
+  position:absolute;right:10px;bottom:8px;
+  font-size:10px;font-weight:700;letter-spacing:.2px;
+  color:var(--ink-soft);opacity:.8;
+}
+#dashboardTiles .dash-tile:active{transform:scale(.985);}
+#dashboardMenuModal .modal{width:min(720px,94vw);max-height:88vh;}
+#dashboardMenuModal .modal-body{padding:18px;overflow:auto;}
+.dash-subtitle{margin:0 0 14px;color:var(--ink-soft);font-size:13px;line-height:1.45;}
+.dash-subgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.dash-subitem{
+  display:flex;align-items:center;gap:10px;min-height:54px;
+  padding:12px 14px;border:1px solid var(--line);border-radius:12px;
+  background:var(--surface);color:var(--ink);font:600 14px/1.25 inherit;
+  text-align:left;cursor:pointer;
+}
+.dash-subitem:hover{border-color:var(--accent);box-shadow:0 2px 10px rgba(0,0,0,.08);}
+.dash-subitem .sub-icon{font-size:20px;flex:0 0 auto;}
+@media(max-width:700px){
+  #dashboardMenuModal .modal{width:96vw;max-height:86vh;}
+  .dash-subgrid{grid-template-columns:1fr;}
+  #dashboardTiles .dash-tile::after{font-size:9px;}
+}
+</style>
+</head>
 <body>${bodyHtml}</body></html>`);
   });
   return await zip.generateAsync({ type:'uint8array' });
@@ -7315,5 +7346,173 @@ document.addEventListener('DOMContentLoaded', () => {
 <div id="developerCredit" style="text-align:center;padding:10px 12px 14px;font-size:11px;color:var(--muted);">
 Developed by <strong>Anil Sharma</strong> · Former General Manager, Central Bank of India
 </div>
+
+<script id="dashboard-submenu-v1-2-15-js">
+(function(){
+  const MENUS = {
+    btnOpen:{title:'Merge PDF',icon:'🗂️',desc:'Open, combine and arrange PDF or photo pages.',
+      items:[
+        ['📂','Open / Merge PDF or photo','btnOpen'],
+        ['➕','Insert PDF at a selected page','btnInsert'],
+        ['📋','Duplicate selected pages','btnDuplicateSel'],
+        ['↻','Rotate selected pages 90°','btnRotateSel'],
+        ['🗑️','Delete selected pages','btnDeleteSel'],
+        ['🧹','Remove blank pages','btnRemoveBlank'],
+        ['✂️','Extract selected pages → new PDF','btnExtract']
+      ]},
+    btnSplit:{title:'Split PDF',icon:'✂️',desc:'Split or compare PDF pages.',
+      items:[
+        ['✂️','Split into separate files','btnSplit'],
+        ['📄','Extract selected pages → new PDF','btnExtract'],
+        ['⚖️','Compare two PDFs','btnPdfCompare']
+      ]},
+    btnCompress:{title:'Compress PDF',icon:'📉',desc:'Reduce PDF size and apply enhancement tools.',
+      items:[
+        ['📉','Compress PDF','btnCompress'],
+        ['💧','Add watermark','btnWatermark'],
+        ['🔢','Add page numbers','btnPageNum'],
+        ['🏷️','Bates numbering','btnBates'],
+        ['↕️','Add header / footer','btnHeaderFooter'],
+        ['ℹ️','Metadata inspector','btnMetadata']
+      ]},
+    btnOcrPdf:{title:'OCR & Image Tools',icon:'🔎',desc:'OCR, image conversion, tables and QR functions.',
+      items:[
+        ['🔎','Create searchable PDF (OCR)','btnOcrPdf'],
+        ['📝','Extract text from image','btnOcrImage'],
+        ['📊','Extract table from image','btnImageTable'],
+        ['🖼️','Combine images into PDF','btnImagesToPdf'],
+        ['🖼️','PDF → Images','btnPdfToImages'],
+        ['🔳','Read QR code','btnQrReader'],
+        ['🔲','Generate QR code','btnQrGenerate']
+      ]},
+    btnFinancialSuite:{title:'Financial Calculator',icon:'🧮',desc:'All financial calculators are available here.',
+      items:[
+        ['🧮','EMI / Moratorium calculator','__financialSuite'],
+        ['🎂','Age calculator','__financialSuite'],
+        ['📈','SIP calculator','__financialSuite'],
+        ['🏦','Deposit Interest calculator','__financialSuite'],
+        ['📅','RDS calculator','__financialSuite'],
+        ['💱','Currency converter','__financialSuite'],
+        ['🧾','Bank Statement Interest Calculator','btnInterestCalc']
+      ]},
+    invoice:{title:'GST Invoice',icon:'🧾',desc:'Open the complete GST Invoice module.',
+      items:[['🧾','Open GST Invoice module','__studio:invoice']]},
+    pdftoolkit:{title:'PDF Toolkit',icon:'🛠️',desc:'Open the complete PDF Toolkit and its sub-functions.',
+      items:[['🛠️','Open PDF Toolkit','__studio:pdftoolkit']]},
+    btnTranslateText:{title:'Translate',icon:'🌍',desc:'Translation functions.',
+      items:[['🌍','Translate text / document','btnTranslateText']]},
+    btnPdfToWord:{title:'PDF → Word',icon:'📝',desc:'Document conversion functions.',
+      items:[
+        ['📝','PDF → Word (.docx)','btnPdfToWord'],
+        ['📄','PDF → Text (.txt)','btnPdfToText'],
+        ['🌐','PDF → HTML','btnPdfToHtml']
+      ]},
+    btnPdfToExcel:{title:'PDF → Excel',icon:'📊',desc:'Spreadsheet and structured-data conversion.',
+      items:[
+        ['📊','PDF → Excel (.xlsx)','btnPdfToExcel'],
+        ['📋','PDF → CSV','btnPdfToCsv'],
+        ['{ }','PDF → JSON','btnPdfToJson'],
+        ['< >','PDF → XML','btnPdfToXml']
+      ]},
+    btnImagesToPdf:{title:'Image → PDF',icon:'🖼️',desc:'Create PDFs and extract information from images.',
+      items:[
+        ['🖼️','Combine images into PDF','btnImagesToPdf'],
+        ['🔎','OCR image','btnOcrImage'],
+        ['📊','Extract table from image','btnImageTable'],
+        ['🔳','Read QR code','btnQrReader']
+      ]},
+    btnAiTools:{title:'AI Tools',icon:'🤖',desc:'AI-assisted document functions.',
+      items:[
+        ['🤖','More AI tasks','btnAiTools'],
+        ['💬','Chat with this PDF','btnChatPdf'],
+        ['🔍','Analyze document','btnAnalyze'],
+        ['📑','Extract tables','btnAiExtractTables'],
+        ['❓','Generate questions','btnAiGenQuestions'],
+        ['✉️','Draft email','btnAiDraftEmail'],
+        ['🎙️','Voice to text','btnVoiceToText'],
+        ['🔊','Read aloud','btnReadAloud']
+      ]},
+    btnBatch:{title:'Batch Processing',icon:'📂',desc:'Process multiple PDF files together.',
+      items:[['📂','Batch process files','btnBatch']]}
+  };
+
+  function ensureModal(){
+    let w=document.getElementById('dashboardMenuModal');
+    if(w) return w;
+    w=document.createElement('div');
+    w.id='dashboardMenuModal';
+    w.className='modal-backdrop';
+    w.style.display='none';
+    w.innerHTML=`
+      <div class="modal">
+        <div class="modal-head">
+          <h3 id="dashboardMenuTitle">Menu</h3>
+          <button class="icon-btn" id="dashboardMenuClose" type="button" aria-label="Close">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="dash-subtitle" id="dashboardMenuDesc"></p>
+          <div class="dash-subgrid" id="dashboardSubGrid"></div>
+        </div>
+      </div>`;
+    document.body.appendChild(w);
+    w.addEventListener('click',e=>{
+      if(e.target===w || e.target.closest('#dashboardMenuClose')) w.style.display='none';
+    });
+    return w;
+  }
+
+  function run(action){
+    const w=document.getElementById('dashboardMenuModal');
+    if(w) w.style.display='none';
+    if(action==='__financialSuite'){
+      if(typeof openFinancialSuite==='function') openFinancialSuite();
+      return;
+    }
+    if(action.startsWith('__studio:')){
+      if(typeof setStudio==='function') setStudio(action.split(':')[1]);
+      return;
+    }
+    const btn=document.getElementById(action);
+    if(btn){
+      if(typeof launchTool==='function') launchTool(action);
+      else btn.click();
+    }
+  }
+
+  function openMenu(key){
+    const menu=MENUS[key];
+    if(!menu) return;
+    const w=ensureModal();
+    w.querySelector('#dashboardMenuTitle').textContent=menu.icon+' '+menu.title;
+    w.querySelector('#dashboardMenuDesc').textContent=menu.desc;
+    const grid=w.querySelector('#dashboardSubGrid');
+    grid.innerHTML=menu.items.map(it=>`
+      <button type="button" class="dash-subitem" data-sub-action="${it[2]}">
+        <span class="sub-icon">${it[0]}</span><span>${it[1]}</span>
+      </button>`).join('');
+    grid.querySelectorAll('[data-sub-action]').forEach(b=>{
+      b.addEventListener('click',()=>run(b.dataset.subAction));
+    });
+    w.style.display='flex';
+  }
+
+  document.addEventListener('click',e=>{
+    const tile=e.target.closest('#dashboardTiles .dash-tile');
+    if(!tile) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    openMenu(tile.dataset.studioLaunch || tile.dataset.tool);
+  },true);
+
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Enter' && e.key!==' ') return;
+    const tile=e.target.closest && e.target.closest('#dashboardTiles .dash-tile');
+    if(!tile) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    openMenu(tile.dataset.studioLaunch || tile.dataset.tool);
+  },true);
+})();
+</script>
 </body>
 </html>
