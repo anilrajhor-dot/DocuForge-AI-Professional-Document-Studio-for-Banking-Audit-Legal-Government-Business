@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.1.9 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.2.0 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -557,7 +557,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.1.9</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.2.0</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -1062,6 +1062,11 @@ let zoomScale = 1.4;
 let zoomPageIndex = 0;
 
 const $ = (id) => document.getElementById(id);
+function on(id, event, handler, options){
+  const el = $(id);
+  if(el) el.addEventListener(event, handler, options);
+  return el;
+}
 const grid = $('grid');
 
 /* iOS Safari note: FileSaver.js's saveAs() falls back to window.open() on iOS
@@ -2226,21 +2231,21 @@ function showTranslationResult(original, translated, sourceLabel, targetLabel, b
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
   setTimeout(() => {
-    $('trCopy').addEventListener('click', async () => {
+    on('trCopy', 'click', async () => {
       try{ await navigator.clipboard.writeText(translated); toast('Translation copied.'); }
       catch{ toast('Could not copy automatically — select the text and copy manually.', true); }
     });
-    $('trTxt').addEventListener('click', () => downloadBlob(new Blob([translated], {type:'text/plain'}), baseName + '.txt'));
-    $('trDocx').addEventListener('click', async () => {
+    on('trTxt', 'click', () => downloadBlob(new Blob([translated], {type:'text/plain'}), baseName + '.txt'));
+    on('trDocx', 'click', async () => {
       const bytes = await buildDocxFromPages([translated.split('\n')]);
       downloadBlob(new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}), baseName + '.docx');
     });
-    $('trPdf').addEventListener('click', async () => {
+    on('trPdf', 'click', async () => {
       const paras = translated.split(/\n\s*\n/).map(p => p.replace(/\n/g, ' '));
       const bytes = await buildTextPdf(paras);
       downloadBlob(new Blob([bytes], {type:'application/pdf'}), baseName + '.pdf');
     });
-    $('trHtml').addEventListener('click', () => {
+    on('trHtml', 'click', () => {
       const html = buildBilingualHtml(original, translated, sourceLabel, targetLabel);
       downloadBlob(new Blob([html], {type:'text/html'}), baseName + '_bilingual.html');
     });
@@ -3589,9 +3594,9 @@ async function renderZoom(){
   canvas.width = viewport.width; canvas.height = viewport.height;
   await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
 }
-$('zoomClose').addEventListener('click', () => $('zoomModal').classList.remove('show'));
-$('zoomIn').addEventListener('click', () => { zoomScale = Math.min(zoomScale + 0.3, 4); renderZoom(); });
-$('zoomOut').addEventListener('click', () => { zoomScale = Math.max(zoomScale - 0.3, 0.5); renderZoom(); });
+on('zoomClose', 'click', () => $('zoomModal').classList.remove('show'));
+on('zoomIn', 'click', () => { zoomScale = Math.min(zoomScale + 0.3, 4); renderZoom(); });
+on('zoomOut', 'click', () => { zoomScale = Math.max(zoomScale - 0.3, 0.5); renderZoom(); });
 
 /* ---------- Generic modal helper ---------- */
 function openModal(title, bodyHTML, onConfirm){
@@ -3622,14 +3627,14 @@ function showTextResult(title, text, filename){
   }, 0);
 }
 function closeModal(){ $('genericModal').classList.remove('show'); }
-$('modalClose').addEventListener('click', closeModal);
-$('modalCancel').addEventListener('click', closeModal);
+on('modalClose', 'click', closeModal);
+on('modalCancel', 'click', closeModal);
 
 /* ---------- Wire up sidebar tools ---------- */
-$('btnOpen').addEventListener('click', () => $('fileInput').click());
-$('fileInput').addEventListener('change', (e) => { loadFiles(e.target.files); e.target.value=''; });
+on('btnOpen', 'click', () => $('fileInput').click());
+on('fileInput', 'change', (e) => { loadFiles(e.target.files); e.target.value=''; });
 
-$('btnInsert').addEventListener('click', () => {
+on('btnInsert', 'click', () => {
   openModal('Insert PDF at page…', `
     <div class="field"><label>PDF or image file to insert</label><input type="file" id="insFile" accept="application/pdf,image/*"></div>
     <div class="field"><label>Insert before page number</label><input type="number" id="insPos" min="1" value="1"></div>
@@ -3642,30 +3647,30 @@ $('btnInsert').addEventListener('click', () => {
   });
 });
 
-$('btnDuplicateSel').addEventListener('click', () => {
+on('btnDuplicateSel', 'click', () => {
   const idx = selectedIndices();
   if(!idx.length){ toast('Select at least one page.', true); return; }
   duplicatePages(idx);
 });
-$('btnRotateSel').addEventListener('click', () => {
+on('btnRotateSel', 'click', () => {
   const idx = selectedIndices();
   if(!idx.length){ toast('Select at least one page.', true); return; }
   rotatePages(idx, 90);
 });
-$('btnReverse').addEventListener('click', () => reverseAll());
+on('btnReverse', 'click', () => reverseAll());
 async function reverseAll(){
   const doc = await PDFDocument.load(workingBytes);
   await rebuildWithOrder(doc.getPageIndices().slice().reverse(), 'Page order reversed.');
 }
-$('btnDeleteSel').addEventListener('click', () => {
+on('btnDeleteSel', 'click', () => {
   const idx = selectedIndices();
   if(!idx.length){ toast('Select at least one page.', true); return; }
   if(confirm(`Delete ${idx.length} selected page(s)? This can be undone.`)) deletePages(idx);
 });
 
-$('btnExtract').addEventListener('click', extractSelected);
+on('btnExtract', 'click', extractSelected);
 
-$('btnSplit').addEventListener('click', () => {
+on('btnSplit', 'click', () => {
   openModal('Split into files…', `
     <div class="radio-row">
       <label><input type="radio" name="splitMode" value="every" checked> Every N pages</label>
@@ -3699,7 +3704,7 @@ $('btnSplit').addEventListener('click', () => {
   }, 0);
 });
 
-$('btnPdfCompare').addEventListener('click', () => {
+on('btnPdfCompare', 'click', () => {
   openModal('Compare two PDFs', `
     <div class="field row">
       <div><label>PDF A</label><input type="file" id="cmpFileA" accept=".pdf"></div>
@@ -3727,7 +3732,7 @@ $('btnPdfCompare').addEventListener('click', () => {
   });
 });
 
-$('btnWatermark').addEventListener('click', () => {
+on('btnWatermark', 'click', () => {
   openModal('Add watermark', `
     <div class="field"><label>Watermark text</label><input type="text" id="wmText" value="CONFIDENTIAL"></div>
     <div class="field row">
@@ -3742,7 +3747,7 @@ $('btnWatermark').addEventListener('click', () => {
   });
 });
 
-$('btnPageNum').addEventListener('click', () => {
+on('btnPageNum', 'click', () => {
   openModal('Add page numbers', `
     <div class="field"><label>Position</label>
       <select id="pnPos"><option value="center">Bottom center</option><option value="right">Bottom right</option><option value="left">Bottom left</option></select>
@@ -3755,7 +3760,7 @@ $('btnPageNum').addEventListener('click', () => {
   });
 });
 
-$('btnCompress').addEventListener('click', () => {
+on('btnCompress', 'click', () => {
   openModal('Compress PDF', `
     <div class="field row">
       <div><label>JPEG quality</label><input type="number" id="cmpQuality" min="0.3" max="0.95" step="0.05" value="0.7"></div>
@@ -3769,7 +3774,7 @@ $('btnCompress').addEventListener('click', () => {
   });
 });
 
-$('btnMetadata').addEventListener('click', async () => {
+on('btnMetadata', 'click', async () => {
   const meta = await getMetadata();
   openModal('Metadata inspector', `
     <div style="background:var(--surface-2);border-radius:4px;padding:10px 12px;font-size:12.5px;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;">
@@ -3794,7 +3799,7 @@ $('btnMetadata').addEventListener('click', async () => {
   });
 });
 
-$('btnOcrImage').addEventListener('click', () => {
+on('btnOcrImage', 'click', () => {
   openModal('Extract text from image', `
     <div class="field"><label>Image file (JPG, PNG, WEBP, BMP…)</label><input type="file" id="ocrImgFile" accept="image/*"></div>
     <div class="field"><label>Language</label>
@@ -3813,7 +3818,7 @@ $('btnOcrImage').addEventListener('click', () => {
   });
 });
 
-$('btnOcrPdf').addEventListener('click', () => {
+on('btnOcrPdf', 'click', () => {
   openModal('Make this PDF searchable', `
     <div class="field"><label>Pages</label>
       <select id="ocrPdfScope"><option value="all">All pages</option><option value="selected">Selected pages only</option></select>
@@ -3837,7 +3842,7 @@ $('btnOcrPdf').addEventListener('click', () => {
   });
 });
 
-$('btnPdfToText').addEventListener('click', async () => {
+on('btnPdfToText', 'click', async () => {
   setStatus('Extracting text…'); showProgress(20);
   try{
     const pages = await getPdfPagesTextItems();
@@ -3848,7 +3853,7 @@ $('btnPdfToText').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToCsv').addEventListener('click', async () => {
+on('btnPdfToCsv', 'click', async () => {
   setStatus('Building CSV…'); showProgress(20);
   try{
     const { rows, hasText } = await collectPdfRows();
@@ -3859,7 +3864,7 @@ $('btnPdfToCsv').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToExcel').addEventListener('click', async () => {
+on('btnPdfToExcel', 'click', async () => {
   setStatus('Building Excel file…'); showProgress(20);
   try{
     const { rows, hasText } = await collectPdfRows();
@@ -3874,7 +3879,7 @@ $('btnPdfToExcel').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToWord').addEventListener('click', async () => {
+on('btnPdfToWord', 'click', async () => {
   setStatus('Building Word document…'); showProgress(20);
   try{
     const pages = await getPdfPagesTextItems();
@@ -3887,7 +3892,7 @@ $('btnPdfToWord').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToHtml').addEventListener('click', async () => {
+on('btnPdfToHtml', 'click', async () => {
   setStatus('Building HTML…'); showProgress(20);
   try{
     const html = await buildPdfHtml();
@@ -3896,7 +3901,7 @@ $('btnPdfToHtml').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToJson').addEventListener('click', async () => {
+on('btnPdfToJson', 'click', async () => {
   setStatus('Building JSON…'); showProgress(20);
   try{
     const json = await buildPdfJson();
@@ -3905,7 +3910,7 @@ $('btnPdfToJson').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToXml').addEventListener('click', async () => {
+on('btnPdfToXml', 'click', async () => {
   setStatus('Building XML…'); showProgress(20);
   try{
     const xml = await buildPdfXml();
@@ -3914,7 +3919,7 @@ $('btnPdfToXml').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToSvg').addEventListener('click', async () => {
+on('btnPdfToSvg', 'click', async () => {
   setStatus('Rendering pages as SVG…'); showProgress(20);
   try{
     const blob = await convertPdfToSvgZip();
@@ -3923,7 +3928,7 @@ $('btnPdfToSvg').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToRtf').addEventListener('click', async () => {
+on('btnPdfToRtf', 'click', async () => {
   setStatus('Building RTF…'); showProgress(20);
   try{
     const pages = await getPdfPagesTextItems();
@@ -3935,7 +3940,7 @@ $('btnPdfToRtf').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToOdt').addEventListener('click', async () => {
+on('btnPdfToOdt', 'click', async () => {
   setStatus('Building ODT…'); showProgress(20);
   try{
     const pages = await getPdfPagesTextItems();
@@ -3947,7 +3952,7 @@ $('btnPdfToOdt').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToOds').addEventListener('click', async () => {
+on('btnPdfToOds', 'click', async () => {
   setStatus('Building ODS…'); showProgress(20);
   try{
     const { hasText } = await collectPdfRows();
@@ -3958,7 +3963,7 @@ $('btnPdfToOds').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToOdp').addEventListener('click', async () => {
+on('btnPdfToOdp', 'click', async () => {
   setStatus('Building ODP…'); showProgress(20);
   try{
     const pages = await getPdfPagesTextItems();
@@ -3970,7 +3975,7 @@ $('btnPdfToOdp').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToEpub').addEventListener('click', async () => {
+on('btnPdfToEpub', 'click', async () => {
   setStatus('Building EPUB…'); showProgress(20);
   try{
     const pages = await getPdfPagesTextItems();
@@ -3982,7 +3987,7 @@ $('btnPdfToEpub').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPdfToImages').addEventListener('click', () => {
+on('btnPdfToImages', 'click', () => {
   openModal('PDF → Images', `
     <div class="field row">
       <div><label>Format</label><select id="imgFmt"><option value="png">PNG</option><option value="jpg">JPG</option></select></div>
@@ -4001,7 +4006,7 @@ $('btnPdfToImages').addEventListener('click', () => {
   });
 });
 
-$('btnCrop').addEventListener('click', () => {
+on('btnCrop', 'click', () => {
   openModal('Crop pages', `
     <p class="hint" style="margin:0;">Trims the visible area from each edge, in points (72pt = 1 inch). This hides content rather than deleting it, so it's reversible with Undo.</p>
     <div class="field row">
@@ -4026,7 +4031,7 @@ $('btnCrop').addEventListener('click', () => {
   });
 });
 
-$('btnDupPages').addEventListener('click', async () => {
+on('btnDupPages', 'click', async () => {
   setStatus('Scanning for duplicate pages…'); showProgress(20);
   try{
     const pairs = await detectDuplicatePages();
@@ -4040,7 +4045,7 @@ $('btnDupPages').addEventListener('click', async () => {
   } finally { showProgress(null); }
 });
 
-$('btnPptxToPdf').addEventListener('click', () => {
+on('btnPptxToPdf', 'click', () => {
   openModal('PowerPoint → PDF', `
     <div class="field"><label>PowerPoint file (.pptx)</label><input type="file" id="pptxFile" accept=".pptx"></div>
     <p class="hint">Reads each slide's title and body text and lays it out one slide per PDF page, using the deck's own aspect ratio.</p>
@@ -4059,7 +4064,7 @@ $('btnPptxToPdf').addEventListener('click', () => {
   });
 });
 
-$('btnPptxMerge').addEventListener('click', () => {
+on('btnPptxMerge', 'click', () => {
   openModal('Merge PowerPoint files', `
     <div class="field"><label>PPTX files (merged in the order selected)</label><input type="file" id="pptxMergeFiles" accept=".pptx" multiple></div>
     <p class="hint">Structural merge: combines each deck's slide text (title + bullets) in order. Original slide design, images, and layouts aren't preserved — same honest limit as PDF ⇄ PowerPoint conversion.</p>
@@ -4079,7 +4084,7 @@ $('btnPptxMerge').addEventListener('click', () => {
   });
 });
 
-$('btnPptxSplit').addEventListener('click', () => {
+on('btnPptxSplit', 'click', () => {
   openModal('Split PowerPoint', `
     <div class="field"><label>PPTX file</label><input type="file" id="pptxSplitFile" accept=".pptx"></div>
     <div class="radio-row">
@@ -4125,7 +4130,7 @@ $('btnPptxSplit').addEventListener('click', () => {
   }, 0);
 });
 
-$('btnPptxReorder').addEventListener('click', () => {
+on('btnPptxReorder', 'click', () => {
   openModal('Reorder slides', `
     <div class="field"><label>PPTX file</label><input type="file" id="pptxReorderFile" accept=".pptx"></div>
     <div id="pptxReorderList" style="display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto;"></div>
@@ -4177,7 +4182,7 @@ function pptxSlideEditorBlock(slide){
   div.querySelector('.pptx-del-slide').addEventListener('click', () => div.remove());
   return div;
 }
-$('btnPptxEdit').addEventListener('click', () => {
+on('btnPptxEdit', 'click', () => {
   openModal('Edit PowerPoint', `
     <div class="field"><label>PPTX file (optional — leave blank to start a new deck)</label><input type="file" id="pptxEditFile" accept=".pptx"></div>
     <div id="pptxEditSlides" style="display:flex;flex-direction:column;gap:10px;max-height:380px;overflow-y:auto;"></div>
@@ -4217,7 +4222,7 @@ $('btnPptxEdit').addEventListener('click', () => {
   }, 0);
 });
 
-$('btnFileToPdf').addEventListener('click', () => {
+on('btnFileToPdf', 'click', () => {
   openModal('Create PDF from file', `
     <div class="field"><label>File</label><input type="file" id="c2pFile" accept=".docx,.pptx,.xlsx,.xls,.csv,.txt,.md,.html,.htm"></div>
     <p class="hint">Word and text files are laid out as wrapped paragraphs. PowerPoint files become one page per slide (title + bullets). HTML keeps headings and bullet lists, dropping styling/layout. Spreadsheets and CSVs become a table with the first row as a header; long values are truncated to fit the column width. Markdown is treated as plain text — headings aren't styled.</p>
@@ -4228,7 +4233,7 @@ $('btnFileToPdf').addEventListener('click', () => {
   });
 });
 
-$('btnTranslateText').addEventListener('click', () => {
+on('btnTranslateText', 'click', () => {
   openModal('Translate text', `
     <div class="field"><label>Text to translate</label><textarea id="trInput" style="min-height:150px;" placeholder="Type or paste text, or choose a file/photo below."></textarea></div>
     <div class="field"><label>Choose file / photo (optional)</label><input type="file" id="trTextFile" accept=".txt,.md,.docx,.pdf,image/*"><p class="hint">Choose a document or a photo from your device/gallery. Text is extracted locally; photos are read with the app's browser OCR.</p></div>
@@ -4306,7 +4311,7 @@ async function extractTextFromAnyFile(file){
   }
   throw new Error('Unsupported file type — use PDF, DOCX, TXT, or MD.');
 }
-$('btnTranslateDoc').addEventListener('click', () => {
+on('btnTranslateDoc', 'click', () => {
   openModal('Translate a document', `
     <div class="field"><label>File (PDF, DOCX, TXT, or MD)</label><input type="file" id="trDocFile" accept=".pdf,.docx,.txt,.md,image/*"></div>
     <div class="field row">
@@ -4334,7 +4339,7 @@ $('btnTranslateDoc').addEventListener('click', () => {
   });
 });
 
-$('btnTranslateAI').addEventListener('click', () => {
+on('btnTranslateAI', 'click', () => {
   const savedKey = localStorage.getItem('pdfworkbench-ai-key') || '';
   const savedProvider = localStorage.getItem('pdfworkbench-ai-provider') || 'anthropic';
   openModal('Translate via AI', `
@@ -4386,7 +4391,7 @@ $('btnTranslateAI').addEventListener('click', () => {
   }, 0);
 });
 
-$('btnTranslatePdf').addEventListener('click', () => {
+on('btnTranslatePdf', 'click', () => {
   openModal('Translate this PDF', `
     <div class="field row">
       <div><label>Source language</label><select id="trpSource">${langOptions(true)}</select></div>
@@ -4416,7 +4421,7 @@ $('btnTranslatePdf').addEventListener('click', () => {
   });
 });
 
-$('btnPdfToPptx').addEventListener('click', async () => {
+on('btnPdfToPptx', 'click', async () => {
   setStatus('Building PowerPoint file…'); showProgress(20);
   try{
     const pages = await getPdfPagesTextItems();
@@ -4433,7 +4438,7 @@ $('btnPdfToPptx').addEventListener('click', async () => {
   finally { showProgress(null); }
 });
 
-$('btnHeaderFooter').addEventListener('click', () => {
+on('btnHeaderFooter', 'click', () => {
   openModal('Add header / footer', `
     <p class="hint" style="margin:0;">Use <span class="mono">{page}</span> and <span class="mono">{total}</span> as placeholders. Leave any field blank to skip it.</p>
     <div class="field"><label>Header — left</label><input type="text" id="hfHL"></div>
@@ -4450,7 +4455,7 @@ $('btnHeaderFooter').addEventListener('click', () => {
   });
 });
 
-$('btnBates').addEventListener('click', () => {
+on('btnBates', 'click', () => {
   openModal('Bates numbering', `
     <p class="hint" style="margin:0;">Standard legal/audit convention: a fixed prefix plus a sequential number on every page, e.g. <span class="mono">ABC-00000001</span>.</p>
     <div class="field"><label>Prefix</label><input type="text" id="batesPrefix" placeholder="e.g. ABC-"></div>
@@ -4472,7 +4477,7 @@ $('btnBates').addEventListener('click', () => {
   });
 });
 
-$('btnRemoveBlank').addEventListener('click', async () => {
+on('btnRemoveBlank', 'click', async () => {
   setStatus('Scanning for blank pages…'); showProgress(20);
   try{
     const blankIndices = await detectBlankPages();
@@ -4487,7 +4492,7 @@ $('btnRemoveBlank').addEventListener('click', async () => {
   finally { showProgress(null); }
 });
 
-$('btnFillForm').addEventListener('click', async () => {
+on('btnFillForm', 'click', async () => {
   const fields = await getFormFieldsInfo();
   if(!fields.length){ toast('This PDF has no fillable form fields.', true); return; }
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
@@ -4513,11 +4518,11 @@ $('btnFillForm').addEventListener('click', async () => {
   });
 });
 
-$('btnFlattenForm').addEventListener('click', () => {
+on('btnFlattenForm', 'click', () => {
   if(confirm('Flatten the form? Field values become permanent page content and the fields can no longer be edited.')) flattenForm();
 });
 
-$('btnSign').addEventListener('click', () => {
+on('btnSign', 'click', () => {
   openModal('Sign PDF', `
     <div class="field"><label>Draw your signature</label>
       <canvas id="sigCanvas" width="380" height="140" style="border:1px solid var(--line);border-radius:4px;background:#fff;touch-action:none;width:100%;max-width:380px;display:block;"></canvas>
@@ -4543,7 +4548,7 @@ $('btnSign').addEventListener('click', () => {
   }, 0);
 });
 
-$('btnEncrypt').addEventListener('click', () => {
+on('btnEncrypt', 'click', () => {
   openModal('Set password (beta)', `
     <p class="hint" style="margin:0;">Uses a community fork of the core PDF library — real encryption, but less proven than the rest of this app. Open the resulting file with your password before relying on it. <strong>Not recommended for confidential or legally sensitive documents until more thoroughly validated.</strong></p>
     <div class="field"><label>Password to open the file</label><input type="password" id="encUserPw" placeholder="Required"></div>
@@ -4578,7 +4583,7 @@ $('btnEncrypt').addEventListener('click', () => {
   });
 });
 
-$('btnOpenEncrypted').addEventListener('click', () => {
+on('btnOpenEncrypted', 'click', () => {
   openModal('Open password-protected PDF', `
     <p class="hint" style="margin:0;">Beta: uses the same community fork as "Set password" — less battle-tested than the rest of this app. Decrypts the file and loads it as a normal working copy; it won't stay password-protected here unless you re-apply "Set password" before exporting.</p>
     <div class="field"><label>Password-protected PDF</label><input type="file" id="pwPdfFile" accept="application/pdf"></div>
@@ -4604,7 +4609,7 @@ $('btnOpenEncrypted').addEventListener('click', () => {
   });
 });
 
-$('btnRedact').addEventListener('click', () => {
+on('btnRedact', 'click', () => {
   openModal('Redact page', `
     <div class="field row">
       <div><label>Page number</label><input type="number" id="redactPageNum" min="1" value="1"></div>
@@ -4681,7 +4686,7 @@ $('btnRedact').addEventListener('click', () => {
   }, 0);
 });
 
-$('btnImagesToPdf').addEventListener('click', () => {
+on('btnImagesToPdf', 'click', () => {
   openModal('Combine images into PDF', `
     <div class="field"><label>Images (added in the order selected)</label><input type="file" id="imgFiles" accept="image/*" multiple></div>
     <p class="hint">Each image becomes one page, sized to match the image so nothing is cropped or stretched.</p>
@@ -4698,7 +4703,7 @@ $('btnImagesToPdf').addEventListener('click', () => {
   });
 });
 
-$('btnBatch').addEventListener('click', () => {
+on('btnBatch', 'click', () => {
   $('modalTitle').textContent = 'Batch process files';
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
@@ -4731,7 +4736,7 @@ $('btnBatch').addEventListener('click', () => {
   document.getElementById('batchStart').addEventListener('click', runBatch);
 });
 
-$('btnAnalyze').addEventListener('click', async () => {
+on('btnAnalyze', 'click', async () => {
   setStatus('Analyzing document…'); showProgress(20);
   try{
     const pages = await getPdfPagesTextItems();
@@ -4788,7 +4793,7 @@ function showWebsiteResult(html, regenerateFn){
     document.getElementById('webRegenerate').addEventListener('click', regenerateFn);
   }, 0);
 }
-$('btnGenWebsite').addEventListener('click', () => {
+on('btnGenWebsite', 'click', () => {
   const savedKey = localStorage.getItem('pdfworkbench-ai-key') || '';
   const savedProvider = localStorage.getItem('pdfworkbench-ai-provider') || 'anthropic';
   openModal('Generate a website', `
@@ -4895,14 +4900,14 @@ function openAiTaskModal(taskId, title, description, filenameSuffix){
     });
   }, 0);
 }
-$('btnAiSummarize').addEventListener('click', () => openAiTaskModal('summarize', 'Summarize', 'Produces a concise summary.', 'summary'));
-$('btnAiRewrite').addEventListener('click', () => openAiTaskModal('rewrite', 'Rewrite', 'Improves clarity and flow while keeping the same meaning.', 'rewrite'));
-$('btnAiExplain').addEventListener('click', () => openAiTaskModal('explain', 'Explain', 'Explains the content in simple, plain language.', 'explanation'));
-$('btnAiExtractTables').addEventListener('click', () => openAiTaskModal('extractTables', 'Extract tables', 'Pulls tabular data out as clean markdown tables.', 'tables'));
-$('btnAiGenQuestions').addEventListener('click', () => openAiTaskModal('generateQuestions', 'Generate questions', 'Creates study/comprehension questions from the content.', 'questions'));
-$('btnAiDraftEmail').addEventListener('click', () => openAiTaskModal('draftEmail', 'Draft email', 'Drafts a professional email referencing the key points.', 'email_draft'));
+on('btnAiSummarize', 'click', () => openAiTaskModal('summarize', 'Summarize', 'Produces a concise summary.', 'summary'));
+on('btnAiRewrite', 'click', () => openAiTaskModal('rewrite', 'Rewrite', 'Improves clarity and flow while keeping the same meaning.', 'rewrite'));
+on('btnAiExplain', 'click', () => openAiTaskModal('explain', 'Explain', 'Explains the content in simple, plain language.', 'explanation'));
+on('btnAiExtractTables', 'click', () => openAiTaskModal('extractTables', 'Extract tables', 'Pulls tabular data out as clean markdown tables.', 'tables'));
+on('btnAiGenQuestions', 'click', () => openAiTaskModal('generateQuestions', 'Generate questions', 'Creates study/comprehension questions from the content.', 'questions'));
+on('btnAiDraftEmail', 'click', () => openAiTaskModal('draftEmail', 'Draft email', 'Drafts a professional email referencing the key points.', 'email_draft'));
 
-$('btnAiTools').addEventListener('click', () => {
+on('btnAiTools', 'click', () => {
   const savedKey = localStorage.getItem('pdfworkbench-ai-key') || '';
   const savedProvider = localStorage.getItem('pdfworkbench-ai-provider') || 'anthropic';
   openModal('AI text tools', `
@@ -4970,7 +4975,7 @@ $('btnAiTools').addEventListener('click', () => {
   }, 0);
 });
 
-$('btnImageTable').addEventListener('click', () => {
+on('btnImageTable', 'click', () => {
   openModal('Extract table from image', `
     <div class="field"><label>Image</label><input type="file" id="tblImgFile" accept="image/*"></div>
     <div class="field"><label>Language</label>${ocrLangOptions('tblImgLang')}</div>
@@ -4988,7 +4993,7 @@ $('btnImageTable').addEventListener('click', () => {
   });
 });
 
-$('btnChatPdf').addEventListener('click', async () => {
+on('btnChatPdf', 'click', async () => {
   const pages = await getPdfPagesTextItems();
   const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
   if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
@@ -5046,7 +5051,7 @@ $('btnChatPdf').addEventListener('click', async () => {
   }, 0);
 });
 
-$('btnVoiceToText').addEventListener('click', () => {
+on('btnVoiceToText', 'click', () => {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SpeechRecognition){ toast('Voice input isn\u2019t supported in this browser — try Chrome, or Safari on iOS/macOS.', true); return; }
   openModal('Voice to text', `
@@ -5084,7 +5089,7 @@ $('btnVoiceToText').addEventListener('click', () => {
   }, 0);
 });
 
-$('btnReadAloud').addEventListener('click', async () => {
+on('btnReadAloud', 'click', async () => {
   if(!('speechSynthesis' in window)){ toast('Text-to-speech isn\u2019t supported in this browser.', true); return; }
   let text = '';
   if(workingBytes){
@@ -5125,7 +5130,7 @@ $('btnReadAloud').addEventListener('click', async () => {
   }, 0);
 });
 
-$('btnQrReader').addEventListener('click', () => {
+on('btnQrReader', 'click', () => {
   openModal('Read QR code', `
     <div class="field"><label>Image containing a QR code</label><input type="file" id="qrFile" accept="image/*"></div>
     <p class="hint">Reads standard QR codes from a photo or screenshot. 1D barcodes (UPC/EAN/Code128) aren't supported.</p>
@@ -5147,7 +5152,7 @@ $('btnQrReader').addEventListener('click', () => {
   });
 });
 
-$('btnQrGenerate').addEventListener('click', () => {
+on('btnQrGenerate', 'click', () => {
   openModal('Generate QR code', `
     <div class="field"><label>Text or URL</label><textarea id="qrGenText" style="min-height:80px;" placeholder="https://example.com or any text"></textarea></div>
     <button class="btn primary" id="qrGenBtn" type="button" style="align-self:flex-start;">Generate</button>
@@ -5179,7 +5184,7 @@ $('btnQrGenerate').addEventListener('click', () => {
 });
 
 /* ---------- Reader controls ---------- */
-$('readerOpenBtn').addEventListener('click', () => {
+on('readerOpenBtn', 'click', () => {
   const input = document.createElement('input');
   input.type = 'file'; input.accept = '.pdf,.epub';
   input.addEventListener('change', async () => {
@@ -5193,28 +5198,28 @@ $('readerOpenBtn').addEventListener('click', () => {
   });
   input.click();
 });
-$('readerUseCurrentBtn').addEventListener('click', async () => {
+on('readerUseCurrentBtn', 'click', async () => {
   if(!workingBytes){ toast('No PDF is currently open in the editor.', true); return; }
   try{ await openReaderPdf(workingBytes, ($('outName').value || 'document') + '_' + workingBytes.byteLength); }
   catch(e){ console.error(e); toast('Could not open the current PDF for reading.', true); }
 });
-$('readerPrev').addEventListener('click', () => {
+on('readerPrev', 'click', () => {
   if($('readerPrev').disabled) return;
   if(readerMode === 'pdf'){ if(readerPdfCurrentPage > 1){ readerPdfCurrentPage--; renderReaderPdfPage(); } }
   else if(readerMode === 'epub'){ if(readerEpubIndex > 0){ readerEpubIndex--; renderReaderEpubChapter(); } }
 });
-$('readerNext').addEventListener('click', () => {
+on('readerNext', 'click', () => {
   if($('readerNext').disabled) return;
   if(readerMode === 'pdf'){ if(readerPdfCurrentPage < readerPdfPageCount){ readerPdfCurrentPage++; renderReaderPdfPage(); } }
   else if(readerMode === 'epub'){ if(readerEpubIndex < readerEpubChapters.length - 1){ readerEpubIndex++; renderReaderEpubChapter(); } }
 });
-$('readerZoomIn').addEventListener('click', () => { if(readerMode === 'pdf'){ readerPdfZoom = Math.min(readerPdfZoom + 0.2, 3); renderReaderPdfPage(); } });
-$('readerZoomOut').addEventListener('click', () => { if(readerMode === 'pdf'){ readerPdfZoom = Math.max(readerPdfZoom - 0.2, 0.6); renderReaderPdfPage(); } });
-$('readerTheme').addEventListener('change', (e) => {
+on('readerZoomIn', 'click', () => { if(readerMode === 'pdf'){ readerPdfZoom = Math.min(readerPdfZoom + 0.2, 3); renderReaderPdfPage(); } });
+on('readerZoomOut', 'click', () => { if(readerMode === 'pdf'){ readerPdfZoom = Math.max(readerPdfZoom - 0.2, 0.6); renderReaderPdfPage(); } });
+on('readerTheme', 'change', (e) => {
   $('readerBody').className = 'reader-body theme-' + e.target.value;
   try{ localStorage.setItem('pdfworkbench-reader-theme', e.target.value); } catch{}
 });
-$('readerToc').addEventListener('click', () => {
+on('readerToc', 'click', () => {
   const panel = $('readerTocPanel');
   if(panel.style.display === 'flex'){ panel.style.display = 'none'; return; }
   panel.innerHTML = readerEpubChapters.map((c,i) => `<button class="toc-item" data-i="${i}" type="button">${c.title}</button>`).join('');
@@ -5226,28 +5231,28 @@ $('readerToc').addEventListener('click', () => {
   }));
 });
 
-$('btnUndo').addEventListener('click', undo);
-$('btnRedo').addEventListener('click', redo);
-$('btnReset').addEventListener('click', () => {
+on('btnUndo', 'click', undo);
+on('btnRedo', 'click', redo);
+on('btnReset', 'click', () => {
   if(confirm('Reset the project? All pages and history will be cleared.')){
     workingBytes = null; history = []; historyIndex = -1; selected.clear();
     setToolsEnabled(false); grid.innerHTML = ''; setStatus('Project reset.');
   }
 });
 
-$('btnSelectAll').addEventListener('click', () => {
+on('btnSelectAll', 'click', () => {
   Array.from(grid.children).forEach(c => { selected.add(parseInt(c.dataset.index)); c.classList.add('sel'); c.querySelector('input[type=checkbox]').checked = true; });
 });
-$('btnSelectNone').addEventListener('click', () => {
+on('btnSelectNone', 'click', () => {
   selected.clear();
   Array.from(grid.children).forEach(c => { c.classList.remove('sel'); c.querySelector('input[type=checkbox]').checked = false; });
 });
-$('gotoPage').addEventListener('change', (e) => {
+on('gotoPage', 'change', (e) => {
   const n = parseInt(e.target.value);
   const card = grid.children[n-1];
   if(card){ card.scrollIntoView({behavior:'smooth', block:'center'}); card.style.outline='2px solid var(--accent)'; setTimeout(()=>{ if(!selected.has(n-1)) card.style.outline=''; }, 1200); }
 });
-$('btnDownload').addEventListener('click', () => {
+on('btnDownload', 'click', () => {
   if(!workingBytes) return;
   downloadBlob(new Blob([workingBytes], {type:'application/pdf'}), `${$('outName').value || 'document'}.pdf`);
   setStatus('Downloaded.');
@@ -5263,13 +5268,13 @@ dz.addEventListener('drop', (e) => { e.preventDefault(); dz.classList.remove('dr
 /* ---------- Dark mode ---------- */
 const darkPref = localStorage.getItem('pdfworkbench-dark');
 if(darkPref === '1') document.body.classList.add('dark');
-$('darkToggle').addEventListener('click', () => {
+on('darkToggle', 'click', () => {
   document.body.classList.toggle('dark');
   localStorage.setItem('pdfworkbench-dark', document.body.classList.contains('dark') ? '1' : '0');
 });
 
 /* ---------- Mobile menu ---------- */
-$('menuToggle').addEventListener('click', () => setStudio('dashboard'));
+on('menuToggle', 'click', () => setStudio('dashboard'));
 
 /* ---------- Keyboard shortcuts ---------- */
 document.addEventListener('keydown', (e) => {
@@ -5301,18 +5306,18 @@ function showKeyboardShortcuts(){
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
 }
-$('btnShowShortcuts').addEventListener('click', showKeyboardShortcuts);
+on('btnShowShortcuts', 'click', showKeyboardShortcuts);
 
 const highContrastPref = localStorage.getItem('pdfworkbench-high-contrast');
-if(highContrastPref === '1'){ document.body.classList.add('high-contrast'); $('toggleHighContrast').checked = true; }
-$('toggleHighContrast').addEventListener('change', (e) => {
+if(highContrastPref === '1'){ document.body.classList.add('high-contrast'); if($('toggleHighContrast')) $('toggleHighContrast').checked = true; }
+on('toggleHighContrast', 'change', (e) => {
   document.body.classList.toggle('high-contrast', e.target.checked);
   localStorage.setItem('pdfworkbench-high-contrast', e.target.checked ? '1' : '0');
 });
 
 const largeTextPref = localStorage.getItem('pdfworkbench-large-text');
-if(largeTextPref === '1'){ document.body.classList.add('large-text'); $('toggleLargeText').checked = true; }
-$('toggleLargeText').addEventListener('change', (e) => {
+if(largeTextPref === '1'){ document.body.classList.add('large-text'); if($('toggleLargeText')) $('toggleLargeText').checked = true; }
+on('toggleLargeText', 'change', (e) => {
   document.body.classList.toggle('large-text', e.target.checked);
   localStorage.setItem('pdfworkbench-large-text', e.target.checked ? '1' : '0');
 });
@@ -5390,23 +5395,23 @@ async function renderDashboardRecent(){
       </div>`).join('');
   }
 }
-$('clearAllRecentFiles').addEventListener('click', async () => {
+on('clearAllRecentFiles', 'click', async () => {
   if(!confirm('Clear all recent files from this device? This only removes them from the Recent Files list — it doesn\'t affect anything already downloaded.')) return;
   await clearAllProjectSnapshots();
   renderDashboardRecent();
 });
-$('clearAllConversions').addEventListener('click', () => {
+on('clearAllConversions', 'click', () => {
   if(!confirm('Clear the recent conversions log?')) return;
   clearConversionLog();
   renderDashboardRecent();
 });
-$('btnClearAllRecentFilesSettings').addEventListener('click', async () => {
+on('btnClearAllRecentFilesSettings', 'click', async () => {
   if(!confirm('Delete all recent files from this device? This only removes them from the Recent Files list — it doesn\'t affect anything already downloaded.')) return;
   await clearAllProjectSnapshots();
   renderDashboardRecent();
   toast('All recent files deleted.');
 });
-$('btnClearConversionsSettings').addEventListener('click', () => {
+on('btnClearConversionsSettings', 'click', () => {
   if(!confirm('Delete the conversion history log?')) return;
   clearConversionLog();
   renderDashboardRecent();
@@ -5480,7 +5485,15 @@ function setStudio(name){
 }
 
 document.querySelectorAll('.studio-tab').forEach(t => {
-  t.addEventListener('click', () => setStudio(t.dataset.studio));
+  const activate = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setStudio(t.dataset.studio);
+  };
+  t.addEventListener('click', activate);
+  t.addEventListener('pointerup', (e) => {
+    if(e.pointerType === 'touch') activate(e);
+  });
 });
 const financialStudioTab = document.querySelector('.studio-tab[data-studio="interest"]');
 if(financialStudioTab){
@@ -5507,12 +5520,12 @@ document.querySelectorAll('.dash-tile').forEach(t => {
   t.addEventListener('click', () => launchTool(t.dataset.tool));
 });
 
-$('exportPdfTile').addEventListener('click', () => {
+on('exportPdfTile', 'click', () => {
   if(!workingBytes){ toast('Open a PDF first.', true); return; }
   downloadBlob(new Blob([workingBytes], {type:'application/pdf'}), ($('outName').value || 'document') + '.pdf');
   setStatus('Downloaded.');
 });
-$('exportAllZipTile').addEventListener('click', async () => {
+on('exportAllZipTile', 'click', async () => {
   if(!workingBytes){ toast('Open a PDF first.', true); return; }
   setStatus('Exporting all formats…'); showProgress(10);
   try{
@@ -5684,7 +5697,7 @@ function fcCalculate(type){
     out.innerHTML='<div class="hint">Fetching live exchange rate…</div>'; fetch(`https://api.frankfurter.app/latest?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`).then(r=>r.json()).then(d=>{const rate=d.rates&&d.rates[to]; if(!rate)throw Error('Rate unavailable'); out.innerHTML=`<div class="totals-card"><div class="totals-row"><span>Rate</span><b>1 ${from} = ${Number(rate).toFixed(6)} ${to}</b></div><div class="totals-row"><span>Converted</span><b>${(amount*rate).toFixed(2)} ${to}</b></div><div class="hint">Latest available market reference rate.</div></div>`;}).catch(()=>{out.innerHTML='<div class="hint">Live rate unavailable. Enter a manual rate and calculate again.</div>';});
   }
 }
-$('btnFinancialSuite').addEventListener('click', openFinancialSuite);
+on('btnFinancialSuite', 'click', openFinancialSuite);
 
 /* ---------- Bank interest calculator ----------
    Simple interest on the daily closing balance between statement
@@ -6007,7 +6020,7 @@ function analyzeColumn(rows, colIdx){
   }
   return { samples, pctNumeric, pctNonzero, isSequential };
 }
-$('btnExcelChart').addEventListener('click', () => {
+on('btnExcelChart', 'click', () => {
   openModal('Excel / CSV → Chart', `
     <div class="field"><label>Spreadsheet file</label><input type="file" id="chartFile" accept=".xlsx,.xls,.csv"></div>
     <div id="chartColumnsArea"></div>
@@ -6194,7 +6207,7 @@ function showMilestoneChartResult(milestones, chartType){
     });
   }, 0);
 }
-$('btnMilestoneTracker').addEventListener('click', () => {
+on('btnMilestoneTracker', 'click', () => {
   openModal('Project milestone tracker', `
     <div class="field"><label>Import from file (optional — CSV/Excel with Name, Date, Value, Note columns)</label><input type="file" id="milestoneImportFile" accept=".xlsx,.xls,.csv"></div>
     <div id="milestoneRows" style="display:flex;flex-direction:column;gap:10px;max-height:320px;overflow-y:auto;"></div>
@@ -6319,7 +6332,7 @@ function digCanvasClick(e){
     digRedraw(); digRenderTable();
   }
 }
-$('btnChartDigitizer').addEventListener('click', () => {
+on('btnChartDigitizer', 'click', () => {
   digImg = null; digCanvas = null; digCtx = null;
   digState = 'idle'; digCalPoints = []; digDataPoints = []; digPendingPixel = null;
   openModal('Chart digitizer', `
@@ -6420,7 +6433,7 @@ $('btnChartDigitizer').addEventListener('click', () => {
     });
   }, 0);
 });
-$('btnInterestCalc').addEventListener('click', () => {
+on('btnInterestCalc', 'click', () => {
   window.__intPdfBuf = null; window.__intPdfPassword = null; window.__intGapThreshold = null;
   window.__intRows = null; window.__intHeaderIdx = null;
   openModal('Financial Calculator — Bank Statement Interest', `
@@ -6754,12 +6767,12 @@ $('btnInterestCalc').addEventListener('click', () => {
 });
 
 /* ---------- Settings ---------- */
-$('btnClearAiKey').addEventListener('click', () => {
+on('btnClearAiKey', 'click', () => {
   localStorage.removeItem('pdfworkbench-ai-key');
   localStorage.removeItem('pdfworkbench-ai-provider');
   toast('Saved AI API key cleared.');
 });
-$('btnClearAllData').addEventListener('click', () => {
+on('btnClearAllData', 'click', () => {
   if(confirm("Clear DocuForge's saved local settings (theme, accessibility and saved AI provider/key)? This does not remove your PDF project snapshots or conversion history.")){
     const appKeys = [
       'pdfworkbench-ai-key',
@@ -6840,14 +6853,14 @@ async function fhHandleQuestion(question){
     fhAddMsg('bot', "I don't have a specific answer for that. Try the Help tab for a full guide — or add your AI API key in AI Studio and ask me again for open-ended questions.");
   }
 }
-$('floatingHelpBtn').addEventListener('click', () => {
+on('floatingHelpBtn', 'click', () => {
   const panel = $('floatingHelpPanel');
   panel.classList.toggle('show');
   if(panel.classList.contains('show') && !$('floatingHelpMessages').children.length){
     fhAddMsg('bot', "Hi! Ask me how to do something in DocuForge AI — or browse the Help tab for a full guide.");
   }
 });
-$('floatingHelpClose').addEventListener('click', () => $('floatingHelpPanel').classList.remove('show'));
+on('floatingHelpClose', 'click', () => $('floatingHelpPanel').classList.remove('show'));
 function fhSend(){
   const input = $('floatingHelpInput');
   const q = input.value.trim();
@@ -6855,9 +6868,9 @@ function fhSend(){
   input.value = '';
   fhHandleQuestion(q);
 }
-$('floatingHelpSend').addEventListener('click', fhSend);
-$('floatingHelpInput').addEventListener('keydown', (e) => { if(e.key === 'Enter') fhSend(); });
-$('floatingHelpMic').addEventListener('click', () => {
+on('floatingHelpSend', 'click', fhSend);
+on('floatingHelpInput', 'keydown', (e) => { if(e.key === 'Enter') fhSend(); });
+on('floatingHelpMic', 'click', () => {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SpeechRecognition){ toast('Voice input isn\u2019t supported in this browser.', true); return; }
   const rec = new SpeechRecognition();
@@ -6870,7 +6883,7 @@ $('floatingHelpMic').addEventListener('click', () => {
 /* ---------- Init ---------- */
 try{
   const savedReaderTheme = localStorage.getItem('pdfworkbench-reader-theme');
-  if(savedReaderTheme){ $('readerTheme').value = savedReaderTheme; $('readerBody').className = 'reader-body theme-' + savedReaderTheme; }
+  if(savedReaderTheme){ if($('readerTheme')) $('readerTheme').value = savedReaderTheme; if($('readerBody')) $('readerBody').className = 'reader-body theme-' + savedReaderTheme; }
 } catch{}
 setStudio('dashboard');
 setToolsEnabled(false);
