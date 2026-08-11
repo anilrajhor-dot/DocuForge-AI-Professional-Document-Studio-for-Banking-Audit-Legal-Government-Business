@@ -495,6 +495,10 @@ body.dark .studio-tab.active{color:var(--pine);}
  .integrated-app-frame{height:calc(100vh - 225px);min-height:680px;border-radius:6px}
 }
 </style>
+<style id="financial-suite-css">
+.fc-tab{font-weight:700}.fc-tab.primary{background:var(--accent);color:var(--accent-ink)}
+#modalBody .totals-card{margin-top:10px}
+</style>
 </head>
 <body>
 
@@ -700,6 +704,7 @@ body.dark .studio-tab.active{color:var(--pine);}
       <div class="ribbon-panel" data-studio-panel="interest">
 <div class="tool-group">
 <button class="tool-btn" id="btnInterestCalc"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg> Bank statement interest calculator…</button>
+<button class="tool-btn" id="btnFinancialSuite"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 8h10M7 12h10M7 16h4"></path></svg> Financial Calculators — EMI / Age / SIP / Deposit / RDS / Currency</button>
 <p class="hint" style="padding:0 14px;margin:6px 0 0;">Calculates interest month by month, from the 1st through the last day of each calendar month inclusive, on the daily closing balance carried forward from your statement's transactions — the standard convention for savings-account interest.</p>
 </div>
 </div>
@@ -1250,6 +1255,32 @@ async function loadPdfSafely(buf){
     throw e;
   }
 }
+async function rebuildProtectedPdfWithPdfJs(file, password){
+  const bytes=new Uint8Array(await file.arrayBuffer());
+  const pdf=await getPdfDocumentSafely(bytes,password);
+  const out=await PDFDocument.create();
+  for(let i=1;i<=pdf.numPages;i++){
+    const page=await pdf.getPage(i); const viewport=page.getViewport({scale:1.5});
+    const canvas=document.createElement('canvas'); canvas.width=Math.ceil(viewport.width); canvas.height=Math.ceil(viewport.height);
+    await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+    const dataUrl=canvas.toDataURL('image/png');
+    const base64=dataUrl.split(',')[1];
+    const bin=atob(base64); const png=new Uint8Array(bin.length); for(let j=0;j<bin.length;j++) png[j]=bin.charCodeAt(j);
+    const img=await out.embedPng(png); const v=page.getViewport({scale:1}); const p=out.addPage([v.width,v.height]);
+    p.drawImage(img,{x:0,y:0,width:v.width,height:v.height});
+  }
+  return out.save();
+}
+async function openProtectedPdf(file){
+  for(let attempt=1;attempt<=3;attempt++){
+    const password=prompt(`This PDF is password-protected. Enter the PDF password (attempt ${attempt} of 3):`);
+    if(password===null) return null;
+    try{ toast('Unlocking protected PDF…'); return await rebuildProtectedPdfWithPdfJs(file,password); }
+    catch(e){ if(attempt===3) throw new Error('The PDF password was incorrect or the protected PDF could not be read.'); }
+  }
+  return null;
+}
+
 async function loadFiles(fileList){
   const isPdfFile = f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
   const isImageFile = f => f.type.startsWith('image/') || /\.(jpe?g|png|gif|webp|bmp|heic|heif)$/i.test(f.name);
@@ -1263,7 +1294,14 @@ async function loadFiles(fileList){
       currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
       if(isPdfFile(allFiles[0])){
         const firstBuf = await allFiles[0].arrayBuffer();
-        doc = await loadPdfSafely(firstBuf);
+        try { doc = await loadPdfSafely(firstBuf); }
+        catch(e) {
+          if(isPdfFile(allFiles[0]) && e && /password-protected/i.test(e.message)) {
+            const rebuilt = await openProtectedPdf(allFiles[0]);
+            if(!rebuilt) return;
+            doc = await PDFDocument.load(rebuilt);
+          } else throw e;
+        }
         startIdx = 1;
       } else {
         doc = await PDFDocument.create();
@@ -1277,7 +1315,15 @@ async function loadFiles(fileList){
       const f = allFiles[i];
       if(isPdfFile(f)){
         const buf = await f.arrayBuffer();
-        const src = await loadPdfSafely(buf);
+        let src;
+        try { src = await loadPdfSafely(buf); }
+        catch(e) {
+          if(e && /password-protected/i.test(e.message)) {
+            const rebuilt = await openProtectedPdf(f);
+            if(!rebuilt) continue;
+            src = await PDFDocument.load(rebuilt);
+          } else throw e;
+        }
         const copied = await doc.copyPages(src, src.getPageIndices());
         copied.forEach(p => doc.addPage(p));
       } else {
@@ -5471,6 +5517,97 @@ function computeStats(data){
   return { n, sum, avg, min, max };
 }
 
+/* ---------- Financial Calculator Suite ---------- */
+function fcNum(v){ const n=parseFloat(v); return Number.isFinite(n)?n:0; }
+function fcMoney(n){ return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(n||0); }
+function fcField(id,label,type='number',value='',step='0.01'){ return `<div class="field"><label>${label}</label><input id="${id}" type="${type}" value="${value}" ${type==='number'?`step="${step}"`:''}></div>`; }
+function fcShowResult(html){ const b=document.getElementById('fcResult'); if(b)b.innerHTML=html; }
+function openFinancialSuite(){
+  openModal('Financial Calculator Suite', `
+    <div class="fc-tabs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+      <button type="button" class="btn ghost fc-tab" data-fc="emi">EMI</button>
+      <button type="button" class="btn ghost fc-tab" data-fc="age">Age</button>
+      <button type="button" class="btn ghost fc-tab" data-fc="sip">SIP</button>
+      <button type="button" class="btn ghost fc-tab" data-fc="deposit">Deposit Interest</button>
+      <button type="button" class="btn ghost fc-tab" data-fc="rds">RDS</button>
+      <button type="button" class="btn ghost fc-tab" data-fc="currency">Currency</button>
+    </div>
+    <div id="fcBody"></div><div id="fcResult" style="margin-top:12px"></div>
+  `, async()=>{});
+  document.getElementById('modalConfirm').style.display='none';
+  const body=document.getElementById('fcBody');
+  const render=(type)=>{
+    if(type==='emi') body.innerHTML=`
+      ${fcField('fcLoan','Loan amount (₹)','number',500000,'1')}
+      ${fcField('fcRate','Annual interest rate (%)','number',10,'0.01')}
+      ${fcField('fcTenure','Total loan tenure (months)','number',60,'1')}
+      ${fcField('fcMoratorium','Moratorium period (months)','number',0,'1')}
+      <div class="field"><label>Interest during moratorium</label><select id="fcMorMode"><option value="pay">Pay interest during moratorium</option><option value="cap">Capitalise interest into loan</option></select></div>
+      <div class="field"><label>EMI rounding</label><select id="fcRound"><option value="2">2 decimals</option><option value="0">Nearest rupee</option></select></div>
+      <button class="btn primary" id="fcCalc">Calculate EMI</button>`;
+    else if(type==='age') body.innerHTML=`
+      <div class="field"><label>Date of birth</label><input id="fcDob" type="date"></div>
+      <div class="field"><label>Age as on</label><input id="fcAgeOn" type="date"></div>
+      <button class="btn primary" id="fcCalc">Calculate Age</button>`;
+    else if(type==='sip') body.innerHTML=`
+      ${fcField('fcSip','Monthly SIP (₹)','number',10000,'1')}
+      ${fcField('fcSipRate','Expected annual return (%)','number',12,'0.01')}
+      ${fcField('fcSipYears','Period (years)','number',10,'1')}
+      ${fcField('fcStep','Annual SIP step-up (%)','number',0,'0.01')}
+      <button class="btn primary" id="fcCalc">Calculate SIP</button>`;
+    else if(type==='deposit') body.innerHTML=`
+      ${fcField('fcDep','Deposit principal (₹)','number',100000,'1')}
+      ${fcField('fcDepRate','Annual interest rate (%)','number',7,'0.01')}
+      ${fcField('fcDepYears','Period (years)','number',3,'0.1')}
+      <div class="field"><label>Interest payout / compounding</label><select id="fcDepFreq"><option value="12">Monthly</option><option value="4">Quarterly</option><option value="2">Half-yearly</option><option value="1">Yearly</option></select></div>
+      <div class="field"><label>Mode</label><select id="fcDepMode"><option value="payout">Interest paid periodically</option><option value="cum">Cumulative / compounded</option></select></div>
+      <button class="btn primary" id="fcCalc">Calculate Deposit Interest</button>`;
+    else if(type==='rds') body.innerHTML=`
+      ${fcField('fcRds','Monthly instalment (₹)','number',5000,'1')}
+      ${fcField('fcRdsRate','Annual interest rate (%)','number',6.5,'0.01')}
+      ${fcField('fcRdsMonths','Tenure (months)','number',60,'1')}
+      <div class="field"><label>Interest calculation</label><select id="fcRdsFreq"><option value="4">Quarterly compounding (bank-style approximation)</option><option value="12">Monthly compounding</option></select></div>
+      <button class="btn primary" id="fcCalc">Calculate RDS</button>`;
+    else body.innerHTML=`
+      <div class="field"><label>From currency</label><select id="fcFrom"><option>INR</option><option>USD</option><option>EUR</option><option>GBP</option><option>AED</option><option>SGD</option><option>AUD</option><option>CAD</option><option>JPY</option></select></div>
+      <div class="field"><label>To currency</label><select id="fcTo"><option>USD</option><option>INR</option><option>EUR</option><option>GBP</option><option>AED</option><option>SGD</option><option>AUD</option><option>CAD</option><option>JPY</option></select></div>
+      ${fcField('fcAmount','Amount','number',1,'0.01')}
+      <button class="btn primary" id="fcCalc">Get Live Exchange Rate</button>
+      <p class="hint">Uses a public live-rate service when internet access is available. If unavailable, enter a rate manually below.</p>
+      ${fcField('fcManualRate','Manual rate (optional)','number','','0.000001')}`;
+    document.getElementById('fcCalc').onclick=()=>fcCalculate(type);
+    if(type==='age'){
+      const today=new Date(), iso=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+      document.getElementById('fcAgeOn').value=iso;
+    }
+  };
+  document.querySelectorAll('.fc-tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.fc-tab').forEach(x=>x.classList.remove('primary'));b.classList.add('primary');render(b.dataset.fc);});
+  const first=document.querySelector('.fc-tab[data-fc="emi"]'); first.classList.add('primary'); render('emi');
+}
+function fcCalculate(type){
+  const out=document.getElementById('fcResult');
+  if(type==='emi'){
+    const P=fcNum($('fcLoan').value), r=fcNum($('fcRate').value)/1200, n=Math.max(1,Math.round(fcNum($('fcTenure').value))), m=Math.max(0,Math.min(n,Math.round(fcNum($('fcMoratorium').value))));
+    const mode=$('fcMorMode').value, rm=Math.pow(1+r,m); const morInt=r===0?0:P*(rm-1); const balance=mode==='cap'?P*rm:P; const repay=Math.max(1,n-m);
+    let emi=r===0?balance/repay:balance*r*Math.pow(1+r,repay)/(Math.pow(1+r,repay)-1); const roundDigits=parseInt($('fcRound').value)||2; emi=roundDigits===0?Math.round(emi):Number(emi.toFixed(roundDigits)); const total=emi*repay+(mode==='pay'?morInt:0); const capInt=mode==='cap'?balance-P:0;
+    out.innerHTML=`<div class="totals-card"><div class="totals-row"><span>EMI after moratorium</span><b>${fcMoney(emi)}</b></div><div class="totals-row"><span>Moratorium interest</span><b>${fcMoney(morInt)}</b></div><div class="totals-row"><span>Interest capitalised</span><b>${fcMoney(capInt)}</b></div><div class="totals-row"><span>Principal for EMI</span><b>${fcMoney(balance)}</b></div><div class="totals-row"><span>Total repayment</span><b>${fcMoney(total)}</b></div><div class="hint">${m} month(s) moratorium; ${mode==='cap'?'interest is added to principal':'interest is paid separately'}.</div></div>`;
+  } else if(type==='age'){
+    const dob=new Date($('fcDob').value+'T00:00:00'), as=new Date($('fcAgeOn').value+'T00:00:00'); if(isNaN(dob)||isNaN(as)||as<dob){out.textContent='Enter valid dates; Age as on must not be before date of birth.';return;}
+    let y=as.getFullYear()-dob.getFullYear(), mo=as.getMonth()-dob.getMonth(), d=as.getDate()-dob.getDate(); if(d<0){mo--;d+=new Date(as.getFullYear(),as.getMonth(),0).getDate();} if(mo<0){y--;mo+=12;} out.innerHTML=`<div class="totals-card"><b>${y} years, ${mo} months, ${d} days</b></div>`;
+  } else if(type==='sip'){
+    const monthly=fcNum($('fcSip').value), annual=fcNum($('fcSipRate').value)/100, years=Math.max(0,fcNum($('fcSipYears').value)), step=fcNum($('fcStep').value)/100; let corpus=0, invested=0, m=0, inst=monthly; const totalMonths=Math.round(years*12);
+    for(let i=1;i<=totalMonths;i++){if((i-1)%12===0 && i>1) inst*=1+step; invested+=inst; corpus=(corpus+inst)*(1+annual/12);m++;} corpus-=0; out.innerHTML=`<div class="totals-card"><div class="totals-row"><span>Total invested</span><b>${fcMoney(invested)}</b></div><div class="totals-row"><span>Estimated corpus</span><b>${fcMoney(corpus)}</b></div><div class="totals-row"><span>Estimated gain</span><b>${fcMoney(corpus-invested)}</b></div></div>`;
+  } else if(type==='deposit'){
+    const P=fcNum($('fcDep').value), rate=fcNum($('fcDepRate').value)/100, years=fcNum($('fcDepYears').value), freq=fcNum($('fcDepFreq').value), mode=$('fcDepMode').value; const periods=Math.max(1,Math.round(years*freq)); const interest=mode==='cum'?P*Math.pow(1+rate/freq,periods)-P:P*rate*years; const maturity=P+interest; out.innerHTML=`<div class="totals-card"><div class="totals-row"><span>Principal</span><b>${fcMoney(P)}</b></div><div class="totals-row"><span>Interest</span><b>${fcMoney(interest)}</b></div><div class="totals-row"><span>${mode==='cum'?'Maturity amount':'Total principal (interest paid periodically)'}</span><b>${fcMoney(maturity)}</b></div><div class="hint">Actual bank FD/RD conventions, tax and day-count rules may differ.</div></div>`;
+  } else if(type==='rds'){
+    const p=fcNum($('fcRds').value), rate=fcNum($('fcRdsRate').value)/100, n=Math.max(1,Math.round(fcNum($('fcRdsMonths').value))), freq=fcNum($('fcRdsFreq').value); let maturity=0; for(let k=1;k<=n;k++){ const t=(n-k+1)/12; maturity += p*Math.pow(1+rate/freq, freq*t)-p; } maturity += p*n; const invested=p*n; out.innerHTML=`<div class="totals-card"><div class="totals-row"><span>Total instalments</span><b>${fcMoney(invested)}</b></div><div class="totals-row"><span>Estimated interest</span><b>${fcMoney(maturity-invested)}</b></div><div class="totals-row"><span>Estimated maturity</span><b>${fcMoney(maturity)}</b></div><div class="hint">RDS maturity is an estimate; banks may use quarterly compounding and specific deposit-date conventions.</div></div>`;
+  } else {
+    const from=$('fcFrom').value,to=$('fcTo').value,amount=fcNum($('fcAmount').value),manual=fcNum($('fcManualRate').value); if(from===to){out.innerHTML=`<div class="totals-card">${fcMoney(amount)} ${to}</div>`;return;} if(manual>0){out.innerHTML=`<div class="totals-card"><div class="totals-row"><span>Rate</span><b>1 ${from} = ${manual} ${to}</b></div><div class="totals-row"><span>Converted</span><b>${fcMoney(amount*manual).replace('₹','') } ${to}</b></div></div>`;return;}
+    out.innerHTML='<div class="hint">Fetching live exchange rate…</div>'; fetch(`https://api.frankfurter.app/latest?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`).then(r=>r.json()).then(d=>{const rate=d.rates&&d.rates[to]; if(!rate)throw Error('Rate unavailable'); out.innerHTML=`<div class="totals-card"><div class="totals-row"><span>Rate</span><b>1 ${from} = ${Number(rate).toFixed(6)} ${to}</b></div><div class="totals-row"><span>Converted</span><b>${(amount*rate).toFixed(2)} ${to}</b></div><div class="hint">Latest available market reference rate.</div></div>`;}).catch(()=>{out.innerHTML='<div class="hint">Live rate unavailable. Enter a manual rate and calculate again.</div>';});
+  }
+}
+$('btnFinancialSuite').addEventListener('click', openFinancialSuite);
+
 /* ---------- Bank interest calculator ----------
    Simple interest on the daily closing balance between statement
    entries: balance × rate × days ÷ 365 for each stretch, summed — the
@@ -5480,6 +5617,14 @@ function computeStats(data){
    fixed layout. */
 const MONTH_ABBR = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
 function parseFlexibleDate(str){
+  if(str instanceof Date && !isNaN(str.getTime())) return new Date(str.getFullYear(), str.getMonth(), str.getDate());
+  if(typeof str === 'number' && Number.isFinite(str)){
+    // Excel serial date (1900 date system). Ignore values outside a practical date range.
+    if(str > 20000 && str < 80000){
+      const d = new Date(Date.UTC(1899,11,30) + Math.round(str)*86400000);
+      return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    }
+  }
   str = String(str || '').trim();
   if(!str) return null;
   let m = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
@@ -6161,7 +6306,7 @@ $('btnInterestCalc').addEventListener('click', () => {
         <option value="current" ${workingBytes ? '' : 'disabled'}>${workingBytes ? 'Use the PDF currently open in the editor' : 'Use the PDF currently open (none loaded)'}</option>
       </select>
     </div>
-    <div class="field" id="intUploadField"><label>Bank statement (PDF, Excel, or CSV)</label><input type="file" id="intFile" accept=".pdf,.xlsx,.xls,.csv"></div>
+    <div class="field" id="intUploadField"><label>Bank statement (PDF, Excel, or CSV) — Excel rows are read from the first worksheet</label><input type="file" id="intFile" accept=".pdf,.xlsx,.xls,.csv"></div>
     <div class="field" id="intPasswordField" style="display:none;"><label>PDF password</label><div style="display:flex;gap:8px;"><input type="password" id="intPassword" style="flex:1;"><button class="btn ghost" id="intPasswordRetry" type="button">Unlock</button></div></div>
     <div id="intColumnsArea"></div>
     <div class="field"><label>Annual interest rate (%)</label><input type="number" id="intRate" step="0.01" value="4"></div>
@@ -6191,9 +6336,15 @@ $('btnInterestCalc').addEventListener('click', () => {
         rows = await collectRowsFromPdfBytes(buf, password);
       } else {
         await loadLib('xlsx');
-        const wb = XLSX.read(buf, { type:'array' });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:'' });
+        const wb = XLSX.read(buf, { type:'array', cellDates:true, raw:true, dense:false });
+        const sheetName = wb.SheetNames[0];
+        const ws = wb.Sheets[sheetName];
+        const range = ws['!ref'] || XLSX.utils.decode_range('A1:A1');
+        rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:true, defval:'', blankrows:true, range });
+        // Normalise every physical row and preserve rows that contain values in any column.
+        rows = rows.map(r => Array.isArray(r) ? r.map(v => v instanceof Date ? v : v) : []).filter(r => r.some(v => String(v ?? '').trim() !== ''));
+        window.__intWorkbookSheet = sheetName;
+        window.__intWorkbookSheets = wb.SheetNames.slice();
       }
       return rows;
     }
@@ -6245,7 +6396,11 @@ $('btnInterestCalc').addEventListener('click', () => {
     }
     function populateColumnPickers(rows){
       window.__intRows = rows;
-      renderColumnSelectors(rows, detectHeaderRowIndex(rows));
+      const hi=detectHeaderRowIndex(rows);
+      renderColumnSelectors(rows, hi);
+      const area=document.getElementById('intColumnsArea');
+      const preview=rows.slice(Math.max(0,hi), Math.min(rows.length,hi+8)).map(r=>r.map(v=>String(v??'')).join(' | ')).join('\n');
+      area.insertAdjacentHTML('beforeend', `<div class="field"><label>Detected rows preview (first 8 rows from header)</label><textarea readonly style="width:100%;min-height:110px;font-family:var(--font-mono);font-size:11px;">${escapeXml(preview)}</textarea><p class="hint">Rows captured: ${Math.max(0,rows.length-hi-1)}. If this is not the expected count, select the correct Header row above and re-check the preview before calculating.</p></div>`);
     }
     document.getElementById('intSource').addEventListener('change', async (e) => {
       document.getElementById('intUploadField').style.display = e.target.value === 'upload' ? 'block' : 'none';
