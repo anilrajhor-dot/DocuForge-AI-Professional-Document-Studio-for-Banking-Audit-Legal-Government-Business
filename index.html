@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.1.3 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.1.4 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -551,13 +551,42 @@ body.dark .studio-tab.active{color:var(--pine);}
   [data-studio="pdftoolkit"], [data-studio-panel="pdftoolkit"]{display:none!important}
   .pdf-toolkit-functions{display:grid!important}
 </style>
+
+<style id="v114-brand-help">
+.header-developer{
+  display:block;
+  margin-top:4px;
+  font-family:var(--font-body);
+  font-size:12px;
+  line-height:1.25;
+  font-weight:700;
+  color:#F2A65A;
+  letter-spacing:.15px;
+}
+@media(max-width:700px){
+  .header-developer{font-size:10px;max-width:245px;white-space:normal;}
+}
+.help-studio-wrap{padding:22px;overflow:auto;height:100%;background:var(--surface);}
+.help-hero{max-width:980px;margin:0 auto 18px;}
+.help-hero h2{margin:0 0 6px;font-family:var(--font-display);font-size:28px;}
+.help-hero p{margin:0;color:var(--ink-soft);line-height:1.55;}
+.help-search{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);font-size:15px;}
+.help-grid{max-width:980px;margin:16px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;}
+.help-card{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--surface-2);}
+.help-card h3{margin:0 0 7px;font-size:16px;}
+.help-card p,.help-card li{font-size:13px;line-height:1.55;color:var(--ink-soft);}
+.help-card ul{margin:7px 0 0;padding-left:19px;}
+.help-note{max-width:980px;margin:0 auto 18px;padding:12px 14px;border-left:4px solid var(--accent);background:var(--surface-2);border-radius:6px;font-size:13px;line-height:1.5;}
+#floatingHelpBtn{font-size:0;}
+#floatingHelpBtn::after{content:'AI';font-size:15px;font-family:var(--font-body);}
+#floatingHelpPanel{width:360px;}
 </head>
 <body>
 
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.1.3</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.1.4</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -592,8 +621,9 @@ body.dark .studio-tab.active{color:var(--pine);}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>
   </button>
   <div class="brand">
-    <h1>DocuForge AI</h1>
+    <h1>DocuForge AI <span class="app-version">v1.1.4</span></h1>
     <span class="tag">Intelligent Document Studio</span>
+    <span class="header-developer">Developed by Anil Sharma · Former General Manager, Central Bank of India</span>
   </div>
   <div class="privacy-pill">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
@@ -898,19 +928,89 @@ body.dark .studio-tab.active{color:var(--pine);}
 
 <div class="toast-wrap" id="toastWrap"></div>
 
-<button id="floatingHelpBtn" aria-label="Help">?</button>
+<button id="floatingHelpBtn" aria-label="AI Help">?</button>
 <div id="floatingHelpPanel">
   <div class="fh-head">
-    <span>Help</span>
+    <span>🤖 AI Help — DocuForge User Assistant</span>
     <button id="floatingHelpClose" type="button" aria-label="Close help">✕</button>
   </div>
   <div id="floatingHelpMessages"></div>
   <div class="fh-inputrow">
     <button id="floatingHelpMic" type="button" aria-label="Ask by voice">🎙️</button>
-    <input type="text" id="floatingHelpInput" placeholder="Ask a question…">
+    <input type="text" id="floatingHelpInput" placeholder="Ask how to use the app…">
     <button id="floatingHelpSend" type="button">Send</button>
   </div>
 </div>
+
+
+<div id="helpStudio" class="help-studio-wrap" style="display:none;">
+  <div class="help-hero">
+    <h2>DocuForge AI — Help & User Guide</h2>
+    <p>Use this section whenever you need instructions. You can also tap the floating <strong>AI Help</strong> button at the bottom-right and ask your question in plain language.</p>
+  </div>
+  <div class="help-note">
+    <strong>Quick rule:</strong> If a tool says that a PDF is required, first open the PDF in PDF Studio. Financial Calculator, Translation, OCR, GST Invoice and other independent tools can be used without opening a PDF where indicated.
+  </div>
+  <div style="max-width:980px;margin:0 auto;">
+    <input id="helpSearch" class="help-search" type="search" placeholder="Search Help — e.g. merge, password PDF, OCR, Excel, interest, translation, EMI…">
+  </div>
+  <div id="helpCards" class="help-grid">
+    <div class="help-card" data-help-key="pdf studio merge split rotate pages">
+      <h3>📄 PDF Studio</h3>
+      <ul><li>Open one PDF to start a project.</li><li>Select multiple PDFs to merge them in the selected order.</li><li>Use page tools for split, extract, delete, rotate, reorder and crop.</li><li>Use Enhance for watermark, page numbers, Bates numbering, headers/footers and compression.</li></ul>
+    </div>
+    <div class="help-card" data-help-key="password protected pdf encrypted unlock">
+      <h3>🔐 Password-protected PDF</h3>
+      <p>Upload the PDF. If it is encrypted, the app should display a password window. Enter the correct password to unlock and process it. The password is not intentionally saved by the app.</p>
+    </div>
+    <div class="help-card" data-help-key="excel bank statement rows daily product interest">
+      <h3>🏦 Bank Statement & Interest</h3>
+      <ul><li>PDF, Excel and CSV statements can be processed where supported.</li><li>Excel header rows are automatically detected.</li><li>The interest calculation uses the daily-product method based on daily closing balances.</li><li>If automatic header detection is wrong, the detected row can be manually corrected.</li></ul>
+    </div>
+    <div class="help-card" data-help-key="financial calculator emi moratorium age sip deposit rds currency">
+      <h3>🧮 Financial Calculator</h3>
+      <p>Use EMI with/without moratorium and choose whether moratorium interest is paid separately or capitalised. The suite also includes Age, SIP, Deposit Interest, RDS and Currency tools.</p>
+    </div>
+    <div class="help-card" data-help-key="ocr image photo gallery searchable pdf table">
+      <h3>🔎 OCR & Images</h3>
+      <ul><li>Extract text from photos/images.</li><li>Create searchable PDFs from scans.</li><li>Extract tables from images where the layout permits.</li><li>Combine images into PDF.</li></ul>
+    </div>
+    <div class="help-card" data-help-key="translation hindi language file gallery photo">
+      <h3>🌍 Translation</h3>
+      <ul><li>Type or paste text.</li><li>Choose a document or photo from Gallery/Photos.</li><li>Photo text can be extracted by OCR before translation.</li><li>Choose source and target languages. Hindi uses the improved translation route introduced in v1.1.3.</li></ul>
+    </div>
+    <div class="help-card" data-help-key="gst invoice tax invoice">
+      <h3>🧾 GST Invoice</h3>
+      <p>Open GST Invoice from the main navigation. Enter seller, buyer, items, GST details and invoice information, then preview and export the invoice.</p>
+    </div>
+    <div class="help-card" data-help-key="conversion word excel powerpoint csv">
+      <h3>🔄 Conversion</h3>
+      <p>Use Conversion Studio for PDF to Word, Excel, PowerPoint, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB and image conversions where supported.</p>
+    </div>
+    <div class="help-card" data-help-key="privacy files device upload">
+      <h3>🛡️ Privacy</h3>
+      <p>Most processing is performed in the browser. Translation and AI features can send selected text to their respective external services. Your original document is not intentionally uploaded by the normal local PDF tools.</p>
+    </div>
+    <div class="help-card" data-help-key="mobile iphone android laptop desktop fullscreen">
+      <h3>📱 Mobile, Laptop & Desktop</h3>
+      <p>The interface is designed responsively. On a phone, use the horizontal Studio navigation and the floating AI Help button. On laptop/desktop, the larger workspace is used automatically.</p>
+    </div>
+    <div class="help-card" data-help-key="undo redo reset">
+      <h3>↩️ Undo / Redo / Reset</h3>
+      <p>These project controls belong to PDF editing. They should appear only in the appropriate PDF workspace, not as duplicate navigation menus.</p>
+    </div>
+    <div class="help-card" data-help-key="ai help assistant api key">
+      <h3>🤖 AI Help</h3>
+      <p>Tap the floating <strong>AI</strong> button and ask questions such as “How do I merge two PDFs?”, “How do I calculate bank interest?”, or “How do I translate a photo?” The built-in help answers common questions without an API key; an AI API key can be used for broader questions.</p>
+    </div>
+  </div>
+</div>
+
+
+<div id="settingsStudio" style="display:none;"></div>
+<div id="aboutStudio" style="display:none;"></div>
+<div id="readerStudio" style="display:none;"></div>
+<div id="exportStudio" style="display:none;"></div>
 
 </div><!-- /#appView -->
 
@@ -5421,10 +5521,13 @@ function setStudio(name){
     document.querySelectorAll('.ribbon-panel').forEach(p => p.classList.remove('active'));
   }
 
-  $('settingsStudio').classList.toggle('active', name === 'settings');
-  $('aboutStudio').classList.toggle('active', name === 'about');
-  $('helpStudio').classList.toggle('active', name === 'help');
-  $('readerStudio').classList.toggle('active', name === 'reader');
+  if($('settingsStudio')) $('settingsStudio').classList.toggle('active', name === 'settings');
+  if($('aboutStudio')) $('aboutStudio').classList.toggle('active', name === 'about');
+  if($('helpStudio')) {
+    $('helpStudio').style.display = name === 'help' ? 'block' : 'none';
+    $('helpStudio').classList.toggle('active', name === 'help');
+  }
+  if($('readerStudio')) $('readerStudio').classList.toggle('active', name === 'reader');
   $('exportStudio').style.display = name === 'export' ? 'block' : 'none';
   $('workspaceLayout').style.display = (integrated || name === 'settings' || name === 'about' || name === 'help' || name === 'reader' || name === 'export') ? 'none' : 'flex';
 
@@ -6575,6 +6678,10 @@ $('btnClearAllData').addEventListener('click', () => {
    has already saved a key elsewhere in the app) for anything outside
    the FAQ; otherwise it points to the Help tab instead of guessing. */
 const HELP_FAQ = [
+  { q: ['password protected pdf','password pdf','encrypted pdf','unlock pdf'], a: 'Upload the protected PDF in PDF Studio. When the app detects encryption, enter the PDF password in the unlock window and continue. If the password is wrong, try again; the password is not saved by the app.' },
+  { q: ['excel rows','excel bank statement','header row','auto detected row','daily product'], a: 'Upload the bank-statement Excel file in the Interest Calculator. The app automatically detects the transaction header row and calculates interest using daily closing balances under the daily-product method; manual header correction is available only if automatic detection is wrong.' },
+  { q: ['gallery','photo translation','translate photo','translate image'], a: 'Translation Studio → Translate text → Choose file/photo. Select a photo from Gallery/Photos; the app extracts the text with browser OCR and places it in the translation box so you can review it before translating.' },
+  { q: ['financial calculator','emi moratorium','sip','rds','deposit interest'], a: 'Open Financial Calculator from the main navigation. The suite contains EMI, including moratorium and interest-treatment options, plus Age, SIP, Deposit Interest, RDS and Currency calculators.' },
   { q: ['merge','combine pdf'], a: 'PDF Studio → Add pages → "Open / Merge PDFs". Pick one file to start, or several at once to merge them in the order chosen.' },
   { q: ['split'], a: 'PDF Studio → Extract & split → "Split into files…" — by page ranges or every N pages, downloads as a .zip.' },
   { q: ['compress','reduce size','file size','smaller'], a: 'PDF Studio → Enhance → "Compress" — recompresses embedded JPEGs. Works best on scanned/photo-heavy PDFs; text-only PDFs won\u2019t shrink much.' },
@@ -6633,14 +6740,14 @@ async function fhHandleQuestion(question){
       thinking.textContent = answer;
     } catch(e){ thinking.textContent = "I couldn't get an answer just now. Try the Help tab for a full guide, or check your AI API key in AI Studio."; }
   } else {
-    fhAddMsg('bot', "I don't have a specific answer for that. Try the Help tab for a full guide — or add your AI API key in AI Studio and ask me again for open-ended questions.");
+    fhAddMsg('bot', "I can answer common DocuForge questions from the built-in User Guide. Try asking about PDF, password-protected PDF, Excel bank statements, daily-product interest, Financial Calculator, OCR, translation, Gallery/photos, GST Invoice, or any Studio menu. For open-ended questions beyond the built-in guide, add your AI API key in AI Studio.");
   }
 }
 $('floatingHelpBtn').addEventListener('click', () => {
   const panel = $('floatingHelpPanel');
   panel.classList.toggle('show');
   if(panel.classList.contains('show') && !$('floatingHelpMessages').children.length){
-    fhAddMsg('bot', "Hi! Ask me how to do something in DocuForge AI — or browse the Help tab for a full guide.");
+    fhAddMsg('bot', "Hello! I am your DocuForge AI Help assistant. Ask me how to use any feature, or open the Help tab for the complete guide.");
   }
 });
 $('floatingHelpClose').addEventListener('click', () => $('floatingHelpPanel').classList.remove('show'));
@@ -6701,6 +6808,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if(b) b.addEventListener('click', runDocuForgeDiagnostic);
 });
 
+
+document.addEventListener('DOMContentLoaded', () => {
+  const hs = document.getElementById('helpSearch');
+  if(hs){
+    hs.addEventListener('input', () => {
+      const q=hs.value.trim().toLowerCase();
+      document.querySelectorAll('#helpCards .help-card').forEach(card => {
+        card.style.display = !q || (card.textContent+' '+(card.dataset.helpKey||'')).toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  }
+  if($('helpStudio')) $('helpStudio').style.display = currentStudio === 'help' ? 'block' : 'none';
+});
 </script>
 <div id="developerCredit" style="text-align:center;padding:10px 12px 14px;font-size:11px;color:var(--muted);">
 Developed by <strong>Anil Sharma</strong> · Former General Manager, Central Bank of India
