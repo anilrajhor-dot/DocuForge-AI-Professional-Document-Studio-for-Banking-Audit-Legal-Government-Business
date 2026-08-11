@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.1.8 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.1.9 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -557,7 +557,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.1.8</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.1.9</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -6430,8 +6430,23 @@ $('btnInterestCalc').addEventListener('click', () => {
         <option value="current" ${workingBytes ? '' : 'disabled'}>${workingBytes ? 'Use the PDF currently open in the editor' : 'Use the PDF currently open (none loaded)'}</option>
       </select>
     </div>
-    <div class="field" id="intUploadField"><label>Bank statement (PDF, Excel, or CSV) — Excel rows are read from the first worksheet</label><input type="file" id="intFile" accept=".pdf,.xlsx,.xls,.csv"></div>
-    <div class="field" id="intPasswordField" style="display:none;"><label>PDF password</label><div style="display:flex;gap:8px;"><input type="password" id="intPassword" style="flex:1;"><button class="btn ghost" id="intPasswordRetry" type="button">Unlock</button></div></div>
+    <div class="field" id="intUploadField">
+      <label>Bank statement (PDF, Excel, or CSV) — Excel rows are read from the first worksheet</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <input type="file" id="intFile" accept=".pdf,.xlsx,.xls,.csv" style="flex:1;min-width:220px;">
+        <button class="btn ghost" id="intProtectedPdfBtn" type="button">🔐 Upload password-protected PDF</button>
+        <input type="file" id="intProtectedPdfFile" accept=".pdf,application/pdf" style="display:none;">
+      </div>
+      <p class="hint">For a password-protected bank statement, use the button above. After selecting the PDF, enter its password and tap <strong>Unlock</strong>.</p>
+    </div>
+    <div class="field" id="intPasswordField" style="display:none;">
+      <label>🔐 PDF password</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="password" id="intPassword" autocomplete="off" placeholder="Enter PDF password" style="flex:1;">
+        <button class="btn ghost" id="intPasswordRetry" type="button">Unlock</button>
+      </div>
+      <p class="hint">The password is used only to read this statement in the current session and is not saved by the app.</p>
+    </div>
     <div id="intColumnsArea"></div>
     <div class="field">
       <label>Interest-rate slabs <span style="font-weight:700;">(add as many slabs as required)</span></label>
@@ -6661,14 +6676,31 @@ $('btnInterestCalc').addEventListener('click', () => {
         finally { showProgress(null); setStatus('Ready.'); }
       }
     });
-    document.getElementById('intFile').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
+    let selectedStatementFile = null;
+
+    async function processInterestStatementFile(file, forcePassword=false){
       if(!file) return;
-      setStatus('Reading statement…'); showProgress(20);
+      selectedStatementFile = file;
+      setStatus(forcePassword ? 'Reading protected statement…' : 'Reading statement…');
+      showProgress(20);
       const ext = (file.name.split('.').pop() || '').toLowerCase();
       try{
         const buf = ext === 'pdf' ? new Uint8Array(await file.arrayBuffer()) : await file.arrayBuffer();
         if(ext === 'pdf'){ window.__intPdfBuf = buf; window.__intPdfPassword = null; } else { window.__intPdfBuf = null; }
+
+        if(forcePassword && ext !== 'pdf'){
+          toast('Please select a PDF for the password-protected option.', true);
+          return;
+        }
+
+        if(forcePassword){
+          document.getElementById('intPasswordField').style.display = 'block';
+          document.getElementById('intPassword').value = '';
+          document.getElementById('intPassword').focus();
+          toast('Password-protected PDF selected. Enter the password and tap Unlock.');
+          return;
+        }
+
         const rows = await loadStatementRows(buf, ext, null);
         if(!rows.length){ toast('Could not read any data from that file.', true); return; }
         document.getElementById('intPasswordField').style.display = 'none';
@@ -6679,30 +6711,45 @@ $('btnInterestCalc').addEventListener('click', () => {
           document.getElementById('intPasswordField').style.display = 'block';
           document.getElementById('intPassword').value = '';
           document.getElementById('intPassword').focus();
-          toast('Could not open this PDF without a password. If it\u2019s password-protected, enter the password below and tap Unlock.', true);
-          const retryHandler = async () => {
-            const password = document.getElementById('intPassword').value;
-            if(!password){ toast('Enter the password first.', true); return; }
-            setStatus('Unlocking statement…'); showProgress(20);
-            try{
-              const buf2 = new Uint8Array(await file.arrayBuffer());
-              window.__intPdfBuf = buf2; window.__intPdfPassword = password;
-              const rows2 = await collectRowsFromPdfBytes(buf2, password);
-              if(!rows2.length){ toast('Could not read any data from that file.', true); return; }
-              populateColumnPickers(rows2);
-              document.getElementById('intPasswordField').style.display = 'none';
-              toast('Statement unlocked and read.');
-            } catch(err2){
-              console.error('Password retry failed:', err2);
-              toast('Could not open with that password \u2014 double-check it and try again.', true);
-            } finally { showProgress(null); setStatus('Ready.'); }
-          };
-          document.getElementById('intPasswordRetry').onclick = retryHandler;
+          toast('This PDF needs a password. Enter the password below and tap Unlock.');
         } else {
           toast('Could not read that file.', true);
         }
       } finally { showProgress(null); setStatus('Ready.'); }
+    }
+
+    document.getElementById('intFile').addEventListener('change', async (e) => {
+      await processInterestStatementFile(e.target.files[0], false);
     });
+
+    document.getElementById('intProtectedPdfBtn').addEventListener('click', () => {
+      document.getElementById('intProtectedPdfFile').click();
+    });
+
+    document.getElementById('intProtectedPdfFile').addEventListener('change', async (e) => {
+      await processInterestStatementFile(e.target.files[0], true);
+    });
+
+    document.getElementById('intPasswordRetry').onclick = async () => {
+      const password = document.getElementById('intPassword').value;
+      if(!password){ toast('Enter the password first.', true); return; }
+      if(!selectedStatementFile || !(selectedStatementFile.name||'').toLowerCase().endsWith('.pdf')){
+        toast('Select a PDF first.', true); return;
+      }
+      setStatus('Unlocking statement…'); showProgress(20);
+      try{
+        const buf2 = new Uint8Array(await selectedStatementFile.arrayBuffer());
+        window.__intPdfBuf = buf2; window.__intPdfPassword = password;
+        const rows2 = await collectRowsFromPdfBytes(buf2, password);
+        if(!rows2.length){ toast('Could not read any data from that file.', true); return; }
+        populateColumnPickers(rows2);
+        document.getElementById('intPasswordField').style.display = 'none';
+        toast('Password accepted. Statement unlocked and read.');
+      } catch(err2){
+        console.error('Password retry failed:', err2);
+        toast('Could not open with that password — double-check it and try again.', true);
+      } finally { showProgress(null); setStatus('Ready.'); }
+    };
   }, 0);
 });
 
