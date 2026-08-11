@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.1.0 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.1.1 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -544,13 +544,20 @@ body.dark .studio-tab.active{color:var(--pine);}
   }
 </style>
 
+
+<style id="v111-pdf-consolidation">
+  /* PDF Toolkit is consolidated into PDF Studio; its functions remain available
+     through the PDF Studio workspace rather than as a second menu. */
+  [data-studio="pdftoolkit"], [data-studio-panel="pdftoolkit"]{display:none!important}
+  .pdf-toolkit-functions{display:grid!important}
+</style>
 </head>
 <body>
 
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.1.0</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.1.1</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -776,138 +783,7 @@ body.dark .studio-tab.active{color:var(--pine);}
       <p class="hint" style="margin:0 0 18px;">One-click access to every export format for the PDF currently open. Each tile jumps to its full tool if it needs more options.</p>
       <div class="dashboard-grid">
         <button class="dash-tile" id="exportPdfTile"><span class="dt-icon">📄</span><span>PDF</span></button>
-        <button class="dash-tile" data-tool="btnPdfToWord"><span class="dt-icon">📝</span><span>Word</span></button>
-        <button class="dash-tile" data-tool="btnPdfToExcel"><span class="dt-icon">📊</span><span>Excel</span></button>
-        <button class="dash-tile" data-tool="btnPdfToPptx"><span class="dt-icon">📽️</span><span>PowerPoint</span></button>
-        <button class="dash-tile" data-tool="btnPdfToHtml"><span class="dt-icon">🌐</span><span>HTML</span></button>
-        <button class="dash-tile" data-tool="btnPdfToEpub"><span class="dt-icon">📖</span><span>EPUB</span></button>
-        <button class="dash-tile" data-tool="btnPdfToImages"><span class="dt-icon">🖼️</span><span>Images</span></button>
-        <button class="dash-tile" id="exportAllZipTile"><span class="dt-icon">🗜️</span><span>Everything (.zip)</span></button>
-      </div>
-    </div>
 
-    <div id="settingsStudio" class="studio-page">
-      <h2>Settings</h2>
-      <div class="tool-group">
-<div class="tool-group">
-<button class="tool-btn" id="btnClearAiKey">Clear saved AI API key</button>
-<button class="tool-btn danger" id="btnClearAllData">Clear all local settings</button>
-</div>
-</div>
-      <h2 style="margin-top:22px;">History</h2>
-      <div class="tool-group" style="flex-direction:column; align-items:flex-start; gap:8px;">
-        <button class="tool-btn danger" id="btnClearAllRecentFilesSettings" style="width:auto;">Delete all recent files</button>
-        <button class="tool-btn danger" id="btnClearConversionsSettings" style="width:auto;">Delete conversion history</button>
-        <p class="hint" style="margin:0;">To remove a single recent file instead of everything, go to the Dashboard tab — each entry in "Recent files" has its own ✕ button.</p>
-      </div>
-      <h2 style="margin-top:22px;">Accessibility</h2>
-      <div class="tool-group" style="flex-direction:column; align-items:flex-start; gap:10px;">
-        <label style="display:flex;align-items:center;gap:8px;font-weight:400;margin:0;"><input type="checkbox" id="toggleHighContrast" style="width:auto;"> High contrast mode</label>
-        <label style="display:flex;align-items:center;gap:8px;font-weight:400;margin:0;"><input type="checkbox" id="toggleLargeText" style="width:auto;"> Larger text &amp; UI</label>
-        <button class="tool-btn" id="btnShowShortcuts" style="width:auto;">Keyboard shortcuts…</button>
-      </div>
-    </div>
-
-    <div id="readerStudio" class="reader-page">
-      <div class="reader-toolbar">
-        <button class="btn ghost" id="readerOpenBtn" type="button">Open PDF or EPUB…</button>
-        <button class="btn ghost" id="readerUseCurrentBtn" type="button">Read current PDF</button>
-        <span class="sep"></span>
-        <button class="icon-btn" id="readerPrev" disabled aria-label="Previous" style="color:var(--ink); border-color:var(--line);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
-        <span id="readerPageIndicator" class="mono" style="font-size:12px;color:var(--ink-soft);min-width:110px;text-align:center;">–</span>
-        <button class="icon-btn" id="readerNext" disabled aria-label="Next" style="color:var(--ink); border-color:var(--line);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
-        <span class="sep"></span>
-        <button class="icon-btn" id="readerZoomOut" aria-label="Zoom out" style="color:var(--ink); border-color:var(--line);">−</button>
-        <span id="readerZoomLevel" class="mono" style="font-size:12px;color:var(--ink-soft);min-width:44px;text-align:center;">100%</span>
-        <button class="icon-btn" id="readerZoomIn" aria-label="Zoom in" style="color:var(--ink); border-color:var(--line);">+</button>
-        <span class="sep"></span>
-        <select id="readerTheme"><option value="light">Light</option><option value="sepia">Sepia</option><option value="dark">Dark</option></select>
-        <button class="btn ghost" id="readerToc" type="button" style="display:none;">Contents</button>
-      </div>
-      <div id="readerBody" class="reader-body theme-light">
-        <div id="readerEmpty" class="reader-empty">Open a PDF or EPUB, or read the PDF currently loaded in the editor.</div>
-        <div id="readerPdfView" class="reader-pdf-view" style="display:none;"></div>
-        <div id="readerEpubView" class="reader-epub-view" style="display:none;"></div>
-        <div id="readerTocPanel" class="reader-toc-panel" style="display:none;"></div>
-      </div>
-    </div>
-
-    <div id="helpStudio" class="studio-page" style="max-width:760px;">
-      <h2>Help &amp; guidelines</h2>
-<div class="df-diagnostic">
-  <h3>Application health check</h3>
-  <p class="hint" style="margin:0;">Checks the browser capabilities and libraries required by DocuForge. If a library is blocked by a network/content filter, the affected tools can be identified here.</p>
-  <div id="dfDiagnosticGrid" class="df-diag-grid"></div>
-  <button class="btn ghost df-diag-btn" id="dfRunDiagnostic" type="button">Run check again</button>
-</div>
-
-      <p>Every tool lives under a Studio tab at the top. Most PDF tools need a file open first — that's why buttons look greyed out until you do. Here's what each Studio covers:</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">📄 PDF Studio</h3>
-      <p><strong>Add pages:</strong> Open/merge PDFs, insert a PDF at a specific position. <strong>Arrange:</strong> duplicate, rotate, reverse, delete, crop, and remove blank pages (checks actual pixels, so it works on scans too). <strong>Extract &amp; split:</strong> pull selected pages into a new file, or split into many files by range or every N pages. <strong>Enhance:</strong> watermark, page numbers, Bates numbering, headers/footers, compress, and the metadata inspector.</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">🖼 OCR &amp; Image Tools</h3>
-      <p>Extract text from a photo, make a scanned PDF genuinely searchable (a real invisible text layer, not just a label), pull a table out of an image into CSV/Excel, combine images into a PDF, or export PDF pages as images.</p>
-
-
-      <h3 style="margin-top:18px;font-size:14px;">🌍 Translation</h3>
-      <p>Translate pasted text, an uploaded PDF/DOCX/TXT/MD file directly, or whatever PDF is currently open in the editor — across 38 languages, side by side. This sends the text you choose (never the file itself) to a translation service — the only exception to "everything stays on your device" besides AI tools.</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">🔄 Document Conversion</h3>
-      <p>PDF to and from Word, Excel, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB, and images. These carry over structure and text, not always exact original formatting — that's an honest limit of any browser-only conversion, not just this one.</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">📽️ PowerPoint Studio</h3>
-      <p>Converts both directions: PDF → PowerPoint and PowerPoint → PDF, each page/slide mapped one-to-one. Structural, not visual — text and titles carry over, original slide design doesn't.</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">🤖 AI Assistant</h3>
-      <p>Summarize, rewrite, simplify, generate meeting minutes, review a contract, or chat with a PDF — all using your own Anthropic, OpenAI, or Google Gemini API key, entered once and optionally remembered in your browser. There's no backend here to provide a shared key. If cost is a concern: Google's Gemini API (aistudio.google.com) has a genuinely free tier — no credit card, no expiration.</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">🌐 Website Studio</h3>
-      <p>Describe a site — name, tagline, sections, style — and get a complete, unique single-file HTML website back, live-previewed and ready to download. Uses the same AI key as AI Studio.</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">📊 Spreadsheet Tools</h3>
-      <p>Turn a spreadsheet into a chart, or digitize numbers out of a chart <em>image</em> (manual calibration — no software can reliably read an arbitrary chart automatically).</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">🏦 Interest Calculator</h3>
-      <p>Upload a bank statement (PDF, Excel, or CSV), pick the date and balance columns, give it a rate — it calculates interest month by month, from the 1st through the last day of each calendar month inclusive, on the daily closing balance carried forward from your statement's transactions.</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">🔐 Security</h3>
-      <p>Visual signature stamps, form fill &amp; flatten, and beta password protection (a less battle-tested library than the rest of the app — verify the output opens correctly). Cryptographic digital signatures aren't supported; that needs a certificate authority.</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">📂 Batch Processing</h3>
-      <p>Run one operation — compress, OCR, convert, watermark, or merge — across many files at once, and download everything as a single .zip.</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">📖 Reader</h3>
-      <p>A dedicated reading view for PDF and EPUB, separate from editing — page navigation, zoom, themes, and a table of contents for EPUB chapters.</p>
-
-      <h3 style="margin-top:18px;font-size:14px;">Stuck on something specific?</h3>
-      <p>Tap the <strong>?</strong> button in the bottom corner any time — type or speak a question and it'll try to answer directly, or point you to the right tool.</p>
-    </div>
-
-    <div id="aboutStudio" class="studio-page">
-      <h2>About DocuForge AI</h2>
-      <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Build:</strong> 2026-08-11.5 &nbsp;|&nbsp; <strong>Version:</strong> 1.0.2 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
-      </div>
-      <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
-      <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
-      <p><strong>What's not supported in this edition:</strong> cryptographic digital signatures &mdash; that genuinely requires a certificate authority, no way around it in a browser tool. Password protection (both setting one and opening an existing password-protected PDF) is supported, but marked beta: it runs on a community-maintained fork of the core library, not the well-established one everything else here relies on.</p>
-      <p class="hint">Developed by Anil Sharma, Former General Manager, Central Bank of India.</p>
-    </div>
-
-    
-    <div id="invoiceStudio" class="integrated-studio-page">
-      <div class="integrated-studio-head">
-        <div><h2>🧾 GST Invoice Generator</h2><p>Complete GST invoice preparation, preview, save and PDF generation.</p></div>
-        <button class="btn ghost" type="button" onclick="setStudio('dashboard')">← Back to Dashboard</button>
-      </div>
-      <iframe id="invoiceAppFrame" class="integrated-app-frame" title="GST Invoice Generator" loading="lazy"></iframe>
-    </div>
-
-    <div id="pdftoolkitStudio" class="integrated-studio-page">
-      <div class="integrated-studio-head">
-        <div><h2>🛠️ PDF Toolkit</h2><p>Quick PDF/image merge, page extraction, deletion, rotation, OCR and translation toolkit.</p></div>
-        <button class="btn ghost" type="button" onclick="setStudio('dashboard')">← Back to Dashboard</button>
       </div>
       <iframe id="pdfToolkitAppFrame" class="integrated-app-frame" title="PDF Toolkit" loading="lazy"></iframe>
     </div>
