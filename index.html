@@ -658,7 +658,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.2.33</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.2.34</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -5943,19 +5943,83 @@ on('btnClearConversionsSettings', 'click', () => {
   renderDashboardRecent();
   toast('Conversion history deleted.');
 });
+
+/* ---------- Menu file isolation / reset ----------
+   Every DocuForge menu owns its temporary file selections. A menu reset
+   clears those selections and temporary parsing state without deleting the
+   main PDF project. The main Open/Insert PDF inputs are deliberately kept.
+*/
+function clearMenuFiles(options={}){
+  const keepCorePdfInputs = options.keepCorePdfInputs !== false;
+  document.querySelectorAll('input[type="file"]').forEach(inp=>{
+    if(keepCorePdfInputs && (inp.id==='fileInput' || inp.id==='insertInput')) return;
+    try{ inp.value=''; }catch(e){}
+  });
+
+  // Close any file-selection modal that may still be open.
+  document.querySelectorAll('.modal, [role="dialog"]').forEach(el=>{
+    if(el.id==='helpModal') return;
+    const style=getComputedStyle(el);
+    if(style.display!=='none'){
+      const close=el.querySelector('[data-close], .modal-close, .close-modal, button[aria-label*="Close" i]');
+      if(close) { try{ close.click(); }catch(e){} }
+      else if(el.classList.contains('modal')) el.style.display='none';
+    }
+  });
+
+  // Clear temporary bank-statement / conversion state.
+  window.__intRows=null;
+  window.__intHeaderIdx=null;
+  window.__intProtectedPdf=null;
+  window.__lastConvertedBlob=null;
+  window.__lastConvertedFilename=null;
+  if(window.__lastConvertedUrl){
+    try{ URL.revokeObjectURL(window.__lastConvertedUrl); }catch(e){}
+  }
+  window.__lastConvertedUrl=null;
+
+  // Remove transient file-preview elements created by menu tools.
+  document.querySelectorAll('[data-menu-file-preview="true"]').forEach(el=>el.remove());
+
+  // Clear common file-name/status labels without touching the main project status.
+  document.querySelectorAll('[data-file-name="true"]').forEach(el=>el.textContent='');
+
+  // Close the in-app converted-file viewer if present.
+  const viewer=document.getElementById('convertedFileViewer');
+  if(viewer){
+    if(viewer.dataset.viewerUrl){
+      try{URL.revokeObjectURL(viewer.dataset.viewerUrl);}catch(e){}
+      viewer.dataset.viewerUrl='';
+    }
+    viewer.style.display='none';
+  }
+}
+
+/* Add a compact reset button to whichever lower menu is active. */
+function ensureMenuResetButton(panel){
+  if(!panel || panel.querySelector('.menu-file-reset')) return;
+  const b=document.createElement('button');
+  b.type='button';
+  b.className='tool-btn danger menu-file-reset';
+  b.textContent='↺ Clear files / Reset menu';
+  b.title='Clear files selected in this menu and reset temporary menu data';
+  b.addEventListener('click',()=>{
+    if(!confirm('Clear files and reset this menu? Your main PDF project will not be deleted.')) return;
+    clearMenuFiles();
+    toast('Menu files cleared.');
+  });
+  const firstGroup=panel.querySelector('.tool-group');
+  if(firstGroup) firstGroup.insertBefore(b,firstGroup.firstChild);
+  else panel.insertBefore(b,panel.firstChild);
+}
+
 function setStudio(name){
   const previousStudio=currentStudio;
   // A file chosen inside one menu belongs only to that menu. Clear menu-specific
   // file pickers when leaving it, so the selected file cannot unexpectedly
   // reappear when another menu is opened later. Keep the main working PDF.
   if(previousStudio && previousStudio!==name){
-    document.querySelectorAll('input[type="file"]').forEach(inp=>{
-      if(inp.id==='fileInput' || inp.id==='insertInput') return;
-      try{ inp.value=''; }catch(e){}
-    });
-    window.__intRows=null;
-    window.__intHeaderIdx=null;
-    window.__intProtectedPdf=null;
+    clearMenuFiles();
   }
   currentStudio = name;
   document.body.setAttribute('data-active-studio', name);
@@ -5972,6 +6036,17 @@ function setStudio(name){
   if(merged){
     if(mergedHost) mergedHost.classList.add('active');
     if(typeof openMergedApp === 'function') openMergedApp(name);
+    if(mergedHost && !mergedHost.querySelector('.merged-menu-file-reset')){
+      const rb=document.createElement('button');
+      rb.type='button';
+      rb.className='tool-btn danger merged-menu-file-reset';
+      rb.textContent='↺ Clear files / Reset menu';
+      rb.style.cssText='position:fixed;right:14px;top:96px;z-index:9000;';
+      rb.addEventListener('click',()=>{
+        if(confirm('Clear files and reset this menu?')){ clearMenuFiles(); toast('Menu files cleared.'); }
+      });
+      mergedHost.appendChild(rb);
+    }
   }
 
   // Lower ribbon follows the selected DocuForge menu.
@@ -5979,6 +6054,7 @@ function setStudio(name){
     const active=!merged && p.dataset.studioPanel===name;
     p.classList.toggle('active',active);
     p.style.setProperty('display',active?'flex':'none','important');
+    if(active) ensureMenuResetButton(p);
   });
 
   const ribbon=document.getElementById('ribbon');
@@ -5998,6 +6074,18 @@ function setStudio(name){
   });
   const exportStudio=$('exportStudio');
   if(exportStudio) exportStudio.style.display=name==='export'?'block':'none';
+
+
+  const activeExtraStudio = name==='invoice' ? $('invoiceStudio')
+    : name==='pdftoolkit' ? $('pdftoolkitStudio')
+    : name==='export' ? $('exportStudio')
+    : name==='settings' ? $('settingsStudio')
+    : name==='about' ? $('aboutStudio')
+    : name==='help' ? $('helpStudio')
+    : name==='reader' ? $('readerStudio') : null;
+  if(activeExtraStudio && !activeExtraStudio.querySelector('.menu-file-reset')){
+    ensureMenuResetButton(activeExtraStudio);
+  }
 
   const invoiceStudio=$('invoiceStudio');
   const pdfToolkitStudio=$('pdftoolkitStudio');
