@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.2.27 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.2.28 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -7595,6 +7595,19 @@ Developed by <strong>Anil Sharma</strong> · Former General Manager, Central Ban
 <script id="dashboard-submenu-v1-2-15-js">
 (function(){
   const MENUS = {
+    btnConvertToPdf:{title:'Convert to PDF',icon:'📄',desc:'Convert documents and images to PDF. Review the result before saving or sharing.',
+      items:[
+        ['📄','Word → PDF (.doc / .docx)','__convertToPdf'],
+        ['📊','Excel → PDF (.xls / .xlsx)','__convertToPdf'],
+        ['📽️','PowerPoint → PDF (.ppt / .pptx)','__convertToPdf'],
+        ['📝','Text / RTF → PDF','__convertToPdf'],
+        ['🌐','HTML → PDF','__convertToPdf'],
+        ['🖼️','Images → PDF','btnImagesToPdf'],
+        ['📋','CSV → PDF','__convertToPdf'],
+        ['📄','ODT → PDF','__convertToPdf'],
+        ['📚','Multiple documents → PDF','__convertToPdf']
+      ]},
+
     btnOpen:{title:'Merge PDF',icon:'🗂️',desc:'Open, combine and arrange PDF or photo pages.',
       items:[['📄','Select PDF / Word / Document','__selectDocument'],['🧹','Clear selected document','__clearDocument'],
         ['📂','Open / Merge PDF or photo','btnOpen'],
@@ -7706,6 +7719,99 @@ Developed by <strong>Anil Sharma</strong> · Former General Manager, Central Ban
     return w;
   }
 
+  function openConvertToPdf(){
+    const modal=ensureModal();
+    modal.querySelector('#dashboardMenuTitle').textContent='📄 Convert to PDF';
+    modal.querySelector('#dashboardMenuDesc').textContent='Select a document or image. The app will prepare a PDF and give you View, Save and Share options.';
+    const grid=modal.querySelector('#dashboardSubGrid');
+    grid.innerHTML=`
+      <div style="grid-column:1/-1;">
+        <label style="display:block;font-weight:700;margin-bottom:6px;">Select file</label>
+        <input type="file" id="convertPdfInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rtf,.html,.htm,.csv,.odt,image/*" multiple>
+        <p class="hint">Images can be converted directly. For Word/Excel/PowerPoint and other office documents, the browser's print-to-PDF route is used where direct rendering is unavailable, so you can review the output before saving.</p>
+        <div id="convertPdfStatus" style="margin-top:8px;"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+          <button class="btn primary" type="button" id="convertPdfStart">Prepare PDF</button>
+          <button class="btn ghost" type="button" id="convertPdfClear">Clear</button>
+        </div>
+      </div>`;
+    modal.style.display='flex';
+
+    const input=grid.querySelector('#convertPdfInput');
+    grid.querySelector('#convertPdfClear').onclick=()=>{input.value='';grid.querySelector('#convertPdfStatus').textContent='';};
+    grid.querySelector('#convertPdfStart').onclick=async()=>{
+      const files=[...(input.files||[])];
+      if(!files.length){toast('Select at least one file.',true);return;}
+      try{
+        grid.querySelector('#convertPdfStatus').textContent='Preparing PDF…';
+        const images=files.filter(f=>f.type.startsWith('image/'));
+        const nonImages=files.filter(f=>!f.type.startsWith('image/'));
+        if(images.length===files.length){
+          const blob=await imagesToPdfBlob(images);
+          downloadBlob(blob,'converted-images.pdf');
+          grid.querySelector('#convertPdfStatus').textContent='PDF prepared. Review it using View before sharing.';
+          return;
+        }
+        if(nonImages.length===1 && /\.pdf$/i.test(nonImages[0].name)){
+          const blob=new Blob([await nonImages[0].arrayBuffer()],{type:'application/pdf'});
+          downloadBlob(blob,nonImages[0].name.replace(/\.pdf$/i,'')+'.pdf');
+          grid.querySelector('#convertPdfStatus').textContent='PDF ready.';
+          return;
+        }
+        // Office formats require a full Office rendering engine for faithful
+        // conversion. The app therefore uses the browser print dialog rather
+        // than silently producing a potentially damaged PDF.
+        const f=nonImages[0];
+        const ext=(f.name.split('.').pop()||'').toLowerCase();
+        if(['doc','docx','xls','xlsx','ppt','pptx','odt','rtf','txt','html','htm','csv'].includes(ext)){
+          const text=await extractTextFromAnyFile(f,'auto').catch(()=>null);
+          if(text){
+            const w=window.open('','_blank','noopener');
+            if(!w) throw new Error('Allow pop-ups for this app to prepare the document for PDF.');
+            w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+String(f.name).replace(/[<>]/g,'')+'</title><style>body{font-family:Arial,sans-serif;white-space:pre-wrap;line-height:1.45;margin:35px;}@media print{body{margin:18mm;}}</style></head><body></body></html>');
+            w.document.body.textContent=text;
+            w.document.close();
+            w.focus();
+            setTimeout(()=>w.print(),300);
+            grid.querySelector('#convertPdfStatus').textContent='Print dialog opened. Choose “Save as PDF” after reviewing.';
+            return;
+          }
+        }
+        throw new Error('This format needs an Office rendering engine for faithful PDF conversion. Please open it in Word/Excel/PowerPoint and choose Print → Save as PDF.');
+      }catch(e){
+        console.error(e);
+        toast(e.message||'Could not prepare the PDF.',true);
+        grid.querySelector('#convertPdfStatus').textContent=e.message||'Conversion failed.';
+      }
+    };
+  }
+
+  async function imagesToPdfBlob(files){
+    const JsPDF=window.jspdf?.jsPDF;
+    if(!JsPDF) await loadLib('jspdf');
+    const pdf=new window.jspdf.jsPDF({unit:'pt',format:'a4'});
+    for(let i=0;i<files.length;i++){
+      const data=await new Promise((resolve,reject)=>{
+        const r=new FileReader();
+        r.onload=()=>resolve(r.result);
+        r.onerror=reject;
+        r.readAsDataURL(files[i]);
+      });
+      const img=new Image();
+      await new Promise((resolve,reject)=>{
+        img.onload=resolve;img.onerror=reject;img.src=data;
+      });
+      if(i) pdf.addPage();
+      const margin=24;
+      const maxW=pdf.internal.pageSize.getWidth()-margin*2;
+      const maxH=pdf.internal.pageSize.getHeight()-margin*2;
+      const scale=Math.min(maxW/img.naturalWidth,maxH/img.naturalHeight);
+      const w=img.naturalWidth*scale,h=img.naturalHeight*scale;
+      pdf.addImage(data,'AUTO',(pdf.internal.pageSize.getWidth()-w)/2,(pdf.internal.pageSize.getHeight()-h)/2,w,h);
+    }
+    return pdf.output('blob');
+  }
+
   function ensureUniversalDocumentInput(){
     let input=document.getElementById('universalDocumentInput');
     if(input) return input;
@@ -7765,6 +7871,10 @@ Developed by <strong>Anil Sharma</strong> · Former General Manager, Central Ban
     }
     if(action==='__clearDocument'){
       clearSelectedDocument();
+      return;
+    }
+    if(action==='__convertToPdf'){
+      openConvertToPdf();
       return;
     }
     if(action==='__financialSuite'){
