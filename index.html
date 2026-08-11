@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>DocuForge AI v1.1.2 — Intelligent Document Studio</title>
+<title>DocuForge AI v1.1.3 — Intelligent Document Studio</title>
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
@@ -557,7 +557,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <div id="landingPage">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
-    <h1>DocuForge AI <span class="app-version">v1.1.2</span></h1>
+    <h1>DocuForge AI <span class="app-version">v1.1.3</span></h1>
     <div class="landing-developer" style="margin:8px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2px;">
       Developed by Anil Sharma · Former General Manager, Central Bank of India
     </div>
@@ -2144,15 +2144,27 @@ function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
 async function translateChunk(text, source, target, email){
   if(!text.trim()) return '';
+  const googleSource = source === 'auto' ? 'auto' : source;
+  if(target === 'hi' || source === 'hi' || source === 'auto'){
+    try{
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${encodeURIComponent(googleSource)}&tl=${encodeURIComponent(target)}&dt=t&q=${encodeURIComponent(text)}`;
+      const res = await fetch(url);
+      if(res.ok){
+        const data = await res.json();
+        const translated = Array.isArray(data?.[0])
+          ? data[0].map(x => Array.isArray(x) ? (x[0] || '') : '').join('')
+          : '';
+        if(translated.trim()) return translated;
+      }
+    }catch(e){ console.warn('Google translation unavailable; using MyMemory fallback.',e); }
+  }
   const langpair = encodeURIComponent(`${source}|${target}`);
   let url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langpair}`;
   if(email) url += `&de=${encodeURIComponent(email)}`;
   const res = await fetch(url);
   if(!res.ok) throw new Error('Translation service unavailable.');
   const data = await res.json();
-  if(data.responseStatus && Number(data.responseStatus) !== 200){
-    throw new Error(data.responseDetails || 'Translation limit reached.');
-  }
+  if(data.responseStatus && Number(data.responseStatus) !== 200) throw new Error(data.responseDetails || 'Translation limit reached.');
   return data.responseData?.translatedText || '';
 }
 async function translateFullText(text, source, target, email, onProgress){
@@ -4215,13 +4227,14 @@ $('btnFileToPdf').addEventListener('click', () => {
 
 $('btnTranslateText').addEventListener('click', () => {
   openModal('Translate text', `
-    <div class="field"><label>Text to translate</label><textarea id="trInput" style="min-height:150px;"></textarea></div>
+    <div class="field"><label>Text to translate</label><textarea id="trInput" style="min-height:150px;" placeholder="Type or paste text, or choose a file/photo below."></textarea></div>
+    <div class="field"><label>Choose file / photo (optional)</label><input type="file" id="trTextFile" accept=".txt,.md,.docx,.pdf,image/*"><p class="hint">Choose a document or a photo from your device/gallery. Text is extracted locally; photos are read with the app's browser OCR.</p></div>
     <div class="field row">
       <div><label>Source language</label><select id="trSource">${langOptions(true)}</select></div>
-      <div><label>Target language</label><select id="trTarget">${langOptions(false)}</select></div>
+      <div><label>Target language</label><select id="trTarget">${langOptions(false).replace('<option value="hi">Hindi</option>', '<option value="hi" selected>Hindi</option>')}</select></div>
     </div>
     <div class="field"><label>Email (optional — raises the free daily translation limit)</label><input type="text" id="trEmail" placeholder="you@example.com"></div>
-    <p class="hint">Uses the free MyMemory translation service over the internet — the text you translate is sent to it (your other files stay local). Long text is split into chunks automatically. Covers 38 languages known to translate reliably through the free service — including English, Hindi, and India's other major regional languages.</p>
+    <p class="hint">Uses an online translation service. For Hindi, the app first uses Google’s translation engine for better sentence quality and falls back to MyMemory if unavailable. Selected text is sent to the translation service; files otherwise stay local. Long text is split into chunks automatically. Covers 38 languages known to translate reliably through the free service — including English, Hindi, and India's other major regional languages.</p>
   `, async () => {
     const text = document.getElementById('trInput').value.trim();
     if(!text){ toast('Enter some text to translate.', true); return; }
@@ -4236,10 +4249,36 @@ $('btnTranslateText').addEventListener('click', () => {
     } catch(e){ console.error(e); toast('Translation failed — the free service may be rate-limited. Try again shortly, or add your email above to raise the limit.', true); }
     finally { showProgress(null); }
   });
+
+  setTimeout(() => {
+    const fileInput = document.getElementById('trTextFile');
+    if(!fileInput) return;
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if(!file) return;
+      try{
+        setStatus('Reading selected file/photo…'); showProgress(10);
+        const text = await extractTextFromAnyFile(file);
+        if(!text.trim()) throw new Error('No readable text was found in that file/photo.');
+        document.getElementById('trInput').value = text;
+        toast('Text loaded. You can edit it before translating.');
+      }catch(err){
+        console.error('Translation file read failed:',err);
+        toast(err.message || 'Could not read that file/photo.',true);
+      }finally{
+        showProgress(null); setStatus('Ready.');
+      }
+    });
+  },0);
 });
 
 async function extractTextFromAnyFile(file){
   const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if(file.type && file.type.startsWith('image/')){
+    const text = await runOcrOnImageFile(file, 'eng');
+    if(text === null) throw new Error('Could not extract text from the selected image.');
+    return text;
+  }
   if(ext === 'pdf'){
     const bytes = new Uint8Array(await file.arrayBuffer());
     const pdf = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
@@ -4266,7 +4305,7 @@ async function extractTextFromAnyFile(file){
 }
 $('btnTranslateDoc').addEventListener('click', () => {
   openModal('Translate a document', `
-    <div class="field"><label>File (PDF, DOCX, TXT, or MD)</label><input type="file" id="trDocFile" accept=".pdf,.docx,.txt,.md"></div>
+    <div class="field"><label>File (PDF, DOCX, TXT, or MD)</label><input type="file" id="trDocFile" accept=".pdf,.docx,.txt,.md,image/*"></div>
     <div class="field row">
       <div><label>Source language</label><select id="trDocSource">${langOptions(true)}</select></div>
       <div><label>Target language</label><select id="trDocTarget">${langOptions(false)}</select></div>
