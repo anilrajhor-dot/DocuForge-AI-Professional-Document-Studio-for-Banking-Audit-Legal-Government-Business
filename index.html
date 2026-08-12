@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="application-version" content="2026.08.12.3">
+<meta name="application-version" content="2026.08.12.4">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -467,9 +467,24 @@ body.dark .studio-tab.active{color:var(--pine);}
 @media (max-width:560px){
   header .tag{display:none;}
 }
+
+/* ===== v2026.08.12.4 usability refinements ===== */
+#studioMoreBtn{display:none;}
+@media(max-width:720px){
+  #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
+  .studio-tabs{scrollbar-width:none;}
+  .studio-tabs::-webkit-scrollbar{display:none;}
+  #docuForgeTopBrand{padding:8px 10px !important;}
+  #docuForgeTopBrand div:first-child{font-size:16px !important;}
+  #docuForgeTopBrand div:nth-child(2){font-size:12px !important;}
+  #docuForgeTopBrand div:nth-child(3){font-size:11px !important;}
+  #docuForgeTopBrand div:nth-child(4){font-size:10px !important;}
+}
+
 </style>
 </head>
 <body>
+<script>const DOCUFORGE_BUILD = '2026.08.12.4';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -480,7 +495,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.3</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.4</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -535,6 +550,8 @@ body.dark .studio-tab.active{color:var(--pine);}
 </header>
 
 <div class="studio-tabs" id="studioTabs">
+      <button class="studio-tab" id="studioMoreBtn" type="button" aria-label="More studios">⋯ More</button>
+
       <button class="studio-tab active" data-studio="dashboard"><span class="st-icon">🏠</span> Dashboard</button>
       <button class="studio-tab" data-studio="pdf"><span class="st-icon">📄</span> PDF Studio</button>
       <button class="studio-tab" data-studio="ocr"><span class="st-icon">🖼</span> OCR Studio</button>
@@ -819,7 +836,6 @@ body.dark .studio-tab.active{color:var(--pine);}
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
       <p><strong>What's not supported in this edition:</strong> cryptographic digital signatures &mdash; that genuinely requires a certificate authority, no way around it in a browser tool. Password protection (both setting one and opening an existing password-protected PDF) is supported, but marked beta: it runs on a community-maintained fork of the core library, not the well-established one everything else here relies on.</p>
-      <p class="hint">Developed by Anil Sharma, Former General Manager, Central Bank of India.</p>
     </div>
 
     <div class="layout" id="workspaceLayout">
@@ -875,6 +891,10 @@ body.dark .studio-tab.active{color:var(--pine);}
     </div>
 
     <div class="page-action-strip" id="pageActionStrip" aria-label="Page management actions">
+<button class="mini-action" id="btnSelectAllPages" type="button">Select all</button>
+<button class="mini-action" id="btnClearPageSelection" type="button">Clear</button>
+<button class="mini-action" id="btnInvertPageSelection" type="button">Invert</button>
+
       <span class="selection-count" id="selectionCount">0 selected</span>
       <div class="action-group">
         <button class="mini-action" id="pageSelectAll">Select all</button>
