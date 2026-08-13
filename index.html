@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="application-version" content="2026.08.12.5">
+<meta name="application-version" content="2026.08.12.6">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.12.5 usability refinements ===== */
+/* ===== v2026.08.12.6 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -484,7 +484,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.12.5';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.12.6';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -495,7 +495,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.5</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.6</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -831,7 +831,7 @@ body.dark .studio-tab.active{color:var(--pine);}
     <div id="aboutStudio" class="studio-page">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.12.5 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.12.6 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -4187,17 +4187,31 @@ $('btnFileToPdf').addEventListener('click', () => {
 });
 
 $('btnTranslateText').addEventListener('click', () => {
-  openModal('Translate text', `
-    <div class="field"><label>Text to translate</label><textarea id="trInput" style="min-height:150px;"></textarea></div>
+  openModal('Translate text / upload', `
+    <div class="field">
+      <label>Text to translate</label>
+      <textarea id="trInput" style="min-height:150px;" placeholder="Type or paste text here, or use one of the upload options below…"></textarea>
+    </div>
+    <div class="field">
+      <label>Upload source</label>
+      <div class="row" style="gap:10px;flex-wrap:wrap;">
+        <button class="btn ghost" type="button" id="trPickFile">📁 Choose from Files</button>
+        <button class="btn ghost" type="button" id="trPickPhoto">🖼️ Choose from Photos / Gallery</button>
+      </div>
+      <input type="file" id="trUploadFile" accept=".pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown" style="display:none;">
+      <input type="file" id="trUploadPhoto" accept="image/*" style="display:none;">
+      <p class="hint" style="margin-top:7px;">On iPhone/iPad, <strong>Files</strong> opens the document picker and <strong>Photos / Gallery</strong> opens the photo picker. A photo is OCR'd in your browser before translation.</p>
+      <div id="trUploadStatus" class="hint" style="display:none;"></div>
+    </div>
     <div class="field row">
       <div><label>Source language</label><select id="trSource">${langOptions(true)}</select></div>
       <div><label>Target language</label><select id="trTarget">${langOptions(false)}</select></div>
     </div>
     <div class="field"><label>Email (optional — raises the free daily translation limit)</label><input type="text" id="trEmail" placeholder="you@example.com"></div>
-    <p class="hint">Uses the free MyMemory translation service over the internet — the text you translate is sent to it (your other files stay local). Long text is split into chunks automatically. Covers 38 languages known to translate reliably through the free service — including English, Hindi, and India's other major regional languages.</p>
+    <p class="hint">You can type/paste text, upload a PDF/DOCX/TXT/MD from Files, or upload a photo from Photos/Gallery. Only the extracted text is sent to the translation service.</p>
   `, async () => {
     const text = document.getElementById('trInput').value.trim();
-    if(!text){ toast('Enter some text to translate.', true); return; }
+    if(!text){ toast('Enter text or upload a file/photo first.', true); return; }
     const source = document.getElementById('trSource').value;
     const target = document.getElementById('trTarget').value;
     const email = document.getElementById('trEmail').value.trim();
@@ -4209,6 +4223,50 @@ $('btnTranslateText').addEventListener('click', () => {
     } catch(e){ console.error(e); toast('Translation failed — the free service may be rate-limited. Try again shortly, or add your email above to raise the limit.', true); }
     finally { showProgress(null); }
   });
+
+  setTimeout(() => {
+    const pickFile = document.getElementById('trPickFile');
+    const pickPhoto = document.getElementById('trPickPhoto');
+    const fileInput = document.getElementById('trUploadFile');
+    const photoInput = document.getElementById('trUploadPhoto');
+    const textArea = document.getElementById('trInput');
+    const status = document.getElementById('trUploadStatus');
+    if(!pickFile || !pickPhoto || !fileInput || !photoInput || !textArea) return;
+
+    pickFile.addEventListener('click', () => fileInput.click());
+    pickPhoto.addEventListener('click', () => photoInput.click());
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files && fileInput.files[0];
+      if(!file) return;
+      try{
+        status.style.display = 'block'; status.textContent = 'Reading ' + file.name + '…';
+        const text = await extractTextFromAnyFile(file);
+        textArea.value = text || '';
+        status.textContent = text ? 'Loaded: ' + file.name : 'No text found in that file.';
+        if(!text) toast('No text found in that file.', true);
+      } catch(e){ status.textContent = 'Could not read file.'; toast(e.message || 'Could not read that file.', true); }
+    });
+
+    photoInput.addEventListener('change', async () => {
+      const image = photoInput.files && photoInput.files[0];
+      if(!image) return;
+      try{
+        status.style.display = 'block'; status.textContent = 'Reading photo with OCR…';
+        const source = document.getElementById('trSource').value;
+        const ocrLang = source === 'auto' ? 'eng+hin' : (OCR_LANGS.find(([c]) => c === source)?.[0] || 'eng');
+        const result = await Tesseract.recognize(image, ocrLang, {
+          logger: m => {
+            if(m && typeof m.progress === 'number') status.textContent = 'OCR: ' + Math.round(m.progress*100) + '%';
+          }
+        });
+        const text = result?.data?.text || '';
+        textArea.value = text;
+        status.textContent = text ? 'OCR complete: ' + image.name : 'No readable text found in the photo.';
+        if(!text) toast('No readable text found. Try a clearer, well-lit photo.', true);
+      } catch(e){ status.textContent = 'Could not read photo.'; toast(e.message || 'Photo OCR failed.', true); }
+    });
+  }, 0);
 });
 
 async function extractTextFromAnyFile(file){
