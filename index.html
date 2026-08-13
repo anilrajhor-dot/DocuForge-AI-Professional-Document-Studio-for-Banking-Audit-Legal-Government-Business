@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="application-version" content="2026.08.12.4">
+<meta name="application-version" content="2026.08.12.5">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.12.4 usability refinements ===== */
+/* ===== v2026.08.12.5 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -484,7 +484,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.12.4';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.12.5';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -495,7 +495,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.4</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.5</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -629,7 +629,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <button class="tool-btn" id="btnTranslateDoc"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M9 15l3-3 3 3M12 12v7"></path></svg> Translate a document…</button>
 <button class="tool-btn" id="btnTranslatePdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M4 5h9M7 3v2m0 0c0 4-1 7-4 9" transform="translate(1,2) scale(0.55)"></path></svg> Translate this open PDF</button>
 <button class="tool-btn" id="btnTranslateAI"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 5h9M7 3v2m0 0c0 4-1 7-4 9m4-4c1 2 2.5 3.5 4 4M14 21l4-9 4 9m-6.5-3h5"></path><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4L12 3z" transform="translate(3,-2) scale(0.4)"></path></svg> Translate via AI (higher quality)…</button>
-<p class="hint" style="padding:0 14px;margin:6px 0 0;">"Translate text/document/PDF" use a free translation service (MyMemory) — no setup needed, but quality is inconsistent, especially on longer or more formal text. "Translate via AI" uses a proper language model instead — noticeably better with grammar and context, but needs an API key. Google's Gemini API has a genuinely free tier if cost is a concern.</p>
+<p class="hint" style="padding:0 14px;margin:6px 0 0;">Translate text, choose a document from Files, or choose a photo from your iPhone/iPad Photos/Gallery. Photo translation uses local OCR first. "Translate this open PDF" works on the PDF currently open in the editor.</p>
 </div>
 </div>
       <div class="ribbon-panel" data-studio-panel="convert">
@@ -831,7 +831,7 @@ body.dark .studio-tab.active{color:var(--pine);}
     <div id="aboutStudio" class="studio-page">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Build:</strong> 2026-08-12.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.12.5 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -4238,27 +4238,54 @@ async function extractTextFromAnyFile(file){
   throw new Error('Unsupported file type — use PDF, DOCX, TXT, or MD.');
 }
 $('btnTranslateDoc').addEventListener('click', () => {
-  openModal('Translate a document', `
-    <div class="field"><label>File (PDF, DOCX, TXT, or MD)</label><input type="file" id="trDocFile" accept=".pdf,.docx,.txt,.md"></div>
+  openModal('Translate a document / image', `
+    <div class="field">
+      <label>Choose a document from Files</label>
+      <input type="file" id="trDocFile" accept=".pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown">
+      <p class="hint" style="margin-top:5px;">On iPhone/iPad, tap the picker and choose <strong>Files</strong> or a supported document from the available locations.</p>
+    </div>
+    <div class="field">
+      <label>Or choose a photo/image from Gallery</label>
+      <input type="file" id="trDocImage" accept="image/*">
+      <p class="hint" style="margin-top:5px;">On iPhone/iPad this opens the photo picker so you can select an image from <strong>Photos</strong>. It can also offer camera/photo options depending on iOS.</p>
+    </div>
     <div class="field row">
       <div><label>Source language</label><select id="trDocSource">${langOptions(true)}</select></div>
       <div><label>Target language</label><select id="trDocTarget">${langOptions(false)}</select></div>
     </div>
     <div class="field"><label>Email (optional — raises the free daily translation limit)</label><input type="text" id="trDocEmail" placeholder="you@example.com"></div>
-    <p class="hint">Extracts the file's text and sends it to the free MyMemory translation service. Scanned PDFs have no text layer — OCR Studio can fix that first.</p>
+    <p class="hint">Documents are read locally. For an image/photo, DocuForge first runs OCR in your browser, then sends only the extracted text to the translation service. For a scanned PDF, run OCR Studio first.</p>
   `, async () => {
     const file = document.getElementById('trDocFile').files[0];
-    if(!file){ toast('Choose a file first.', true); return; }
+    const image = document.getElementById('trDocImage').files[0];
+    if(!file && !image){ toast('Choose a document from Files or an image from Gallery first.', true); return; }
+    if(file && image){ toast('Please choose either a document or an image, not both.', true); return; }
     const source = document.getElementById('trDocSource').value;
     const target = document.getElementById('trDocTarget').value;
     const email = document.getElementById('trDocEmail').value.trim();
-    setStatus('Reading document…'); showProgress(10);
+    setStatus(image ? 'Reading image with OCR…' : 'Reading document…'); showProgress(10);
     try{
-      const text = await extractTextFromAnyFile(file);
-      if(!text.trim()){ toast('No text found in that file.', true); return; }
+      let text = '';
+      let baseName = 'translation';
+      if(image){
+        // Use the selected source language for OCR where possible; auto-detect
+        // falls back to English+Hindi, which is useful for common Indian documents.
+        const ocrLang = source === 'auto' ? 'eng+hin' : (OCR_LANGS.find(([c]) => c === source)?.[0] || 'eng');
+        const result = await Tesseract.recognize(image, ocrLang, {
+          logger: m => {
+            if(m && typeof m.progress === 'number') showProgress(Math.max(10, Math.min(65, Math.round(m.progress * 55))));
+          }
+        });
+        text = result?.data?.text || '';
+        baseName = image.name.replace(/\.[^.]+$/, '') + '_translated';
+      } else {
+        text = await extractTextFromAnyFile(file);
+        baseName = file.name.replace(/\.[^.]+$/, '') + '_translated';
+      }
+      if(!text.trim()){ toast('No text found. For a photo, make sure the text is clear and well lit.', true); return; }
       setStatus('Translating…');
-      const translated = await translateFullText(text, source, target, email, (d,t) => showProgress(Math.round((d/t)*100)));
-      showTranslationResult(text, translated, langName(source), langName(target), file.name.replace(/\.[^.]+$/, '') + '_translated');
+      const translated = await translateFullText(text, source, target, email, (d,t) => showProgress(65 + Math.round((d/t)*35)));
+      showTranslationResult(text, translated, langName(source), langName(target), baseName);
       setStatus('Translation complete.');
     } catch(e){ console.error(e); toast(e.message || 'Translation failed.', true); }
     finally { showProgress(null); }
