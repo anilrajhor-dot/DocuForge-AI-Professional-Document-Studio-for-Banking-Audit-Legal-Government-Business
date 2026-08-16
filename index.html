@@ -441,6 +441,12 @@ body.dark .studio-tab.active{color:var(--pine);}
 .dash-tile:hover{border-color:var(--accent); transform:translateY(-1px);}
 .dash-tile .dt-icon{font-size:22px;}
 
+.dashboard-main-menu{grid-template-columns:repeat(auto-fit,minmax(145px,1fr));}
+.main-menu-tile{min-height:118px;justify-content:center;padding:18px 12px;}
+.main-menu-tile span:not(.dt-icon){font-size:14px;font-weight:700;}
+.main-menu-tile small{font-size:10.5px;font-weight:400;color:var(--ink-soft);line-height:1.35;}
+.main-menu-tile::after{content:'Open submenu →';display:block;margin-top:3px;font-size:9.5px;font-family:var(--font-mono);color:var(--pine);opacity:.9;}
+
 .recent-row{
   display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 12px;
   background:var(--surface); border:1px solid var(--line); border-radius:5px; font-size:12.5px;
@@ -468,7 +474,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.17 usability refinements ===== */
+/* ===== v2026.08.16.18 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -500,7 +506,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.17 PDF workflow ===== */
+/* ===== v2026.08.16.18 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -509,7 +515,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.17 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.18 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -548,7 +554,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.17</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.18</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -557,12 +563,11 @@ body.dark .studio-tab.active{color:var(--pine);}
 
 
 
-<div id="landingPage">
+<div id="landingPage" style="display:none;">
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
     <h1>DocuForge AI</h1>
     <p class="tagline">Create &bull; Convert &bull; Translate &bull; Extract &bull; Protect &mdash; all your documents, one toolkit. Everything runs in your browser; your files are never uploaded anywhere.</p>
-    <button class="btn-launch" id="btnLaunchEditor" type="button">Launch Editor →</button>
   </div>
   <div style="padding:40px 20px 50px;">
     <div class="feature-grid">
@@ -584,7 +589,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   </div>
 </div>
 
-<div id="appView" style="display:none;">
+<div id="appView" style="display:block;">
 <header>
   <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Go to Dashboard">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>
@@ -942,23 +947,26 @@ function openGstInvoiceApp(){
     <div id="dashboardNavigationHint" class="hint" style="
       margin:0 14px 12px;padding:11px 13px;border:1px solid var(--line);
       border-radius:10px;background:var(--surface);text-align:center;">
-      <strong>Quick access:</strong> Tap a tile to open its <strong>main menu / Studio</strong>.
-      You can then choose the required tool from that Studio's submenu.
+      <strong>Main menu:</strong> Tap any category to open its <strong>Studio submenu</strong>.
+      Then choose the required tool. No document is selected until a tool asks for one.
     </div>
-<div id="dashboardTiles" class="dashboard-grid">
-      <button class="dash-tile" id="dashboardUploadDocuments"><span class="dt-icon">📂</span><span>Upload Documents</span></button>
-      <button class="dash-tile" data-tool="btnOpen"><span class="dt-icon">🗂️</span><span>Merge PDF</span></button>
-      <button class="dash-tile" data-tool="btnSplit"><span class="dt-icon">✂️</span><span>Split PDF</span></button>
-      <button class="dash-tile" data-tool="btnCompress"><span class="dt-icon">📉</span><span>Compress PDF</span></button>
-      <button class="dash-tile" data-tool="btnOcrPdf"><span class="dt-icon">🔎</span><span>OCR</span></button>
-      <button class="dash-tile" data-tool="btnTranslateText"><span class="dt-icon">🌍</span><span>Translate</span></button>
-      <button class="dash-tile" data-tool="btnPdfToWord"><span class="dt-icon">📝</span><span>PDF → Word</span></button>
-      <button class="dash-tile" data-tool="btnPdfToExcel"><span class="dt-icon">📊</span><span>PDF → Excel</span></button>
-      <button class="dash-tile" id="excelDashboardTile" type="button"><span class="dt-icon">📈</span><span>Excel Dashboard</span></button>
-      <button class="dash-tile" id="gstInvoiceDashboardTile" type="button"><span class="dt-icon">🧾</span><span>GST Invoice</span></button>
-      <button class="dash-tile" data-tool="btnImagesToPdf"><span class="dt-icon">🖼️</span><span>Image → PDF</span></button>
-      <button class="dash-tile" data-tool="btnAiTools"><span class="dt-icon">🤖</span><span>AI Summarizer</span></button>
-      <button class="dash-tile" data-tool="btnBatch"><span class="dt-icon">📂</span><span>Batch Processing</span></button>
+<div id="dashboardTiles" class="dashboard-grid dashboard-main-menu">
+      <button class="dash-tile main-menu-tile" data-studio="pdf"><span class="dt-icon">📄</span><span>PDF Studio</span><small>Merge, split, edit &amp; manage PDFs</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="ocr"><span class="dt-icon">🖼️</span><span>OCR &amp; Image Studio</span><small>OCR, extract text &amp; images</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="translate"><span class="dt-icon">🌍</span><span>Translation Studio</span><small>Translate documents &amp; text</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="convert"><span class="dt-icon">🔄</span><span>Conversion Studio</span><small>PDF, Word, Excel &amp; other formats</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="powerpoint"><span class="dt-icon">📽️</span><span>PowerPoint Studio</span><small>Create and convert presentations</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="ai"><span class="dt-icon">🤖</span><span>AI Studio</span><small>Summarise, rewrite &amp; analyse</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="excel"><span class="dt-icon">📊</span><span>Excel Studio</span><small>Excel tools &amp; dashboards</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="gstinvoice"><span class="dt-icon">🧾</span><span>GST Invoice</span><small>Create GST-compliant invoices</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="website"><span class="dt-icon">🌐</span><span>Website Studio</span><small>Create web pages &amp; tools</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="security"><span class="dt-icon">🔐</span><span>Security Studio</span><small>Sign, fill &amp; protect documents</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="batch"><span class="dt-icon">📂</span><span>Batch Studio</span><small>Process multiple files together</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="reader"><span class="dt-icon">📖</span><span>Reader</span><small>Read PDF &amp; EPUB files</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="export"><span class="dt-icon">📤</span><span>Export</span><small>Download and share results</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="help"><span class="dt-icon">❓</span><span>Help</span><small>How to use DocuForge AI</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="settings"><span class="dt-icon">⚙️</span><span>Settings</span><small>App preferences</small></button>
+      <button class="dash-tile main-menu-tile" data-studio="about"><span class="dt-icon">ℹ️</span><span>About</span><small>Version &amp; developer information</small></button>
     </div>
     <div id="dashboardRecent" style="display:none;">
       <div id="continueProjectArea" style="margin-bottom:18px;"></div>
@@ -5719,10 +5727,11 @@ $('toggleLargeText').addEventListener('change', (e) => {
 });
 
 /* ---------- Landing page ---------- */
-$('btnLaunchEditor').addEventListener('click', () => {
-  $('landingPage').style.display = 'none';
-  $('appView').style.display = 'block';
-});
+/* Landing page removed from the workflow: DocuForge now opens directly on its main menu/dashboard. */
+const legacyLaunch = $('btnLaunchEditor');
+if(legacyLaunch) legacyLaunch.remove();
+$('landingPage').style.display = 'none';
+$('appView').style.display = 'block';
 
 /* ---------- Studio navigation (top tabs + ribbon) ---------- */
 let currentStudio = 'dashboard';
@@ -5879,24 +5888,15 @@ function studioLabel(name){
   return labels[name] || name;
 }
 
-$('dashboardUploadDocuments')?.addEventListener('click', () => {
-  $('fileInput').click();
-});
-document.querySelectorAll('#dashboardTiles .dash-tile[data-tool]').forEach(t => {
-  t.addEventListener('click', () => openDashboardCategory(t.dataset.tool));
-});
-
-$('excelDashboardTile')?.addEventListener('click', () => {
-  setStudio('excel');
-  const tabs = document.getElementById('studioTabs');
-  if(tabs) tabs.scrollIntoView({behavior:'smooth', block:'start'});
-  setStatus('Opened Excel Studio. Choose a dashboard tool from the submenu.');
-});
-$('gstInvoiceDashboardTile')?.addEventListener('click', () => {
-  setStudio('gstinvoice');
-  const tabs = document.getElementById('studioTabs');
-  if(tabs) tabs.scrollIntoView({behavior:'smooth', block:'start'});
-  setStatus('Opened GST Invoice Studio.');
+/* Dashboard = main menu. Each tile opens its Studio/submenu; no file picker is shown here. */
+document.querySelectorAll('#dashboardTiles .main-menu-tile[data-studio]').forEach(t => {
+  t.addEventListener('click', () => {
+    const studio = t.dataset.studio;
+    setStudio(studio);
+    const tabs = document.getElementById('studioTabs');
+    if(tabs) tabs.scrollIntoView({behavior:'smooth', block:'start'});
+    setStatus('Opened ' + studioLabel(studio) + ' Studio. Choose a tool from the submenu.');
+  });
 });
 
 $('exportPdfTile').addEventListener('click', () => {
