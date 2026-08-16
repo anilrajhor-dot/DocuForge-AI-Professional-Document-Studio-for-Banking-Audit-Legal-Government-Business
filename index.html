@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.26 usability refinements ===== */
+/* ===== v2026.08.16.28 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.26 PDF workflow ===== */
+/* ===== v2026.08.16.28 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.26 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.28 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.26 dashboard cleanup ===== */
+/* ===== v2026.08.16.28 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.16.26: clean Dashboard ===== */
+/* ===== v2026.08.16.28: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.16.26: Dashboard is a true main menu ===== */
+/* ===== v2026.08.16.28: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.16.26: hard dashboard/studio separation ===== */
+/* ===== v2026.08.16.28: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.16.26: Dashboard upload entry ===== */
+/* ===== v2026.08.16.28: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.16.26 — one navigation system only ===== */
+/* ===== v2026.08.16.28 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -687,7 +687,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.16.26';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.16.28';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -698,7 +698,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.26</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.28</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -2203,293 +2203,6 @@ function showCompareResult(diff, nameA, nameB){
       const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Comparison: ${esc(nameA)} vs ${esc(nameB)}</title>
 <style>body{font-family:ui-monospace,monospace;font-size:13px;margin:24px;} .added{background:#d7f5d7;} .removed{background:#f8d7d7;text-decoration:line-through;}</style>
 </head><body><h2>${esc(nameA)} vs ${esc(nameB)}</h2>${bodyHtml}
-<script>
-/* ===== DocuForge AI v2026.08.16.26 — navigation safety controller ===== */
-(function(){
-  function q(id){ return document.getElementById(id); }
-  function studioPanels(){
-    return Array.from(document.querySelectorAll('.ribbon-panel[data-studio-panel]'));
-  }
-  function showDashboard(){
-    document.body.classList.add('dashboard-active');
-    const ids=['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'];
-    ids.forEach(id=>{ const el=q(id); if(el) el.style.display='none'; });
-    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='grid';
-    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='block';
-    const recent=q('dashboardRecent'); if(recent) recent.style.display='block';
-    studioPanels().forEach(p=>p.style.display='none');
-    window.__docuforgeStudio='dashboard';
-  }
-  function showStudio(name){
-    document.body.classList.remove('dashboard-active');
-    const tabs=q('studioTabs'); if(tabs) tabs.style.display='flex';
-    const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='block';
-    const toolbar=q('toolbar'); if(toolbar) toolbar.style.display='none';
-    const strip=q('pageActionStrip'); if(strip) strip.style.display='none';
-    const drop=q('dropzone'); if(drop) drop.style.display='none';
-    const grid=q('grid'); if(grid) grid.style.display='none';
-    const banner=q('noPdfBanner'); if(banner) banner.style.display='none';
-    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='none';
-    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='none';
-    const recent=q('dashboardRecent'); if(recent) recent.style.display='none';
-
-    studioPanels().forEach(p=>{
-      p.style.display = (p.dataset.studioPanel===name) ? 'block' : 'none';
-      p.classList.toggle('active', p.dataset.studioPanel===name);
-    });
-    document.querySelectorAll('#studioTabs .studio-tab').forEach(t=>{
-      t.classList.toggle('active', t.dataset.studio===name);
-    });
-    window.__docuforgeStudio=name;
-
-    /* Let the app's own studio loader run when it is available. */
-    try{
-      if(typeof window.setStudio==='function'){
-        window.setStudio(name);
-      }
-    }catch(e){ console.warn('Studio loader recovered:',e); }
-
-    const r=q('ribbon');
-    if(r) setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}),30);
-  }
-
-  function wire(){
-    /* Always start on a clean Dashboard. */
-    showDashboard();
-
-    /* Main-menu cards. */
-    document.addEventListener('click',function(ev){
-      const tile=ev.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      const name=tile.getAttribute('data-studio');
-      if(name) showStudio(name);
-    },true);
-
-    /* Upper studio tabs are only used after a Studio is opened. */
-    document.addEventListener('click',function(ev){
-      const tab=ev.target.closest('#studioTabs .studio-tab[data-studio]');
-      if(!tab) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      const name=tab.getAttribute('data-studio');
-      if(name==='dashboard') showDashboard();
-      else if(name) showStudio(name);
-    },true);
-
-    /* Home icon returns to the Dashboard. */
-    const home=q('homeBtn') || q('brandHome') || q('homeButton');
-    if(home) home.addEventListener('click',function(ev){
-      ev.preventDefault(); ev.stopPropagation(); showDashboard();
-    },true);
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
-
-<script>
-/* ===== v2026.08.16.26 — Dashboard upload + Studio visibility controller ===== */
-(function(){
-  function q(id){return document.getElementById(id);}
-  function allStudioPages(){
-    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
-            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
-  }
-  function hideAllEmbeddedPages(){
-    allStudioPages().forEach(el=>el.style.display='none');
-  }
-  function setStatus(msg, show=true){
-    const el=q('dashboardUploadStatus');
-    if(!el) return;
-    el.innerHTML=msg;
-    el.style.display=show?'block':'none';
-  }
-  function extension(name){
-    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
-    return m?m[1]:'';
-  }
-  function routeUploadedFile(file){
-    const ext=extension(file.name);
-    let studio='convert', label='Conversion Studio';
-    if(ext==='pdf' || /^image\//i.test(file.type)){
-      studio='pdf'; label='PDF Studio';
-    }else if(['xls','xlsx','csv'].includes(ext)){
-      studio='excel'; label='Excel Studio';
-    }else if(['ppt','pptx','odp'].includes(ext)){
-      studio='powerpoint'; label='PowerPoint Studio';
-    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
-      studio='convert'; label='Conversion Studio';
-    }
-    window.__docuforgePendingFile=file;
-    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(studio);
-    }catch(e){console.warn(e);}
-    document.body.classList.remove('dashboard-active');
-
-    /* For PDF/image, feed the existing PDF loader immediately. */
-    if(studio==='pdf'){
-      const dt=new DataTransfer();
-      dt.items.add(file);
-      const input=q('fileInput');
-      if(input){
-        input.files=dt.files;
-        input.dispatchEvent(new Event('change',{bubbles:true}));
-      }
-    }
-
-    /* For Excel, keep the file pending and open the Excel Studio.
-       The Excel module can use this reference when its import action is selected. */
-    setTimeout(()=>{
-      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
-      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
-    },80);
-  }
-
-  function wire(){
-    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
-    hideAllEmbeddedPages();
-
-    const upload=q('dashboardUploadFileTile');
-    const input=q('universalFileInput');
-    if(upload && input){
-      upload.addEventListener('click',()=>input.click());
-      input.addEventListener('change',()=>{
-        const file=input.files && input.files[0];
-        if(file) routeUploadedFile(file);
-        input.value='';
-      });
-    }
-
-    /* Make Dashboard truly clean even if another script changes a Studio's display. */
-    const observer=new MutationObserver(()=>{
-      if(document.body.classList.contains('dashboard-active')){
-        hideAllEmbeddedPages();
-        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
-        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
-        const grid=q('grid'); if(grid) grid.style.display='none';
-      }
-    });
-    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
-
-<script>
-/* ===== v2026.08.16.26 — single navigation controller ===== */
-(function(){
-  const $=id=>document.getElementById(id);
-  function hideStudioPanels(){
-    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
-      p.style.display='none';
-      p.classList.remove('active');
-    });
-    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
-     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
-  }
-  function dashboard(){
-    document.body.classList.add('dashboard-active');
-    hideStudioPanels();
-    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
-      .forEach(id=>{if($(id)) $(id).style.display='none';});
-    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
-    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
-    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
-  }
-  function studio(name){
-    document.body.classList.remove('dashboard-active');
-    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
-    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
-    if($('studioTabs')) $('studioTabs').style.display='none';
-    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
-    if($('ribbon')) $('ribbon').style.display='flex';
-    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
-
-    hideStudioPanels();
-    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
-    if(panel){
-      panel.style.display='flex';
-      panel.classList.add('active');
-    }
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(name);
-    }catch(e){console.warn('Existing studio loader:',e);}
-    // Re-assert our navigation after the legacy loader runs.
-    setTimeout(()=>{
-      if($('studioTabs')) $('studioTabs').style.display='none';
-      if($('ribbon')) $('ribbon').style.display='flex';
-      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
-    },50);
-  }
-
-  function wire(){
-    /* Always start clean. */
-    dashboard();
-
-    /* Main menu cards. */
-    document.addEventListener('click',e=>{
-      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      e.preventDefault(); e.stopImmediatePropagation();
-      studio(tile.dataset.studio);
-    },true);
-
-    /* Upload File card. */
-    const dashUpload=$('dashboardUploadFileTile');
-    const input=$('universalFileInput');
-    if(dashUpload && input){
-      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
-    }
-
-    /* Upload button inside any Studio. */
-    const studioUpload=$('studioUploadFileBtn');
-    if(studioUpload && input){
-      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
-    }
-
-    /* Back to Main Menu. */
-    $('backToMainMenu')?.addEventListener('click',e=>{
-      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
-    },true);
-
-    /* Route uploaded file. */
-    input?.addEventListener('change',()=>{
-      const file=input.files?.[0];
-      if(!file) return;
-      const ext=(file.name.split('.').pop()||'').toLowerCase();
-      let target='convert';
-      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
-      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
-      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
-      studio(target);
-
-      /* Feed PDF/image files into the existing PDF input. */
-      if(target==='pdf'){
-        try{
-          const dt=new DataTransfer(); dt.items.add(file);
-          const pdfInput=$('fileInput');
-          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
-        }catch(e){console.warn(e);}
-      }
-      input.value='';
-    },true);
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
 <\/body><\/html>`;
       downloadBlob(new Blob([html], {type:'text/html'}), 'comparison.html');
     });
@@ -2812,293 +2525,6 @@ function buildBilingualHtml(original, translated, sourceLabel, targetLabel){
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Translation</title>
 <style>body{font-family:sans-serif;margin:24px;} table{width:100%;border-collapse:collapse;} td{border:1px solid #ccc;padding:8px;vertical-align:top;width:50%;white-space:pre-wrap;} th{background:#113B34;color:#fff;padding:8px;text-align:left;}</style>
 </head><body><h1>Translation</h1><table><tr><th>${esc(sourceLabel)}</th><th>${esc(targetLabel)}</th></tr>${rows}</table>
-<script>
-/* ===== DocuForge AI v2026.08.16.26 — navigation safety controller ===== */
-(function(){
-  function q(id){ return document.getElementById(id); }
-  function studioPanels(){
-    return Array.from(document.querySelectorAll('.ribbon-panel[data-studio-panel]'));
-  }
-  function showDashboard(){
-    document.body.classList.add('dashboard-active');
-    const ids=['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'];
-    ids.forEach(id=>{ const el=q(id); if(el) el.style.display='none'; });
-    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='grid';
-    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='block';
-    const recent=q('dashboardRecent'); if(recent) recent.style.display='block';
-    studioPanels().forEach(p=>p.style.display='none');
-    window.__docuforgeStudio='dashboard';
-  }
-  function showStudio(name){
-    document.body.classList.remove('dashboard-active');
-    const tabs=q('studioTabs'); if(tabs) tabs.style.display='flex';
-    const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='block';
-    const toolbar=q('toolbar'); if(toolbar) toolbar.style.display='none';
-    const strip=q('pageActionStrip'); if(strip) strip.style.display='none';
-    const drop=q('dropzone'); if(drop) drop.style.display='none';
-    const grid=q('grid'); if(grid) grid.style.display='none';
-    const banner=q('noPdfBanner'); if(banner) banner.style.display='none';
-    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='none';
-    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='none';
-    const recent=q('dashboardRecent'); if(recent) recent.style.display='none';
-
-    studioPanels().forEach(p=>{
-      p.style.display = (p.dataset.studioPanel===name) ? 'block' : 'none';
-      p.classList.toggle('active', p.dataset.studioPanel===name);
-    });
-    document.querySelectorAll('#studioTabs .studio-tab').forEach(t=>{
-      t.classList.toggle('active', t.dataset.studio===name);
-    });
-    window.__docuforgeStudio=name;
-
-    /* Let the app's own studio loader run when it is available. */
-    try{
-      if(typeof window.setStudio==='function'){
-        window.setStudio(name);
-      }
-    }catch(e){ console.warn('Studio loader recovered:',e); }
-
-    const r=q('ribbon');
-    if(r) setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}),30);
-  }
-
-  function wire(){
-    /* Always start on a clean Dashboard. */
-    showDashboard();
-
-    /* Main-menu cards. */
-    document.addEventListener('click',function(ev){
-      const tile=ev.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      const name=tile.getAttribute('data-studio');
-      if(name) showStudio(name);
-    },true);
-
-    /* Upper studio tabs are only used after a Studio is opened. */
-    document.addEventListener('click',function(ev){
-      const tab=ev.target.closest('#studioTabs .studio-tab[data-studio]');
-      if(!tab) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      const name=tab.getAttribute('data-studio');
-      if(name==='dashboard') showDashboard();
-      else if(name) showStudio(name);
-    },true);
-
-    /* Home icon returns to the Dashboard. */
-    const home=q('homeBtn') || q('brandHome') || q('homeButton');
-    if(home) home.addEventListener('click',function(ev){
-      ev.preventDefault(); ev.stopPropagation(); showDashboard();
-    },true);
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
-
-<script>
-/* ===== v2026.08.16.26 — Dashboard upload + Studio visibility controller ===== */
-(function(){
-  function q(id){return document.getElementById(id);}
-  function allStudioPages(){
-    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
-            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
-  }
-  function hideAllEmbeddedPages(){
-    allStudioPages().forEach(el=>el.style.display='none');
-  }
-  function setStatus(msg, show=true){
-    const el=q('dashboardUploadStatus');
-    if(!el) return;
-    el.innerHTML=msg;
-    el.style.display=show?'block':'none';
-  }
-  function extension(name){
-    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
-    return m?m[1]:'';
-  }
-  function routeUploadedFile(file){
-    const ext=extension(file.name);
-    let studio='convert', label='Conversion Studio';
-    if(ext==='pdf' || /^image\//i.test(file.type)){
-      studio='pdf'; label='PDF Studio';
-    }else if(['xls','xlsx','csv'].includes(ext)){
-      studio='excel'; label='Excel Studio';
-    }else if(['ppt','pptx','odp'].includes(ext)){
-      studio='powerpoint'; label='PowerPoint Studio';
-    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
-      studio='convert'; label='Conversion Studio';
-    }
-    window.__docuforgePendingFile=file;
-    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(studio);
-    }catch(e){console.warn(e);}
-    document.body.classList.remove('dashboard-active');
-
-    /* For PDF/image, feed the existing PDF loader immediately. */
-    if(studio==='pdf'){
-      const dt=new DataTransfer();
-      dt.items.add(file);
-      const input=q('fileInput');
-      if(input){
-        input.files=dt.files;
-        input.dispatchEvent(new Event('change',{bubbles:true}));
-      }
-    }
-
-    /* For Excel, keep the file pending and open the Excel Studio.
-       The Excel module can use this reference when its import action is selected. */
-    setTimeout(()=>{
-      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
-      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
-    },80);
-  }
-
-  function wire(){
-    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
-    hideAllEmbeddedPages();
-
-    const upload=q('dashboardUploadFileTile');
-    const input=q('universalFileInput');
-    if(upload && input){
-      upload.addEventListener('click',()=>input.click());
-      input.addEventListener('change',()=>{
-        const file=input.files && input.files[0];
-        if(file) routeUploadedFile(file);
-        input.value='';
-      });
-    }
-
-    /* Make Dashboard truly clean even if another script changes a Studio's display. */
-    const observer=new MutationObserver(()=>{
-      if(document.body.classList.contains('dashboard-active')){
-        hideAllEmbeddedPages();
-        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
-        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
-        const grid=q('grid'); if(grid) grid.style.display='none';
-      }
-    });
-    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
-
-<script>
-/* ===== v2026.08.16.26 — single navigation controller ===== */
-(function(){
-  const $=id=>document.getElementById(id);
-  function hideStudioPanels(){
-    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
-      p.style.display='none';
-      p.classList.remove('active');
-    });
-    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
-     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
-  }
-  function dashboard(){
-    document.body.classList.add('dashboard-active');
-    hideStudioPanels();
-    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
-      .forEach(id=>{if($(id)) $(id).style.display='none';});
-    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
-    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
-    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
-  }
-  function studio(name){
-    document.body.classList.remove('dashboard-active');
-    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
-    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
-    if($('studioTabs')) $('studioTabs').style.display='none';
-    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
-    if($('ribbon')) $('ribbon').style.display='flex';
-    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
-
-    hideStudioPanels();
-    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
-    if(panel){
-      panel.style.display='flex';
-      panel.classList.add('active');
-    }
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(name);
-    }catch(e){console.warn('Existing studio loader:',e);}
-    // Re-assert our navigation after the legacy loader runs.
-    setTimeout(()=>{
-      if($('studioTabs')) $('studioTabs').style.display='none';
-      if($('ribbon')) $('ribbon').style.display='flex';
-      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
-    },50);
-  }
-
-  function wire(){
-    /* Always start clean. */
-    dashboard();
-
-    /* Main menu cards. */
-    document.addEventListener('click',e=>{
-      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      e.preventDefault(); e.stopImmediatePropagation();
-      studio(tile.dataset.studio);
-    },true);
-
-    /* Upload File card. */
-    const dashUpload=$('dashboardUploadFileTile');
-    const input=$('universalFileInput');
-    if(dashUpload && input){
-      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
-    }
-
-    /* Upload button inside any Studio. */
-    const studioUpload=$('studioUploadFileBtn');
-    if(studioUpload && input){
-      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
-    }
-
-    /* Back to Main Menu. */
-    $('backToMainMenu')?.addEventListener('click',e=>{
-      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
-    },true);
-
-    /* Route uploaded file. */
-    input?.addEventListener('change',()=>{
-      const file=input.files?.[0];
-      if(!file) return;
-      const ext=(file.name.split('.').pop()||'').toLowerCase();
-      let target='convert';
-      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
-      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
-      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
-      studio(target);
-
-      /* Feed PDF/image files into the existing PDF input. */
-      if(target==='pdf'){
-        try{
-          const dt=new DataTransfer(); dt.items.add(file);
-          const pdfInput=$('fileInput');
-          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
-        }catch(e){console.warn(e);}
-      }
-      input.value='';
-    },true);
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
 </body></html>`;
 }
 function showTranslationResult(original, translated, sourceLabel, targetLabel, baseName){
@@ -4039,293 +3465,6 @@ async function buildPdfHtml(){
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}</style>
 </head><body><h1>${title}</h1>${body}
-<script>
-/* ===== DocuForge AI v2026.08.16.26 — navigation safety controller ===== */
-(function(){
-  function q(id){ return document.getElementById(id); }
-  function studioPanels(){
-    return Array.from(document.querySelectorAll('.ribbon-panel[data-studio-panel]'));
-  }
-  function showDashboard(){
-    document.body.classList.add('dashboard-active');
-    const ids=['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'];
-    ids.forEach(id=>{ const el=q(id); if(el) el.style.display='none'; });
-    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='grid';
-    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='block';
-    const recent=q('dashboardRecent'); if(recent) recent.style.display='block';
-    studioPanels().forEach(p=>p.style.display='none');
-    window.__docuforgeStudio='dashboard';
-  }
-  function showStudio(name){
-    document.body.classList.remove('dashboard-active');
-    const tabs=q('studioTabs'); if(tabs) tabs.style.display='flex';
-    const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='block';
-    const toolbar=q('toolbar'); if(toolbar) toolbar.style.display='none';
-    const strip=q('pageActionStrip'); if(strip) strip.style.display='none';
-    const drop=q('dropzone'); if(drop) drop.style.display='none';
-    const grid=q('grid'); if(grid) grid.style.display='none';
-    const banner=q('noPdfBanner'); if(banner) banner.style.display='none';
-    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='none';
-    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='none';
-    const recent=q('dashboardRecent'); if(recent) recent.style.display='none';
-
-    studioPanels().forEach(p=>{
-      p.style.display = (p.dataset.studioPanel===name) ? 'block' : 'none';
-      p.classList.toggle('active', p.dataset.studioPanel===name);
-    });
-    document.querySelectorAll('#studioTabs .studio-tab').forEach(t=>{
-      t.classList.toggle('active', t.dataset.studio===name);
-    });
-    window.__docuforgeStudio=name;
-
-    /* Let the app's own studio loader run when it is available. */
-    try{
-      if(typeof window.setStudio==='function'){
-        window.setStudio(name);
-      }
-    }catch(e){ console.warn('Studio loader recovered:',e); }
-
-    const r=q('ribbon');
-    if(r) setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}),30);
-  }
-
-  function wire(){
-    /* Always start on a clean Dashboard. */
-    showDashboard();
-
-    /* Main-menu cards. */
-    document.addEventListener('click',function(ev){
-      const tile=ev.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      const name=tile.getAttribute('data-studio');
-      if(name) showStudio(name);
-    },true);
-
-    /* Upper studio tabs are only used after a Studio is opened. */
-    document.addEventListener('click',function(ev){
-      const tab=ev.target.closest('#studioTabs .studio-tab[data-studio]');
-      if(!tab) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      const name=tab.getAttribute('data-studio');
-      if(name==='dashboard') showDashboard();
-      else if(name) showStudio(name);
-    },true);
-
-    /* Home icon returns to the Dashboard. */
-    const home=q('homeBtn') || q('brandHome') || q('homeButton');
-    if(home) home.addEventListener('click',function(ev){
-      ev.preventDefault(); ev.stopPropagation(); showDashboard();
-    },true);
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
-
-<script>
-/* ===== v2026.08.16.26 — Dashboard upload + Studio visibility controller ===== */
-(function(){
-  function q(id){return document.getElementById(id);}
-  function allStudioPages(){
-    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
-            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
-  }
-  function hideAllEmbeddedPages(){
-    allStudioPages().forEach(el=>el.style.display='none');
-  }
-  function setStatus(msg, show=true){
-    const el=q('dashboardUploadStatus');
-    if(!el) return;
-    el.innerHTML=msg;
-    el.style.display=show?'block':'none';
-  }
-  function extension(name){
-    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
-    return m?m[1]:'';
-  }
-  function routeUploadedFile(file){
-    const ext=extension(file.name);
-    let studio='convert', label='Conversion Studio';
-    if(ext==='pdf' || /^image\//i.test(file.type)){
-      studio='pdf'; label='PDF Studio';
-    }else if(['xls','xlsx','csv'].includes(ext)){
-      studio='excel'; label='Excel Studio';
-    }else if(['ppt','pptx','odp'].includes(ext)){
-      studio='powerpoint'; label='PowerPoint Studio';
-    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
-      studio='convert'; label='Conversion Studio';
-    }
-    window.__docuforgePendingFile=file;
-    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(studio);
-    }catch(e){console.warn(e);}
-    document.body.classList.remove('dashboard-active');
-
-    /* For PDF/image, feed the existing PDF loader immediately. */
-    if(studio==='pdf'){
-      const dt=new DataTransfer();
-      dt.items.add(file);
-      const input=q('fileInput');
-      if(input){
-        input.files=dt.files;
-        input.dispatchEvent(new Event('change',{bubbles:true}));
-      }
-    }
-
-    /* For Excel, keep the file pending and open the Excel Studio.
-       The Excel module can use this reference when its import action is selected. */
-    setTimeout(()=>{
-      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
-      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
-    },80);
-  }
-
-  function wire(){
-    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
-    hideAllEmbeddedPages();
-
-    const upload=q('dashboardUploadFileTile');
-    const input=q('universalFileInput');
-    if(upload && input){
-      upload.addEventListener('click',()=>input.click());
-      input.addEventListener('change',()=>{
-        const file=input.files && input.files[0];
-        if(file) routeUploadedFile(file);
-        input.value='';
-      });
-    }
-
-    /* Make Dashboard truly clean even if another script changes a Studio's display. */
-    const observer=new MutationObserver(()=>{
-      if(document.body.classList.contains('dashboard-active')){
-        hideAllEmbeddedPages();
-        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
-        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
-        const grid=q('grid'); if(grid) grid.style.display='none';
-      }
-    });
-    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
-
-<script>
-/* ===== v2026.08.16.26 — single navigation controller ===== */
-(function(){
-  const $=id=>document.getElementById(id);
-  function hideStudioPanels(){
-    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
-      p.style.display='none';
-      p.classList.remove('active');
-    });
-    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
-     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
-  }
-  function dashboard(){
-    document.body.classList.add('dashboard-active');
-    hideStudioPanels();
-    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
-      .forEach(id=>{if($(id)) $(id).style.display='none';});
-    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
-    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
-    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
-  }
-  function studio(name){
-    document.body.classList.remove('dashboard-active');
-    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
-    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
-    if($('studioTabs')) $('studioTabs').style.display='none';
-    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
-    if($('ribbon')) $('ribbon').style.display='flex';
-    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
-
-    hideStudioPanels();
-    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
-    if(panel){
-      panel.style.display='flex';
-      panel.classList.add('active');
-    }
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(name);
-    }catch(e){console.warn('Existing studio loader:',e);}
-    // Re-assert our navigation after the legacy loader runs.
-    setTimeout(()=>{
-      if($('studioTabs')) $('studioTabs').style.display='none';
-      if($('ribbon')) $('ribbon').style.display='flex';
-      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
-    },50);
-  }
-
-  function wire(){
-    /* Always start clean. */
-    dashboard();
-
-    /* Main menu cards. */
-    document.addEventListener('click',e=>{
-      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      e.preventDefault(); e.stopImmediatePropagation();
-      studio(tile.dataset.studio);
-    },true);
-
-    /* Upload File card. */
-    const dashUpload=$('dashboardUploadFileTile');
-    const input=$('universalFileInput');
-    if(dashUpload && input){
-      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
-    }
-
-    /* Upload button inside any Studio. */
-    const studioUpload=$('studioUploadFileBtn');
-    if(studioUpload && input){
-      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
-    }
-
-    /* Back to Main Menu. */
-    $('backToMainMenu')?.addEventListener('click',e=>{
-      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
-    },true);
-
-    /* Route uploaded file. */
-    input?.addEventListener('change',()=>{
-      const file=input.files?.[0];
-      if(!file) return;
-      const ext=(file.name.split('.').pop()||'').toLowerCase();
-      let target='convert';
-      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
-      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
-      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
-      studio(target);
-
-      /* Feed PDF/image files into the existing PDF input. */
-      if(target==='pdf'){
-        try{
-          const dt=new DataTransfer(); dt.items.add(file);
-          const pdfInput=$('fileInput');
-          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
-        }catch(e){console.warn(e);}
-      }
-      input.value='';
-    },true);
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
 </body></html>`;
 }
 async function buildPdfJson(){
@@ -4492,292 +3631,6 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title></head>
 <body>${bodyHtml}
-<script>
-/* ===== DocuForge AI v2026.08.16.26 — navigation safety controller ===== */
-(function(){
-  function q(id){ return document.getElementById(id); }
-  function studioPanels(){
-    return Array.from(document.querySelectorAll('.ribbon-panel[data-studio-panel]'));
-  }
-  function showDashboard(){
-    document.body.classList.add('dashboard-active');
-    const ids=['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'];
-    ids.forEach(id=>{ const el=q(id); if(el) el.style.display='none'; });
-    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='grid';
-    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='block';
-    const recent=q('dashboardRecent'); if(recent) recent.style.display='block';
-    studioPanels().forEach(p=>p.style.display='none');
-    window.__docuforgeStudio='dashboard';
-  }
-  function showStudio(name){
-    document.body.classList.remove('dashboard-active');
-    const tabs=q('studioTabs'); if(tabs) tabs.style.display='flex';
-    const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='block';
-    const toolbar=q('toolbar'); if(toolbar) toolbar.style.display='none';
-    const strip=q('pageActionStrip'); if(strip) strip.style.display='none';
-    const drop=q('dropzone'); if(drop) drop.style.display='none';
-    const grid=q('grid'); if(grid) grid.style.display='none';
-    const banner=q('noPdfBanner'); if(banner) banner.style.display='none';
-    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='none';
-    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='none';
-    const recent=q('dashboardRecent'); if(recent) recent.style.display='none';
-
-    studioPanels().forEach(p=>{
-      p.style.display = (p.dataset.studioPanel===name) ? 'block' : 'none';
-      p.classList.toggle('active', p.dataset.studioPanel===name);
-    });
-    document.querySelectorAll('#studioTabs .studio-tab').forEach(t=>{
-      t.classList.toggle('active', t.dataset.studio===name);
-    });
-    window.__docuforgeStudio=name;
-
-    /* Let the app's own studio loader run when it is available. */
-    try{
-      if(typeof window.setStudio==='function'){
-        window.setStudio(name);
-      }
-    }catch(e){ console.warn('Studio loader recovered:',e); }
-
-    const r=q('ribbon');
-    if(r) setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}),30);
-  }
-
-  function wire(){
-    /* Always start on a clean Dashboard. */
-    showDashboard();
-
-    /* Main-menu cards. */
-    document.addEventListener('click',function(ev){
-      const tile=ev.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      const name=tile.getAttribute('data-studio');
-      if(name) showStudio(name);
-    },true);
-
-    /* Upper studio tabs are only used after a Studio is opened. */
-    document.addEventListener('click',function(ev){
-      const tab=ev.target.closest('#studioTabs .studio-tab[data-studio]');
-      if(!tab) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      const name=tab.getAttribute('data-studio');
-      if(name==='dashboard') showDashboard();
-      else if(name) showStudio(name);
-    },true);
-
-    /* Home icon returns to the Dashboard. */
-    const home=q('homeBtn') || q('brandHome') || q('homeButton');
-    if(home) home.addEventListener('click',function(ev){
-      ev.preventDefault(); ev.stopPropagation(); showDashboard();
-    },true);
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
-
-<script>
-/* ===== v2026.08.16.26 — Dashboard upload + Studio visibility controller ===== */
-(function(){
-  function q(id){return document.getElementById(id);}
-  function allStudioPages(){
-    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
-            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
-  }
-  function hideAllEmbeddedPages(){
-    allStudioPages().forEach(el=>el.style.display='none');
-  }
-  function setStatus(msg, show=true){
-    const el=q('dashboardUploadStatus');
-    if(!el) return;
-    el.innerHTML=msg;
-    el.style.display=show?'block':'none';
-  }
-  function extension(name){
-    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
-    return m?m[1]:'';
-  }
-  function routeUploadedFile(file){
-    const ext=extension(file.name);
-    let studio='convert', label='Conversion Studio';
-    if(ext==='pdf' || /^image\//i.test(file.type)){
-      studio='pdf'; label='PDF Studio';
-    }else if(['xls','xlsx','csv'].includes(ext)){
-      studio='excel'; label='Excel Studio';
-    }else if(['ppt','pptx','odp'].includes(ext)){
-      studio='powerpoint'; label='PowerPoint Studio';
-    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
-      studio='convert'; label='Conversion Studio';
-    }
-    window.__docuforgePendingFile=file;
-    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(studio);
-    }catch(e){console.warn(e);}
-    document.body.classList.remove('dashboard-active');
-
-    /* For PDF/image, feed the existing PDF loader immediately. */
-    if(studio==='pdf'){
-      const dt=new DataTransfer();
-      dt.items.add(file);
-      const input=q('fileInput');
-      if(input){
-        input.files=dt.files;
-        input.dispatchEvent(new Event('change',{bubbles:true}));
-      }
-    }
-
-    /* For Excel, keep the file pending and open the Excel Studio.
-       The Excel module can use this reference when its import action is selected. */
-    setTimeout(()=>{
-      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
-      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
-    },80);
-  }
-
-  function wire(){
-    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
-    hideAllEmbeddedPages();
-
-    const upload=q('dashboardUploadFileTile');
-    const input=q('universalFileInput');
-    if(upload && input){
-      upload.addEventListener('click',()=>input.click());
-      input.addEventListener('change',()=>{
-        const file=input.files && input.files[0];
-        if(file) routeUploadedFile(file);
-        input.value='';
-      });
-    }
-
-    /* Make Dashboard truly clean even if another script changes a Studio's display. */
-    const observer=new MutationObserver(()=>{
-      if(document.body.classList.contains('dashboard-active')){
-        hideAllEmbeddedPages();
-        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
-        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
-        const grid=q('grid'); if(grid) grid.style.display='none';
-      }
-    });
-    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
-
-<script>
-/* ===== v2026.08.16.26 — single navigation controller ===== */
-(function(){
-  const $=id=>document.getElementById(id);
-  function hideStudioPanels(){
-    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
-      p.style.display='none';
-      p.classList.remove('active');
-    });
-    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
-     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
-  }
-  function dashboard(){
-    document.body.classList.add('dashboard-active');
-    hideStudioPanels();
-    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
-      .forEach(id=>{if($(id)) $(id).style.display='none';});
-    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
-    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
-    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
-  }
-  function studio(name){
-    document.body.classList.remove('dashboard-active');
-    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
-    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
-    if($('studioTabs')) $('studioTabs').style.display='none';
-    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
-    if($('ribbon')) $('ribbon').style.display='flex';
-    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
-
-    hideStudioPanels();
-    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
-    if(panel){
-      panel.style.display='flex';
-      panel.classList.add('active');
-    }
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(name);
-    }catch(e){console.warn('Existing studio loader:',e);}
-    // Re-assert our navigation after the legacy loader runs.
-    setTimeout(()=>{
-      if($('studioTabs')) $('studioTabs').style.display='none';
-      if($('ribbon')) $('ribbon').style.display='flex';
-      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
-    },50);
-  }
-
-  function wire(){
-    /* Always start clean. */
-    dashboard();
-
-    /* Main menu cards. */
-    document.addEventListener('click',e=>{
-      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      e.preventDefault(); e.stopImmediatePropagation();
-      studio(tile.dataset.studio);
-    },true);
-
-    /* Upload File card. */
-    const dashUpload=$('dashboardUploadFileTile');
-    const input=$('universalFileInput');
-    if(dashUpload && input){
-      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
-    }
-
-    /* Upload button inside any Studio. */
-    const studioUpload=$('studioUploadFileBtn');
-    if(studioUpload && input){
-      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
-    }
-
-    /* Back to Main Menu. */
-    $('backToMainMenu')?.addEventListener('click',e=>{
-      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
-    },true);
-
-    /* Route uploaded file. */
-    input?.addEventListener('change',()=>{
-      const file=input.files?.[0];
-      if(!file) return;
-      const ext=(file.name.split('.').pop()||'').toLowerCase();
-      let target='convert';
-      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
-      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
-      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
-      studio(target);
-
-      /* Feed PDF/image files into the existing PDF input. */
-      if(target==='pdf'){
-        try{
-          const dt=new DataTransfer(); dt.items.add(file);
-          const pdfInput=$('fileInput');
-          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
-        }catch(e){console.warn(e);}
-      }
-      input.value='';
-    },true);
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
 
 </body></html>`);
   });
@@ -7850,291 +6703,170 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 </script>
 
 <script>
-/* ===== DocuForge AI v2026.08.16.26 — navigation safety controller ===== */
+/* ===== DocuForge AI v2026.08.16.28 — final navigation controller ===== */
 (function(){
-  function q(id){ return document.getElementById(id); }
-  function studioPanels(){
-    return Array.from(document.querySelectorAll('.ribbon-panel[data-studio-panel]'));
-  }
-  function showDashboard(){
-    document.body.classList.add('dashboard-active');
-    const ids=['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'];
-    ids.forEach(id=>{ const el=q(id); if(el) el.style.display='none'; });
-    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='grid';
-    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='block';
-    const recent=q('dashboardRecent'); if(recent) recent.style.display='block';
-    studioPanels().forEach(p=>p.style.display='none');
-    window.__docuforgeStudio='dashboard';
-  }
-  function showStudio(name){
-    document.body.classList.remove('dashboard-active');
-    const tabs=q('studioTabs'); if(tabs) tabs.style.display='flex';
-    const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='block';
-    const toolbar=q('toolbar'); if(toolbar) toolbar.style.display='none';
-    const strip=q('pageActionStrip'); if(strip) strip.style.display='none';
-    const drop=q('dropzone'); if(drop) drop.style.display='none';
-    const grid=q('grid'); if(grid) grid.style.display='none';
-    const banner=q('noPdfBanner'); if(banner) banner.style.display='none';
-    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='none';
-    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='none';
-    const recent=q('dashboardRecent'); if(recent) recent.style.display='none';
+  function $(id){ return document.getElementById(id); }
 
-    studioPanels().forEach(p=>{
-      p.style.display = (p.dataset.studioPanel===name) ? 'block' : 'none';
-      p.classList.toggle('active', p.dataset.studioPanel===name);
+  function hideEmbeddedStudios(){
+    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+     'aboutStudio','gstInvoiceStudio'].forEach(function(id){
+      var el=$(id); if(el) el.style.display='none';
     });
-    document.querySelectorAll('#studioTabs .studio-tab').forEach(t=>{
-      t.classList.toggle('active', t.dataset.studio===name);
-    });
-    window.__docuforgeStudio=name;
-
-    /* Let the app's own studio loader run when it is available. */
-    try{
-      if(typeof window.setStudio==='function'){
-        window.setStudio(name);
-      }
-    }catch(e){ console.warn('Studio loader recovered:',e); }
-
-    const r=q('ribbon');
-    if(r) setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}),30);
-  }
-
-  function wire(){
-    /* Always start on a clean Dashboard. */
-    showDashboard();
-
-    /* Main-menu cards. */
-    document.addEventListener('click',function(ev){
-      const tile=ev.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      const name=tile.getAttribute('data-studio');
-      if(name) showStudio(name);
-    },true);
-
-    /* Upper studio tabs are only used after a Studio is opened. */
-    document.addEventListener('click',function(ev){
-      const tab=ev.target.closest('#studioTabs .studio-tab[data-studio]');
-      if(!tab) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      const name=tab.getAttribute('data-studio');
-      if(name==='dashboard') showDashboard();
-      else if(name) showStudio(name);
-    },true);
-
-    /* Home icon returns to the Dashboard. */
-    const home=q('homeBtn') || q('brandHome') || q('homeButton');
-    if(home) home.addEventListener('click',function(ev){
-      ev.preventDefault(); ev.stopPropagation(); showDashboard();
-    },true);
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
-
-<script>
-/* ===== v2026.08.16.26 — Dashboard upload + Studio visibility controller ===== */
-(function(){
-  function q(id){return document.getElementById(id);}
-  function allStudioPages(){
-    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
-            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
-  }
-  function hideAllEmbeddedPages(){
-    allStudioPages().forEach(el=>el.style.display='none');
-  }
-  function setStatus(msg, show=true){
-    const el=q('dashboardUploadStatus');
-    if(!el) return;
-    el.innerHTML=msg;
-    el.style.display=show?'block':'none';
-  }
-  function extension(name){
-    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
-    return m?m[1]:'';
-  }
-  function routeUploadedFile(file){
-    const ext=extension(file.name);
-    let studio='convert', label='Conversion Studio';
-    if(ext==='pdf' || /^image\//i.test(file.type)){
-      studio='pdf'; label='PDF Studio';
-    }else if(['xls','xlsx','csv'].includes(ext)){
-      studio='excel'; label='Excel Studio';
-    }else if(['ppt','pptx','odp'].includes(ext)){
-      studio='powerpoint'; label='PowerPoint Studio';
-    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
-      studio='convert'; label='Conversion Studio';
-    }
-    window.__docuforgePendingFile=file;
-    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(studio);
-    }catch(e){console.warn(e);}
-    document.body.classList.remove('dashboard-active');
-
-    /* For PDF/image, feed the existing PDF loader immediately. */
-    if(studio==='pdf'){
-      const dt=new DataTransfer();
-      dt.items.add(file);
-      const input=q('fileInput');
-      if(input){
-        input.files=dt.files;
-        input.dispatchEvent(new Event('change',{bubbles:true}));
-      }
-    }
-
-    /* For Excel, keep the file pending and open the Excel Studio.
-       The Excel module can use this reference when its import action is selected. */
-    setTimeout(()=>{
-      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
-      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
-    },80);
-  }
-
-  function wire(){
-    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
-    hideAllEmbeddedPages();
-
-    const upload=q('dashboardUploadFileTile');
-    const input=q('universalFileInput');
-    if(upload && input){
-      upload.addEventListener('click',()=>input.click());
-      input.addEventListener('change',()=>{
-        const file=input.files && input.files[0];
-        if(file) routeUploadedFile(file);
-        input.value='';
-      });
-    }
-
-    /* Make Dashboard truly clean even if another script changes a Studio's display. */
-    const observer=new MutationObserver(()=>{
-      if(document.body.classList.contains('dashboard-active')){
-        hideAllEmbeddedPages();
-        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
-        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
-        const grid=q('grid'); if(grid) grid.style.display='none';
-      }
-    });
-    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
-
-<script>
-/* ===== v2026.08.16.26 — single navigation controller ===== */
-(function(){
-  const $=id=>document.getElementById(id);
-  function hideStudioPanels(){
-    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(function(p){
       p.style.display='none';
       p.classList.remove('active');
     });
-    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
-     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
   }
-  function dashboard(){
+
+  function showDashboard(){
     document.body.classList.add('dashboard-active');
-    hideStudioPanels();
-    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
-      .forEach(id=>{if($(id)) $(id).style.display='none';});
+    hideEmbeddedStudios();
+
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid',
+     'noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
+      .forEach(function(id){ var el=$(id); if(el) el.style.display='none'; });
+
     if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
     if($('dashboardRecent')) $('dashboardRecent').style.display='block';
     if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
+    if($('dashboardUploadStatus')) $('dashboardUploadStatus').style.display='none';
     if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
   }
-  function studio(name){
+
+  function showStudio(name){
     document.body.classList.remove('dashboard-active');
+
     if($('dashboardTiles')) $('dashboardTiles').style.display='none';
     if($('dashboardRecent')) $('dashboardRecent').style.display='none';
     if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
+
     if($('studioTabs')) $('studioTabs').style.display='none';
     if($('backToMainMenu')) $('backToMainMenu').style.display='block';
     if($('ribbon')) $('ribbon').style.display='flex';
     if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
 
-    hideStudioPanels();
-    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    hideEmbeddedStudios();
+
+    var panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
     if(panel){
       panel.style.display='flex';
       panel.classList.add('active');
     }
+
     try{
       if(typeof window.setStudio==='function') window.setStudio(name);
-    }catch(e){console.warn('Existing studio loader:',e);}
-    // Re-assert our navigation after the legacy loader runs.
-    setTimeout(()=>{
+    }catch(err){
+      console.warn('Studio loader:',err);
+    }
+
+    /* Reassert the single-navigation design after legacy code runs. */
+    setTimeout(function(){
       if($('studioTabs')) $('studioTabs').style.display='none';
       if($('ribbon')) $('ribbon').style.display='flex';
       if($('backToMainMenu')) $('backToMainMenu').style.display='block';
-    },50);
+    },80);
+  }
+
+  function routeFile(file){
+    if(!file) return;
+    var name=file.name||'';
+    var ext=(name.split('.').pop()||'').toLowerCase();
+    var target='convert';
+
+    if(ext==='pdf' || /^image\//i.test(file.type||'')) target='pdf';
+    else if(['xls','xlsx','csv'].indexOf(ext)>=0) target='excel';
+    else if(['ppt','pptx','odp'].indexOf(ext)>=0) target='powerpoint';
+
+    if($('dashboardUploadStatus')){
+      $('dashboardUploadStatus').innerHTML='<strong>Selected:</strong> '+name+
+        '<br>Opening '+target+' Studio.';
+      $('dashboardUploadStatus').style.display='block';
+    }
+
+    showStudio(target);
+
+    /* Feed PDF/image into the existing PDF loader. */
+    if(target==='pdf'){
+      try{
+        var dt=new DataTransfer();
+        dt.items.add(file);
+        var pdfInput=$('fileInput');
+        if(pdfInput){
+          pdfInput.files=dt.files;
+          pdfInput.dispatchEvent(new Event('change',{bubbles:true}));
+        }
+      }catch(err){ console.warn('PDF upload:',err); }
+    }
+
+    window.__docuforgePendingFile=file;
   }
 
   function wire(){
-    /* Always start clean. */
-    dashboard();
+    /* Start with a genuinely clean Dashboard. */
+    showDashboard();
 
-    /* Main menu cards. */
-    document.addEventListener('click',e=>{
-      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+    /* Dashboard Studio cards. Capture phase prevents legacy handlers from
+       reopening the old upper navigation. */
+    document.addEventListener('click',function(ev){
+      var tile=ev.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
       if(!tile) return;
-      e.preventDefault(); e.stopImmediatePropagation();
-      studio(tile.dataset.studio);
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      showStudio(tile.getAttribute('data-studio'));
     },true);
 
-    /* Upload File card. */
-    const dashUpload=$('dashboardUploadFileTile');
-    const input=$('universalFileInput');
+    /* Dashboard Upload File. */
+    var dashUpload=$('dashboardUploadFileTile');
+    var input=$('universalFileInput');
     if(dashUpload && input){
-      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+      dashUpload.addEventListener('click',function(ev){
+        ev.preventDefault();
+        input.click();
+      },true);
     }
 
-    /* Upload button inside any Studio. */
-    const studioUpload=$('studioUploadFileBtn');
+    /* Upload from within a Studio. */
+    var studioUpload=$('studioUploadFileBtn');
     if(studioUpload && input){
-      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+      studioUpload.addEventListener('click',function(ev){
+        ev.preventDefault();
+        input.click();
+      },true);
     }
 
-    /* Back to Main Menu. */
-    $('backToMainMenu')?.addEventListener('click',e=>{
-      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
-    },true);
+    if(input){
+      input.addEventListener('change',function(){
+        var file=input.files && input.files[0];
+        if(file) routeFile(file);
+        input.value='';
+      },true);
+    }
 
-    /* Route uploaded file. */
-    input?.addEventListener('change',()=>{
-      const file=input.files?.[0];
-      if(!file) return;
-      const ext=(file.name.split('.').pop()||'').toLowerCase();
-      let target='convert';
-      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
-      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
-      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
-      studio(target);
+    if($('backToMainMenu')){
+      $('backToMainMenu').addEventListener('click',function(ev){
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        showDashboard();
+      },true);
+    }
 
-      /* Feed PDF/image files into the existing PDF input. */
-      if(target==='pdf'){
-        try{
-          const dt=new DataTransfer(); dt.items.add(file);
-          const pdfInput=$('fileInput');
-          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
-        }catch(e){console.warn(e);}
-      }
-      input.value='';
-    },true);
+    /* Home icon. */
+    ['homeBtn','brandHome','homeButton'].forEach(function(id){
+      var el=$(id);
+      if(el) el.addEventListener('click',function(ev){
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        showDashboard();
+      },true);
+    });
   }
 
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
-  else wire();
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',wire);
+  }else{
+    wire();
+  }
 })();
 </script>
-
 </body>
 </html>
