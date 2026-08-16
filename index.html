@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.34 usability refinements ===== */
+/* ===== v2026.08.16.35 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.34 PDF workflow ===== */
+/* ===== v2026.08.16.35 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.34 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.35 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.34 dashboard cleanup ===== */
+/* ===== v2026.08.16.35 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.16.34: clean Dashboard ===== */
+/* ===== v2026.08.16.35: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.16.34: Dashboard is a true main menu ===== */
+/* ===== v2026.08.16.35: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.16.34: hard dashboard/studio separation ===== */
+/* ===== v2026.08.16.35: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.16.34: Dashboard upload entry ===== */
+/* ===== v2026.08.16.35: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.16.34 — one navigation system only ===== */
+/* ===== v2026.08.16.35 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.16.34';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.16.35';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.34</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.35</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1444,7 +1444,7 @@ function updatePdfUploadAction(){
     if(group) group.querySelector('h2').textContent = 'Start project';
   }
 }
-/* ===== v2026.08.16.34 — pending-tool upload workflow =====
+/* ===== v2026.08.16.35 — pending-tool upload workflow =====
    If a user taps a conversion/OCR/etc. tool before opening a PDF, remember
    that exact tool. After the file is loaded, automatically continue with it.
 */
@@ -1522,24 +1522,26 @@ function updateUndoRedoButtons(){
 
 /* ---------- Loading / merging files ---------- */
 async function rebuildPdfFromPdfJs(buf, password){
-  if(typeof pdfjsLib === 'undefined') throw new Error('PDF engine is unavailable. Please reload the app.');
+  if(typeof pdfjsLib === 'undefined') throw new Error('PDF.js is not loaded.');
   const src=await pdfjsLib.getDocument({
-    data: buf.slice ? buf.slice() : new Uint8Array(buf),
+    data: new Uint8Array(buf),
     password: password || undefined,
-    disableWorker:true
+    // Use the configured PDF.js worker. This is more reliable for larger PDFs
+    // than forcing the entire parser onto the iPhone main thread.
+    disableWorker:false
   }).promise;
-  const rebuilt=await PDFDocument.create();
 
+  const rebuilt=await PDFDocument.create();
   for(let i=1;i<=src.numPages;i++){
     const page=await src.getPage(i);
-    const viewport=page.getViewport({scale:1.5});
+    const viewport=page.getViewport({scale:1.25});
     const canvas=document.createElement('canvas');
     canvas.width=Math.ceil(viewport.width);
     canvas.height=Math.ceil(viewport.height);
     const ctx=canvas.getContext('2d',{willReadFrequently:true});
     await page.render({canvasContext:ctx,viewport}).promise;
     const png=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
-    if(!png) throw new Error('Could not render PDF page '+i+'.');
+    if(!png) throw new Error('PDF.js could not render page '+i+'.');
     const img=await rebuilt.embedPng(await png.arrayBuffer());
     const w=img.width*72/96, h=img.height*72/96;
     const outPage=rebuilt.addPage([w,h]);
@@ -1549,22 +1551,40 @@ async function rebuildPdfFromPdfJs(buf, password){
 }
 
 async function loadPdfSafely(buf){
-  // First try the normal editable PDF path.
+  let pdfjsError=null;
+
+  // PDF.js is the primary compatibility reader. It handles a wider range
+  // of real-world PDFs than pdf-lib and also gives us proper password errors.
   try{
-    return await PDFDocument.load(buf, {ignoreEncryption:false});
-  }catch(primary){
-    const msg=String(primary && primary.message || primary);
-    // Encryption must be handled by the password workflow, not reported as corruption.
-    if(/encrypt|password|encrypted/i.test(msg)){
+    const src=await pdfjsLib.getDocument({
+      data:new Uint8Array(buf),
+      disableWorker:false
+    }).promise;
+    // If PDF.js can parse it, retain the original bytes whenever possible.
+    // This preserves text, forms, bookmarks and quality.
+    if(src && src.numPages > 0){
+      try{
+        return await PDFDocument.load(buf, {ignoreEncryption:true});
+      }catch(_){
+        return await rebuildPdfFromPdfJs(buf);
+      }
+    }
+  }catch(e){
+    pdfjsError=e;
+    const name=String(e && e.name || '');
+    const msg=String(e && e.message || e);
+    if(name==='PasswordException' || /password|encrypted|encrypt/i.test(msg)){
       throw new Error('This PDF is password-protected. Please enter its password.');
     }
-    // Then use PDF.js to handle legitimate PDFs that pdf-lib cannot import.
-    try{
-      return await rebuildPdfFromPdfJs(buf);
-    }catch(fallbackErr){
-      console.error('PDF.js fallback failed:',fallbackErr);
-      throw new Error('The PDF could not be opened by either PDF engine. It may be damaged or use an unsupported PDF feature.');
-    }
+  }
+
+  // Final fallback to pdf-lib for PDFs that PDF.js rejected.
+  try{
+    return await PDFDocument.load(buf);
+  }catch(e){
+    const a=String(e && e.message || e);
+    const b=pdfjsError ? String(pdfjsError.message || pdfjsError) : '';
+    throw new Error('PDF could not be opened. PDF.js: '+b+' | pdf-lib: '+a);
   }
 }
 
@@ -1622,7 +1642,10 @@ async function loadFiles(fileList){
         }
       });
     }else{
-      toast('Could not open the selected file. It may be corrupted, unsupported, or password protected.', true);
+      const detail=String(e && e.message || e || 'Unknown error');
+      console.error('DocuForge file-open error:',detail);
+      toast('Could not open this PDF: '+detail, true);
+      setStatus('PDF open failed. See the message above for the exact reason.');
     }
   } finally { showProgress(null); }
 }
@@ -1646,7 +1669,7 @@ async function renderThumbnails(){
   if(!workingBytes){ showProgress(null); return; }
   let pdf;
   try{
-    pdf = await pdfjsLib.getDocument({ data: workingBytes.slice(), disableWorker:true }).promise;
+    pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes), disableWorker:false }).promise;
   } catch(e){
     console.error(e); toast('Could not render the PDF for preview.', true); showProgress(null); return;
   }
@@ -2045,7 +2068,7 @@ async function runOcrOnPdfPages(lang, pageIndices){
   const results = [];
   try{
     await loadLib('tesseract');
-    const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice(), disableWorker:true }).promise;
+    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes), disableWorker:false }).promise;
     for(let i = 0; i < pageIndices.length; i++){
       const pageNum = pageIndices[i] + 1;
       setStatus(`OCR — rendering page ${pageNum} (${i+1}/${pageIndices.length})…`);
@@ -2111,7 +2134,7 @@ async function buildSearchablePdf(results){
    and exact for born-digital PDFs, but returns nothing for scans (no text
    layer to read), in which case each tool tells the user to OCR first. */
 async function getPdfPagesTextItems(){
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice(), disableWorker:true }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes), disableWorker:false }).promise;
   const pages = [];
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -2976,7 +2999,7 @@ async function addBatesNumbering({ prefix, startNum, digits, position, size }){
    resolution and measures how much of it is near-white. */
 async function detectBlankPages(threshold){
   threshold = threshold || 0.995;
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice(), disableWorker:true }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes), disableWorker:false }).promise;
   const blankIndices = [];
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -3090,7 +3113,7 @@ async function signPdf({ dataUrl, pageIndex, position, widthPt }){
    Tradeoff: the redacted page becomes a raster image, so its own text
    is no longer selectable/searchable afterward. */
 async function redactPage(pageIndex, boxes, renderScale){
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice(), disableWorker:true }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes), disableWorker:false }).promise;
   const page = await pdf.getPage(pageIndex + 1);
   const viewport = page.getViewport({ scale: renderScale });
   const canvas = document.createElement('canvas');
@@ -3503,7 +3526,7 @@ async function cropPages(indices, margins){
 
 /* ---------- More PDF exports: Images, HTML, JSON ---------- */
 async function convertPdfToImagesZip(format, quality){
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice(), disableWorker:true }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes), disableWorker:false }).promise;
   const zip = new JSZip();
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -3530,7 +3553,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.16.34 — single main menu; file requested by operation */
+/* v2026.08.16.35 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3540,7 +3563,7 @@ body.dashboard-active #grid,
 body.dashboard-active #noPdfBanner{display:none !important;}
 
 
-/* ===== v2026.08.16.34 — Studio submenu layout ===== */
+/* ===== v2026.08.16.35 — Studio submenu layout ===== */
 
 /* Dashboard contains ONLY the main menu. */
 body.dashboard-active #studioTabs,
@@ -3632,7 +3655,7 @@ body:not(.dashboard-active) #grid{
 #studioTabs{display:none !important;}
 
 
-/* ===== v2026.08.16.34 — submenu host / mobile fixes ===== */
+/* ===== v2026.08.16.35 — submenu host / mobile fixes ===== */
 #studioSubmenuHost{
   width:100%;
   display:block;
@@ -3688,8 +3711,12 @@ body.dashboard-active #backToMainMenu{display:none !important;}
 }
 
 
-/* ===== v2026.08.16.34 — upload continuation feedback ===== */
+/* ===== v2026.08.16.35 — upload continuation feedback ===== */
 #statusMsg{font-weight:600;}
+
+
+/* v2026.08.16.35 — clearer PDF compatibility diagnostics */
+.toast-wrap .toast{max-width:min(92vw,760px);white-space:normal;line-height:1.35;}
 
 </style>
 </head><body><h1>${title}</h1>${body}
@@ -3721,7 +3748,7 @@ async function buildPdfXml(){
    doesn't expose in this version. Said plainly rather than overclaiming
    "vector export". */
 async function convertPdfToSvgZip(){
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice(), disableWorker:true }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes), disableWorker:false }).promise;
   const zip = new JSZip();
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -4204,7 +4231,7 @@ async function openZoom(index){
   await renderZoom();
 }
 async function renderZoom(){
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice(), disableWorker:true }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes), disableWorker:false }).promise;
   const page = await pdf.getPage(zoomPageIndex + 1);
   const viewport = page.getViewport({ scale: zoomScale });
   const canvas = $('zoomCanvas');
@@ -5415,7 +5442,7 @@ async function openEncryptedPdfFromFile(file, password, continueAfterOpen){
     if(/password|incorrect|invalid/i.test(msg)){
       toast('The PDF password was not accepted. Please check the password and try again.',true);
     }else{
-      toast('The password was accepted, but this PDF could not be rendered. It may use an unsupported encryption feature.',true);
+      toast('The protected PDF could not be opened: '+msg,true);
     }
     return false;
   }finally{ showProgress(null); }
@@ -5487,7 +5514,7 @@ $('btnRedact').addEventListener('click', () => {
     document.getElementById('redactLoadPage').addEventListener('click', async () => {
       const pageNum = parseInt(document.getElementById('redactPageNum').value) || 1;
       try{
-        const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice(), disableWorker:true }).promise;
+        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes), disableWorker:false }).promise;
         if(pageNum < 1 || pageNum > pdf.numPages){ toast('Page number out of range.', true); return; }
         const page = await pdf.getPage(pageNum);
         const viewport = page.getViewport({ scale });
@@ -6998,7 +7025,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* ===== DocuForge AI v2026.08.16.34 — reliable Studio submenu host ===== */
+/* ===== DocuForge AI v2026.08.16.35 — reliable Studio submenu host ===== */
 (function(){
   const $=id=>document.getElementById(id);
   const host=()=>$('studioSubmenuHost');
