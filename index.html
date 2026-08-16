@@ -474,7 +474,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.21 usability refinements ===== */
+/* ===== v2026.08.16.22 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -506,7 +506,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.21 PDF workflow ===== */
+/* ===== v2026.08.16.22 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -515,7 +515,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.21 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.22 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -541,7 +541,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.21 dashboard cleanup ===== */
+/* ===== v2026.08.16.22 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -577,7 +577,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.16.21: clean Dashboard ===== */
+/* ===== v2026.08.16.22: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -601,7 +601,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.16.21: Dashboard is a true main menu ===== */
+/* ===== v2026.08.16.22: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -611,6 +611,27 @@ body.dashboard-active #grid,
 body.dashboard-active #noPdfBanner{display:none !important;}
 body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
+
+
+/* ===== v2026.08.16.22: hard dashboard/studio separation ===== */
+body.dashboard-active #studioTabs,
+body.dashboard-active #ribbon,
+body.dashboard-active #toolbar,
+body.dashboard-active #pageActionStrip,
+body.dashboard-active #dropzone,
+body.dashboard-active #grid,
+body.dashboard-active #noPdfBanner,
+body.dashboard-active #workspaceLayout > .pdf-editor,
+body.dashboard-active .pdf-editor,
+body.dashboard-active .pdf-workspace,
+body.dashboard-active .pdf-toolbar {
+  display:none !important;
+}
+body.dashboard-active #dashboardTiles,
+body.dashboard-active #dashboardRecent,
+body.dashboard-active #dashboardNavigationHint {
+  display:grid !important;
+}
 
 </style>
 </head>
@@ -626,7 +647,7 @@ body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.21</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.22</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -681,8 +702,6 @@ body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 <div class="studio-tabs" id="studioTabs">
       <button class="studio-tab" id="studioMoreBtn" type="button" aria-label="More studios">⋯ More</button>
-      <button class="studio-tab" id="topHelpMenu" type="button" title="Help">❓ Help</button>
-      <button class="studio-tab" id="topAskMeMenu" type="button" title="Ask me">💬 Ask me</button>
 
       <button class="studio-tab active" data-studio="dashboard"><span class="st-icon">🏠</span> Dashboard</button>
       <button class="studio-tab" data-studio="excel"><span class="st-icon">📊</span> Excel</button>
@@ -5921,29 +5940,57 @@ function openExcelDashboard(){
 }
 function setStudio(name){
   const isDashboard = name === 'dashboard';
+  currentStudio = name;
   document.body.classList.toggle('dashboard-active', isDashboard);
 
-  // Dashboard is only the main menu. PDF editor controls appear only inside a Studio.
-  $('ribbon').style.display = isDashboard ? 'none' : '';
-  $('toolbar').style.display = isDashboard ? 'none' : ($('toolbar').style.display || 'none');
-  $('pageActionStrip').style.display = isDashboard ? 'none' : '';
-  $('dropzone').style.display = isDashboard ? 'none' : $('dropzone').style.display;
-  $('noPdfBanner').style.display = isDashboard ? 'none' : $('noPdfBanner').style.display;
+  // The Dashboard is ONLY the main menu. The editor/ribbon appears only after
+  // a Studio is selected.
+  const studioTabs = $('studioTabs');
+  const ribbon = $('ribbon');
+  const toolbar = $('toolbar');
+  const pageStrip = $('pageActionStrip');
+  const dropzone = $('dropzone');
+  const gridEl = $('grid');
+  const banner = $('noPdfBanner');
+  const workspace = $('workspaceLayout');
 
-  currentStudio = name;
-  document.querySelectorAll('.studio-tab').forEach(t => t.classList.toggle('active', t.dataset.studio === name));
-  document.querySelectorAll('.ribbon-panel').forEach(p => p.classList.toggle('active', p.dataset.studioPanel === name));
-  $('settingsStudio').classList.toggle('active', name === 'settings');
-  $('aboutStudio').classList.toggle('active', name === 'about');
-  $('helpStudio').classList.toggle('active', name === 'help');
-  $('readerStudio').classList.toggle('active', name === 'reader');
-  $('exportStudio').style.display = name === 'export' ? 'block' : 'none';
-  $('excelStudio').classList.toggle('active', name === 'excel');
-  $('gstInvoiceStudio').classList.toggle('active', name === 'gstinvoice');
-  $('workspaceLayout').style.display = (name === 'settings' || name === 'about' || name === 'help' || name === 'reader' || name === 'export' || name === 'excel' || name === 'gstinvoice') ? 'none' : 'flex';
-  if(name === 'excel') openExcelDashboard();
-  if(name === 'gstinvoice') openGstInvoiceApp();
+  if(studioTabs) studioTabs.style.display = isDashboard ? 'none' : 'flex';
+  if(ribbon) ribbon.style.display = isDashboard ? 'none' : '';
+  if(toolbar) toolbar.style.display = isDashboard ? 'none' : (workingBytes ? 'flex' : 'none');
+  if(pageStrip) pageStrip.style.display = isDashboard ? 'none' : '';
+  if(dropzone) dropzone.style.display = isDashboard ? 'none' : (workingBytes ? 'none' : 'block');
+  if(banner) banner.style.display = isDashboard ? 'none' : (workingBytes ? 'none' : 'block');
+  if(gridEl) gridEl.style.display = isDashboard ? 'none' : '';
+  if(workspace) workspace.style.display = isDashboard ? 'none' : '';
+
+  document.querySelectorAll('.studio-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.studio === name)
+  );
+  document.querySelectorAll('.ribbon-panel').forEach(panel =>
+    panel.classList.toggle('active', panel.dataset.studioPanel === name)
+  );
+
+  if($('settingsStudio')) $('settingsStudio').classList.toggle('active', name === 'settings');
+  if($('aboutStudio')) $('aboutStudio').classList.toggle('active', name === 'about');
+  if($('helpStudio')) $('helpStudio').classList.toggle('active', name === 'help');
+  if($('readerStudio')) $('readerStudio').classList.toggle('active', name === 'reader');
+  if($('exportStudio')) $('exportStudio').style.display = name === 'export' ? 'block' : 'none';
+  if($('excelStudio')) $('excelStudio').classList.toggle('active', name === 'excel');
+  if($('gstInvoiceStudio')) $('gstInvoiceStudio').classList.toggle('active', name === 'gstinvoice');
+
+  // These two embedded Studios need their own initialisers.
+  if(name === 'excel' && typeof openExcelDashboard === 'function') openExcelDashboard();
+  if(name === 'gstinvoice' && typeof openGstInvoiceApp === 'function') openGstInvoiceApp();
+
   updateDashboardTilesVisibility();
+
+  if(isDashboard){
+    // Hard inline cleanup so no stale PDF editor element can occupy space.
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout']
+      .forEach(id => { if($(id)) $(id).style.display='none'; });
+    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+  }
 }
 document.querySelectorAll('.studio-tab').forEach(t => {
   t.addEventListener('click', () => setStudio(t.dataset.studio));
@@ -5982,15 +6029,19 @@ function studioLabel(name){
   return labels[name] || name;
 }
 
-/* Dashboard = main menu. Each tile opens its Studio/submenu; no file picker is shown here. */
-document.querySelectorAll('#dashboardTiles .main-menu-tile[data-studio]').forEach(t => {
-  t.addEventListener('click', () => {
-    const studio = t.dataset.studio;
-    setStudio(studio);
-    const tabs = document.getElementById('studioTabs');
-    if(tabs) tabs.scrollIntoView({behavior:'smooth', block:'start'});
-    setStatus('Opened ' + studioLabel(studio) + ' Studio. Choose a tool from the submenu.');
-  });
+/* Dashboard main-menu navigation — delegated so every card works reliably on iPhone/laptop. */
+document.addEventListener('click', (e) => {
+  const tile = e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+  if(!tile) return;
+  e.preventDefault();
+  const studio = tile.dataset.studio;
+  if(!studio) return;
+  setStudio(studio);
+  setTimeout(() => {
+    const panel = document.querySelector(`.ribbon-panel[data-studio-panel="${studio}"]`);
+    if(panel) panel.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 50);
+  if(typeof setStatus === 'function') setStatus('Opened ' + studioLabel(studio) + ' Studio. Choose a tool from the submenu.');
 });
 
 $('exportPdfTile').addEventListener('click', () => {
@@ -6572,6 +6623,19 @@ $('dashboardAskTile')?.addEventListener('click', () => $('topAskMeMenu')?.click(
     }
   });
 })();
+
+
+$('dashboardHelpTile')?.addEventListener('click', () => {
+  if(typeof openHelp === 'function') return openHelp();
+  if(typeof showHelp === 'function') return showHelp();
+  setStudio('help');
+});
+$('dashboardAskTile')?.addEventListener('click', () => {
+  if(typeof openAskMe === 'function') return openAskMe();
+  if(typeof showAskMe === 'function') return showAskMe();
+  const ask = document.querySelector('#askMeBtn, #askBtn, .ask-me');
+  if(ask) ask.click();
+});
 
 </script>
 </body>
