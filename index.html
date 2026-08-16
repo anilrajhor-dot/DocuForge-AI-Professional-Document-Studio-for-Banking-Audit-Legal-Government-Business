@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="application-version" content="2026.08.12.15">
+<meta name="application-version" content="2026.08.12.16">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.12.15 usability refinements ===== */
+/* ===== v2026.08.12.16 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -499,10 +499,19 @@ body.dark .studio-tab.active{color:var(--pine);}
   z-index:1200;
 }
 
+
+/* ===== v2026.08.12.16 PDF workflow ===== */
+#dashboardNavigationHint{display:none;}
+@media(max-width:720px){
+  #pageActionStrip{flex-wrap:wrap;gap:6px;}
+  #btnShareCurrentPdf{width:100%;}
+  #pdfAddPagesGroup .tool-btn{min-height:42px;}
+}
+
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.12.15';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.12.16';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -513,7 +522,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.15</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.16</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -859,7 +868,7 @@ body.dark .studio-tab.active{color:var(--pine);}
     <div id="aboutStudio" class="studio-page">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.12.15 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.12.16 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -875,6 +884,7 @@ body.dark .studio-tab.active{color:var(--pine);}
       You can then choose the required tool from that Studio's submenu.
     </div>
 <div id="dashboardTiles" class="dashboard-grid">
+      <button class="dash-tile" id="dashboardUploadDocuments"><span class="dt-icon">📂</span><span>Upload Documents</span></button>
       <button class="dash-tile" data-tool="btnOpen"><span class="dt-icon">🗂️</span><span>Merge PDF</span></button>
       <button class="dash-tile" data-tool="btnSplit"><span class="dt-icon">✂️</span><span>Split PDF</span></button>
       <button class="dash-tile" data-tool="btnCompress"><span class="dt-icon">📉</span><span>Compress PDF</span></button>
@@ -923,6 +933,7 @@ body.dark .studio-tab.active{color:var(--pine);}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
         Download PDF
       </button>
+      <button class="btn primary" id="btnShareCurrentPdf" type="button">📤 Share PDF</button>
     </div>
 
     <div class="page-action-strip" id="pageActionStrip" aria-label="Page management actions">
@@ -931,11 +942,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 <button class="mini-action" id="btnInvertPageSelection" type="button">Invert</button>
 
       <span class="selection-count" id="selectionCount">0 selected</span>
-      <div class="action-group">
-        <button class="mini-action" id="pageSelectAll">Select all</button>
-        <button class="mini-action" id="pageClearSelection">Clear</button>
-        <button class="mini-action" id="pageInvertSelection">Invert</button>
-      </div>
+      
       <div class="action-group">
         <button class="mini-action" id="pageRotateLeft" disabled>↺ Rotate</button>
         <button class="mini-action" id="pageDuplicate" disabled>⧉ Duplicate</button>
@@ -1194,6 +1201,21 @@ const PDF_REQUIRED_IDS = ['btnInsert','btnDuplicateSel','btnRotateSel','btnRever
    'btnPdfToWord','btnPdfToPptx','btnPdfToExcel','btnPdfToCsv','btnPdfToText','btnPdfToHtml','btnPdfToJson','btnPdfToImages',
    'btnPdfToXml','btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds','btnPdfToOdp','btnPdfToEpub',
    'btnTranslatePdf','btnAnalyze','btnDupPages','btnChatPdf'];
+
+function updatePdfUploadAction(){
+  const btn = $('btnOpen');
+  const group = $('pdfAddPagesGroup');
+  if(!btn) return;
+  if(workingBytes){
+    btn.innerHTML = '<span aria-hidden="true">📤</span> Share merged PDF';
+    btn.title = 'Share the currently loaded merged PDF. Use Insert PDF at page… only when you need to add another file.';
+    if(group) group.querySelector('h2').textContent = 'Current project';
+  }else{
+    btn.innerHTML = '<span aria-hidden="true">📂</span> Upload PDF / Photos';
+    btn.title = 'Upload one or more PDF files or photos to start the project.';
+    if(group) group.querySelector('h2').textContent = 'Start project';
+  }
+}
 function setToolsEnabled(on){
   PDF_REQUIRED_IDS.forEach(id=>{
     $(id).title = on ? '' : 'Tap to open a PDF first — this tool needs one loaded.';
@@ -1202,6 +1224,7 @@ function setToolsEnabled(on){
   grid.classList.toggle('empty-hide', !on);
   $('dropzone').style.display = on ? 'none' : 'block';
   $('noPdfBanner').style.display = on ? 'none' : 'block';
+  updatePdfUploadAction();
   updateDashboardTilesVisibility();
 }
 // Buttons stay tappable at all times (never visually disabled) so every menu
@@ -1498,7 +1521,8 @@ async function extractSelected(){
     const copied = await newDoc.copyPages(doc, idx);
     copied.forEach(p => newDoc.addPage(p));
     const bytes = await newDoc.save();
-    downloadBlob(new Blob([bytes], {type:'application/pdf'}), `${$('outName').value || 'document'}_extracted.pdf`);
+    const name = `${$('outName').value || 'document'}_extracted.pdf`;
+    showPdfResult('Extract result', new Blob([bytes], {type:'application/pdf'}), name, `Extracted ${idx.length} page${idx.length===1?'':'s'} — ready to share.`);
     setStatus(`Extracted ${idx.length} pages to a new file.`);
   } catch(e){ console.error(e); toast('Could not extract those pages.', true); }
 }
@@ -1530,7 +1554,8 @@ async function splitPdf({mode, everyN, ranges}){
       zip.file(`${$('outName').value || 'document'}_part${c+1}.pdf`, bytes);
     }
     const zipBlob = await zip.generateAsync({type:'blob'});
-    downloadBlob(zipBlob, `${$('outName').value || 'document'}_split.zip`);
+    const zipName = `${$('outName').value || 'document'}_split.zip`;
+    showPdfResult('Split result', zipBlob, zipName, `Split into ${chunks.length} PDF file${chunks.length===1?'':'s'} — ready to share.`);
     setStatus(`Split into ${chunks.length} files.`);
   } catch(e){ console.error(e); toast('Could not split — check your ranges.', true); }
 }
@@ -3783,8 +3808,74 @@ function closeModal(){ $('genericModal').classList.remove('show'); }
 $('modalClose').addEventListener('click', closeModal);
 $('modalCancel').addEventListener('click', closeModal);
 
+
+/* ---------- Current project result sharing ---------- */
+async function shareCurrentPdfResult(filename, title='PDF ready', extraText=''){
+  if(!workingBytes){ toast('Upload a document first.', true); return; }
+  try{
+    const blob = new Blob([workingBytes], {type:'application/pdf'});
+    const file = new File([blob], filename || 'document.pdf', {type:'application/pdf'});
+    if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+      await navigator.share({
+        files:[file],
+        title,
+        text: extraText || filename
+      });
+      return;
+    }
+    downloadBlob(blob, filename || 'document.pdf');
+    toast('File sharing is not supported by this browser. The PDF was downloaded; attach it in Email or WhatsApp.', false);
+  }catch(e){
+    if(e && e.name === 'AbortError') return;
+    toast('Could not share the PDF. Try again.', true);
+  }
+}
+
+function showPdfResult(title, blob, filename, message){
+  const safe = String(filename || 'document.pdf').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const isZip = /\.zip$/i.test(filename || '');
+  openModal(title || 'Result ready', `
+    <div style="padding:4px 0 10px;"><strong>${message || 'Your result is ready.'}</strong></div>
+    <div class="hint" style="margin-bottom:14px;">File: <strong>${safe}</strong></div>
+    <button class="btn primary" id="pdfResultShare" type="button" style="width:100%;min-height:52px;">
+      📤 Share via Email / WhatsApp
+    </button>
+    <p class="hint" style="margin-top:12px;">
+      On iPhone/iPad, Share opens the system Share Sheet so you can choose WhatsApp, Mail, AirDrop, Files or another app.
+      ${isZip ? 'The split PDF files are shared together as one ZIP file.' : 'The PDF is shared as an attachment.'}
+    </p>
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+  setTimeout(() => {
+    $('pdfResultShare')?.addEventListener('click', async () => {
+      try{
+        const mime = isZip ? 'application/zip' : 'application/pdf';
+        const file = new File([blob], filename, {type:mime});
+        if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+          await navigator.share({files:[file], title:title || 'DocuForge result', text:filename});
+        }else{
+          downloadBlob(blob, filename);
+          toast('File sharing is not supported by this browser. The result was downloaded; attach it in Email or WhatsApp.', false);
+        }
+      }catch(e){
+        if(e && e.name === 'AbortError') return;
+        toast('Could not share the result. Try again.', true);
+      }
+    });
+  }, 0);
+}
+
 /* ---------- Wire up sidebar tools ---------- */
-$('btnOpen').addEventListener('click', () => $('fileInput').click());
+$('btnOpen').addEventListener('click', async () => {
+  if(!workingBytes){
+    $('fileInput').click();
+    return;
+  }
+  const filename = `${$('outName').value || 'document'}_merged.pdf`;
+  const blob = new Blob([workingBytes], {type:'application/pdf'});
+  showPdfResult('Merge result', blob, filename, 'The currently loaded documents are ready as one merged PDF.');
+});
 $('fileInput').addEventListener('change', (e) => { loadFiles(e.target.files); e.target.value=''; });
 
 $('btnInsert').addEventListener('click', () => {
@@ -5490,6 +5581,10 @@ $('gotoPage').addEventListener('change', (e) => {
   const card = grid.children[n-1];
   if(card){ card.scrollIntoView({behavior:'smooth', block:'center'}); card.style.outline='2px solid var(--accent)'; setTimeout(()=>{ if(!selected.has(n-1)) card.style.outline=''; }, 1200); }
 });
+$('btnShareCurrentPdf')?.addEventListener('click', () => {
+  const filename = `${$('outName').value || 'document'}.pdf`;
+  shareCurrentPdfResult(filename, 'Current PDF');
+});
 $('btnDownload').addEventListener('click', () => {
   if(!workingBytes) return;
   downloadBlob(new Blob([workingBytes], {type:'application/pdf'}), `${$('outName').value || 'document'}.pdf`);
@@ -5570,6 +5665,7 @@ $('btnLaunchEditor').addEventListener('click', () => {
 let currentStudio = 'dashboard';
 function updateDashboardTilesVisibility(){
   const showDash = currentStudio === 'dashboard' && !workingBytes;
+  $('dashboardNavigationHint').style.display = showDash ? 'block' : 'none';
   $('dashboardTiles').style.display = showDash ? 'grid' : 'none';
   $('dashboardRecent').style.display = showDash ? 'block' : 'none';
   if(showDash) renderDashboardRecent();
@@ -5718,6 +5814,9 @@ function studioLabel(name){
   return labels[name] || name;
 }
 
+$('dashboardUploadDocuments')?.addEventListener('click', () => {
+  $('fileInput').click();
+});
 document.querySelectorAll('#dashboardTiles .dash-tile[data-tool]').forEach(t => {
   t.addEventListener('click', () => openDashboardCategory(t.dataset.tool));
 });
