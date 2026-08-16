@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="application-version" content="2026.08.12.9">
+<meta name="application-version" content="2026.08.12.10">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.12.9 usability refinements ===== */
+/* ===== v2026.08.12.10 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -484,7 +484,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.12.9';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.12.10';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -495,7 +495,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.9</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.10</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -821,7 +821,7 @@ body.dark .studio-tab.active{color:var(--pine);}
     <div id="aboutStudio" class="studio-page">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.12.9 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.12.10 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -2239,6 +2239,7 @@ function showTranslationResult(original, translated, sourceLabel, targetLabel, b
       <button class="btn ghost" id="trDocx" type="button">Download .docx</button>
       <button class="btn ghost" id="trPdf" type="button">Download .pdf</button>
       <button class="btn ghost" id="trHtml" type="button">Download bilingual .html</button>
+      <button class="btn primary" id="trShare" type="button">📤 Share via Email / WhatsApp</button>
     </div>
   `, async () => {});
   $('modalConfirm').style.display = 'none';
@@ -2261,6 +2262,38 @@ function showTranslationResult(original, translated, sourceLabel, targetLabel, b
     $('trHtml').addEventListener('click', () => {
       const html = buildBilingualHtml(original, translated, sourceLabel, targetLabel);
       downloadBlob(new Blob([html], {type:'text/html'}), baseName + '_bilingual.html');
+    });
+    $('trShare').addEventListener('click', async () => {
+      try{
+        const safeName = (baseName || 'translation').replace(/[^a-z0-9._-]+/gi,'_');
+        const file = new File(
+          [translated],
+          safeName + '.txt',
+          {type:'text/plain;charset=utf-8'}
+        );
+        if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+          await navigator.share({
+            files:[file],
+            title:'DocuForge AI translation',
+            text:`${sourceLabel} → ${targetLabel} — ${safeName}`
+          });
+          return;
+        }
+        // Fallback for desktop/older browsers: download the translated text
+        // and prepare an email with instructions to attach it.
+        downloadBlob(new Blob([translated], {type:'text/plain;charset=utf-8'}), safeName + '.txt');
+        const subject = encodeURIComponent(`DocuForge translation — ${safeName}`);
+        const body = encodeURIComponent(
+          `Translated from ${sourceLabel} to ${targetLabel}.\n\n` +
+          `The translated text has been downloaded as ${safeName}.txt. ` +
+          `Please attach that file to this email or share it through WhatsApp.`
+        );
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        toast('Translation file downloaded. Attach it in Email or WhatsApp.', false);
+      }catch(e){
+        if(e && e.name === 'AbortError') return;
+        toast('Could not share the translation. Try again or download the translation file.', true);
+      }
     });
   }, 0);
 }
