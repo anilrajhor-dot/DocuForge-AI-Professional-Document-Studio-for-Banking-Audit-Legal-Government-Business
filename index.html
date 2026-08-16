@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="application-version" content="2026.08.12.14">
+<meta name="application-version" content="2026.08.12.15">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.12.14 usability refinements ===== */
+/* ===== v2026.08.12.15 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -481,10 +481,28 @@ body.dark .studio-tab.active{color:var(--pine);}
   #docuForgeTopBrand div:nth-child(4){font-size:10px !important;}
 }
 
+
+/* ===== dashboard-navigation ===== */
+#dashboardTiles .dash-tile[data-tool],
+#dashboardTiles #excelDashboardTile{position:relative;}
+#dashboardTiles .dash-tile[data-tool]::after,
+#dashboardTiles #excelDashboardTile::after{
+  content:'Open menu →';display:block;margin-top:5px;font-size:10px;
+  font-family:var(--font-mono);color:var(--ink-soft);opacity:.8;
+}
+
+
+/* ===== dashboard-main-menu-sticky ===== */
+#studioTabs{
+  position:sticky;
+  top:0;
+  z-index:1200;
+}
+
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.12.14';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.12.15';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -495,7 +513,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.14</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.15</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -841,7 +859,7 @@ body.dark .studio-tab.active{color:var(--pine);}
     <div id="aboutStudio" class="studio-page">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.12.14 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.12.15 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -850,7 +868,13 @@ body.dark .studio-tab.active{color:var(--pine);}
 
     <div class="layout" id="workspaceLayout">
   <main>
-    <div id="dashboardTiles" class="dashboard-grid">
+    <div id="dashboardNavigationHint" class="hint" style="
+      margin:0 14px 12px;padding:11px 13px;border:1px solid var(--line);
+      border-radius:10px;background:var(--surface);text-align:center;">
+      <strong>Quick access:</strong> Tap a tile to open its <strong>main menu / Studio</strong>.
+      You can then choose the required tool from that Studio's submenu.
+    </div>
+<div id="dashboardTiles" class="dashboard-grid">
       <button class="dash-tile" data-tool="btnOpen"><span class="dt-icon">🗂️</span><span>Merge PDF</span></button>
       <button class="dash-tile" data-tool="btnSplit"><span class="dt-icon">✂️</span><span>Split PDF</span></button>
       <button class="dash-tile" data-tool="btnCompress"><span class="dt-icon">📉</span><span>Compress PDF</span></button>
@@ -5661,23 +5685,49 @@ document.querySelectorAll('.studio-tab').forEach(t => {
   t.addEventListener('click', () => setStudio(t.dataset.studio));
 });
 
-/* ---------- Dashboard quick-launch tiles ---------- */
-function launchTool(id){
-  const btn = document.getElementById(id);
-  if(!btn) return;
-  const panel = btn.closest('.ribbon-panel');
-  if(panel) setStudio(panel.dataset.studioPanel);
-  if(btn.disabled){
-    toast('Open a PDF first, then choose this tool.');
-    $('btnOpen').click();
-  } else {
-    btn.click();
+/* ---------- Dashboard category shortcuts ---------- */
+const DASHBOARD_TILE_STUDIOS = {
+  btnSplit: 'pdf',
+  btnCompress: 'pdf',
+  btnOcrPdf: 'ocr',
+  btnTranslateText: 'translate',
+  btnPdfToWord: 'convert',
+  btnPdfToExcel: 'convert',
+  btnImagesToPdf: 'pdf',
+  btnAiTools: 'ai',
+  btnBatch: 'batch'
+};
+
+function openDashboardCategory(toolId){
+  const studio = DASHBOARD_TILE_STUDIOS[toolId];
+  if(!studio) return;
+  setStudio(studio);
+  // Keep the upper main menu/submenu immediately accessible on iPhone and desktop.
+  const tabs = document.getElementById('studioTabs');
+  if(tabs){
+    tabs.scrollIntoView({behavior:'smooth', block:'start'});
   }
+  setStatus('Opened ' + studioLabel(studio) + ' Studio. Choose a tool from the submenu.');
 }
-document.querySelectorAll('.dash-tile').forEach(t => {
-  t.addEventListener('click', () => launchTool(t.dataset.tool));
+
+function studioLabel(name){
+  const labels = {
+    pdf:'PDF', ocr:'OCR', translate:'Translation', convert:'Conversion',
+    ai:'AI', batch:'Batch', excel:'Excel'
+  };
+  return labels[name] || name;
+}
+
+document.querySelectorAll('#dashboardTiles .dash-tile[data-tool]').forEach(t => {
+  t.addEventListener('click', () => openDashboardCategory(t.dataset.tool));
 });
-$('excelDashboardTile')?.addEventListener('click', () => setStudio('excel'));
+
+$('excelDashboardTile')?.addEventListener('click', () => {
+  setStudio('excel');
+  const tabs = document.getElementById('studioTabs');
+  if(tabs) tabs.scrollIntoView({behavior:'smooth', block:'start'});
+  setStatus('Opened Excel Studio. Choose a dashboard tool from the submenu.');
+});
 
 $('exportPdfTile').addEventListener('click', () => {
   if(!workingBytes){ toast('Open a PDF first.', true); return; }
