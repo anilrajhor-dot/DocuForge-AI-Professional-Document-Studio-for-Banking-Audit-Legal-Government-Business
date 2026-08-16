@@ -474,7 +474,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.18 usability refinements ===== */
+/* ===== v2026.08.16.20 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -506,7 +506,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.18 PDF workflow ===== */
+/* ===== v2026.08.16.20 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -515,7 +515,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.18 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.20 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -540,6 +540,66 @@ body.dark .studio-tab.active{color:var(--pine);}
   #gstInvoiceFrame{height:calc(100vh - 125px)!important;min-height:1200px!important;}
 }
 
+
+/* ===== v2026.08.16.20 dashboard cleanup ===== */
+body.dashboard-active #pdfStudioWorkspace,
+body.dashboard-active #pdfWorkspace,
+body.dashboard-active #pdfEditor,
+body.dashboard-active #pdfToolbar,
+body.dashboard-active #pageActionStrip,
+body.dashboard-active #pdfCanvas,
+body.dashboard-active #pdfCanvasWrap,
+body.dashboard-active #canvasWrap,
+body.dashboard-active #pdfPages,
+body.dashboard-active #pageGrid,
+body.dashboard-active #pdfEditorArea {
+  display:none !important;
+}
+body.dashboard-active .pdf-workspace,
+body.dashboard-active .pdf-editor,
+body.dashboard-active .pdf-toolbar,
+body.dashboard-active .page-action-strip,
+body.dashboard-active .pdf-canvas-wrap {
+  display:none !important;
+}
+
+
+/* Main menu on iPhone: horizontal scroll, compact but accessible */
+#studioTabs{
+  display:flex;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  white-space:nowrap;
+}
+#studioTabs::-webkit-scrollbar{display:none;}
+#studioTabs .studio-tab{flex:0 0 auto;}
+#topHelpMenu,#topAskMeMenu{font-weight:700;}
+
+
+/* ===== v2026.08.16.20: clean Dashboard ===== */
+body.dashboard-active #noPdfBanner,
+body.dashboard-active #ribbon,
+body.dashboard-active #toolbar,
+body.dashboard-active #pageActionStrip,
+body.dashboard-active #dropzone,
+body.dashboard-active #grid {
+  display:none !important;
+}
+body.dashboard-active #workspaceLayout{
+  margin-top:0 !important;
+}
+body.dashboard-active main{
+  padding-top:0 !important;
+}
+
+/* Main menu: Help and Ask Me stay immediately accessible beside More. */
+#studioTabs #topHelpMenu,
+#studioTabs #topAskMeMenu{
+  flex:0 0 auto;
+  font-weight:800;
+}
+
 </style>
 </head>
 <body>
@@ -554,7 +614,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.18</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.20</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -609,6 +669,8 @@ body.dark .studio-tab.active{color:var(--pine);}
 
 <div class="studio-tabs" id="studioTabs">
       <button class="studio-tab" id="studioMoreBtn" type="button" aria-label="More studios">⋯ More</button>
+      <button class="studio-tab" id="topHelpMenu" type="button" title="Help">❓ Help</button>
+      <button class="studio-tab" id="topAskMeMenu" type="button" title="Ask me">💬 Ask me</button>
 
       <button class="studio-tab active" data-studio="dashboard"><span class="st-icon">🏠</span> Dashboard</button>
       <button class="studio-tab" data-studio="excel"><span class="st-icon">📊</span> Excel</button>
@@ -628,7 +690,7 @@ body.dark .studio-tab.active{color:var(--pine);}
       <button class="studio-tab" data-studio="reader"><span class="st-icon">📖</span> Reader</button>
       <button class="studio-tab" data-studio="export"><span class="st-icon">📤</span> Export</button>
       <button class="studio-tab" data-studio="about"><span class="st-icon">ℹ️</span> About</button>
-    </div>
+</div>
 
     <div id="noPdfBanner" style="display:none;background:var(--accent);color:var(--accent-ink);padding:8px 16px;font-size:12.5px;font-weight:600;text-align:center;">
       📄 Most tools below need a PDF open first — tap <strong>Open / Merge PDFs</strong> in PDF Studio, or a Dashboard tile, to get started.
@@ -947,7 +1009,7 @@ function openGstInvoiceApp(){
     <div id="dashboardNavigationHint" class="hint" style="
       margin:0 14px 12px;padding:11px 13px;border:1px solid var(--line);
       border-radius:10px;background:var(--surface);text-align:center;">
-      <strong>Main menu:</strong> Tap any category to open its <strong>Studio submenu</strong>.
+      <strong>Main menu:</strong> Tap any category to open its <strong>Studio submenu</strong>. Use <strong>Help</strong> for guidance or <strong>Ask me</strong> for questions.
       Then choose the required tool. No document is selected until a tool asks for one.
     </div>
 <div id="dashboardTiles" class="dashboard-grid dashboard-main-menu">
@@ -5836,6 +5898,8 @@ function openExcelDashboard(){
   }
 }
 function setStudio(name){
+  document.body.classList.toggle('dashboard-active', name === 'dashboard');
+
   currentStudio = name;
   document.querySelectorAll('.studio-tab').forEach(t => t.classList.toggle('active', t.dataset.studio === name));
   document.querySelectorAll('.ribbon-panel').forEach(p => p.classList.toggle('active', p.dataset.studioPanel === name));
@@ -6412,6 +6476,63 @@ try{
 } catch{}
 setStudio('dashboard');
 setToolsEnabled(false);
+
+/* ===== Main menu Help / Ask Me ===== */
+(function wireTopHelpAsk(){
+  const helpBtn = document.getElementById('topHelpMenu');
+  const askBtn = document.getElementById('topAskMeMenu');
+
+  helpBtn?.addEventListener('click', () => {
+    // Prefer the app's existing Help menu/action.
+    const existing = document.querySelector('[data-action="help"], #btnHelp, #helpBtn, [id*="Help"]');
+    if(existing && existing !== helpBtn) {
+      existing.click();
+      return;
+    }
+    if(typeof openHelp === 'function') { openHelp(); return; }
+    if(typeof showHelp === 'function') { showHelp(); return; }
+    if(typeof openModal === 'function') {
+      openModal('Help', `
+        <div style="line-height:1.55">
+          <strong>How to use DocuForge AI</strong>
+          <ol>
+            <li>Choose a main menu/Studio.</li>
+            <li>Select the required tool from its submenu.</li>
+            <li>Upload a file only when that tool asks for one.</li>
+            <li>Use the result window to download or share the result.</li>
+          </ol>
+        </div>
+      `, async()=>{});
+      if(typeof $==='function' && $('modalConfirm')) $('modalConfirm').style.display='none';
+    }
+  });
+
+  askBtn?.addEventListener('click', () => {
+    // Prefer the existing floating Ask Me button.
+    const existing = document.querySelector('#askMeBtn, #askBtn, [id*="askMe" i], [id*="ask" i].floating, .ask-me');
+    if(existing && existing !== askBtn) {
+      existing.click();
+      return;
+    }
+    if(typeof openAskMe === 'function') { openAskMe(); return; }
+    if(typeof showAskMe === 'function') { showAskMe(); return; }
+    if(typeof openModal === 'function') {
+      openModal('Ask me', `
+        <p class="hint">Ask about how to use any DocuForge AI menu or tool.</p>
+        <textarea id="topAskQuestion" placeholder="Type your question..." style="width:100%;min-height:130px;"></textarea>
+      `, async()=>{});
+      if(typeof $==='function' && $('modalConfirm')){
+        $('modalConfirm').textContent='Ask';
+        $('modalConfirm').onclick = async () => {
+          const q = $('topAskQuestion')?.value?.trim();
+          if(!q) return;
+          if(typeof toast==='function') toast('Your question is ready for the AI assistant.');
+        };
+      }
+    }
+  });
+})();
+
 </script>
 </body>
 </html>
