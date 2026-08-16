@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="application-version" content="2026.08.12.11">
+<meta name="application-version" content="2026.08.12.12">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.12.11 usability refinements ===== */
+/* ===== v2026.08.12.12 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -484,7 +484,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.12.11';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.12.12';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -495,7 +495,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.11</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.12</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -821,7 +821,7 @@ body.dark .studio-tab.active{color:var(--pine);}
     <div id="aboutStudio" class="studio-page">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.12.11 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.12.12 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -2406,6 +2406,42 @@ async function buildSlideDeckPdf(slides, pageWidth, pageHeight){
   }
   return await doc.save();
 }
+
+function shareGeneratedFile(blob, filename, label='File'){
+  const item = { blob, filename, label };
+  const safe = String(filename).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  openModal('PowerPoint ready', `
+    <div style="padding:4px 0 10px;"><strong>${label} ready.</strong></div>
+    <div class="hint" style="margin-bottom:14px;">File: <strong>${safe}</strong></div>
+    <button class="btn primary" id="pptShareFile" type="button" style="width:100%;min-height:52px;">📤 Share via Email / WhatsApp</button>
+    <p class="hint" style="margin-top:12px;">On iPhone/iPad, Share opens the system Share Sheet so you can choose WhatsApp, Mail, AirDrop, Files or another app. The PowerPoint file is not opened or downloaded automatically.</p>
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+  setTimeout(() => {
+    $('pptShareFile')?.addEventListener('click', async () => {
+      try{
+        const file = new File([item.blob], item.filename, {
+          type:item.blob.type || 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+        });
+        if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+          await navigator.share({
+            files:[file],
+            title:item.label || 'DocuForge PowerPoint',
+            text:`${item.label || 'PowerPoint file'} — ${item.filename}`
+          });
+        } else {
+          downloadBlob(item.blob, item.filename);
+          toast('File sharing is not supported by this browser. The PowerPoint file was downloaded; attach it in Email or WhatsApp.', false);
+        }
+      }catch(e){
+        if(e && e.name === 'AbortError') return;
+        toast('Could not share the PowerPoint file. Try again.', true);
+      }
+    });
+  }, 0);
+}
+
 async function buildPptxFromSlides(slides){
   const zip = new JSZip();
   const esc = escapeXml;
@@ -4272,7 +4308,7 @@ $('btnPptxEdit').addEventListener('click', () => {
     setStatus('Rebuilding presentation…'); showProgress(20);
     try{
       const bytes = await buildPptxFromSlides(slides);
-      downloadBlob(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' }), 'edited.pptx');
+      shareGeneratedFile(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' }), 'edited.pptx', 'Edited PowerPoint');
       setStatus('Presentation saved.');
       logConversion('Edited PowerPoint', 'edited.pptx');
     } catch(e){ console.error(e); toast('Could not rebuild the presentation.', true); }
