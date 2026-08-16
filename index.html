@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="application-version" content="2026.08.16.17">
+<meta name="application-ver
+      <button class="dash-tile main-menu-tile upload-main-tile" id="dashboardUploadFileTile" type="button">
+        <span class="dt-icon">📂</span><span>Upload File</span>
+        <small>PDF, Excel, Word, PowerPoint, image &amp; HTML</small>
+        <strong>Choose file →</strong>
+      </button>
+sion" content="2026.08.16.17">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -474,7 +480,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.23 usability refinements ===== */
+/* ===== v2026.08.16.24 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -506,7 +512,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.23 PDF workflow ===== */
+/* ===== v2026.08.16.24 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -515,7 +521,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.23 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.24 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -541,7 +547,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.23 dashboard cleanup ===== */
+/* ===== v2026.08.16.24 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -577,7 +583,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.16.23: clean Dashboard ===== */
+/* ===== v2026.08.16.24: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -601,7 +607,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.16.23: Dashboard is a true main menu ===== */
+/* ===== v2026.08.16.24: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -613,7 +619,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.16.23: hard dashboard/studio separation ===== */
+/* ===== v2026.08.16.24: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -633,10 +639,27 @@ body.dashboard-active #dashboardNavigationHint {
   display:grid !important;
 }
 
+
+/* ===== v2026.08.16.24: Dashboard upload entry ===== */
+#dashboardUploadFileTile{
+  border:2px solid var(--accent);
+  background:var(--surface);
+}
+#dashboardUploadFileTile .dt-icon{font-size:30px;}
+body.dashboard-active #excelStudio,
+body.dashboard-active #exportStudio,
+body.dashboard-active #settingsStudio,
+body.dashboard-active #readerStudio,
+body.dashboard-active #helpStudio,
+body.dashboard-active #aboutStudio,
+body.dashboard-active #gstInvoiceStudio{
+  display:none !important;
+}
+
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.16.17';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.16.24';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -647,7 +670,7 @@ body.dashboard-active #dashboardNavigationHint {
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.23</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.24</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -883,11 +906,11 @@ body.dashboard-active #dashboardNavigationHint {
 </div>
     </div>
 
-    <div id="excelStudio" aria-label="Excel Dashboard Studio">
+    <div id="excelStudio" aria-label="Excel Dashboard Studio" style="display:none !important">
       <iframe id="excelDashboardFrame" title="Excel to Dashboard" loading="lazy"></iframe>
     </div>
 
-    <div id="exportStudio" style="display:none;max-width:640px;margin:0 auto;padding:28px 24px;">
+    <div id="exportStudio" style="display:none;max-width:640px;margin:0 auto;padding:28px 24px;;display:none !important;">
       <h2 style="font-family:var(--font-display);margin-bottom:6px;">Export</h2>
       <p class="hint" style="margin:0 0 18px;">One-click access to every export format for the PDF currently open. Each tile jumps to its full tool if it needs more options.</p>
       <div class="dashboard-grid">
@@ -902,7 +925,7 @@ body.dashboard-active #dashboardNavigationHint {
       </div>
     </div>
 
-    <div id="settingsStudio" class="studio-page">
+    <div id="settingsStudio" class="studio-page" style="display:none !important">
       <h2>Settings</h2>
       <div class="tool-group">
 <div class="tool-group">
@@ -924,7 +947,7 @@ body.dashboard-active #dashboardNavigationHint {
       </div>
     </div>
 
-    <div id="readerStudio" class="reader-page">
+    <div id="readerStudio" class="reader-page" style="display:none !important">
       <div class="reader-toolbar">
         <button class="btn ghost" id="readerOpenBtn" type="button">Open PDF or EPUB…</button>
         <button class="btn ghost" id="readerUseCurrentBtn" type="button">Read current PDF</button>
@@ -948,7 +971,7 @@ body.dashboard-active #dashboardNavigationHint {
       </div>
     </div>
 
-    <div id="helpStudio" class="studio-page" style="max-width:760px;">
+    <div id="helpStudio" class="studio-page" style="max-width:760px;;display:none !important;">
       <h2>Help &amp; guidelines</h2>
       <p>Every tool lives under a Studio tab at the top. Most PDF tools need a file open first — that's why buttons look greyed out until you do. Here's what each Studio covers:</p>
 
@@ -990,7 +1013,7 @@ body.dashboard-active #dashboardNavigationHint {
       <p>Tap the <strong>?</strong> button in the bottom corner any time — type or speak a question and it'll try to answer directly, or point you to the right tool.</p>
     </div>
 
-    <div id="aboutStudio" class="studio-page">
+    <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
         <strong>Version:</strong> 2026.08.16.17 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
@@ -1002,7 +1025,7 @@ body.dashboard-active #dashboardNavigationHint {
 
     <!-- ===== EMBEDDED GST INVOICE APP ===== -->
 <!-- ===== EMBEDDED GST INVOICE APP ===== -->
-<div id="gstInvoiceStudio" class="studio-page gst-invoice-studio-page">
+<div id="gstInvoiceStudio" class="studio-page gst-invoice-studio-page" style="display:none !important">
   <div class="gst-wrapper-head">
     <div>
       <h2>GST Invoice Generator</h2>
@@ -1042,7 +1065,7 @@ function openGstInvoiceApp(){
       border-radius:10px;background:var(--surface);text-align:center;;display:block">
       <strong>Main menu:</strong> Tap any category to open its <strong>Studio submenu</strong>. Use <strong>Help</strong> for guidance or <strong>Ask me</strong> for questions.
       Then choose the required tool. No document is selected until a tool asks for one.
-    </div>
+    </div><div id="dashboardUploadStatus" class="hint" style="display:none;margin:0 14px 12px;text-align:center;"></div>
 <div id="dashboardTiles" class="dashboard-grid dashboard-main-menu" style="display:grid">
       <button class="dash-tile main-menu-tile" id="dashboardHelpTile" type="button">
         <span class="dt-icon">❓</span><span>Help</span><small>How to use DocuForge AI</small><strong>Open Help →</strong>
@@ -1137,7 +1160,9 @@ function openGstInvoiceApp(){
   <div class="progress-track" id="progressTrack"><div class="progress-fill" id="progressFill"></div></div>
 </div>
 
-<input type="file" id="fileInput" accept="application/pdf,image/*" multiple class="sr-only">
+<input type="file" id="universalFileInput"
+  accept=".pdf,.xls,.xlsx,.csv,.doc,.docx,.odt,.txt,.rtf,.ppt,.pptx,.odp,.html,.htm,image/*"
+  class="sr-only"> <input type="file" id="fileInput" accept="application/pdf,image/*" multiple class="sr-only">
 <input type="file" id="insertInput" accept="application/pdf,image/*" class="sr-only">
 
 <div class="modal-backdrop" id="genericModal">
@@ -2146,7 +2171,7 @@ function showCompareResult(diff, nameA, nameB){
 <style>body{font-family:ui-monospace,monospace;font-size:13px;margin:24px;} .added{background:#d7f5d7;} .removed{background:#f8d7d7;text-decoration:line-through;}</style>
 </head><body><h2>${esc(nameA)} vs ${esc(nameB)}</h2>${bodyHtml}
 <script>
-/* ===== DocuForge AI v2026.08.16.23 — navigation safety controller ===== */
+/* ===== DocuForge AI v2026.08.16.24 — navigation safety controller ===== */
 (function(){
   function q(id){ return document.getElementById(id); }
   function studioPanels(){
@@ -2225,6 +2250,98 @@ function showCompareResult(diff, nameA, nameB){
     if(home) home.addEventListener('click',function(ev){
       ev.preventDefault(); ev.stopPropagation(); showDashboard();
     },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.16.24 — Dashboard upload + Studio visibility controller ===== */
+(function(){
+  function q(id){return document.getElementById(id);}
+  function allStudioPages(){
+    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
+  }
+  function hideAllEmbeddedPages(){
+    allStudioPages().forEach(el=>el.style.display='none');
+  }
+  function setStatus(msg, show=true){
+    const el=q('dashboardUploadStatus');
+    if(!el) return;
+    el.innerHTML=msg;
+    el.style.display=show?'block':'none';
+  }
+  function extension(name){
+    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
+    return m?m[1]:'';
+  }
+  function routeUploadedFile(file){
+    const ext=extension(file.name);
+    let studio='convert', label='Conversion Studio';
+    if(ext==='pdf' || /^image\//i.test(file.type)){
+      studio='pdf'; label='PDF Studio';
+    }else if(['xls','xlsx','csv'].includes(ext)){
+      studio='excel'; label='Excel Studio';
+    }else if(['ppt','pptx','odp'].includes(ext)){
+      studio='powerpoint'; label='PowerPoint Studio';
+    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
+      studio='convert'; label='Conversion Studio';
+    }
+    window.__docuforgePendingFile=file;
+    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(studio);
+    }catch(e){console.warn(e);}
+    document.body.classList.remove('dashboard-active');
+
+    /* For PDF/image, feed the existing PDF loader immediately. */
+    if(studio==='pdf'){
+      const dt=new DataTransfer();
+      dt.items.add(file);
+      const input=q('fileInput');
+      if(input){
+        input.files=dt.files;
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    }
+
+    /* For Excel, keep the file pending and open the Excel Studio.
+       The Excel module can use this reference when its import action is selected. */
+    setTimeout(()=>{
+      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
+      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    },80);
+  }
+
+  function wire(){
+    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
+    hideAllEmbeddedPages();
+
+    const upload=q('dashboardUploadFileTile');
+    const input=q('universalFileInput');
+    if(upload && input){
+      upload.addEventListener('click',()=>input.click());
+      input.addEventListener('change',()=>{
+        const file=input.files && input.files[0];
+        if(file) routeUploadedFile(file);
+        input.value='';
+      });
+    }
+
+    /* Make Dashboard truly clean even if another script changes a Studio's display. */
+    const observer=new MutationObserver(()=>{
+      if(document.body.classList.contains('dashboard-active')){
+        hideAllEmbeddedPages();
+        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
+        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
+        const grid=q('grid'); if(grid) grid.style.display='none';
+      }
+    });
+    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
@@ -2555,7 +2672,7 @@ function buildBilingualHtml(original, translated, sourceLabel, targetLabel){
 <style>body{font-family:sans-serif;margin:24px;} table{width:100%;border-collapse:collapse;} td{border:1px solid #ccc;padding:8px;vertical-align:top;width:50%;white-space:pre-wrap;} th{background:#113B34;color:#fff;padding:8px;text-align:left;}</style>
 </head><body><h1>Translation</h1><table><tr><th>${esc(sourceLabel)}</th><th>${esc(targetLabel)}</th></tr>${rows}</table>
 <script>
-/* ===== DocuForge AI v2026.08.16.23 — navigation safety controller ===== */
+/* ===== DocuForge AI v2026.08.16.24 — navigation safety controller ===== */
 (function(){
   function q(id){ return document.getElementById(id); }
   function studioPanels(){
@@ -2634,6 +2751,98 @@ function buildBilingualHtml(original, translated, sourceLabel, targetLabel){
     if(home) home.addEventListener('click',function(ev){
       ev.preventDefault(); ev.stopPropagation(); showDashboard();
     },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.16.24 — Dashboard upload + Studio visibility controller ===== */
+(function(){
+  function q(id){return document.getElementById(id);}
+  function allStudioPages(){
+    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
+  }
+  function hideAllEmbeddedPages(){
+    allStudioPages().forEach(el=>el.style.display='none');
+  }
+  function setStatus(msg, show=true){
+    const el=q('dashboardUploadStatus');
+    if(!el) return;
+    el.innerHTML=msg;
+    el.style.display=show?'block':'none';
+  }
+  function extension(name){
+    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
+    return m?m[1]:'';
+  }
+  function routeUploadedFile(file){
+    const ext=extension(file.name);
+    let studio='convert', label='Conversion Studio';
+    if(ext==='pdf' || /^image\//i.test(file.type)){
+      studio='pdf'; label='PDF Studio';
+    }else if(['xls','xlsx','csv'].includes(ext)){
+      studio='excel'; label='Excel Studio';
+    }else if(['ppt','pptx','odp'].includes(ext)){
+      studio='powerpoint'; label='PowerPoint Studio';
+    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
+      studio='convert'; label='Conversion Studio';
+    }
+    window.__docuforgePendingFile=file;
+    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(studio);
+    }catch(e){console.warn(e);}
+    document.body.classList.remove('dashboard-active');
+
+    /* For PDF/image, feed the existing PDF loader immediately. */
+    if(studio==='pdf'){
+      const dt=new DataTransfer();
+      dt.items.add(file);
+      const input=q('fileInput');
+      if(input){
+        input.files=dt.files;
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    }
+
+    /* For Excel, keep the file pending and open the Excel Studio.
+       The Excel module can use this reference when its import action is selected. */
+    setTimeout(()=>{
+      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
+      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    },80);
+  }
+
+  function wire(){
+    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
+    hideAllEmbeddedPages();
+
+    const upload=q('dashboardUploadFileTile');
+    const input=q('universalFileInput');
+    if(upload && input){
+      upload.addEventListener('click',()=>input.click());
+      input.addEventListener('change',()=>{
+        const file=input.files && input.files[0];
+        if(file) routeUploadedFile(file);
+        input.value='';
+      });
+    }
+
+    /* Make Dashboard truly clean even if another script changes a Studio's display. */
+    const observer=new MutationObserver(()=>{
+      if(document.body.classList.contains('dashboard-active')){
+        hideAllEmbeddedPages();
+        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
+        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
+        const grid=q('grid'); if(grid) grid.style.display='none';
+      }
+    });
+    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
@@ -3582,7 +3791,7 @@ async function buildPdfHtml(){
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}</style>
 </head><body><h1>${title}</h1>${body}
 <script>
-/* ===== DocuForge AI v2026.08.16.23 — navigation safety controller ===== */
+/* ===== DocuForge AI v2026.08.16.24 — navigation safety controller ===== */
 (function(){
   function q(id){ return document.getElementById(id); }
   function studioPanels(){
@@ -3661,6 +3870,98 @@ h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}</
     if(home) home.addEventListener('click',function(ev){
       ev.preventDefault(); ev.stopPropagation(); showDashboard();
     },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.16.24 — Dashboard upload + Studio visibility controller ===== */
+(function(){
+  function q(id){return document.getElementById(id);}
+  function allStudioPages(){
+    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
+  }
+  function hideAllEmbeddedPages(){
+    allStudioPages().forEach(el=>el.style.display='none');
+  }
+  function setStatus(msg, show=true){
+    const el=q('dashboardUploadStatus');
+    if(!el) return;
+    el.innerHTML=msg;
+    el.style.display=show?'block':'none';
+  }
+  function extension(name){
+    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
+    return m?m[1]:'';
+  }
+  function routeUploadedFile(file){
+    const ext=extension(file.name);
+    let studio='convert', label='Conversion Studio';
+    if(ext==='pdf' || /^image\//i.test(file.type)){
+      studio='pdf'; label='PDF Studio';
+    }else if(['xls','xlsx','csv'].includes(ext)){
+      studio='excel'; label='Excel Studio';
+    }else if(['ppt','pptx','odp'].includes(ext)){
+      studio='powerpoint'; label='PowerPoint Studio';
+    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
+      studio='convert'; label='Conversion Studio';
+    }
+    window.__docuforgePendingFile=file;
+    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(studio);
+    }catch(e){console.warn(e);}
+    document.body.classList.remove('dashboard-active');
+
+    /* For PDF/image, feed the existing PDF loader immediately. */
+    if(studio==='pdf'){
+      const dt=new DataTransfer();
+      dt.items.add(file);
+      const input=q('fileInput');
+      if(input){
+        input.files=dt.files;
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    }
+
+    /* For Excel, keep the file pending and open the Excel Studio.
+       The Excel module can use this reference when its import action is selected. */
+    setTimeout(()=>{
+      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
+      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    },80);
+  }
+
+  function wire(){
+    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
+    hideAllEmbeddedPages();
+
+    const upload=q('dashboardUploadFileTile');
+    const input=q('universalFileInput');
+    if(upload && input){
+      upload.addEventListener('click',()=>input.click());
+      input.addEventListener('change',()=>{
+        const file=input.files && input.files[0];
+        if(file) routeUploadedFile(file);
+        input.value='';
+      });
+    }
+
+    /* Make Dashboard truly clean even if another script changes a Studio's display. */
+    const observer=new MutationObserver(()=>{
+      if(document.body.classList.contains('dashboard-active')){
+        hideAllEmbeddedPages();
+        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
+        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
+        const grid=q('grid'); if(grid) grid.style.display='none';
+      }
+    });
+    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
@@ -3835,7 +4136,7 @@ ${navPoints}
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title></head>
 <body>${bodyHtml}
 <script>
-/* ===== DocuForge AI v2026.08.16.23 — navigation safety controller ===== */
+/* ===== DocuForge AI v2026.08.16.24 — navigation safety controller ===== */
 (function(){
   function q(id){ return document.getElementById(id); }
   function studioPanels(){
@@ -3914,6 +4215,98 @@ ${navPoints}
     if(home) home.addEventListener('click',function(ev){
       ev.preventDefault(); ev.stopPropagation(); showDashboard();
     },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.16.24 — Dashboard upload + Studio visibility controller ===== */
+(function(){
+  function q(id){return document.getElementById(id);}
+  function allStudioPages(){
+    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
+  }
+  function hideAllEmbeddedPages(){
+    allStudioPages().forEach(el=>el.style.display='none');
+  }
+  function setStatus(msg, show=true){
+    const el=q('dashboardUploadStatus');
+    if(!el) return;
+    el.innerHTML=msg;
+    el.style.display=show?'block':'none';
+  }
+  function extension(name){
+    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
+    return m?m[1]:'';
+  }
+  function routeUploadedFile(file){
+    const ext=extension(file.name);
+    let studio='convert', label='Conversion Studio';
+    if(ext==='pdf' || /^image\//i.test(file.type)){
+      studio='pdf'; label='PDF Studio';
+    }else if(['xls','xlsx','csv'].includes(ext)){
+      studio='excel'; label='Excel Studio';
+    }else if(['ppt','pptx','odp'].includes(ext)){
+      studio='powerpoint'; label='PowerPoint Studio';
+    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
+      studio='convert'; label='Conversion Studio';
+    }
+    window.__docuforgePendingFile=file;
+    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(studio);
+    }catch(e){console.warn(e);}
+    document.body.classList.remove('dashboard-active');
+
+    /* For PDF/image, feed the existing PDF loader immediately. */
+    if(studio==='pdf'){
+      const dt=new DataTransfer();
+      dt.items.add(file);
+      const input=q('fileInput');
+      if(input){
+        input.files=dt.files;
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    }
+
+    /* For Excel, keep the file pending and open the Excel Studio.
+       The Excel module can use this reference when its import action is selected. */
+    setTimeout(()=>{
+      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
+      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    },80);
+  }
+
+  function wire(){
+    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
+    hideAllEmbeddedPages();
+
+    const upload=q('dashboardUploadFileTile');
+    const input=q('universalFileInput');
+    if(upload && input){
+      upload.addEventListener('click',()=>input.click());
+      input.addEventListener('change',()=>{
+        const file=input.files && input.files[0];
+        if(file) routeUploadedFile(file);
+        input.value='';
+      });
+    }
+
+    /* Make Dashboard truly clean even if another script changes a Studio's display. */
+    const observer=new MutationObserver(()=>{
+      if(document.body.classList.contains('dashboard-active')){
+        hideAllEmbeddedPages();
+        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
+        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
+        const grid=q('grid'); if(grid) grid.style.display='none';
+      }
+    });
+    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
@@ -6992,7 +7385,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 </script>
 
 <script>
-/* ===== DocuForge AI v2026.08.16.23 — navigation safety controller ===== */
+/* ===== DocuForge AI v2026.08.16.24 — navigation safety controller ===== */
 (function(){
   function q(id){ return document.getElementById(id); }
   function studioPanels(){
@@ -7071,6 +7464,98 @@ $('dashboardAskTile')?.addEventListener('click', () => {
     if(home) home.addEventListener('click',function(ev){
       ev.preventDefault(); ev.stopPropagation(); showDashboard();
     },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.16.24 — Dashboard upload + Studio visibility controller ===== */
+(function(){
+  function q(id){return document.getElementById(id);}
+  function allStudioPages(){
+    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
+  }
+  function hideAllEmbeddedPages(){
+    allStudioPages().forEach(el=>el.style.display='none');
+  }
+  function setStatus(msg, show=true){
+    const el=q('dashboardUploadStatus');
+    if(!el) return;
+    el.innerHTML=msg;
+    el.style.display=show?'block':'none';
+  }
+  function extension(name){
+    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
+    return m?m[1]:'';
+  }
+  function routeUploadedFile(file){
+    const ext=extension(file.name);
+    let studio='convert', label='Conversion Studio';
+    if(ext==='pdf' || /^image\//i.test(file.type)){
+      studio='pdf'; label='PDF Studio';
+    }else if(['xls','xlsx','csv'].includes(ext)){
+      studio='excel'; label='Excel Studio';
+    }else if(['ppt','pptx','odp'].includes(ext)){
+      studio='powerpoint'; label='PowerPoint Studio';
+    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
+      studio='convert'; label='Conversion Studio';
+    }
+    window.__docuforgePendingFile=file;
+    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(studio);
+    }catch(e){console.warn(e);}
+    document.body.classList.remove('dashboard-active');
+
+    /* For PDF/image, feed the existing PDF loader immediately. */
+    if(studio==='pdf'){
+      const dt=new DataTransfer();
+      dt.items.add(file);
+      const input=q('fileInput');
+      if(input){
+        input.files=dt.files;
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    }
+
+    /* For Excel, keep the file pending and open the Excel Studio.
+       The Excel module can use this reference when its import action is selected. */
+    setTimeout(()=>{
+      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
+      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    },80);
+  }
+
+  function wire(){
+    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
+    hideAllEmbeddedPages();
+
+    const upload=q('dashboardUploadFileTile');
+    const input=q('universalFileInput');
+    if(upload && input){
+      upload.addEventListener('click',()=>input.click());
+      input.addEventListener('change',()=>{
+        const file=input.files && input.files[0];
+        if(file) routeUploadedFile(file);
+        input.value='';
+      });
+    }
+
+    /* Make Dashboard truly clean even if another script changes a Studio's display. */
+    const observer=new MutationObserver(()=>{
+      if(document.body.classList.contains('dashboard-active')){
+        hideAllEmbeddedPages();
+        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
+        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
+        const grid=q('grid'); if(grid) grid.style.display='none';
+      }
+    });
+    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
