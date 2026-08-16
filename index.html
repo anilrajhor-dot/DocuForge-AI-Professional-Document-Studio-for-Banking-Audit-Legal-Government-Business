@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.38 usability refinements ===== */
+/* ===== v2026.08.16.39 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.38 PDF workflow ===== */
+/* ===== v2026.08.16.39 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.38 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.39 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.38 dashboard cleanup ===== */
+/* ===== v2026.08.16.39 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.16.38: clean Dashboard ===== */
+/* ===== v2026.08.16.39: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.16.38: Dashboard is a true main menu ===== */
+/* ===== v2026.08.16.39: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.16.38: hard dashboard/studio separation ===== */
+/* ===== v2026.08.16.39: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.16.38: Dashboard upload entry ===== */
+/* ===== v2026.08.16.39: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.16.38 — one navigation system only ===== */
+/* ===== v2026.08.16.39 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.16.38';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.16.39';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.38</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.39</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1444,7 +1444,7 @@ function updatePdfUploadAction(){
     if(group) group.querySelector('h2').textContent = 'Start project';
   }
 }
-/* ===== v2026.08.16.38 — pending-tool upload workflow =====
+/* ===== v2026.08.16.39 — pending-tool upload workflow =====
    If a user taps a conversion/OCR/etc. tool before opening a PDF, remember
    that exact tool. After the file is loaded, automatically continue with it.
 */
@@ -1522,7 +1522,7 @@ function updateUndoRedoButtons(){
 
 /* ---------- Loading / merging files ---------- */
 
-/* v2026.08.16.38 — never give PDF.js the working ArrayBuffer directly.
+/* v2026.08.16.39 — never give PDF.js the working ArrayBuffer directly.
    A Blob URL lets the browser fetch the PDF without transferring/detaching
    the app's source buffer. */
 async function openPdfJsFromBytes(bytes, password){
@@ -3585,7 +3585,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.16.38 — single main menu; file requested by operation */
+/* v2026.08.16.39 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3595,7 +3595,7 @@ body.dashboard-active #grid,
 body.dashboard-active #noPdfBanner{display:none !important;}
 
 
-/* ===== v2026.08.16.38 — Studio submenu layout ===== */
+/* ===== v2026.08.16.39 — Studio submenu layout ===== */
 
 /* Dashboard contains ONLY the main menu. */
 body.dashboard-active #studioTabs,
@@ -3687,7 +3687,7 @@ body:not(.dashboard-active) #grid{
 #studioTabs{display:none !important;}
 
 
-/* ===== v2026.08.16.38 — submenu host / mobile fixes ===== */
+/* ===== v2026.08.16.39 — submenu host / mobile fixes ===== */
 #studioSubmenuHost{
   width:100%;
   display:block;
@@ -3743,15 +3743,15 @@ body.dashboard-active #backToMainMenu{display:none !important;}
 }
 
 
-/* ===== v2026.08.16.38 — upload continuation feedback ===== */
+/* ===== v2026.08.16.39 — upload continuation feedback ===== */
 #statusMsg{font-weight:600;}
 
 
-/* v2026.08.16.38 — clearer PDF compatibility diagnostics */
+/* v2026.08.16.39 — clearer PDF compatibility diagnostics */
 .toast-wrap .toast{max-width:min(92vw,760px);white-space:normal;line-height:1.35;}
 
 
-/* v2026.08.16.38 — error messages must remain visible on iPhone */
+/* v2026.08.16.39 — error messages must remain visible on iPhone */
 .toast-wrap{
   position:fixed !important;
   top:auto !important;
@@ -3800,6 +3800,29 @@ body.dashboard-active #backToMainMenu{display:none !important;}
   overflow-wrap:anywhere !important;
   word-break:break-word !important;
   line-height:1.35 !important;
+}
+
+
+/* v39: diagnostic/error banner — never cover the application header */
+.toast-wrap{
+  position:fixed !important;
+  top:auto !important;
+  bottom:96px !important;
+  left:12px !important;
+  right:12px !important;
+  width:auto !important;
+  z-index:2147483647 !important;
+  pointer-events:none !important;
+}
+.toast-wrap .toast,
+.toast.error,
+.toast.danger{
+  max-width:100% !important;
+  max-height:30vh !important;
+  overflow:auto !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
 }
 
 </style>
@@ -6304,6 +6327,22 @@ $('appView').style.display = 'block';
 
 /* ---------- Studio navigation (top tabs + ribbon) ---------- */
 let currentStudio = (typeof window !== 'undefined' && window.currentStudio) ? window.currentStudio : null;
+/* v39: PDF Studio state and byte-copy helpers.
+   These must exist before any PDF.js/pdf-lib handler can be invoked. */
+function ensureStudio(studio){
+  if(studio) currentStudio = studio;
+  if(!currentStudio) currentStudio = 'pdf';
+  if(typeof window !== 'undefined') window.currentStudio = currentStudio;
+  return currentStudio;
+}
+function clonePdfBytes(bytes){
+  if(bytes instanceof ArrayBuffer) return bytes.slice(0);
+  if(ArrayBuffer.isView(bytes)){
+    return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+  }
+  return new Uint8Array(bytes || []).slice().buffer;
+}
+
 function updateDashboardTilesVisibility(){
   const showDash = currentStudio === 'dashboard' && !workingBytes;
   $('dashboardNavigationHint').style.display = showDash ? 'block' : 'none';
@@ -7109,7 +7148,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* ===== DocuForge AI v2026.08.16.38 — reliable Studio submenu host ===== */
+/* ===== DocuForge AI v2026.08.16.39 — reliable Studio submenu host ===== */
 (function(){
   const $=id=>document.getElementById(id);
   const host=()=>$('studioSubmenuHost');
