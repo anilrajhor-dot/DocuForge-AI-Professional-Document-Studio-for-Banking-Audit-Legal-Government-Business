@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.36 usability refinements ===== */
+/* ===== v2026.08.16.37 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.36 PDF workflow ===== */
+/* ===== v2026.08.16.37 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.36 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.37 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.36 dashboard cleanup ===== */
+/* ===== v2026.08.16.37 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.16.36: clean Dashboard ===== */
+/* ===== v2026.08.16.37: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.16.36: Dashboard is a true main menu ===== */
+/* ===== v2026.08.16.37: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.16.36: hard dashboard/studio separation ===== */
+/* ===== v2026.08.16.37: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.16.36: Dashboard upload entry ===== */
+/* ===== v2026.08.16.37: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.16.36 — one navigation system only ===== */
+/* ===== v2026.08.16.37 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.16.36';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.16.37';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.36</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.37</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1444,7 +1444,7 @@ function updatePdfUploadAction(){
     if(group) group.querySelector('h2').textContent = 'Start project';
   }
 }
-/* ===== v2026.08.16.36 — pending-tool upload workflow =====
+/* ===== v2026.08.16.37 — pending-tool upload workflow =====
    If a user taps a conversion/OCR/etc. tool before opening a PDF, remember
    that exact tool. After the file is loaded, automatically continue with it.
 */
@@ -1521,62 +1521,84 @@ function updateUndoRedoButtons(){
 }
 
 /* ---------- Loading / merging files ---------- */
-async function rebuildPdfFromPdfJs(buf, password){
-  if(typeof pdfjsLib === 'undefined') throw new Error('PDF.js is not loaded.');
-  const pdfjsCopy = clonePdfBytes(buf);
-  const src=await pdfjsLib.getDocument({
-    data: pdfjsCopy,
-    password: password || undefined,
-    // Use the configured PDF.js worker. This is more reliable for larger PDFs
-    // than forcing the entire parser onto the iPhone main thread.
-    disableWorker:false
-  }).promise;
 
-  const rebuilt=await PDFDocument.create();
-  for(let i=1;i<=src.numPages;i++){
-    const page=await src.getPage(i);
-    const viewport=page.getViewport({scale:1.25});
-    const canvas=document.createElement('canvas');
-    canvas.width=Math.ceil(viewport.width);
-    canvas.height=Math.ceil(viewport.height);
-    const ctx=canvas.getContext('2d',{willReadFrequently:true});
-    await page.render({canvasContext:ctx,viewport}).promise;
-    const png=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
-    if(!png) throw new Error('PDF.js could not render page '+i+'.');
-    const img=await rebuilt.embedPng(await png.arrayBuffer());
-    const w=img.width*72/96, h=img.height*72/96;
-    const outPage=rebuilt.addPage([w,h]);
-    outPage.drawImage(img,{x:0,y:0,width:w,height:h});
+/* v2026.08.16.37 — never give PDF.js the working ArrayBuffer directly.
+   A Blob URL lets the browser fetch the PDF without transferring/detaching
+   the app's source buffer. */
+async function openPdfJsFromBytes(bytes, password){
+  if(typeof pdfjsLib === 'undefined') throw new Error('PDF.js is not loaded.');
+  const copy = bytes instanceof ArrayBuffer ? bytes.slice(0) :
+               ArrayBuffer.isView(bytes) ? bytes.slice().buffer :
+               new Uint8Array(bytes).slice().buffer;
+  const blob = new Blob([copy], {type:'application/pdf'});
+  const url = URL.createObjectURL(blob);
+  try{
+    const task = pdfjsLib.getDocument({
+      url,
+      password: password || undefined,
+      disableWorker:false
+    });
+    const pdf = await task.promise;
+    // Keep the URL attached to the PDF object until the caller finishes using it.
+    pdf.__docuforgeBlobUrl = url;
+    return pdf;
+  }catch(e){
+    URL.revokeObjectURL(url);
+    throw e;
   }
-  return rebuilt;
+}
+function releasePdfJsDocument(pdf){
+  try{
+    const u=pdf && pdf.__docuforgeBlobUrl;
+    if(pdf && typeof pdf.destroy==='function') pdf.destroy();
+    if(u) URL.revokeObjectURL(u);
+  }catch(_){}
 }
 
-function clonePdfBytes(buf){
-  if(buf instanceof ArrayBuffer) return buf.slice(0);
-  if(ArrayBuffer.isView(buf)) return buf.slice().buffer;
-  return new Uint8Array(buf).slice().buffer;
+async function rebuildPdfFromPdfJs(buf, password){
+  const src=await openPdfJsFromBytes(buf,password);
+  try{
+    const rebuilt=await PDFDocument.create();
+    for(let i=1;i<=src.numPages;i++){
+      const page=await src.getPage(i);
+      const viewport=page.getViewport({scale:1.25});
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.ceil(viewport.width);
+      canvas.height=Math.ceil(viewport.height);
+      const ctx=canvas.getContext('2d',{willReadFrequently:true});
+      await page.render({canvasContext:ctx,viewport}).promise;
+      const png=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+      if(!png) throw new Error('PDF.js could not render page '+i+'.');
+      const img=await rebuilt.embedPng(await png.arrayBuffer());
+      const w=img.width*72/96, h=img.height*72/96;
+      const outPage=rebuilt.addPage([w,h]);
+      outPage.drawImage(img,{x:0,y:0,width:w,height:h});
+    }
+    return rebuilt;
+  }finally{
+    releasePdfJsDocument(src);
+  }
 }
 
 async function loadPdfSafely(buf){
   let pdfjsError=null;
-
-  // PDF.js is the primary compatibility reader. It handles a wider range
-  // of real-world PDFs than pdf-lib and also gives us proper password errors.
+  // Primary reader: PDF.js through a Blob URL.
   try{
-    const pdfjsCopy = clonePdfBytes(buf);
-    const src=await pdfjsLib.getDocument({
-      data:pdfjsCopy,
-      disableWorker:false
-    }).promise;
-    // If PDF.js can parse it, retain the original bytes whenever possible.
-    // This preserves text, forms, bookmarks and quality.
-    if(src && src.numPages > 0){
-      try{
-        const pdfLibCopy = buf instanceof ArrayBuffer ? buf.slice(0) : new Uint8Array(buf).slice().buffer;
-        return await PDFDocument.load(pdfLibCopy, {ignoreEncryption:true});
-      }catch(_){
-        return await rebuildPdfFromPdfJs(buf);
-      }
+    const src=await openPdfJsFromBytes(buf);
+    try{
+      // Validate that at least one page is readable.
+      if(!src || !src.numPages) throw new Error('PDF contains no readable pages.');
+    }finally{
+      releasePdfJsDocument(src);
+    }
+
+    // Prefer the original PDF bytes when pdf-lib can import them.
+    try{
+      const copy=clonePdfBytes(buf);
+      return await PDFDocument.load(copy,{ignoreEncryption:true});
+    }catch(_){
+      // Rebuild through PDF.js only when pdf-lib cannot import the original.
+      return await rebuildPdfFromPdfJs(buf);
     }
   }catch(e){
     pdfjsError=e;
@@ -1587,10 +1609,9 @@ async function loadPdfSafely(buf){
     }
   }
 
-  // Final fallback to pdf-lib for PDFs that PDF.js rejected.
+  // Final fallback: pdf-lib with a completely independent copy.
   try{
-    const pdfLibCopy = buf instanceof ArrayBuffer ? buf.slice(0) : new Uint8Array(buf).slice().buffer;
-    return await PDFDocument.load(pdfLibCopy);
+    return await PDFDocument.load(clonePdfBytes(buf));
   }catch(e){
     const a=String(e && e.message || e);
     const b=pdfjsError ? String(pdfjsError.message || pdfjsError) : '';
@@ -1655,7 +1676,7 @@ async function loadFiles(fileList){
       const detail=String(e && e.message || e || 'Unknown error');
       console.error('DocuForge file-open error:',detail);
       toast('Could not open this PDF: '+detail, true);
-      setStatus('PDF open failed. See the message above for the exact reason.');
+      setStatus('PDF open failed. The error is shown at the bottom of the screen.');
     }
   } finally { showProgress(null); }
 }
@@ -1679,9 +1700,9 @@ async function renderThumbnails(){
   if(!workingBytes){ showProgress(null); return; }
   let pdf;
   try{
-    pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes).slice(), disableWorker:false }).promise;
+    pdf = await openPdfJsFromBytes(workingBytes);
   } catch(e){
-    console.error(e); toast('Could not render the PDF for preview.', true); showProgress(null); return;
+    console.error(e); toast('Could not render the PDF for preview: '+String(e.message||e), true); showProgress(null); return;
   }
   const n = pdf.numPages;
   $('pageCountStat').textContent = n + (n===1 ? ' page' : ' pages');
@@ -2078,7 +2099,7 @@ async function runOcrOnPdfPages(lang, pageIndices){
   const results = [];
   try{
     await loadLib('tesseract');
-    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes).slice(), disableWorker:false }).promise;
+    const pdf = await openPdfJsFromBytes(workingBytes);
     for(let i = 0; i < pageIndices.length; i++){
       const pageNum = pageIndices[i] + 1;
       setStatus(`OCR — rendering page ${pageNum} (${i+1}/${pageIndices.length})…`);
@@ -3563,7 +3584,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.16.36 — single main menu; file requested by operation */
+/* v2026.08.16.37 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3573,7 +3594,7 @@ body.dashboard-active #grid,
 body.dashboard-active #noPdfBanner{display:none !important;}
 
 
-/* ===== v2026.08.16.36 — Studio submenu layout ===== */
+/* ===== v2026.08.16.37 — Studio submenu layout ===== */
 
 /* Dashboard contains ONLY the main menu. */
 body.dashboard-active #studioTabs,
@@ -3665,7 +3686,7 @@ body:not(.dashboard-active) #grid{
 #studioTabs{display:none !important;}
 
 
-/* ===== v2026.08.16.36 — submenu host / mobile fixes ===== */
+/* ===== v2026.08.16.37 — submenu host / mobile fixes ===== */
 #studioSubmenuHost{
   width:100%;
   display:block;
@@ -3721,12 +3742,43 @@ body.dashboard-active #backToMainMenu{display:none !important;}
 }
 
 
-/* ===== v2026.08.16.36 — upload continuation feedback ===== */
+/* ===== v2026.08.16.37 — upload continuation feedback ===== */
 #statusMsg{font-weight:600;}
 
 
-/* v2026.08.16.36 — clearer PDF compatibility diagnostics */
+/* v2026.08.16.37 — clearer PDF compatibility diagnostics */
 .toast-wrap .toast{max-width:min(92vw,760px);white-space:normal;line-height:1.35;}
+
+
+/* v2026.08.16.37 — error messages must remain visible on iPhone */
+.toast-wrap{
+  position:fixed !important;
+  top:auto !important;
+  right:12px !important;
+  left:12px !important;
+  bottom:78px !important;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:8px;
+  z-index:99999 !important;
+  pointer-events:none;
+}
+.toast{
+  width:auto !important;
+  max-width:none !important;
+  box-sizing:border-box;
+  font-size:16px !important;
+  padding:14px 16px !important;
+  line-height:1.35 !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere;
+  pointer-events:auto;
+}
+.toast.err{
+  background:#B63A20 !important;
+  color:#fff !important;
+}
 
 </style>
 </head><body><h1>${title}</h1>${body}
@@ -7035,7 +7087,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* ===== DocuForge AI v2026.08.16.36 — reliable Studio submenu host ===== */
+/* ===== DocuForge AI v2026.08.16.37 — reliable Studio submenu host ===== */
 (function(){
   const $=id=>document.getElementById(id);
   const host=()=>$('studioSubmenuHost');
@@ -7128,3 +7180,5 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 </body>
 </html>
+  releasePdfJsDocument(pdf);
+
