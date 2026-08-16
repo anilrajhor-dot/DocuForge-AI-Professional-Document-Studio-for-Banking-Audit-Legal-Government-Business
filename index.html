@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.28 usability refinements ===== */
+/* ===== v2026.08.16.29 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.28 PDF workflow ===== */
+/* ===== v2026.08.16.29 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.28 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.29 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.28 dashboard cleanup ===== */
+/* ===== v2026.08.16.29 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.16.28: clean Dashboard ===== */
+/* ===== v2026.08.16.29: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.16.28: Dashboard is a true main menu ===== */
+/* ===== v2026.08.16.29: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.16.28: hard dashboard/studio separation ===== */
+/* ===== v2026.08.16.29: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.16.28: Dashboard upload entry ===== */
+/* ===== v2026.08.16.29: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.16.28 — one navigation system only ===== */
+/* ===== v2026.08.16.29 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -665,9 +665,13 @@ body.dashboard-active #toolbar,
 body.dashboard-active #pageActionStrip,
 body.dashboard-active #dropzone,
 body.dashboard-active #grid,
-body.dashboard-active #noPdfBanner,
-body.dashboard-active #workspaceLayout{
+body.dashboard-active #noPdfBanner{
   display:none !important;
+}
+/* IMPORTANT: dashboardTiles and dashboardRecent are INSIDE workspaceLayout.
+   Never hide workspaceLayout on the Dashboard. */
+body.dashboard-active #workspaceLayout{
+  display:flex !important;
 }
 
 /* When a Studio is open, show only its submenu/ribbon — never the main menu. */
@@ -687,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.16.28';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.16.29';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -698,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.28</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.29</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -6051,6 +6055,7 @@ function setStudio(name){
     // Hard inline cleanup so no stale PDF editor element can occupy space.
     ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout']
       .forEach(id => { if($(id)) $(id).style.display='none'; });
+    if($('workspaceLayout')) $('workspaceLayout').style.display='flex';
     if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
     if($('dashboardRecent')) $('dashboardRecent').style.display='block';
   }
@@ -6703,7 +6708,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 </script>
 
 <script>
-/* ===== DocuForge AI v2026.08.16.28 — final navigation controller ===== */
+/* ===== DocuForge AI v2026.08.16.29 — final navigation controller ===== */
 (function(){
   function $(id){ return document.getElementById(id); }
 
@@ -6723,7 +6728,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
     hideEmbeddedStudios();
 
     ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid',
-     'noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
+     'noPdfBanner','backToMainMenu','studioUploadFileBtn']
       .forEach(function(id){ var el=$(id); if(el) el.style.display='none'; });
 
     if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
@@ -6804,6 +6809,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   function wire(){
     /* Start with a genuinely clean Dashboard. */
     showDashboard();
+    if($('workspaceLayout')) $('workspaceLayout').style.display='flex';
 
     /* Dashboard Studio cards. Capture phase prevents legacy handlers from
        reopening the old upper navigation. */
