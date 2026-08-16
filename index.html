@@ -2,11 +2,6 @@
 <html lang="en">
 <head>
 <meta name="application-ver
-      <button class="dash-tile main-menu-tile upload-main-tile" id="dashboardUploadFileTile" type="button">
-        <span class="dt-icon">📂</span><span>Upload File</span>
-        <small>PDF, Excel, Word, PowerPoint, image &amp; HTML</small>
-        <strong>Choose file →</strong>
-      </button>
 sion" content="2026.08.16.17">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
@@ -480,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.24 usability refinements ===== */
+/* ===== v2026.08.16.25 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -512,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.24 PDF workflow ===== */
+/* ===== v2026.08.16.25 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -521,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.24 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.25 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -547,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.24 dashboard cleanup ===== */
+/* ===== v2026.08.16.25 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -583,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.16.24: clean Dashboard ===== */
+/* ===== v2026.08.16.25: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -607,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.16.24: Dashboard is a true main menu ===== */
+/* ===== v2026.08.16.25: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -619,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.16.24: hard dashboard/studio separation ===== */
+/* ===== v2026.08.16.25: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -640,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.16.24: Dashboard upload entry ===== */
+/* ===== v2026.08.16.25: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -656,10 +651,43 @@ body.dashboard-active #gstInvoiceStudio{
   display:none !important;
 }
 
+
+/* ===== v2026.08.16.25 — one navigation system only ===== */
+#studioTabs{
+  display:none !important;
+}
+#studioTabs .studio-tab{display:none !important;}
+
+/* The Dashboard is the only main menu. */
+body.dashboard-active #studioTabs,
+body.dashboard-active #ribbon,
+body.dashboard-active #toolbar,
+body.dashboard-active #pageActionStrip,
+body.dashboard-active #dropzone,
+body.dashboard-active #grid,
+body.dashboard-active #noPdfBanner,
+body.dashboard-active #workspaceLayout{
+  display:none !important;
+}
+
+/* When a Studio is open, show only its submenu/ribbon — never the main menu. */
+body:not(.dashboard-active) #studioTabs{display:none !important;}
+body:not(.dashboard-active) #ribbon{display:flex !important;}
+body:not(.dashboard-active) #workspaceLayout{display:block !important;}
+
+/* Clear back-to-main control */
+#backToMainMenu{
+  display:none;
+  margin:8px 10px 4px;
+  width:calc(100% - 20px);
+  min-height:44px;
+}
+body:not(.dashboard-active) #backToMainMenu{display:block;}
+
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.16.24';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.16.25';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -670,7 +698,7 @@ body.dashboard-active #gstInvoiceStudio{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.24</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.25</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -750,7 +778,9 @@ body.dashboard-active #gstInvoiceStudio{
       📄 Most tools below need a PDF open first — tap <strong>Open / Merge PDFs</strong> in PDF Studio, or a Dashboard tile, to get started.
     </div>
 
-    <div class="ribbon" id="ribbon" style="display:none">
+    <button id="backToMainMenu" class="btn ghost" type="button">← Back to Main Menu</button>
+<div class="ribbon" id="ribbon" style="display:none">
+      <button id="studioUploadFileBtn" class="btn primary" type="button" style="margin:6px 8px;min-height:46px;">📂 Upload File</button>
       <div class="ribbon-quick">
 <button class="tool-btn" id="btnUndo">Undo <kbd>Ctrl Z</kbd></button>
 <button class="tool-btn" id="btnRedo">Redo <kbd>Ctrl Y</kbd></button>
@@ -1067,6 +1097,11 @@ function openGstInvoiceApp(){
       Then choose the required tool. No document is selected until a tool asks for one.
     </div><div id="dashboardUploadStatus" class="hint" style="display:none;margin:0 14px 12px;text-align:center;"></div>
 <div id="dashboardTiles" class="dashboard-grid dashboard-main-menu" style="display:grid">
+      <button class="dash-tile main-menu-tile upload-main-tile" id="dashboardUploadFileTile" type="button">
+        <span class="dt-icon">📂</span><span>Upload File</span>
+        <small>PDF • Excel • Word • PowerPoint • Image • HTML</small>
+        <strong>Choose file →</strong>
+      </button>
       <button class="dash-tile main-menu-tile" id="dashboardHelpTile" type="button">
         <span class="dt-icon">❓</span><span>Help</span><small>How to use DocuForge AI</small><strong>Open Help →</strong>
       </button>
@@ -1160,9 +1195,7 @@ function openGstInvoiceApp(){
   <div class="progress-track" id="progressTrack"><div class="progress-fill" id="progressFill"></div></div>
 </div>
 
-<input type="file" id="universalFileInput"
-  accept=".pdf,.xls,.xlsx,.csv,.doc,.docx,.odt,.txt,.rtf,.ppt,.pptx,.odp,.html,.htm,image/*"
-  class="sr-only"> <input type="file" id="fileInput" accept="application/pdf,image/*" multiple class="sr-only">
+<input type="file" id="universalFileInput" accept=".pdf,.xls,.xlsx,.csv,.doc,.docx,.odt,.txt,.rtf,.ppt,.pptx,.odp,.html,.htm,image/*" class="sr-only"> <input type="file" id="fileInput" accept="application/pdf,image/*" multiple class="sr-only">
 <input type="file" id="insertInput" accept="application/pdf,image/*" class="sr-only">
 
 <div class="modal-backdrop" id="genericModal">
@@ -2171,7 +2204,7 @@ function showCompareResult(diff, nameA, nameB){
 <style>body{font-family:ui-monospace,monospace;font-size:13px;margin:24px;} .added{background:#d7f5d7;} .removed{background:#f8d7d7;text-decoration:line-through;}</style>
 </head><body><h2>${esc(nameA)} vs ${esc(nameB)}</h2>${bodyHtml}
 <script>
-/* ===== DocuForge AI v2026.08.16.24 — navigation safety controller ===== */
+/* ===== DocuForge AI v2026.08.16.25 — navigation safety controller ===== */
 (function(){
   function q(id){ return document.getElementById(id); }
   function studioPanels(){
@@ -2259,7 +2292,7 @@ function showCompareResult(diff, nameA, nameB){
 
 
 <script>
-/* ===== v2026.08.16.24 — Dashboard upload + Studio visibility controller ===== */
+/* ===== v2026.08.16.25 — Dashboard upload + Studio visibility controller ===== */
 (function(){
   function q(id){return document.getElementById(id);}
   function allStudioPages(){
@@ -2342,6 +2375,114 @@ function showCompareResult(diff, nameA, nameB){
       }
     });
     observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.16.25 — single navigation controller ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  function hideStudioPanels(){
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
+      p.style.display='none';
+      p.classList.remove('active');
+    });
+    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+  }
+  function dashboard(){
+    document.body.classList.add('dashboard-active');
+    hideStudioPanels();
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
+      .forEach(id=>{if($(id)) $(id).style.display='none';});
+    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
+    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
+  }
+  function studio(name){
+    document.body.classList.remove('dashboard-active');
+    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
+    if($('studioTabs')) $('studioTabs').style.display='none';
+    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    if($('ribbon')) $('ribbon').style.display='flex';
+    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
+
+    hideStudioPanels();
+    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    if(panel){
+      panel.style.display='flex';
+      panel.classList.add('active');
+    }
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(name);
+    }catch(e){console.warn('Existing studio loader:',e);}
+    // Re-assert our navigation after the legacy loader runs.
+    setTimeout(()=>{
+      if($('studioTabs')) $('studioTabs').style.display='none';
+      if($('ribbon')) $('ribbon').style.display='flex';
+      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    },50);
+  }
+
+  function wire(){
+    /* Always start clean. */
+    dashboard();
+
+    /* Main menu cards. */
+    document.addEventListener('click',e=>{
+      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      studio(tile.dataset.studio);
+    },true);
+
+    /* Upload File card. */
+    const dashUpload=$('dashboardUploadFileTile');
+    const input=$('universalFileInput');
+    if(dashUpload && input){
+      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Upload button inside any Studio. */
+    const studioUpload=$('studioUploadFileBtn');
+    if(studioUpload && input){
+      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Back to Main Menu. */
+    $('backToMainMenu')?.addEventListener('click',e=>{
+      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
+    },true);
+
+    /* Route uploaded file. */
+    input?.addEventListener('change',()=>{
+      const file=input.files?.[0];
+      if(!file) return;
+      const ext=(file.name.split('.').pop()||'').toLowerCase();
+      let target='convert';
+      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
+      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
+      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
+      studio(target);
+
+      /* Feed PDF/image files into the existing PDF input. */
+      if(target==='pdf'){
+        try{
+          const dt=new DataTransfer(); dt.items.add(file);
+          const pdfInput=$('fileInput');
+          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
+        }catch(e){console.warn(e);}
+      }
+      input.value='';
+    },true);
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
@@ -2672,7 +2813,7 @@ function buildBilingualHtml(original, translated, sourceLabel, targetLabel){
 <style>body{font-family:sans-serif;margin:24px;} table{width:100%;border-collapse:collapse;} td{border:1px solid #ccc;padding:8px;vertical-align:top;width:50%;white-space:pre-wrap;} th{background:#113B34;color:#fff;padding:8px;text-align:left;}</style>
 </head><body><h1>Translation</h1><table><tr><th>${esc(sourceLabel)}</th><th>${esc(targetLabel)}</th></tr>${rows}</table>
 <script>
-/* ===== DocuForge AI v2026.08.16.24 — navigation safety controller ===== */
+/* ===== DocuForge AI v2026.08.16.25 — navigation safety controller ===== */
 (function(){
   function q(id){ return document.getElementById(id); }
   function studioPanels(){
@@ -2760,7 +2901,7 @@ function buildBilingualHtml(original, translated, sourceLabel, targetLabel){
 
 
 <script>
-/* ===== v2026.08.16.24 — Dashboard upload + Studio visibility controller ===== */
+/* ===== v2026.08.16.25 — Dashboard upload + Studio visibility controller ===== */
 (function(){
   function q(id){return document.getElementById(id);}
   function allStudioPages(){
@@ -2843,6 +2984,114 @@ function buildBilingualHtml(original, translated, sourceLabel, targetLabel){
       }
     });
     observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.16.25 — single navigation controller ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  function hideStudioPanels(){
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
+      p.style.display='none';
+      p.classList.remove('active');
+    });
+    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+  }
+  function dashboard(){
+    document.body.classList.add('dashboard-active');
+    hideStudioPanels();
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
+      .forEach(id=>{if($(id)) $(id).style.display='none';});
+    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
+    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
+  }
+  function studio(name){
+    document.body.classList.remove('dashboard-active');
+    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
+    if($('studioTabs')) $('studioTabs').style.display='none';
+    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    if($('ribbon')) $('ribbon').style.display='flex';
+    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
+
+    hideStudioPanels();
+    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    if(panel){
+      panel.style.display='flex';
+      panel.classList.add('active');
+    }
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(name);
+    }catch(e){console.warn('Existing studio loader:',e);}
+    // Re-assert our navigation after the legacy loader runs.
+    setTimeout(()=>{
+      if($('studioTabs')) $('studioTabs').style.display='none';
+      if($('ribbon')) $('ribbon').style.display='flex';
+      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    },50);
+  }
+
+  function wire(){
+    /* Always start clean. */
+    dashboard();
+
+    /* Main menu cards. */
+    document.addEventListener('click',e=>{
+      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      studio(tile.dataset.studio);
+    },true);
+
+    /* Upload File card. */
+    const dashUpload=$('dashboardUploadFileTile');
+    const input=$('universalFileInput');
+    if(dashUpload && input){
+      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Upload button inside any Studio. */
+    const studioUpload=$('studioUploadFileBtn');
+    if(studioUpload && input){
+      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Back to Main Menu. */
+    $('backToMainMenu')?.addEventListener('click',e=>{
+      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
+    },true);
+
+    /* Route uploaded file. */
+    input?.addEventListener('change',()=>{
+      const file=input.files?.[0];
+      if(!file) return;
+      const ext=(file.name.split('.').pop()||'').toLowerCase();
+      let target='convert';
+      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
+      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
+      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
+      studio(target);
+
+      /* Feed PDF/image files into the existing PDF input. */
+      if(target==='pdf'){
+        try{
+          const dt=new DataTransfer(); dt.items.add(file);
+          const pdfInput=$('fileInput');
+          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
+        }catch(e){console.warn(e);}
+      }
+      input.value='';
+    },true);
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
@@ -3791,7 +4040,7 @@ async function buildPdfHtml(){
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}</style>
 </head><body><h1>${title}</h1>${body}
 <script>
-/* ===== DocuForge AI v2026.08.16.24 — navigation safety controller ===== */
+/* ===== DocuForge AI v2026.08.16.25 — navigation safety controller ===== */
 (function(){
   function q(id){ return document.getElementById(id); }
   function studioPanels(){
@@ -3879,7 +4128,7 @@ h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}</
 
 
 <script>
-/* ===== v2026.08.16.24 — Dashboard upload + Studio visibility controller ===== */
+/* ===== v2026.08.16.25 — Dashboard upload + Studio visibility controller ===== */
 (function(){
   function q(id){return document.getElementById(id);}
   function allStudioPages(){
@@ -3962,6 +4211,114 @@ h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}</
       }
     });
     observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.16.25 — single navigation controller ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  function hideStudioPanels(){
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
+      p.style.display='none';
+      p.classList.remove('active');
+    });
+    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+  }
+  function dashboard(){
+    document.body.classList.add('dashboard-active');
+    hideStudioPanels();
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
+      .forEach(id=>{if($(id)) $(id).style.display='none';});
+    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
+    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
+  }
+  function studio(name){
+    document.body.classList.remove('dashboard-active');
+    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
+    if($('studioTabs')) $('studioTabs').style.display='none';
+    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    if($('ribbon')) $('ribbon').style.display='flex';
+    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
+
+    hideStudioPanels();
+    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    if(panel){
+      panel.style.display='flex';
+      panel.classList.add('active');
+    }
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(name);
+    }catch(e){console.warn('Existing studio loader:',e);}
+    // Re-assert our navigation after the legacy loader runs.
+    setTimeout(()=>{
+      if($('studioTabs')) $('studioTabs').style.display='none';
+      if($('ribbon')) $('ribbon').style.display='flex';
+      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    },50);
+  }
+
+  function wire(){
+    /* Always start clean. */
+    dashboard();
+
+    /* Main menu cards. */
+    document.addEventListener('click',e=>{
+      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      studio(tile.dataset.studio);
+    },true);
+
+    /* Upload File card. */
+    const dashUpload=$('dashboardUploadFileTile');
+    const input=$('universalFileInput');
+    if(dashUpload && input){
+      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Upload button inside any Studio. */
+    const studioUpload=$('studioUploadFileBtn');
+    if(studioUpload && input){
+      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Back to Main Menu. */
+    $('backToMainMenu')?.addEventListener('click',e=>{
+      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
+    },true);
+
+    /* Route uploaded file. */
+    input?.addEventListener('change',()=>{
+      const file=input.files?.[0];
+      if(!file) return;
+      const ext=(file.name.split('.').pop()||'').toLowerCase();
+      let target='convert';
+      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
+      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
+      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
+      studio(target);
+
+      /* Feed PDF/image files into the existing PDF input. */
+      if(target==='pdf'){
+        try{
+          const dt=new DataTransfer(); dt.items.add(file);
+          const pdfInput=$('fileInput');
+          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
+        }catch(e){console.warn(e);}
+      }
+      input.value='';
+    },true);
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
@@ -4136,7 +4493,7 @@ ${navPoints}
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title></head>
 <body>${bodyHtml}
 <script>
-/* ===== DocuForge AI v2026.08.16.24 — navigation safety controller ===== */
+/* ===== DocuForge AI v2026.08.16.25 — navigation safety controller ===== */
 (function(){
   function q(id){ return document.getElementById(id); }
   function studioPanels(){
@@ -4224,7 +4581,7 @@ ${navPoints}
 
 
 <script>
-/* ===== v2026.08.16.24 — Dashboard upload + Studio visibility controller ===== */
+/* ===== v2026.08.16.25 — Dashboard upload + Studio visibility controller ===== */
 (function(){
   function q(id){return document.getElementById(id);}
   function allStudioPages(){
@@ -4307,6 +4664,114 @@ ${navPoints}
       }
     });
     observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.16.25 — single navigation controller ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  function hideStudioPanels(){
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
+      p.style.display='none';
+      p.classList.remove('active');
+    });
+    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+  }
+  function dashboard(){
+    document.body.classList.add('dashboard-active');
+    hideStudioPanels();
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
+      .forEach(id=>{if($(id)) $(id).style.display='none';});
+    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
+    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
+  }
+  function studio(name){
+    document.body.classList.remove('dashboard-active');
+    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
+    if($('studioTabs')) $('studioTabs').style.display='none';
+    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    if($('ribbon')) $('ribbon').style.display='flex';
+    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
+
+    hideStudioPanels();
+    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    if(panel){
+      panel.style.display='flex';
+      panel.classList.add('active');
+    }
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(name);
+    }catch(e){console.warn('Existing studio loader:',e);}
+    // Re-assert our navigation after the legacy loader runs.
+    setTimeout(()=>{
+      if($('studioTabs')) $('studioTabs').style.display='none';
+      if($('ribbon')) $('ribbon').style.display='flex';
+      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    },50);
+  }
+
+  function wire(){
+    /* Always start clean. */
+    dashboard();
+
+    /* Main menu cards. */
+    document.addEventListener('click',e=>{
+      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      studio(tile.dataset.studio);
+    },true);
+
+    /* Upload File card. */
+    const dashUpload=$('dashboardUploadFileTile');
+    const input=$('universalFileInput');
+    if(dashUpload && input){
+      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Upload button inside any Studio. */
+    const studioUpload=$('studioUploadFileBtn');
+    if(studioUpload && input){
+      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Back to Main Menu. */
+    $('backToMainMenu')?.addEventListener('click',e=>{
+      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
+    },true);
+
+    /* Route uploaded file. */
+    input?.addEventListener('change',()=>{
+      const file=input.files?.[0];
+      if(!file) return;
+      const ext=(file.name.split('.').pop()||'').toLowerCase();
+      let target='convert';
+      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
+      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
+      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
+      studio(target);
+
+      /* Feed PDF/image files into the existing PDF input. */
+      if(target==='pdf'){
+        try{
+          const dt=new DataTransfer(); dt.items.add(file);
+          const pdfInput=$('fileInput');
+          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
+        }catch(e){console.warn(e);}
+      }
+      input.value='';
+    },true);
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
@@ -7385,7 +7850,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 </script>
 
 <script>
-/* ===== DocuForge AI v2026.08.16.24 — navigation safety controller ===== */
+/* ===== DocuForge AI v2026.08.16.25 — navigation safety controller ===== */
 (function(){
   function q(id){ return document.getElementById(id); }
   function studioPanels(){
@@ -7473,7 +7938,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* ===== v2026.08.16.24 — Dashboard upload + Studio visibility controller ===== */
+/* ===== v2026.08.16.25 — Dashboard upload + Studio visibility controller ===== */
 (function(){
   function q(id){return document.getElementById(id);}
   function allStudioPages(){
@@ -7556,6 +8021,114 @@ $('dashboardAskTile')?.addEventListener('click', () => {
       }
     });
     observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.16.25 — single navigation controller ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  function hideStudioPanels(){
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
+      p.style.display='none';
+      p.classList.remove('active');
+    });
+    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+  }
+  function dashboard(){
+    document.body.classList.add('dashboard-active');
+    hideStudioPanels();
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
+      .forEach(id=>{if($(id)) $(id).style.display='none';});
+    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
+    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
+  }
+  function studio(name){
+    document.body.classList.remove('dashboard-active');
+    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
+    if($('studioTabs')) $('studioTabs').style.display='none';
+    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    if($('ribbon')) $('ribbon').style.display='flex';
+    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
+
+    hideStudioPanels();
+    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    if(panel){
+      panel.style.display='flex';
+      panel.classList.add('active');
+    }
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(name);
+    }catch(e){console.warn('Existing studio loader:',e);}
+    // Re-assert our navigation after the legacy loader runs.
+    setTimeout(()=>{
+      if($('studioTabs')) $('studioTabs').style.display='none';
+      if($('ribbon')) $('ribbon').style.display='flex';
+      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    },50);
+  }
+
+  function wire(){
+    /* Always start clean. */
+    dashboard();
+
+    /* Main menu cards. */
+    document.addEventListener('click',e=>{
+      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      studio(tile.dataset.studio);
+    },true);
+
+    /* Upload File card. */
+    const dashUpload=$('dashboardUploadFileTile');
+    const input=$('universalFileInput');
+    if(dashUpload && input){
+      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Upload button inside any Studio. */
+    const studioUpload=$('studioUploadFileBtn');
+    if(studioUpload && input){
+      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Back to Main Menu. */
+    $('backToMainMenu')?.addEventListener('click',e=>{
+      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
+    },true);
+
+    /* Route uploaded file. */
+    input?.addEventListener('change',()=>{
+      const file=input.files?.[0];
+      if(!file) return;
+      const ext=(file.name.split('.').pop()||'').toLowerCase();
+      let target='convert';
+      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
+      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
+      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
+      studio(target);
+
+      /* Feed PDF/image files into the existing PDF input. */
+      if(target==='pdf'){
+        try{
+          const dt=new DataTransfer(); dt.items.add(file);
+          const pdfInput=$('fileInput');
+          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
+        }catch(e){console.warn(e);}
+      }
+      input.value='';
+    },true);
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
