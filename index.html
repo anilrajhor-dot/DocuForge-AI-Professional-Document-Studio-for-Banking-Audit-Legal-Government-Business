@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="application-version" content="2026.08.12.7">
+<meta name="application-version" content="2026.08.12.8">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.12.7 usability refinements ===== */
+/* ===== v2026.08.12.8 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -484,7 +484,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.12.7';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.12.8';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -495,7 +495,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.7</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.12.8</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -561,7 +561,6 @@ body.dark .studio-tab.active{color:var(--pine);}
       <button class="studio-tab" data-studio="ai"><span class="st-icon">🤖</span> AI Studio</button>
       <button class="studio-tab" data-studio="website"><span class="st-icon">🌐</span> Website Studio</button>
       <button class="studio-tab" data-studio="spreadsheet"><span class="st-icon">📊</span> Spreadsheet Studio</button>
-      <button class="studio-tab" data-studio="interest"><span class="st-icon">🏦</span> Interest Calculator</button>
       <button class="studio-tab" data-studio="security"><span class="st-icon">🔐</span> Security Studio</button>
       <button class="studio-tab" data-studio="batch"><span class="st-icon">📂</span> Batch Studio</button>
       <button class="studio-tab" data-studio="help"><span class="st-icon">❓</span> Help</button>
@@ -698,12 +697,6 @@ body.dark .studio-tab.active{color:var(--pine);}
 <button class="tool-btn" id="btnMilestoneTracker"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"></path></svg> Project milestone tracker…</button>
 </div>
 </div>
-      <div class="ribbon-panel" data-studio-panel="interest">
-<div class="tool-group">
-<button class="tool-btn" id="btnInterestCalc"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg> Bank interest calculator…</button>
-<p class="hint" style="padding:0 14px;margin:6px 0 0;">Calculates interest month by month, from the 1st through the last day of each calendar month inclusive, on the daily closing balance carried forward from your statement's transactions — the standard convention for savings-account interest.</p>
-</div>
-</div>
       <div class="ribbon-panel" data-studio-panel="security">
 <div class="tool-group">
 <button class="tool-btn" id="btnSign"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 17c2-4 3-2 5-6s2 3 4-1 3 2 5-2M4 21h16"></path></svg> Sign PDF…</button>
@@ -812,9 +805,6 @@ body.dark .studio-tab.active{color:var(--pine);}
       <h3 style="margin-top:18px;font-size:14px;">📊 Spreadsheet Tools</h3>
       <p>Turn a spreadsheet into a chart, or digitize numbers out of a chart <em>image</em> (manual calibration — no software can reliably read an arbitrary chart automatically).</p>
 
-      <h3 style="margin-top:18px;font-size:14px;">🏦 Interest Calculator</h3>
-      <p>Upload a bank statement (PDF, Excel, or CSV), pick the date and balance columns, give it a rate — it calculates interest month by month, from the 1st through the last day of each calendar month inclusive, on the daily closing balance carried forward from your statement's transactions.</p>
-
       <h3 style="margin-top:18px;font-size:14px;">🔐 Security</h3>
       <p>Visual signature stamps, form fill &amp; flatten, and beta password protection (a less battle-tested library than the rest of the app — verify the output opens correctly). Cryptographic digital signatures aren't supported; that needs a certificate authority.</p>
 
@@ -831,7 +821,7 @@ body.dark .studio-tab.active{color:var(--pine);}
     <div id="aboutStudio" class="studio-page">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.12.7 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.12.8 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -1912,6 +1902,48 @@ function showCompareResult(diff, nameA, nameB){
 <style>body{font-family:ui-monospace,monospace;font-size:13px;margin:24px;} .added{background:#d7f5d7;} .removed{background:#f8d7d7;text-decoration:line-through;}</style>
 </head><body><h2>${esc(nameA)} vs ${esc(nameB)}</h2>${bodyHtml}</body></html>`;
       downloadBlob(new Blob([html], {type:'text/html'}), 'comparison.html');
+    });
+  }, 0);
+}
+
+/* ---------- Conversion output sharing ---------- */
+let lastConversionOutput = null;
+function conversionOutput(blob, filename, label){
+  lastConversionOutput = { blob, filename, label };
+  downloadBlob(blob, filename);
+  showConversionShare(label);
+}
+function showConversionShare(label){
+  const item = lastConversionOutput;
+  if(!item) return;
+  const safe = String(item.filename).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  openModal('Conversion complete', `
+    <div style="padding:4px 0 10px;"><strong>${label || 'File'} ready.</strong></div>
+    <div class="hint" style="margin-bottom:12px;">File: <strong>${safe}</strong></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button class="btn primary" id="convDownload" type="button">⬇️ Download</button>
+      <button class="btn primary" id="convShare" type="button">📤 Share via Email / WhatsApp</button>
+    </div>
+    <p class="hint" style="margin-top:12px;">On iPhone/iPad, Share opens the system share sheet so you can choose Mail or WhatsApp and, where supported, attach the converted file. On browsers that do not support file sharing, download the file and attach it manually.</p>
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+  setTimeout(() => {
+    $('convDownload')?.addEventListener('click', () => downloadBlob(item.blob, item.filename));
+    $('convShare')?.addEventListener('click', async () => {
+      try{
+        const file = new File([item.blob], item.filename, { type: item.blob.type || 'application/octet-stream' });
+        if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+          await navigator.share({ files:[file], title:item.label || 'DocuForge conversion', text:`${item.label || 'Converted file'} — ${item.filename}` });
+          return;
+        }
+        const subject = encodeURIComponent(`DocuForge: ${item.filename}`);
+        const body = encodeURIComponent(`I converted a file using DocuForge AI.\n\nFile: ${item.filename}\n\nPlease attach the downloaded file to this message.`);
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+      }catch(e){
+        if(e && e.name === 'AbortError') return;
+        toast('File sharing is not supported here. Download the file and attach it in Email or WhatsApp.', true);
+      }
     });
   }, 0);
 }
@@ -3827,7 +3859,9 @@ $('btnPdfToText').addEventListener('click', async () => {
     const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
     if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Try "Make this PDF searchable" (OCR) first.', true); return; }
     const text = pages.map(p => `--- Page ${p.pageIndex+1} ---\n` + groupIntoLines(p.items).map(lineToText).join('\n')).join('\n\n');
-    showTextResult('Extracted text', text, ($('outName').value || 'document') + '.txt');
+    const textName = ($('outName').value || 'document') + '.txt';
+    showTextResult('Extracted text', text, textName);
+    conversionOutput(new Blob([text], { type:'text/plain' }), textName, 'PDF → Text');
   } finally { showProgress(null); }
 });
 
@@ -3837,7 +3871,7 @@ $('btnPdfToCsv').addEventListener('click', async () => {
     const { rows, hasText } = await collectPdfRows();
     if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
     const csv = rows.map(r => r.map(toCsvValue).join(',')).join('\n');
-    downloadBlob(new Blob([csv], { type:'text/csv' }), ($('outName').value || 'document') + '.csv');
+    conversionOutput(new Blob([csv], { type:'text/csv' }), ($('outName').value || 'document') + '.csv', 'PDF → CSV');
     setStatus('Exported CSV.');
   } finally { showProgress(null); }
 });
@@ -3852,7 +3886,7 @@ $('btnPdfToExcel').addEventListener('click', async () => {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
     const out = XLSX.write(wb, { bookType:'xlsx', type:'array' });
-    downloadBlob(new Blob([out], { type:'application/octet-stream' }), ($('outName').value || 'document') + '.xlsx');
+    conversionOutput(new Blob([out], { type:'application/octet-stream' }), ($('outName').value || 'document') + '.xlsx', 'PDF → Excel');
     setStatus('Exported Excel file.'); logConversion('PDF → Excel', $('outName').value);
   } finally { showProgress(null); }
 });
@@ -3865,7 +3899,7 @@ $('btnPdfToWord').addEventListener('click', async () => {
     if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
     const pagesLines = pages.map(p => groupIntoLines(p.items).map(lineToText));
     const bytes = await buildDocxFromPages(pagesLines);
-    downloadBlob(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), ($('outName').value || 'document') + '.docx');
+    conversionOutput(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), ($('outName').value || 'document') + '.docx', 'PDF → Word');
     setStatus('Exported Word document.'); logConversion('PDF → Word', $('outName').value);
   } finally { showProgress(null); }
 });
@@ -3874,7 +3908,7 @@ $('btnPdfToHtml').addEventListener('click', async () => {
   setStatus('Building HTML…'); showProgress(20);
   try{
     const html = await buildPdfHtml();
-    downloadBlob(new Blob([html], { type:'text/html' }), ($('outName').value || 'document') + '.html');
+    conversionOutput(new Blob([html], { type:'text/html' }), ($('outName').value || 'document') + '.html', 'PDF → HTML');
     setStatus('Exported HTML.');
   } finally { showProgress(null); }
 });
@@ -3883,7 +3917,7 @@ $('btnPdfToJson').addEventListener('click', async () => {
   setStatus('Building JSON…'); showProgress(20);
   try{
     const json = await buildPdfJson();
-    downloadBlob(new Blob([json], { type:'application/json' }), ($('outName').value || 'document') + '.json');
+    conversionOutput(new Blob([json], { type:'application/json' }), ($('outName').value || 'document') + '.json', 'PDF → JSON');
     setStatus('Exported JSON.');
   } finally { showProgress(null); }
 });
@@ -3892,7 +3926,7 @@ $('btnPdfToXml').addEventListener('click', async () => {
   setStatus('Building XML…'); showProgress(20);
   try{
     const xml = await buildPdfXml();
-    downloadBlob(new Blob([xml], { type:'application/xml' }), ($('outName').value || 'document') + '.xml');
+    conversionOutput(new Blob([xml], { type:'application/xml' }), ($('outName').value || 'document') + '.xml', 'PDF → XML');
     setStatus('Exported XML.');
   } finally { showProgress(null); }
 });
@@ -3901,7 +3935,7 @@ $('btnPdfToSvg').addEventListener('click', async () => {
   setStatus('Rendering pages as SVG…'); showProgress(20);
   try{
     const blob = await convertPdfToSvgZip();
-    downloadBlob(blob, ($('outName').value || 'document') + '_svg.zip');
+    conversionOutput(blob, ($('outName').value || 'document') + '_svg.zip', 'PDF → SVG');
     setStatus('Exported SVG pages.');
   } finally { showProgress(null); }
 });
@@ -3913,7 +3947,7 @@ $('btnPdfToRtf').addEventListener('click', async () => {
     const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
     if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
     const rtf = await buildPdfRtf();
-    downloadBlob(new Blob([rtf], { type:'application/rtf' }), ($('outName').value || 'document') + '.rtf');
+    conversionOutput(new Blob([rtf], { type:'application/rtf' }), ($('outName').value || 'document') + '.rtf', 'PDF → RTF');
     setStatus('Exported RTF.');
   } finally { showProgress(null); }
 });
@@ -3925,7 +3959,7 @@ $('btnPdfToOdt').addEventListener('click', async () => {
     const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
     if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
     const bytes = await buildPdfOdt();
-    downloadBlob(new Blob([bytes], { type:'application/vnd.oasis.opendocument.text' }), ($('outName').value || 'document') + '.odt');
+    conversionOutput(new Blob([bytes], { type:'application/vnd.oasis.opendocument.text' }), ($('outName').value || 'document') + '.odt', 'PDF → ODT');
     setStatus('Exported ODT.');
   } finally { showProgress(null); }
 });
@@ -3936,7 +3970,7 @@ $('btnPdfToOds').addEventListener('click', async () => {
     const { hasText } = await collectPdfRows();
     if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
     const bytes = await buildPdfOds();
-    downloadBlob(new Blob([bytes], { type:'application/vnd.oasis.opendocument.spreadsheet' }), ($('outName').value || 'document') + '.ods');
+    conversionOutput(new Blob([bytes], { type:'application/vnd.oasis.opendocument.spreadsheet' }), ($('outName').value || 'document') + '.ods', 'PDF → ODS');
     setStatus('Exported ODS.');
   } finally { showProgress(null); }
 });
@@ -3948,7 +3982,7 @@ $('btnPdfToOdp').addEventListener('click', async () => {
     const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
     if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
     const bytes = await buildPdfOdp();
-    downloadBlob(new Blob([bytes], { type:'application/vnd.oasis.opendocument.presentation' }), ($('outName').value || 'document') + '.odp');
+    conversionOutput(new Blob([bytes], { type:'application/vnd.oasis.opendocument.presentation' }), ($('outName').value || 'document') + '.odp', 'PDF → ODP');
     setStatus('Exported ODP.');
   } finally { showProgress(null); }
 });
@@ -3960,7 +3994,7 @@ $('btnPdfToEpub').addEventListener('click', async () => {
     const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
     if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
     const bytes = await buildPdfEpub();
-    downloadBlob(new Blob([bytes], { type:'application/epub+zip' }), ($('outName').value || 'document') + '.epub');
+    conversionOutput(new Blob([bytes], { type:'application/epub+zip' }), ($('outName').value || 'document') + '.epub', 'PDF → EPUB');
     setStatus('Exported EPUB.');
   } finally { showProgress(null); }
 });
@@ -3978,7 +4012,7 @@ $('btnPdfToImages').addEventListener('click', () => {
     setStatus('Rendering pages as images…'); showProgress(20);
     try{
       const blob = await convertPdfToImagesZip(format, quality);
-      downloadBlob(blob, ($('outName').value || 'document') + '_images.zip');
+      conversionOutput(blob, ($('outName').value || 'document') + '_images.zip', 'PDF → Images');
       setStatus('Exported images.');
     } finally { showProgress(null); }
   });
@@ -4473,7 +4507,7 @@ $('btnPdfToPptx').addEventListener('click', async () => {
       return { title: lines[0] || `Page ${p.pageIndex+1}`, bullets: lines.slice(1) };
     });
     const bytes = await buildPptxFromSlides(slides);
-    downloadBlob(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' }), ($('outName').value || 'document') + '.pptx');
+    conversionOutput(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' }), ($('outName').value || 'document') + '.pptx', 'PDF → PowerPoint');
     setStatus('Exported PowerPoint file.'); logConversion('PDF → PowerPoint', $('outName').value);
   } catch(e){ console.error(e); toast('Could not build the PowerPoint file.', true); }
   finally { showProgress(null); }
@@ -5573,350 +5607,6 @@ function computeStats(data){
   return { n, sum, avg, min, max };
 }
 
-/* ---------- Bank interest calculator ----------
-   Simple interest on the daily closing balance between statement
-   entries: balance × rate × days ÷ 365 for each stretch, summed — the
-   standard way savings-account interest is computed in practice. Dates
-   and amounts from real bank statements come in all sorts of formats,
-   so both parsers are deliberately permissive rather than assuming one
-   fixed layout. */
-const MONTH_ABBR = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
-function parseFlexibleDate(str){
-  str = String(str || '').trim();
-  if(!str) return null;
-  let m = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
-  if(m) return new Date(+m[1], +m[2] - 1, +m[3]);
-  // DD-MMM-YYYY / DD MMM YYYY / DD-MMM-YY (very common in Indian bank statements)
-  m = str.match(/^(\d{1,2})[\s\-\/]([A-Za-z]{3,9})[\s\-\/](\d{2,4})/);
-  if(m){
-    const mon = MONTH_ABBR[m[2].slice(0,3).toLowerCase()];
-    if(mon !== undefined){
-      let y = m[3];
-      if(y.length === 2) y = (parseInt(y) > 50 ? '19' : '20') + y;
-      return new Date(+y, mon, parseInt(m[1]));
-    }
-  }
-  // MMM DD, YYYY / MMM DD YYYY
-  m = str.match(/^([A-Za-z]{3,9})[\s\-]?(\d{1,2}),?[\s\-](\d{2,4})/);
-  if(m){
-    const mon = MONTH_ABBR[m[1].slice(0,3).toLowerCase()];
-    if(mon !== undefined){
-      let y = m[3];
-      if(y.length === 2) y = (parseInt(y) > 50 ? '19' : '20') + y;
-      return new Date(+y, mon, parseInt(m[2]));
-    }
-  }
-  m = str.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
-  if(m){
-    let [, d, mo, y] = m;
-    if(y.length === 2) y = (parseInt(y) > 50 ? '19' : '20') + y;
-    const dNum = parseInt(d), moNum = parseInt(mo);
-    // if the first number can't be a month (>12), it's unambiguously DD/MM
-    return new Date(+y, moNum - 1, dNum);
-  }
-  const parsed = Date.parse(str);
-  return isNaN(parsed) ? null : new Date(parsed);
-}
-function parseFlexibleAmount(str){
-  if(typeof str === 'number') return str;
-  const s = String(str || '').trim();
-  if(!s) return null;
-  const negative = /^\(.*\)$/.test(s) || /-$/.test(s);
-  const cleaned = s.replace(/[^\d.]/g, '');
-  if(!cleaned) return null;
-  const v = parseFloat(cleaned);
-  return isNaN(v) ? null : (negative ? -v : v);
-}
-const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-function computeInterestFromStatement(rows, dateIdx, balanceIdx, annualRatePct){
-  const entries = rows.map(r => ({ date: parseFlexibleDate(r[dateIdx]), balance: parseFlexibleAmount(r[balanceIdx]) }))
-    .filter(e => e.date && e.balance !== null && !isNaN(e.date.getTime()));
-  entries.sort((a, b) => a.date - b.date);
-  if(!entries.length) return { totalInterest: 0, monthly: [], entries };
-
-  // Balance in effect on any given calendar day: the most recent entry on/before
-  // that day, or the first entry's balance for any day before the statement starts.
-  function balanceOn(day){
-    let bal = entries[0].balance;
-    for(const e of entries){
-      if(e.date <= day) bal = e.balance;
-      else break;
-    }
-    return bal;
-  }
-
-  const first = entries[0].date, last = entries[entries.length - 1].date;
-  const monthly = [];
-  let totalInterest = 0;
-  let cursor = new Date(first.getFullYear(), first.getMonth(), 1);
-  const endMonth = new Date(last.getFullYear(), last.getMonth(), 1);
-
-  while(cursor <= endMonth){
-    const year = cursor.getFullYear(), month = cursor.getMonth();
-    const monthStart = new Date(year, month, 1);
-    const monthEnd = new Date(year, month + 1, 0); // last day of month, inclusive
-    let monthInterest = 0, days = 0;
-    for(let d = new Date(monthStart); d <= monthEnd; d.setDate(d.getDate() + 1)){
-      monthInterest += balanceOn(d) * (annualRatePct / 100) / 365;
-      days++;
-    }
-    monthly.push({ year, month, monthStart, monthEnd, days, interest: monthInterest, closingBalance: balanceOn(monthEnd) });
-    totalInterest += monthInterest;
-    cursor = new Date(year, month + 1, 1);
-  }
-  return { totalInterest, monthly, entries };
-}
-function showInterestResult(result, rate){
-  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const rows = result.monthly.map(m => [`${MONTH_NAMES[m.month]} ${m.year}`, m.days, m.closingBalance.toFixed(2), m.interest.toFixed(2)]);
-  const preview = rows.map(r => `<tr>${r.map(c => `<td style="padding:4px 6px;border:1px solid var(--line);font-size:11.5px;white-space:nowrap;">${esc(String(c))}</td>`).join('')}</tr>`).join('');
-  openModal('Interest calculation', `
-    <div style="background:var(--surface-2);padding:12px;border-radius:4px;text-align:center;">
-      <div style="font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;">Total interest @ ${rate}% p.a.</div>
-      <div style="font-size:24px;font-weight:700;font-family:var(--font-mono);">${result.totalInterest.toFixed(2)}</div>
-    </div>
-    <div style="overflow:auto;max-height:300px;border:1px solid var(--line);border-radius:4px;">
-      <table style="border-collapse:collapse;width:100%;">
-        <tr><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Month</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Days</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Closing balance</th><th style="padding:4px 6px;border:1px solid var(--line);font-size:11px;">Interest</th></tr>
-        ${preview}
-      </table>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn ghost" id="intCsv" type="button">Download breakdown as CSV</button>
-      <button class="btn ghost" id="intXlsx" type="button">Download breakdown as Excel</button>
-    </div>
-    <p class="hint">Interest is calculated per calendar month, from the 1st through the last day of that month inclusive (e.g. a 31-day month counts all 31 days), on the daily closing balance carried forward from your statement's transactions. This is a calculation aid, not a substitute for your bank's own statement.</p>
-  `, async () => {});
-  $('modalConfirm').style.display = 'none';
-  $('modalCancel').textContent = 'Close';
-  setTimeout(() => {
-    const allRows = [['Month','Days','Closing balance','Interest'], ...rows, ['','','Total', result.totalInterest.toFixed(2)]];
-    document.getElementById('intCsv').addEventListener('click', () => {
-      downloadBlob(new Blob([allRows.map(r => r.map(toCsvValue).join(',')).join('\n')], {type:'text/csv'}), 'interest_breakdown.csv');
-    });
-    document.getElementById('intXlsx').addEventListener('click', async () => {
-      await loadLib('xlsx');
-      const ws = XLSX.utils.aoa_to_sheet(allRows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Interest');
-      downloadBlob(new Blob([XLSX.write(wb, { bookType:'xlsx', type:'array' })], {type:'application/octet-stream'}), 'interest_breakdown.xlsx');
-    });
-  }, 0);
-}
-async function buildChartPdf(dataUrl, title, s){
-  const doc = await PDFDocument.create();
-  const pngBytes = await (await fetch(dataUrl)).arrayBuffer();
-  const img = await doc.embedPng(pngBytes);
-  const pageWidth = 595.28, pageHeight = 841.89, margin = 40;
-  const page = doc.addPage([pageWidth, pageHeight]);
-  const font = await doc.embedFont(StandardFonts.Helvetica);
-  const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
-  let y = pageHeight - margin;
-  page.drawText(title, { x: margin, y, size: 16, font: fontBold, color: rgb(0.043,0.231,0.204) });
-  y -= 34;
-  const maxImgWidth = pageWidth - margin * 2;
-  const imgWidth = Math.min(maxImgWidth, img.width);
-  const imgHeight = imgWidth * (img.height / img.width);
-  page.drawImage(img, { x: margin, y: y - imgHeight, width: imgWidth, height: imgHeight });
-  y -= imgHeight + 24;
-  const statsLine = `Count: ${s.n}    Sum: ${s.sum.toFixed(2)}    Average: ${s.avg.toFixed(2)}    Min: ${s.min.toFixed(2)}    Max: ${s.max.toFixed(2)}`;
-  page.drawText(statsLine, { x: margin, y, size: 10, font, color: rgb(0.2,0.2,0.2) });
-  return await doc.save();
-}
-function showChartResult(labels, data, type, seriesLabel){
-  const s = computeStats(data);
-  const fmt = v => Number(v.toFixed(2)).toLocaleString();
-  openModal('Chart', `
-    <div style="background:#fff;padding:12px;border-radius:4px;position:relative;height:300px;"><canvas id="chartCanvas"></canvas></div>
-    <p class="hint" style="margin:0;">Tap any bar, point, or slice to see its exact value.</p>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;font-size:11.5px;text-align:center;">
-      <div><div class="mono" style="font-weight:600;font-size:13px;">${s.n}</div>Count</div>
-      <div><div class="mono" style="font-weight:600;font-size:13px;">${fmt(s.sum)}</div>Sum</div>
-      <div><div class="mono" style="font-weight:600;font-size:13px;">${fmt(s.avg)}</div>Average</div>
-      <div><div class="mono" style="font-weight:600;font-size:13px;">${fmt(s.min)}</div>Min</div>
-      <div><div class="mono" style="font-weight:600;font-size:13px;">${fmt(s.max)}</div>Max</div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn ghost" id="chartPng" type="button">Download chart as PNG</button>
-      <button class="btn ghost" id="chartPdf" type="button">Download chart as PDF</button>
-      <button class="btn ghost" id="chartCsv" type="button">Download data as CSV</button>
-      <button class="btn ghost" id="chartXlsx" type="button">Download data as Excel</button>
-    </div>
-  `, async () => {});
-  $('modalConfirm').style.display = 'none';
-  $('modalCancel').textContent = 'Close';
-  setTimeout(async () => {
-    try{
-      await loadLib('chartjs');
-      if(Chart.registerables){ try{ Chart.register(...Chart.registerables); } catch(e){} }
-      const canvasEl = document.getElementById('chartCanvas');
-      const existing = Chart.getChart ? Chart.getChart(canvasEl) : null;
-      if(existing) existing.destroy();
-      const ctx = canvasEl.getContext('2d');
-      const palette = ['#B65C1F','#113B34','#4B5750','#A3341E','#1B4F45','#C7B08A','#7A8B84','#D97757','#5F9E8A','#E08A45'];
-      const multiSlice = ['pie','doughnut','polarArea','radar'].includes(type);
-      const chartJsType = type === 'hbar' ? 'bar' : type === 'area' ? 'line' : type;
-      new Chart(ctx, {
-        type: chartJsType,
-        data: { labels, datasets: [{
-          label: seriesLabel, data,
-          backgroundColor: multiSlice ? labels.map((_,i) => palette[i % palette.length]) : (type === 'area' ? 'rgba(182,92,31,0.25)' : '#B65C1F'),
-          borderColor: type === 'radar' ? '#B65C1F' : '#113B34',
-          borderWidth: (type === 'line' || type === 'area') ? 2 : 1,
-          fill: type === 'area',
-        }] },
-        options: {
-          indexAxis: type === 'hbar' ? 'y' : 'x',
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: multiSlice },
-            tooltip: {
-              enabled: true,
-              callbacks: { label: (item) => `${item.label}: ${item.formattedValue}` },
-            },
-          },
-          interaction: { mode: 'nearest', intersect: true },
-        },
-      });
-    } catch(e){
-      console.error('Chart render failed:', e);
-      toast('Could not render the chart: ' + (e && e.message ? e.message : 'unknown error'), true);
-    }
-    document.getElementById('chartPng').addEventListener('click', () => {
-      downloadBlob(dataUrlToBlob(document.getElementById('chartCanvas').toDataURL('image/png')), 'chart.png');
-    });
-    document.getElementById('chartPdf').addEventListener('click', async () => {
-      const dataUrl = document.getElementById('chartCanvas').toDataURL('image/png');
-      const bytes = await buildChartPdf(dataUrl, seriesLabel || 'Chart', s);
-      downloadBlob(new Blob([bytes], { type:'application/pdf' }), 'chart.pdf');
-    });
-    document.getElementById('chartCsv').addEventListener('click', () => {
-      const rows = [[  'Label', seriesLabel || 'Value' ], ...labels.map((l,i) => [l, data[i]])];
-      downloadBlob(new Blob([rows.map(r => r.map(toCsvValue).join(',')).join('\n')], {type:'text/csv'}), 'chart_data.csv');
-    });
-    document.getElementById('chartXlsx').addEventListener('click', async () => {
-      await loadLib('xlsx');
-      const rows = [[  'Label', seriesLabel || 'Value' ], ...labels.map((l,i) => [l, data[i]])];
-      const ws = XLSX.utils.aoa_to_sheet(rows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Chart data');
-      downloadBlob(new Blob([XLSX.write(wb, { bookType:'xlsx', type:'array' })], {type:'application/octet-stream'}), 'chart_data.xlsx');
-    });
-  }, 0);
-}
-function analyzeColumn(rows, colIdx){
-  const body = rows.slice(1);
-  const samples = [];
-  const numericVals = [];
-  let numericCount = 0, nonEmptyCount = 0, nonzeroCount = 0;
-  for(const r of body.slice(0, 60)){
-    const v = r[colIdx];
-    if(v === undefined || v === '') continue;
-    nonEmptyCount++;
-    if(samples.length < 3) samples.push(String(v));
-    const fv = parseFloat(v);
-    if(typeof v === 'number' || (v !== '' && !isNaN(fv) && isFinite(v))){
-      numericCount++;
-      numericVals.push(fv);
-      if(fv !== 0) nonzeroCount++;
-    }
-  }
-  const pctNumeric = nonEmptyCount ? Math.round((numericCount / nonEmptyCount) * 100) : 0;
-  const pctNonzero = nonEmptyCount ? Math.round((nonzeroCount / nonEmptyCount) * 100) : 0;
-  let isSequential = false;
-  if(numericVals.length > 5){
-    const diffs = [];
-    for(let i = 1; i < numericVals.length; i++) diffs.push(numericVals[i] - numericVals[i-1]);
-    const avgDiff = diffs.reduce((a,b) => a+b, 0) / diffs.length;
-    const constSteps = diffs.filter(d => Math.abs(d - avgDiff) < 0.01).length;
-    isSequential = (constSteps / diffs.length) > 0.9 && avgDiff !== 0;
-  }
-  return { samples, pctNumeric, pctNonzero, isSequential };
-}
-$('btnExcelChart').addEventListener('click', () => {
-  openModal('Excel / CSV → Chart', `
-    <div class="field"><label>Spreadsheet file</label><input type="file" id="chartFile" accept=".xlsx,.xls,.csv"></div>
-    <div id="chartColumnsArea"></div>
-    <p class="hint">Uses the first sheet. Columns marked 🔢 look numeric and useful; ⚠️ marks a row-number-style column — a poor choice for either axis. Sample values are shown so you can tell columns apart before picking.</p>
-  `, async () => {
-    const rows = window.__chartRows;
-    if(!rows){ toast('Choose a spreadsheet file first.', true); return; }
-    const xIdx = parseInt(document.getElementById('chartX').value);
-    const yIdx = parseInt(document.getElementById('chartY').value);
-    let type = document.getElementById('chartType').value;
-    const body = rows.slice(1).filter(r => r[xIdx] !== undefined && r[xIdx] !== '');
-    const labels = body.map(r => String(r[xIdx]));
-    const rawData = body.map(r => { const v = parseFloat(r[yIdx]); return isNaN(v) ? null : v; });
-    const validCount = rawData.filter(v => v !== null).length;
-    if(!labels.length){ toast('No data rows found.', true); return; }
-    const colInfo = window.__chartColInfo;
-    if(colInfo && colInfo[yIdx] && colInfo[yIdx].isSequential){
-      toast('That Y-axis column looks like a row number/ID (values just count upward) rather than real data — the chart will just be a straight ramp. Pick a column with actual varying values instead.', true);
-      return;
-    }
-    if(validCount === 0){
-      toast('That Y-axis column doesn\u2019t contain usable numbers for every row — pick a column marked 🔢 in the list instead.', true);
-      return;
-    }
-    if(validCount < labels.length * 0.5){
-      toast(`Only ${validCount} of ${labels.length} rows in that column have numbers — the rest will show as 0. Check you picked the right column.`, false);
-    }
-    const data = rawData.map(v => v === null ? 0 : v);
-    if(data.every(v => v === 0)){
-      toast('Every value in that column is 0 — this is almost certainly the wrong column. Check the sample values shown in the Y-axis dropdown and pick one with real numbers.', true);
-      return;
-    }
-    const pieLikeTypes = ['pie', 'doughnut', 'polarArea', 'radar'];
-    if(pieLikeTypes.includes(type) && labels.length > 20){
-      toast(`This chart type doesn\u2019t work with ${labels.length} categories — showing as a bar chart instead.`, false);
-      type = 'bar';
-    }
-    showChartResult(labels, data, type, String(rows[0][yIdx] ?? 'Value'));
-  });
-  setTimeout(() => {
-    document.getElementById('chartFile').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if(!file) return;
-      try{
-        await loadLib('xlsx');
-        const buf = await file.arrayBuffer();
-        const wb = XLSX.read(buf, { type:'array' });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:'' });
-        if(!rows.length){ toast('Could not read any data from that file.', true); return; }
-        window.__chartRows = rows;
-        const headers = rows[0];
-        const colInfo = headers.map((h, i) => analyzeColumn(rows, i));
-        window.__chartColInfo = colInfo;
-        // Y default: prefer numeric, non-sequential, high-nonzero-density columns
-        let bestYIdx = headers.length - 1, bestYScore = -Infinity;
-        colInfo.forEach((info, i) => {
-          const score = info.pctNumeric + info.pctNonzero - (info.isSequential ? 1000 : 0);
-          if(score > bestYScore){ bestYScore = score; bestYIdx = i; }
-        });
-        // X default: prefer the first clearly non-numeric (categorical) column
-        let bestXIdx = 0;
-        const catIdx = colInfo.findIndex(info => info.pctNumeric < 50);
-        if(catIdx >= 0) bestXIdx = catIdx;
-        const optLabel = (h, i) => {
-          const info = colInfo[i];
-          const marker = info.isSequential ? '\u26a0\ufe0f ' : (info.pctNumeric >= 70 ? '\ud83d\udd22 ' : '');
-          const sample = info.samples.length ? ` \u2014 e.g. ${info.samples.join(', ')}` : '';
-          return `${marker}${String(h)}${sample}`;
-        };
-        document.getElementById('chartColumnsArea').innerHTML = `
-          <div class="field row">
-            <div><label>X-axis (labels)</label><select id="chartX">${headers.map((h,i) => `<option value="${i}" ${i === bestXIdx ? 'selected' : ''}>${escapeXml(optLabel(h,i))}</option>`).join('')}</select></div>
-            <div><label>Y-axis (values)</label><select id="chartY">${headers.map((h,i) => `<option value="${i}" ${i === bestYIdx ? 'selected' : ''}>${escapeXml(optLabel(h,i))}</option>`).join('')}</select></div>
-          </div>
-          <div class="field"><label>Chart type</label><select id="chartType"><option value="bar">Bar (vertical)</option><option value="hbar">Bar (horizontal)</option><option value="line">Line</option><option value="area">Area (filled line)</option><option value="pie">Pie</option><option value="doughnut">Doughnut</option><option value="radar">Radar</option><option value="polarArea">Polar area</option></select></div>
-        `;
-      } catch(err){ console.error(err); toast('Could not read that spreadsheet.', true); }
-    });
-  }, 0);
-});
-
 /* ---------- Project milestone tracker ----------
    Distinct from the general Excel/CSV chart tool: each point here is a
    milestone with its own free-text note/reason (e.g. "delayed — vendor
@@ -6248,161 +5938,6 @@ $('btnChartDigitizer').addEventListener('click', () => {
   }, 0);
 });
 
-$('btnInterestCalc').addEventListener('click', () => {
-  window.__intPdfBuf = null; window.__intPdfPassword = null; window.__intGapThreshold = null;
-  window.__intRows = null; window.__intHeaderIdx = null;
-  openModal('Bank interest calculator', `
-    <div class="field"><label>Source</label>
-      <select id="intSource">
-        <option value="upload">Upload a file</option>
-        <option value="current" ${workingBytes ? '' : 'disabled'}>${workingBytes ? 'Use the PDF currently open in the editor' : 'Use the PDF currently open (none loaded)'}</option>
-      </select>
-    </div>
-    <div class="field" id="intUploadField"><label>Bank statement (PDF, Excel, or CSV)</label><input type="file" id="intFile" accept=".pdf,.xlsx,.xls,.csv"></div>
-    <div class="field" id="intPasswordField" style="display:none;"><label>PDF password</label><div style="display:flex;gap:8px;"><input type="password" id="intPassword" style="flex:1;"><button class="btn ghost" id="intPasswordRetry" type="button">Unlock</button></div></div>
-    <div id="intColumnsArea"></div>
-    <div class="field"><label>Annual interest rate (%)</label><input type="number" id="intRate" step="0.01" value="4"></div>
-    <p class="hint">Calculates interest month by month — from the 1st through the last day of each calendar month, inclusive — on the daily closing balance carried forward from your statement's transactions. Assumes the statement has a running balance column after each entry — most do.</p>
-  `, async () => {
-    const rows = window.__intRows;
-    if(!rows){ toast('Choose a statement first.', true); return; }
-    const dateIdx = parseInt(document.getElementById('intDateCol').value);
-    const balIdx = parseInt(document.getElementById('intBalCol').value);
-    const rate = parseFloat(document.getElementById('intRate').value);
-    if(isNaN(rate)){ toast('Enter a valid interest rate.', true); return; }
-    const headerIdx = window.__intHeaderIdx || 0;
-    const body = rows.slice(headerIdx + 1);
-    const result = computeInterestFromStatement(body, dateIdx, balIdx, rate);
-    if(!result.monthly.length){
-      const sampleDates = body.slice(0, 3).map(r => JSON.stringify(r[dateIdx])).join(', ');
-      const sampleBals = body.slice(0, 3).map(r => JSON.stringify(r[balIdx])).join(', ');
-      toast(`Could not compute — no rows had both a valid date and balance. Raw date values seen: ${sampleDates}. Raw balance values seen: ${sampleBals}. Check the column and header row choices.`, true);
-      return;
-    }
-    showInterestResult(result, rate);
-  });
-  setTimeout(() => {
-    async function loadStatementRows(buf, ext, password){
-      let rows;
-      if(ext === 'pdf'){
-        rows = await collectRowsFromPdfBytes(buf, password);
-      } else {
-        await loadLib('xlsx');
-        const wb = XLSX.read(buf, { type:'array' });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:'' });
-      }
-      return rows;
-    }
-    function detectHeaderRowIndex(rows){
-      // PDFs of bank statements often have letterhead/account-summary lines
-      // before the real table starts, and those lines extract as a single
-      // cell. Row 0 is rarely the real header — the row with the most
-      // columns usually is, so use that instead of blindly trusting row 0.
-      let bestIdx = 0, bestCount = (rows[0] || []).length;
-      const scanLimit = Math.min(rows.length, 30);
-      for(let i = 0; i < scanLimit; i++){
-        const len = (rows[i] || []).length;
-        if(len > bestCount){ bestCount = len; bestIdx = i; }
-      }
-      return bestIdx;
-    }
-    function renderColumnSelectors(rows, headerIdx){
-      window.__intHeaderIdx = headerIdx;
-      const headers = rows[headerIdx] || [];
-      const isPdf = !!window.__intPdfBuf;
-      document.getElementById('intColumnsArea').innerHTML = `
-        <div class="field"><label>Header row (auto-detected — change the number if the columns below look wrong)</label><input type="number" id="intHeaderRow" min="1" value="${headerIdx + 1}"></div>
-        ${isPdf ? `<div class="field"><label>Column sensitivity (increase if columns look merged together, like "Post Date Value" instead of separate "Post Date" and "Value")</label><div style="display:flex;gap:8px;"><input type="number" id="intGapThreshold" min="1" max="40" value="${window.__intGapThreshold || 9}" style="flex:1;"><button class="btn ghost" id="intReparse" type="button">Re-read PDF</button></div></div>` : ''}
-        <div class="field row">
-          <div><label>Date column</label><select id="intDateCol">${headers.map((h,i) => `<option value="${i}">${escapeXml(String(h))}</option>`).join('')}</select></div>
-          <div><label>Balance column</label><select id="intBalCol">${headers.map((h,i) => `<option value="${i}" ${i === headers.length-1 ? 'selected' : ''}>${escapeXml(String(h))}</option>`).join('')}</select></div>
-        </div>
-      `;
-      document.getElementById('intHeaderRow').addEventListener('change', (e) => {
-        const newIdx = Math.max(0, (parseInt(e.target.value) || 1) - 1);
-        if(newIdx >= rows.length){ toast('That row number is beyond the end of the file.', true); return; }
-        renderColumnSelectors(rows, newIdx);
-      });
-      if(isPdf){
-        document.getElementById('intReparse').addEventListener('click', async () => {
-          const gap = parseInt(document.getElementById('intGapThreshold').value) || 9;
-          window.__intGapThreshold = gap;
-          setStatus('Re-reading statement…'); showProgress(20);
-          try{
-            const newRows = await collectRowsFromPdfBytes(window.__intPdfBuf, window.__intPdfPassword, gap);
-            if(!newRows.length){ toast('Could not read any data at this sensitivity.', true); return; }
-            window.__intRows = newRows;
-            renderColumnSelectors(newRows, detectHeaderRowIndex(newRows));
-            toast('Re-read with new column sensitivity.');
-          } catch(err){ console.error(err); toast('Could not re-read the PDF.', true); }
-          finally { showProgress(null); setStatus('Ready.'); }
-        });
-      }
-    }
-    function populateColumnPickers(rows){
-      window.__intRows = rows;
-      renderColumnSelectors(rows, detectHeaderRowIndex(rows));
-    }
-    document.getElementById('intSource').addEventListener('change', async (e) => {
-      document.getElementById('intUploadField').style.display = e.target.value === 'upload' ? 'block' : 'none';
-      document.getElementById('intPasswordField').style.display = 'none';
-      if(e.target.value === 'current'){
-        if(!workingBytes){ toast('No PDF is currently open.', true); return; }
-        setStatus('Reading current PDF…'); showProgress(20);
-        try{
-          window.__intPdfBuf = workingBytes; window.__intPdfPassword = null;
-          const rows = await collectRowsFromPdfBytes(workingBytes);
-          if(!rows.length){ toast('Could not read any data from the current PDF.', true); return; }
-          populateColumnPickers(rows);
-        } catch(err){ console.error(err); toast('Could not read the current PDF.', true); }
-        finally { showProgress(null); setStatus('Ready.'); }
-      }
-    });
-    document.getElementById('intFile').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if(!file) return;
-      setStatus('Reading statement…'); showProgress(20);
-      const ext = (file.name.split('.').pop() || '').toLowerCase();
-      try{
-        const buf = ext === 'pdf' ? new Uint8Array(await file.arrayBuffer()) : await file.arrayBuffer();
-        if(ext === 'pdf'){ window.__intPdfBuf = buf; window.__intPdfPassword = null; } else { window.__intPdfBuf = null; }
-        const rows = await loadStatementRows(buf, ext, null);
-        if(!rows.length){ toast('Could not read any data from that file.', true); return; }
-        document.getElementById('intPasswordField').style.display = 'none';
-        populateColumnPickers(rows);
-      } catch(err){
-        console.error('Initial statement read failed:', err);
-        if(ext === 'pdf'){
-          document.getElementById('intPasswordField').style.display = 'block';
-          document.getElementById('intPassword').value = '';
-          document.getElementById('intPassword').focus();
-          toast('Could not open this PDF without a password. If it\u2019s password-protected, enter the password below and tap Unlock.', true);
-          const retryHandler = async () => {
-            const password = document.getElementById('intPassword').value;
-            if(!password){ toast('Enter the password first.', true); return; }
-            setStatus('Unlocking statement…'); showProgress(20);
-            try{
-              const buf2 = new Uint8Array(await file.arrayBuffer());
-              window.__intPdfBuf = buf2; window.__intPdfPassword = password;
-              const rows2 = await collectRowsFromPdfBytes(buf2, password);
-              if(!rows2.length){ toast('Could not read any data from that file.', true); return; }
-              populateColumnPickers(rows2);
-              document.getElementById('intPasswordField').style.display = 'none';
-              toast('Statement unlocked and read.');
-            } catch(err2){
-              console.error('Password retry failed:', err2);
-              toast('Could not open with that password \u2014 double-check it and try again.', true);
-            } finally { showProgress(null); setStatus('Ready.'); }
-          };
-          document.getElementById('intPasswordRetry').onclick = retryHandler;
-        } else {
-          toast('Could not read that file.', true);
-        }
-      } finally { showProgress(null); setStatus('Ready.'); }
-    });
-  }, 0);
-});
 
 /* ---------- Settings ---------- */
 $('btnClearAiKey').addEventListener('click', () => {
@@ -6443,7 +5978,6 @@ const HELP_FAQ = [
   { q: ['crop'], a: 'PDF Studio → Arrange → "Crop pages…" — trims the visible area without deleting content, so it\u2019s reversible with Undo.' },
   { q: ['blank page'], a: 'PDF Studio → Arrange → "Remove blank pages…" checks actual page pixels, so it works on scanned blank pages too, not just text-empty ones.' },
   { q: ['bates'], a: 'PDF Studio → Enhance → "Bates numbering…" — a prefix plus sequential zero-padded numbers across every page.' },
-  { q: ['interest','bank statement'], a: 'Interest Calculator (its own tab) reads a statement (PDF, Excel, or CSV) and calculates interest month by month, from the 1st through the last day of each calendar month inclusive, using the daily closing balance and the rate you give it.' },
   { q: ['digitize','chart image','extract chart'], a: 'Spreadsheet Studio → "Digitize chart image…" — calibrate two known axis points, then click each data point; no software can read an arbitrary chart automatically.' },
   { q: ['website','generate site'], a: 'Website Studio → "Generate a website…" — describe your site, get a complete single-file HTML site to preview, download, and deploy the same way as this app.' },
   { q: ['powerpoint','pptx','ppt','slide'], a: 'PowerPoint Studio: convert PDF ⇄ PowerPoint, edit slide titles/bullets directly, add or delete slides, merge several .pptx files, split one into parts, or drag to reorder slides. All structural — titles and bullets carry over, original design doesn\u2019t.' },
@@ -6476,7 +6010,7 @@ async function fhHandleQuestion(question){
   if(savedKey){
     const thinking = fhAddMsg('bot', '…thinking…');
     try{
-      const prompt = `You are a help assistant for "DocuForge AI," a browser-based PDF/document toolkit with these tools organized into Studios: PDF (merge/split/rotate/crop/watermark/page numbers/Bates numbering/headers-footers/forms/compress/blank-page removal/metadata), OCR & Images (searchable PDFs, text/table extraction from images, images-to-PDF, QR reading), Translation (38 languages), Conversion (PDF to/from Word, Excel, PowerPoint, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB, images), AI (summarize/rewrite/chat with PDF/meeting minutes/contract review/website generation, using the user's own API key), Spreadsheet (Excel/CSV to chart, chart digitizer, bank interest calculator), Security (visual signature stamps, form fill/flatten, beta password protection), Batch processing, and a Reader for PDF/EPUB. Everything runs in the browser except Translate and AI features, which send only chosen text (never files) to external providers. Answer the following question about how to use the app, concisely, in 2-3 sentences:\n\n${question}`;
+      const prompt = `You are a help assistant for "DocuForge AI," a browser-based PDF/document toolkit with these tools organized into Studios: PDF (merge/split/rotate/crop/watermark/page numbers/Bates numbering/headers-footers/forms/compress/blank-page removal/metadata), OCR & Images (searchable PDFs, text/table extraction from images, images-to-PDF, QR reading), Translation (38 languages), Conversion (PDF to/from Word, Excel, PowerPoint, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB, images), AI (summarize/rewrite/chat with PDF/meeting minutes/contract review/website generation, using the user's own API key), Spreadsheet (Excel/CSV to chart, chart digitizer), Security (visual signature stamps, form fill/flatten, beta password protection), Batch processing, and a Reader for PDF/EPUB. Everything runs in the browser except Translate and AI features, which send only chosen text (never files) to external providers. Answer the following question about how to use the app, concisely, in 2-3 sentences:\n\n${question}`;
       const answer = await callAI(savedProvider, savedKey, '', prompt, 400);
       thinking.textContent = answer;
     } catch(e){ thinking.textContent = "I couldn't get an answer just now. Try the Help tab for a full guide, or check your AI API key in AI Studio."; }
