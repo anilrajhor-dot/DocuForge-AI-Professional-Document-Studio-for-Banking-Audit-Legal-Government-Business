@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.30 usability refinements ===== */
+/* ===== v2026.08.16.31 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.30 PDF workflow ===== */
+/* ===== v2026.08.16.31 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.30 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.31 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.30 dashboard cleanup ===== */
+/* ===== v2026.08.16.31 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.16.30: clean Dashboard ===== */
+/* ===== v2026.08.16.31: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.16.30: Dashboard is a true main menu ===== */
+/* ===== v2026.08.16.31: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.16.30: hard dashboard/studio separation ===== */
+/* ===== v2026.08.16.31: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.16.30: Dashboard upload entry ===== */
+/* ===== v2026.08.16.31: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.16.30 — one navigation system only ===== */
+/* ===== v2026.08.16.31 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.16.30';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.16.31';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.30</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.31</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -3463,7 +3463,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.16.30 — single main menu; file requested by operation */
+/* v2026.08.16.31 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3471,6 +3471,98 @@ body.dashboard-active #pageActionStrip,
 body.dashboard-active #dropzone,
 body.dashboard-active #grid,
 body.dashboard-active #noPdfBanner{display:none !important;}
+
+
+/* ===== v2026.08.16.31 — Studio submenu layout ===== */
+
+/* Dashboard contains ONLY the main menu. */
+body.dashboard-active #studioTabs,
+body.dashboard-active #ribbon,
+body.dashboard-active #toolbar,
+body.dashboard-active #pageActionStrip,
+body.dashboard-active #dropzone,
+body.dashboard-active #grid,
+body.dashboard-active #noPdfBanner{
+  display:none !important;
+}
+
+/* When a Studio is selected, its submenu is a normal vertical section,
+   not a horizontally scrolling ribbon. */
+body:not(.dashboard-active) #studioTabs{display:none !important;}
+body:not(.dashboard-active) #ribbon{
+  display:block !important;
+  width:100%;
+  overflow:visible !important;
+  padding:0 !important;
+  background:var(--surface-2);
+}
+
+/* Keep Undo / Redo / Reset as a compact top row. */
+body:not(.dashboard-active) #ribbon .ribbon-quick{
+  width:100%;
+  max-width:none;
+  display:flex !important;
+  flex-wrap:wrap;
+  justify-content:space-around;
+  align-items:center;
+  padding:12px 8px;
+  border-right:0;
+  border-bottom:1px solid var(--line);
+}
+
+/* Actual Studio submenu fills the screen width. */
+body:not(.dashboard-active) #ribbon .ribbon-panel.active{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  width:100%;
+  padding:14px 12px 22px;
+  align-items:stretch;
+  overflow:visible !important;
+}
+
+/* Tool groups become clear submenu sections. */
+body:not(.dashboard-active) #ribbon .ribbon-panel.active .tool-group{
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  width:100%;
+  max-width:none;
+  padding:0;
+  border:0;
+}
+
+/* Section heading spans the whole submenu. */
+body:not(.dashboard-active) #ribbon .ribbon-panel.active .tool-group h2{
+  grid-column:1 / -1;
+  order:-1;
+  width:100%;
+  font-size:12px;
+  text-align:left;
+  padding:8px 4px 3px;
+  margin:0;
+}
+
+/* Each tool is a proper tappable submenu item. */
+body:not(.dashboard-active) #ribbon .ribbon-panel.active .tool-btn{
+  width:100%;
+  min-height:72px;
+  padding:10px 7px;
+  font-size:12px;
+  line-height:1.2;
+  white-space:normal;
+}
+
+/* Avoid the blank PDF work area before a file is selected. */
+body:not(.dashboard-active) #dropzone,
+body:not(.dashboard-active) #noPdfBanner,
+body:not(.dashboard-active) #grid{
+  display:none !important;
+}
+
+/* Do not show the old horizontal navigation anywhere. */
+#studioTabs{display:none !important;}
 
 </style>
 </head><body><h1>${title}</h1>${body}
@@ -6715,139 +6807,78 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* ===== DocuForge AI v2026.08.16.30 — task-first file selection ===== */
+/* ===== DocuForge AI v2026.08.16.31 — visible Studio submenus ===== */
 (function(){
   const $=id=>document.getElementById(id);
 
-  function hideLegacyMenus(){
-    const ids=['studioTabs','studioUploadFileBtn','dashboardUploadFileTile'];
-    ids.forEach(id=>{const el=$(id); if(el) el.style.display='none';});
+  function hideLegacy(){
+    ['studioTabs','studioUploadFileBtn','dashboardUploadFileTile'].forEach(id=>{
+      const el=$(id); if(el) el.style.display='none';
+    });
+  }
+
+  function activatePanel(name){
+    const panels=document.querySelectorAll('.ribbon-panel[data-studio-panel]');
+    panels.forEach(p=>{
+      const active=p.dataset.studioPanel===name;
+      p.classList.toggle('active',active);
+      p.style.display=active?'grid':'none';
+    });
+    const ribbon=$('ribbon');
+    if(ribbon) ribbon.style.display='block';
+    hideLegacy();
   }
 
   function showDashboard(){
     document.body.classList.add('dashboard-active');
-    hideLegacyMenus();
-    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
-      p.style.display='none';
-      p.classList.remove('active');
-    });
+    try{ if(typeof window.setStudio==='function') window.setStudio('dashboard'); }catch(e){}
     ['ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','backToMainMenu']
       .forEach(id=>{const el=$(id); if(el) el.style.display='none';});
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
+      p.classList.remove('active'); p.style.display='none';
+    });
     if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
     if($('dashboardRecent')) $('dashboardRecent').style.display='block';
     if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
     if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu to begin.';
+    hideLegacy();
   }
 
   function showStudio(name){
     document.body.classList.remove('dashboard-active');
+
     if($('dashboardTiles')) $('dashboardTiles').style.display='none';
     if($('dashboardRecent')) $('dashboardRecent').style.display='none';
     if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
-    hideLegacyMenus();
-    if($('ribbon')) $('ribbon').style.display='flex';
     if($('backToMainMenu')) $('backToMainMenu').style.display='block';
 
-    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
-      p.style.display='none';
-      p.classList.remove('active');
-    });
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(name);
-    }catch(e){ console.warn('Studio loader:',e); }
+    try{ if(typeof window.setStudio==='function') window.setStudio(name); }catch(e){ console.warn(e); }
 
-    setTimeout(()=>{
-      hideLegacyMenus();
-      if($('ribbon')) $('ribbon').style.display='flex';
-      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
-    },100);
-  }
+    /* Force the selected submenu to be visible below the quick controls. */
+    activatePanel(name);
 
-  /*
-   * These operations work on the currently open PDF. If there is no PDF,
-   * selecting the operation first asks for the file. This is the requested
-   * flow: Dashboard → Studio → operation → file → result.
-   */
-  const pdfNeedsDocument = new Set([
-    'btnSplit','btnCompress','btnExtract','btnDeleteSel','btnCrop',
-    'btnRemoveBlank','btnRotateSel','btnReverseOrder','btnCompare',
-    'btnWatermark','btnPageNumbers','btnBates','btnHeaderFooter',
-    'btnMetadata','btnPdfToWord','btnPdfToExcel','btnPdfToCsv',
-    'btnPdfToText','btnPdfToHtml','btnPdfToJson','btnPdfToXml',
-    'btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds',
-    'btnPdfToOdp','btnPdfToEpub','btnPdfToPptx','btnTranslatePdf',
-    'btnAiSummarize','btnAiRewrite','btnAiExplain','btnAiExtractTables',
-    'btnAiGenQuestions','btnAiDraftEmail','btnAiChatPdf','btnAiMore',
-    'btnAnalyze','btnDuplicateDetect','btnVoiceText','btnReadAloud'
-  ]);
-
-  function pdfPickerAccept(id){
-    return id==='btnCompare' ? 'application/pdf' : 'application/pdf,image/*';
-  }
-
-  let pendingButton=null;
-  let pickerBusy=false;
-
-  function requestFileForButton(button){
-    if(pickerBusy) return;
-    pendingButton=button;
-    const input=$('universalFileInput');
-    if(!input) return;
-
-    input.accept=pdfPickerAccept(button.id);
-    input.multiple = button.id==='btnCompare' ? true : false;
-    pickerBusy=true;
-    input.click();
-  }
-
-  function loadSelectedFile(fileList, button){
-    const files=Array.from(fileList||[]);
-    if(!files.length) { pickerBusy=false; pendingButton=null; return; }
-
-    /* PDF workbench accepts PDF/images. For compare, multiple PDFs are useful. */
-    const input=$('fileInput');
-    if(!input){
-      pickerBusy=false; pendingButton=null; return;
-    }
-
-    try{
-      const dt=new DataTransfer();
-      files.forEach(f=>dt.items.add(f));
-      input.files=dt.files;
-      input.dispatchEvent(new Event('change',{bubbles:true}));
-    }catch(e){
-      console.warn('Could not pass selected file to PDF Studio:',e);
-      pickerBusy=false;
-      pendingButton=null;
-      return;
-    }
-
-    /* loadFiles is async; wait until the working PDF exists, then perform
-       the operation the user originally selected. */
-    let tries=0;
-    const wait=()=>{
-      tries++;
-      if(window.docuforgeHasPdf && window.docuforgeHasPdf()){
-        const b=pendingButton;
-        pickerBusy=false;
-        pendingButton=null;
-        if(b && document.contains(b)){
-          b.__docuforgeReplay=true;
-          b.click();
-          b.__docuforgeReplay=false;
-        }
-        return;
+    /* Special non-ribbon Studios are handled by the app's setStudio(). */
+    if(!document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]')){
+      const specialIds={
+        help:'helpStudio', settings:'settingsStudio', about:'aboutStudio',
+        reader:'readerStudio', export:'exportStudio',
+        excel:'excelStudio', gstinvoice:'gstInvoiceStudio'
+      };
+      const el=$(specialIds[name]);
+      if(el){
+        el.style.display = name==='export' ? 'block' : '';
+        el.classList.add('active');
       }
-      if(tries<120){ setTimeout(wait,150); }
-      else { pickerBusy=false; pendingButton=null; }
-    };
-    setTimeout(wait,150);
+    }
+
+    if($('statusMsg')) $('statusMsg').textContent='Choose a tool from the '+name+' Studio submenu.';
+    hideLegacy();
   }
 
   function wire(){
     showDashboard();
 
-    /* Main Dashboard is category-only. */
+    /* Main menu category tiles. */
     document.addEventListener('click',e=>{
       const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
       if(!tile) return;
@@ -6862,33 +6893,14 @@ $('dashboardAskTile')?.addEventListener('click', () => {
       showDashboard();
     },true);
 
-    /* File request occurs only after an actual operation is selected. */
-    document.addEventListener('click',e=>{
-      const button=e.target.closest('.ribbon-panel.active button.tool-btn');
-      if(!button || !pdfNeedsDocument.has(button.id)) return;
-      if(button.__docuforgeReplay) return;
-
-      /* If a working PDF already exists, allow the original tool to run. */
-      if(window.docuforgeHasPdf && window.docuforgeHasPdf()) return;
-
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      requestFileForButton(button);
-    },true);
-
-    const universal=$('universalFileInput');
-    universal?.addEventListener('change',()=>{
-      const files=universal.files;
-      loadSelectedFile(files,pendingButton);
-      universal.value='';
-    },true);
-
-    /* Hide any legacy duplicate navigation if another script restores it. */
+    /* Re-assert the selected submenu if another legacy handler changes it. */
     const observer=new MutationObserver(()=>{
-      hideLegacyMenus();
+      hideLegacy();
       if(document.body.classList.contains('dashboard-active')){
         if($('ribbon')) $('ribbon').style.display='none';
-        if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+      }else{
+        const active=document.querySelector('.ribbon-panel.active[data-studio-panel]');
+        if(active) active.style.display='grid';
       }
     });
     observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
