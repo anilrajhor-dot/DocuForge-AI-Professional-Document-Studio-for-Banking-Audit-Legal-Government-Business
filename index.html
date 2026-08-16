@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.31 usability refinements ===== */
+/* ===== v2026.08.16.32 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.31 PDF workflow ===== */
+/* ===== v2026.08.16.32 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.31 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.16.32 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.31 dashboard cleanup ===== */
+/* ===== v2026.08.16.32 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.16.31: clean Dashboard ===== */
+/* ===== v2026.08.16.32: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.16.31: Dashboard is a true main menu ===== */
+/* ===== v2026.08.16.32: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.16.31: hard dashboard/studio separation ===== */
+/* ===== v2026.08.16.32: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.16.31: Dashboard upload entry ===== */
+/* ===== v2026.08.16.32: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.16.31 — one navigation system only ===== */
+/* ===== v2026.08.16.32 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.16.31';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.16.32';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.31</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.32</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -783,6 +783,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
     </div>
 
     <button id="backToMainMenu" class="btn ghost" type="button">← Back to Main Menu</button>
+<div id="studioSubmenuHost" aria-live="polite"></div>
 <div class="ribbon" id="ribbon" style="display:none">
       <div class="ribbon-quick">
 <button class="tool-btn" id="btnUndo">Undo <kbd>Ctrl Z</kbd></button>
@@ -867,7 +868,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 
 <div class="tool-group conversion-reverse-group">
   <div class="tool-group-title">Other files → PDF</div>
-  <button class="tool-btn" id="btnFileToPdf" title="Convert Word, Excel, PowerPoint, HTML, CSV, TXT or Markdown to PDF">
+  <button class="tool-btn" id="btnFileToPdfPpt" title="Convert Word, Excel, PowerPoint, HTML, CSV, TXT or Markdown to PDF">
     📄 Convert Files → PDF
   </button>
   <div class="hint" style="margin-top:6px;">
@@ -1507,10 +1508,36 @@ async function loadPdfSafely(buf){
   try{
     return await PDFDocument.load(buf);
   } catch(e){
-    if(e && e.message && /encrypt/i.test(e.message)){
-      throw new Error('This PDF is password-protected. Use Security Studio → "Open password-protected PDF" first, then try again.');
+    if(e && e.message && /encrypt|password/i.test(e.message)){
+      throw new Error('This PDF is password-protected. Use Security Studio → Open password-protected PDF.');
     }
-    throw e;
+
+    /* Some legitimate PDFs use features pdf-lib cannot import. PDF.js can
+       render those pages reliably; rebuild a clean working PDF from the
+       rendered pages rather than falsely reporting "corrupted". */
+    try{
+      const src=await pdfjsLib.getDocument({data:buf.slice ? buf.slice() : new Uint8Array(buf)}).promise;
+      const rebuilt=await PDFDocument.create();
+      for(let i=1;i<=src.numPages;i++){
+        const page=await src.getPage(i);
+        const viewport=page.getViewport({scale:1.5});
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.ceil(viewport.width);
+        canvas.height=Math.ceil(viewport.height);
+        const ctx=canvas.getContext('2d',{willReadFrequently:true});
+        await page.render({canvasContext:ctx,viewport}).promise;
+        const png=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+        if(!png) throw new Error('Could not render PDF page.');
+        const img=await rebuilt.embedPng(await png.arrayBuffer());
+        const w=img.width*72/96, h=img.height*72/96;
+        const outPage=rebuilt.addPage([w,h]);
+        outPage.drawImage(img,{x:0,y:0,width:w,height:h});
+      }
+      return rebuilt;
+    }catch(fallbackErr){
+      console.error('PDF.js fallback failed:',fallbackErr);
+      throw e;
+    }
   }
 }
 window.docuforgeHasPdf = function(){ return !!workingBytes; };
@@ -3463,7 +3490,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.16.31 — single main menu; file requested by operation */
+/* v2026.08.16.32 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3473,7 +3500,7 @@ body.dashboard-active #grid,
 body.dashboard-active #noPdfBanner{display:none !important;}
 
 
-/* ===== v2026.08.16.31 — Studio submenu layout ===== */
+/* ===== v2026.08.16.32 — Studio submenu layout ===== */
 
 /* Dashboard contains ONLY the main menu. */
 body.dashboard-active #studioTabs,
@@ -3563,6 +3590,62 @@ body:not(.dashboard-active) #grid{
 
 /* Do not show the old horizontal navigation anywhere. */
 #studioTabs{display:none !important;}
+
+
+/* ===== v2026.08.16.32 — submenu host / mobile fixes ===== */
+#studioSubmenuHost{
+  width:100%;
+  display:block;
+  margin:0;
+}
+#studioSubmenuHost .ribbon-panel{
+  display:none !important;
+}
+#studioSubmenuHost .ribbon-panel.active{
+  display:grid !important;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  width:100%;
+  padding:14px 12px 24px;
+  background:var(--surface-2);
+}
+#studioSubmenuHost .tool-group{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  width:100%;
+  max-width:none;
+  padding:0;
+  border:0;
+}
+#studioSubmenuHost .tool-group h2{
+  grid-column:1/-1;
+  order:-1;
+  width:100%;
+  margin:4px 0;
+  padding:8px 4px 2px;
+  text-align:left;
+}
+#studioSubmenuHost .tool-btn{
+  width:100%;
+  min-height:72px;
+  padding:10px 7px;
+  white-space:normal;
+}
+#backToMainMenu{
+  background:var(--accent) !important;
+  color:var(--accent-ink) !important;
+  border:2px solid var(--accent) !important;
+  font-weight:800 !important;
+  box-shadow:0 3px 8px rgba(0,0,0,.15);
+}
+body.dashboard-active #studioSubmenuHost,
+body.dashboard-active #backToMainMenu{display:none !important;}
+@media(max-width:520px){
+  #studioSubmenuHost .tool-group{grid-template-columns:1fr 1fr;}
+  #studioSubmenuHost .tool-btn{font-size:12px;min-height:78px;}
+}
 
 </style>
 </head><body><h1>${title}</h1>${body}
@@ -4383,21 +4466,56 @@ $('btnMetadata').addEventListener('click', async () => {
 
 $('btnOcrImage').addEventListener('click', () => {
   openModal('Extract text from image', `
-    <div class="field"><label>Image file (JPG, PNG, WEBP, BMP…)</label><input type="file" id="ocrImgFile" accept="image/*"></div>
-    <div class="field"><label>Language</label>
-      ${ocrLangOptions('ocrImgLang')}
+    <div class="field">
+      <label>Select image</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button type="button" class="btn primary" id="ocrGalleryBtn">🖼️ Gallery / Photos</button>
+        <button type="button" class="btn ghost" id="ocrCameraBtn">📷 Camera</button>
+        <button type="button" class="btn ghost" id="ocrFilesBtn">📁 Files</button>
+      </div>
+      <input type="file" id="ocrImgGallery" accept="image/*" class="sr-only">
+      <input type="file" id="ocrImgCamera" accept="image/*" capture="environment" class="sr-only">
+      <input type="file" id="ocrImgFiles" accept=".jpg,.jpeg,.png,.webp,.bmp,.gif,image/*" class="sr-only">
+      <div id="ocrSelectedName" class="hint" style="margin-top:8px;">No image selected.</div>
     </div>
-    <p class="hint">Runs entirely in your browser. The first time you use a language, your browser downloads a small recognition model — no document or image content is ever sent anywhere.</p>
+    <div class="field"><label>Language</label>${ocrLangOptions('ocrImgLang')}</div>
+    <p class="hint">Choose an image from Photos/Gallery, take a new photo, or browse Files. OCR runs in your browser.</p>
   `, async () => {
-    const file = document.getElementById('ocrImgFile').files[0];
-    const lang = document.getElementById('ocrImgLang').value;
-    if(!file){ toast('Choose an image first.', true); return; }
-    const text = await runOcrOnImageFile(file, lang);
-    if(text !== null){
-      const fname = (file.name.replace(/\.[^.]+$/, '') || 'extracted') + '.txt';
-      showTextResult('Extracted text', text, fname, true);
+    const sources=['ocrImgGallery','ocrImgCamera','ocrImgFiles'];
+    let file=null;
+    for(const id of sources){
+      const f=document.getElementById(id)?.files?.[0];
+      if(f){file=f;break;}
     }
+    const lang=document.getElementById('ocrImgLang').value;
+    if(!file){toast('Choose an image first.',true);return;}
+    setStatus('Reading image…'); showProgress(10);
+    try{
+      const text=await runOcrOnImageFile(file,lang);
+      if(text!==null){
+        const fname=(file.name.replace(/\.[^.]+$/,'')||'extracted')+'.txt';
+        showTextResult('Extracted text',text,fname);
+      }
+    }catch(e){
+      console.error(e); toast('Could not extract text from that image.',true);
+    }finally{showProgress(null);}
   });
+
+  setTimeout(()=>{
+    const wire=(buttonId,inputId)=>{
+      document.getElementById(buttonId)?.addEventListener('click',()=>{
+        document.getElementById(inputId)?.click();
+      });
+      document.getElementById(inputId)?.addEventListener('change',e=>{
+        const f=e.target.files?.[0];
+        const n=document.getElementById('ocrSelectedName');
+        if(n) n.textContent=f ? 'Selected: '+f.name : 'No image selected.';
+      });
+    };
+    wire('ocrGalleryBtn','ocrImgGallery');
+    wire('ocrCameraBtn','ocrImgCamera');
+    wire('ocrFilesBtn','ocrImgFiles');
+  },0);
 });
 
 $('btnOcrPdf').addEventListener('click', () => {
@@ -5232,27 +5350,53 @@ $('btnEncrypt').addEventListener('click', () => {
 
 $('btnOpenEncrypted').addEventListener('click', () => {
   openModal('Open password-protected PDF', `
-    <p class="hint" style="margin:0;">Beta: uses the same community fork as "Set password" — less battle-tested than the rest of this app. Decrypts the file and loads it as a normal working copy; it won't stay password-protected here unless you re-apply "Set password" before exporting.</p>
-    <div class="field"><label>Password-protected PDF</label><input type="file" id="pwPdfFile" accept="application/pdf"></div>
-    <div class="field"><label>Password</label><input type="password" id="pwPdfPassword"></div>
+    <p class="hint" style="margin:0;">Enter the PDF password. The protected file is opened locally in your browser and converted to a normal working copy for editing/export.</p>
+    <div class="field"><label>PDF</label><input type="file" id="pwPdfFile" accept="application/pdf"></div>
+    <div class="field"><label>Password</label><input type="password" id="pwPdfPassword" autocomplete="off"></div>
   `, async () => {
-    const file = document.getElementById('pwPdfFile').files[0];
-    const password = document.getElementById('pwPdfPassword').value;
-    if(!file){ toast('Choose a file.', true); return; }
-    if(!password){ toast('Enter the password.', true); return; }
-    setStatus('Decrypting PDF…'); showProgress(20);
+    const file=document.getElementById('pwPdfFile')?.files?.[0];
+    const password=document.getElementById('pwPdfPassword')?.value || '';
+    if(!file){ toast('Choose a PDF first.',true); return; }
+    if(!password){ toast('Enter the PDF password.',true); return; }
+
+    setStatus('Opening password-protected PDF…'); showProgress(10);
     try{
-      const buf = new Uint8Array(await file.arrayBuffer());
-      const decryptedBytes = await decryptPdfBytes(buf, password);
-      $('outName').value = file.name.replace(/\.pdf$/i, '') || 'document';
-      currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+      const buf=new Uint8Array(await file.arrayBuffer());
+      const task=pdfjsLib.getDocument({data:buf,password});
+      const src=await task.promise;
+      const doc=await PDFDocument.create();
+
+      for(let i=1;i<=src.numPages;i++){
+        showProgress(10+Math.round(i/src.numPages*80));
+        const page=await src.getPage(i);
+        const viewport=page.getViewport({scale:1.5});
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.ceil(viewport.width);
+        canvas.height=Math.ceil(viewport.height);
+        const ctx=canvas.getContext('2d',{willReadFrequently:true});
+        await page.render({canvasContext:ctx,viewport}).promise;
+        const png=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+        if(!png) throw new Error('Could not render page '+i);
+        const img=await doc.embedPng(await png.arrayBuffer());
+        const w=img.width*72/96, h=img.height*72/96;
+        const outPage=doc.addPage([w,h]);
+        outPage.drawImage(img,{x:0,y:0,width:w,height:h});
+      }
+
+      const bytes=await doc.save();
+      $('outName').value=file.name.replace(/\.pdf$/i,'') || 'document';
+      currentProjectId='proj_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
       setToolsEnabled(true);
-      await commit(decryptedBytes, `Opened and decrypted "${file.name}".`);
+      await commit(bytes,`Opened password-protected "${file.name}".`);
       setStudio('pdf');
-    } catch(e){
+      toast('PDF opened successfully.',false);
+    }catch(e){
       console.error(e);
-      toast('Could not open that PDF — check the password is correct: ' + (e && e.message ? e.message : 'unknown error'), true);
-    } finally { showProgress(null); }
+      const msg=(e && e.name==='PasswordException')
+        ? 'Incorrect PDF password. Please check the password and try again.'
+        : 'Could not open this PDF. It may use an unsupported encryption method or be damaged.';
+      toast(msg,true);
+    }finally{ showProgress(null); }
   });
 });
 
@@ -6807,78 +6951,76 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* ===== DocuForge AI v2026.08.16.31 — visible Studio submenus ===== */
+/* ===== DocuForge AI v2026.08.16.32 — reliable Studio submenu host ===== */
 (function(){
   const $=id=>document.getElementById(id);
+  const host=()=>$('studioSubmenuHost');
 
-  function hideLegacy(){
-    ['studioTabs','studioUploadFileBtn','dashboardUploadFileTile'].forEach(id=>{
-      const el=$(id); if(el) el.style.display='none';
-    });
+  function allPanels(){
+    return Array.from(document.querySelectorAll('.ribbon-panel[data-studio-panel]'));
   }
 
-  function activatePanel(name){
-    const panels=document.querySelectorAll('.ribbon-panel[data-studio-panel]');
-    panels.forEach(p=>{
-      const active=p.dataset.studioPanel===name;
-      p.classList.toggle('active',active);
-      p.style.display=active?'grid':'none';
+  function hideAllPanels(){
+    allPanels().forEach(p=>{
+      p.classList.remove('active');
+      p.style.display='none';
     });
-    const ribbon=$('ribbon');
-    if(ribbon) ribbon.style.display='block';
-    hideLegacy();
+    const h=host();
+    if(h) h.innerHTML='';
   }
 
   function showDashboard(){
     document.body.classList.add('dashboard-active');
-    try{ if(typeof window.setStudio==='function') window.setStudio('dashboard'); }catch(e){}
-    ['ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','backToMainMenu']
-      .forEach(id=>{const el=$(id); if(el) el.style.display='none';});
-    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
-      p.classList.remove('active'); p.style.display='none';
+    hideAllPanels();
+    ['ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'].forEach(id=>{
+      const el=$(id); if(el) el.style.display='none';
     });
+    if($('backToMainMenu')) $('backToMainMenu').style.display='none';
     if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
     if($('dashboardRecent')) $('dashboardRecent').style.display='block';
     if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
     if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu to begin.';
-    hideLegacy();
   }
 
   function showStudio(name){
     document.body.classList.remove('dashboard-active');
-
     if($('dashboardTiles')) $('dashboardTiles').style.display='none';
     if($('dashboardRecent')) $('dashboardRecent').style.display='none';
     if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
-    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
 
     try{ if(typeof window.setStudio==='function') window.setStudio(name); }catch(e){ console.warn(e); }
 
-    /* Force the selected submenu to be visible below the quick controls. */
-    activatePanel(name);
+    const h=host();
+    hideAllPanels();
+    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
 
-    /* Special non-ribbon Studios are handled by the app's setStudio(). */
-    if(!document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]')){
-      const specialIds={
-        help:'helpStudio', settings:'settingsStudio', about:'aboutStudio',
-        reader:'readerStudio', export:'exportStudio',
-        excel:'excelStudio', gstinvoice:'gstInvoiceStudio'
-      };
-      const el=$(specialIds[name]);
-      if(el){
-        el.style.display = name==='export' ? 'block' : '';
-        el.classList.add('active');
-      }
+    if(panel && h){
+      /* Move the real panel, rather than cloning it, so every existing
+         event listener attached to its buttons remains intact. */
+      h.appendChild(panel);
+      panel.classList.add('active');
+      panel.style.display='grid';
     }
 
+    if($('backToMainMenu')){
+      $('backToMainMenu').style.display='block';
+      $('backToMainMenu').classList.add('primary');
+      $('backToMainMenu').style.cssText += ';display:block!important;width:calc(100% - 24px);margin:10px 12px;padding:14px 18px;background:var(--accent);color:var(--accent-ink);border:2px solid var(--accent);font-weight:800;font-size:17px;border-radius:12px;text-align:center;';
+    }
+
+    /* Hide the old ribbon container; the selected panel is now in our host. */
+    if($('ribbon')) $('ribbon').style.display='none';
+    ['toolbar','pageActionStrip','dropzone','grid','noPdfBanner'].forEach(id=>{
+      const el=$(id); if(el) el.style.display='none';
+    });
+
     if($('statusMsg')) $('statusMsg').textContent='Choose a tool from the '+name+' Studio submenu.';
-    hideLegacy();
+    h?.scrollIntoView({behavior:'smooth',block:'start'});
   }
 
   function wire(){
     showDashboard();
 
-    /* Main menu category tiles. */
     document.addEventListener('click',e=>{
       const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
       if(!tile) return;
@@ -6891,19 +7033,8 @@ $('dashboardAskTile')?.addEventListener('click', () => {
       e.preventDefault();
       e.stopImmediatePropagation();
       showDashboard();
+      window.scrollTo({top:0,behavior:'smooth'});
     },true);
-
-    /* Re-assert the selected submenu if another legacy handler changes it. */
-    const observer=new MutationObserver(()=>{
-      hideLegacy();
-      if(document.body.classList.contains('dashboard-active')){
-        if($('ribbon')) $('ribbon').style.display='none';
-      }else{
-        const active=document.querySelector('.ribbon-panel.active[data-studio-panel]');
-        if(active) active.style.display='grid';
-      }
-    });
-    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
