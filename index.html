@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta name="application-ver
-sion" content="2026.08.16.17">
+sion" content="2026.08.17.40">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.16.39 usability refinements ===== */
+/* ===== v2026.08.17.40 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.39 PDF workflow ===== */
+/* ===== v2026.08.17.40 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.16.39 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.17.40 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.16.39 dashboard cleanup ===== */
+/* ===== v2026.08.17.40 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.16.39: clean Dashboard ===== */
+/* ===== v2026.08.17.40: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.16.39: Dashboard is a true main menu ===== */
+/* ===== v2026.08.17.40: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.16.39: hard dashboard/studio separation ===== */
+/* ===== v2026.08.17.40: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.16.39: Dashboard upload entry ===== */
+/* ===== v2026.08.17.40: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.16.39 — one navigation system only ===== */
+/* ===== v2026.08.17.40 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -665,13 +665,9 @@ body.dashboard-active #toolbar,
 body.dashboard-active #pageActionStrip,
 body.dashboard-active #dropzone,
 body.dashboard-active #grid,
-body.dashboard-active #noPdfBanner{
-  display:none !important;
-}
-/* IMPORTANT: dashboardTiles and dashboardRecent are INSIDE workspaceLayout.
-   Never hide workspaceLayout on the Dashboard. */
+body.dashboard-active #noPdfBanner,
 body.dashboard-active #workspaceLayout{
-  display:flex !important;
+  display:none !important;
 }
 
 /* When a Studio is open, show only its submenu/ribbon — never the main menu. */
@@ -691,7 +687,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.16.39';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.17.40';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +698,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.16.39</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.17.40</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -783,7 +779,6 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
     </div>
 
     <button id="backToMainMenu" class="btn ghost" type="button">← Back to Main Menu</button>
-<div id="studioSubmenuHost" aria-live="polite"></div>
 <div class="ribbon" id="ribbon" style="display:none">
       <div class="ribbon-quick">
 <button class="tool-btn" id="btnUndo">Undo <kbd>Ctrl Z</kbd></button>
@@ -868,7 +863,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 
 <div class="tool-group conversion-reverse-group">
   <div class="tool-group-title">Other files → PDF</div>
-  <button class="tool-btn" id="btnFileToPdfPpt" title="Convert Word, Excel, PowerPoint, HTML, CSV, TXT or Markdown to PDF">
+  <button class="tool-btn" id="btnFileToPdf" title="Convert Word, Excel, PowerPoint, HTML, CSV, TXT or Markdown to PDF">
     📄 Convert Files → PDF
   </button>
   <div class="hint" style="margin-top:6px;">
@@ -1050,7 +1045,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.16.17 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.17.40 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -1444,21 +1439,6 @@ function updatePdfUploadAction(){
     if(group) group.querySelector('h2').textContent = 'Start project';
   }
 }
-/* ===== v2026.08.16.39 — pending-tool upload workflow =====
-   If a user taps a conversion/OCR/etc. tool before opening a PDF, remember
-   that exact tool. After the file is loaded, automatically continue with it.
-*/
-let pendingToolId = null;
-function runPendingTool(){
-  const id = pendingToolId;
-  pendingToolId = null;
-  if(!id || !workingBytes) return;
-  const btn=$(id);
-  if(btn){
-    setTimeout(()=>btn.click(), 80);
-  }
-}
-
 function setToolsEnabled(on){
   PDF_REQUIRED_IDS.forEach(id=>{
     $(id).title = on ? '' : 'Tap to open a PDF first — this tool needs one loaded.';
@@ -1483,9 +1463,7 @@ document.addEventListener('click', (e) => {
   if(workingBytes) return;
   e.preventDefault();
   e.stopImmediatePropagation();
-  pendingToolId = btn.id;
-  setStatus('Waiting for the PDF for this operation…');
-  toast('Choose the PDF for this operation.');
+  toast('Opening a PDF first — this tool needs one loaded.');
   $('fileInput').click();
 }, true);
 
@@ -1521,106 +1499,16 @@ function updateUndoRedoButtons(){
 }
 
 /* ---------- Loading / merging files ---------- */
-
-/* v2026.08.16.39 — never give PDF.js the working ArrayBuffer directly.
-   A Blob URL lets the browser fetch the PDF without transferring/detaching
-   the app's source buffer. */
-async function openPdfJsFromBytes(bytes, password){
-  ensureStudio('pdf');
-  if(typeof pdfjsLib === 'undefined') throw new Error('PDF.js is not loaded.');
-  const copy = bytes instanceof ArrayBuffer ? bytes.slice(0) :
-               ArrayBuffer.isView(bytes) ? bytes.slice().buffer :
-               new Uint8Array(bytes).slice().buffer;
-  const blob = new Blob([copy], {type:'application/pdf'});
-  const url = URL.createObjectURL(blob);
+async function loadPdfSafely(buf){
   try{
-    const task = pdfjsLib.getDocument({
-      url,
-      password: password || undefined,
-      disableWorker:false
-    });
-    const pdf = await task.promise;
-    // Keep the URL attached to the PDF object until the caller finishes using it.
-    pdf.__docuforgeBlobUrl = url;
-    return pdf;
-  }catch(e){
-    URL.revokeObjectURL(url);
+    return await PDFDocument.load(buf);
+  } catch(e){
+    if(e && e.message && /encrypt/i.test(e.message)){
+      throw new Error('This PDF is password-protected. Use Security Studio → "Open password-protected PDF" first, then try again.');
+    }
     throw e;
   }
 }
-function releasePdfJsDocument(pdf){
-  try{
-    const u=pdf && pdf.__docuforgeBlobUrl;
-    if(pdf && typeof pdf.destroy==='function') pdf.destroy();
-    if(u) URL.revokeObjectURL(u);
-  }catch(_){}
-}
-
-async function rebuildPdfFromPdfJs(buf, password){
-  const src=await openPdfJsFromBytes(buf,password);
-  try{
-    const rebuilt=await PDFDocument.create();
-    for(let i=1;i<=src.numPages;i++){
-      const page=await src.getPage(i);
-      const viewport=page.getViewport({scale:1.25});
-      const canvas=document.createElement('canvas');
-      canvas.width=Math.ceil(viewport.width);
-      canvas.height=Math.ceil(viewport.height);
-      const ctx=canvas.getContext('2d',{willReadFrequently:true});
-      await page.render({canvasContext:ctx,viewport}).promise;
-      const png=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
-      if(!png) throw new Error('PDF.js could not render page '+i+'.');
-      const img=await rebuilt.embedPng(await png.arrayBuffer());
-      const w=img.width*72/96, h=img.height*72/96;
-      const outPage=rebuilt.addPage([w,h]);
-      outPage.drawImage(img,{x:0,y:0,width:w,height:h});
-    }
-    return rebuilt;
-  }finally{
-    releasePdfJsDocument(src);
-  }
-}
-
-async function loadPdfSafely(buf){
-  let pdfjsError=null;
-  // Primary reader: PDF.js through a Blob URL.
-  try{
-    const src=await openPdfJsFromBytes(buf);
-    try{
-      // Validate that at least one page is readable.
-      if(!src || !src.numPages) throw new Error('PDF contains no readable pages.');
-    }finally{
-      releasePdfJsDocument(src);
-    }
-
-    // Prefer the original PDF bytes when pdf-lib can import them.
-    try{
-      const copy=clonePdfBytes(buf);
-      return await PDFDocument.load(copy,{ignoreEncryption:true});
-    }catch(_){
-      // Rebuild through PDF.js only when pdf-lib cannot import the original.
-      return await rebuildPdfFromPdfJs(buf);
-    }
-  }catch(e){
-    pdfjsError=e;
-    const name=String(e && e.name || '');
-    const msg=String(e && e.message || e);
-    if(name==='PasswordException' || /password|encrypted|encrypt/i.test(msg)){
-      throw new Error('This PDF is password-protected. Please enter its password.');
-    }
-  }
-
-  // Final fallback: pdf-lib with a completely independent copy.
-  try{
-    return await PDFDocument.load(clonePdfBytes(buf));
-  }catch(e){
-    const a=String(e && e.message || e);
-    const b=pdfjsError ? String(pdfjsError.message || pdfjsError) : '';
-    throw new Error('PDF could not be opened. PDF.js: '+b+' | pdf-lib: '+a);
-  }
-}
-
-window.docuforgeHasPdf = function(){ return !!workingBytes; };
 async function loadFiles(fileList){
   const isPdfFile = f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
   const isImageFile = f => f.type.startsWith('image/') || /\.(jpe?g|png|gif|webp|bmp|heic|heif)$/i.test(f.name);
@@ -1661,24 +1549,9 @@ async function loadFiles(fileList){
     const bytes = await doc.save();
     setToolsEnabled(true);
     await commit(bytes, `Loaded ${allFiles.length} file${allFiles.length>1?'s':''} (${doc.getPageCount()} pages total).`);
-    runPendingTool();
   } catch(e){
     console.error(e);
-    const first=allFiles[0];
-    if(first && isPdfFile(first) && e && e.message && /password|encrypt|encrypted/i.test(e.message)){
-      const pending=pendingToolId;
-      askPasswordForExistingFile(first, ()=>{
-        if(pending){
-          pendingToolId=null;
-          setTimeout(()=>$(pending)?.click(),80);
-        }
-      });
-    }else{
-      const detail=String(e && e.message || e || 'Unknown error');
-      console.error('DocuForge file-open error:',detail);
-      toast('Could not open this PDF: '+detail, true);
-      setStatus('PDF open failed. The error is shown at the bottom of the screen.');
-    }
+    toast((e && e.message && /password-protected/.test(e.message)) ? e.message : 'Could not open one of those files — it may be corrupted, an unsupported format, or password protected.', true);
   } finally { showProgress(null); }
 }
 
@@ -1701,9 +1574,9 @@ async function renderThumbnails(){
   if(!workingBytes){ showProgress(null); return; }
   let pdf;
   try{
-    pdf = await openPdfJsFromBytes(workingBytes);
+    pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
   } catch(e){
-    console.error(e); toast('Could not render the PDF for preview: '+String(e.message||e), true); showProgress(null); return;
+    console.error(e); toast('Could not render the PDF for preview.', true); showProgress(null); return;
   }
   const n = pdf.numPages;
   $('pageCountStat').textContent = n + (n===1 ? ' page' : ' pages');
@@ -2100,7 +1973,7 @@ async function runOcrOnPdfPages(lang, pageIndices){
   const results = [];
   try{
     await loadLib('tesseract');
-    const pdf = await openPdfJsFromBytes(workingBytes);
+    const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
     for(let i = 0; i < pageIndices.length; i++){
       const pageNum = pageIndices[i] + 1;
       setStatus(`OCR — rendering page ${pageNum} (${i+1}/${pageIndices.length})…`);
@@ -2166,7 +2039,7 @@ async function buildSearchablePdf(results){
    and exact for born-digital PDFs, but returns nothing for scans (no text
    layer to read), in which case each tool tells the user to OCR first. */
 async function getPdfPagesTextItems(){
-  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes).slice(), disableWorker:false }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
   const pages = [];
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -2324,6 +2197,293 @@ function showCompareResult(diff, nameA, nameB){
       const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Comparison: ${esc(nameA)} vs ${esc(nameB)}</title>
 <style>body{font-family:ui-monospace,monospace;font-size:13px;margin:24px;} .added{background:#d7f5d7;} .removed{background:#f8d7d7;text-decoration:line-through;}</style>
 </head><body><h2>${esc(nameA)} vs ${esc(nameB)}</h2>${bodyHtml}
+<script>
+/* ===== DocuForge AI v2026.08.17.40 — navigation safety controller ===== */
+(function(){
+  function q(id){ return document.getElementById(id); }
+  function studioPanels(){
+    return Array.from(document.querySelectorAll('.ribbon-panel[data-studio-panel]'));
+  }
+  function showDashboard(){
+    document.body.classList.add('dashboard-active');
+    const ids=['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'];
+    ids.forEach(id=>{ const el=q(id); if(el) el.style.display='none'; });
+    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='grid';
+    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='block';
+    const recent=q('dashboardRecent'); if(recent) recent.style.display='block';
+    studioPanels().forEach(p=>p.style.display='none');
+    window.__docuforgeStudio='dashboard';
+  }
+  function showStudio(name){
+    document.body.classList.remove('dashboard-active');
+    const tabs=q('studioTabs'); if(tabs) tabs.style.display='flex';
+    const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='block';
+    const toolbar=q('toolbar'); if(toolbar) toolbar.style.display='none';
+    const strip=q('pageActionStrip'); if(strip) strip.style.display='none';
+    const drop=q('dropzone'); if(drop) drop.style.display='none';
+    const grid=q('grid'); if(grid) grid.style.display='none';
+    const banner=q('noPdfBanner'); if(banner) banner.style.display='none';
+    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='none';
+    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='none';
+    const recent=q('dashboardRecent'); if(recent) recent.style.display='none';
+
+    studioPanels().forEach(p=>{
+      p.style.display = (p.dataset.studioPanel===name) ? 'block' : 'none';
+      p.classList.toggle('active', p.dataset.studioPanel===name);
+    });
+    document.querySelectorAll('#studioTabs .studio-tab').forEach(t=>{
+      t.classList.toggle('active', t.dataset.studio===name);
+    });
+    window.__docuforgeStudio=name;
+
+    /* Let the app's own studio loader run when it is available. */
+    try{
+      if(typeof window.setStudio==='function'){
+        window.setStudio(name);
+      }
+    }catch(e){ console.warn('Studio loader recovered:',e); }
+
+    const r=q('ribbon');
+    if(r) setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}),30);
+  }
+
+  function wire(){
+    /* Always start on a clean Dashboard. */
+    showDashboard();
+
+    /* Main-menu cards. */
+    document.addEventListener('click',function(ev){
+      const tile=ev.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const name=tile.getAttribute('data-studio');
+      if(name) showStudio(name);
+    },true);
+
+    /* Upper studio tabs are only used after a Studio is opened. */
+    document.addEventListener('click',function(ev){
+      const tab=ev.target.closest('#studioTabs .studio-tab[data-studio]');
+      if(!tab) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const name=tab.getAttribute('data-studio');
+      if(name==='dashboard') showDashboard();
+      else if(name) showStudio(name);
+    },true);
+
+    /* Home icon returns to the Dashboard. */
+    const home=q('homeBtn') || q('brandHome') || q('homeButton');
+    if(home) home.addEventListener('click',function(ev){
+      ev.preventDefault(); ev.stopPropagation(); showDashboard();
+    },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.17.40 — Dashboard upload + Studio visibility controller ===== */
+(function(){
+  function q(id){return document.getElementById(id);}
+  function allStudioPages(){
+    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
+  }
+  function hideAllEmbeddedPages(){
+    allStudioPages().forEach(el=>el.style.display='none');
+  }
+  function setStatus(msg, show=true){
+    const el=q('dashboardUploadStatus');
+    if(!el) return;
+    el.innerHTML=msg;
+    el.style.display=show?'block':'none';
+  }
+  function extension(name){
+    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
+    return m?m[1]:'';
+  }
+  function routeUploadedFile(file){
+    const ext=extension(file.name);
+    let studio='convert', label='Conversion Studio';
+    if(ext==='pdf' || /^image\//i.test(file.type)){
+      studio='pdf'; label='PDF Studio';
+    }else if(['xls','xlsx','csv'].includes(ext)){
+      studio='excel'; label='Excel Studio';
+    }else if(['ppt','pptx','odp'].includes(ext)){
+      studio='powerpoint'; label='PowerPoint Studio';
+    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
+      studio='convert'; label='Conversion Studio';
+    }
+    window.__docuforgePendingFile=file;
+    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(studio);
+    }catch(e){console.warn(e);}
+    document.body.classList.remove('dashboard-active');
+
+    /* For PDF/image, feed the existing PDF loader immediately. */
+    if(studio==='pdf'){
+      const dt=new DataTransfer();
+      dt.items.add(file);
+      const input=q('fileInput');
+      if(input){
+        input.files=dt.files;
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    }
+
+    /* For Excel, keep the file pending and open the Excel Studio.
+       The Excel module can use this reference when its import action is selected. */
+    setTimeout(()=>{
+      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
+      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    },80);
+  }
+
+  function wire(){
+    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
+    hideAllEmbeddedPages();
+
+    const upload=q('dashboardUploadFileTile');
+    const input=q('universalFileInput');
+    if(upload && input){
+      upload.addEventListener('click',()=>input.click());
+      input.addEventListener('change',()=>{
+        const file=input.files && input.files[0];
+        if(file) routeUploadedFile(file);
+        input.value='';
+      });
+    }
+
+    /* Make Dashboard truly clean even if another script changes a Studio's display. */
+    const observer=new MutationObserver(()=>{
+      if(document.body.classList.contains('dashboard-active')){
+        hideAllEmbeddedPages();
+        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
+        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
+        const grid=q('grid'); if(grid) grid.style.display='none';
+      }
+    });
+    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.17.40 — single navigation controller ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  function hideStudioPanels(){
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
+      p.style.display='none';
+      p.classList.remove('active');
+    });
+    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+  }
+  function dashboard(){
+    document.body.classList.add('dashboard-active');
+    hideStudioPanels();
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
+      .forEach(id=>{if($(id)) $(id).style.display='none';});
+    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
+    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
+  }
+  function studio(name){
+    document.body.classList.remove('dashboard-active');
+    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
+    if($('studioTabs')) $('studioTabs').style.display='none';
+    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    if($('ribbon')) $('ribbon').style.display='flex';
+    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
+
+    hideStudioPanels();
+    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    if(panel){
+      panel.style.display='flex';
+      panel.classList.add('active');
+    }
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(name);
+    }catch(e){console.warn('Existing studio loader:',e);}
+    // Re-assert our navigation after the legacy loader runs.
+    setTimeout(()=>{
+      if($('studioTabs')) $('studioTabs').style.display='none';
+      if($('ribbon')) $('ribbon').style.display='flex';
+      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    },50);
+  }
+
+  function wire(){
+    /* Always start clean. */
+    dashboard();
+
+    /* Main menu cards. */
+    document.addEventListener('click',e=>{
+      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      studio(tile.dataset.studio);
+    },true);
+
+    /* Upload File card. */
+    const dashUpload=$('dashboardUploadFileTile');
+    const input=$('universalFileInput');
+    if(dashUpload && input){
+      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Upload button inside any Studio. */
+    const studioUpload=$('studioUploadFileBtn');
+    if(studioUpload && input){
+      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Back to Main Menu. */
+    $('backToMainMenu')?.addEventListener('click',e=>{
+      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
+    },true);
+
+    /* Route uploaded file. */
+    input?.addEventListener('change',()=>{
+      const file=input.files?.[0];
+      if(!file) return;
+      const ext=(file.name.split('.').pop()||'').toLowerCase();
+      let target='convert';
+      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
+      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
+      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
+      studio(target);
+
+      /* Feed PDF/image files into the existing PDF input. */
+      if(target==='pdf'){
+        try{
+          const dt=new DataTransfer(); dt.items.add(file);
+          const pdfInput=$('fileInput');
+          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
+        }catch(e){console.warn(e);}
+      }
+      input.value='';
+    },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
 <\/body><\/html>`;
       downloadBlob(new Blob([html], {type:'text/html'}), 'comparison.html');
     });
@@ -2646,6 +2806,293 @@ function buildBilingualHtml(original, translated, sourceLabel, targetLabel){
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Translation</title>
 <style>body{font-family:sans-serif;margin:24px;} table{width:100%;border-collapse:collapse;} td{border:1px solid #ccc;padding:8px;vertical-align:top;width:50%;white-space:pre-wrap;} th{background:#113B34;color:#fff;padding:8px;text-align:left;}</style>
 </head><body><h1>Translation</h1><table><tr><th>${esc(sourceLabel)}</th><th>${esc(targetLabel)}</th></tr>${rows}</table>
+<script>
+/* ===== DocuForge AI v2026.08.17.40 — navigation safety controller ===== */
+(function(){
+  function q(id){ return document.getElementById(id); }
+  function studioPanels(){
+    return Array.from(document.querySelectorAll('.ribbon-panel[data-studio-panel]'));
+  }
+  function showDashboard(){
+    document.body.classList.add('dashboard-active');
+    const ids=['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'];
+    ids.forEach(id=>{ const el=q(id); if(el) el.style.display='none'; });
+    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='grid';
+    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='block';
+    const recent=q('dashboardRecent'); if(recent) recent.style.display='block';
+    studioPanels().forEach(p=>p.style.display='none');
+    window.__docuforgeStudio='dashboard';
+  }
+  function showStudio(name){
+    document.body.classList.remove('dashboard-active');
+    const tabs=q('studioTabs'); if(tabs) tabs.style.display='flex';
+    const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='block';
+    const toolbar=q('toolbar'); if(toolbar) toolbar.style.display='none';
+    const strip=q('pageActionStrip'); if(strip) strip.style.display='none';
+    const drop=q('dropzone'); if(drop) drop.style.display='none';
+    const grid=q('grid'); if(grid) grid.style.display='none';
+    const banner=q('noPdfBanner'); if(banner) banner.style.display='none';
+    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='none';
+    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='none';
+    const recent=q('dashboardRecent'); if(recent) recent.style.display='none';
+
+    studioPanels().forEach(p=>{
+      p.style.display = (p.dataset.studioPanel===name) ? 'block' : 'none';
+      p.classList.toggle('active', p.dataset.studioPanel===name);
+    });
+    document.querySelectorAll('#studioTabs .studio-tab').forEach(t=>{
+      t.classList.toggle('active', t.dataset.studio===name);
+    });
+    window.__docuforgeStudio=name;
+
+    /* Let the app's own studio loader run when it is available. */
+    try{
+      if(typeof window.setStudio==='function'){
+        window.setStudio(name);
+      }
+    }catch(e){ console.warn('Studio loader recovered:',e); }
+
+    const r=q('ribbon');
+    if(r) setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}),30);
+  }
+
+  function wire(){
+    /* Always start on a clean Dashboard. */
+    showDashboard();
+
+    /* Main-menu cards. */
+    document.addEventListener('click',function(ev){
+      const tile=ev.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const name=tile.getAttribute('data-studio');
+      if(name) showStudio(name);
+    },true);
+
+    /* Upper studio tabs are only used after a Studio is opened. */
+    document.addEventListener('click',function(ev){
+      const tab=ev.target.closest('#studioTabs .studio-tab[data-studio]');
+      if(!tab) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const name=tab.getAttribute('data-studio');
+      if(name==='dashboard') showDashboard();
+      else if(name) showStudio(name);
+    },true);
+
+    /* Home icon returns to the Dashboard. */
+    const home=q('homeBtn') || q('brandHome') || q('homeButton');
+    if(home) home.addEventListener('click',function(ev){
+      ev.preventDefault(); ev.stopPropagation(); showDashboard();
+    },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.17.40 — Dashboard upload + Studio visibility controller ===== */
+(function(){
+  function q(id){return document.getElementById(id);}
+  function allStudioPages(){
+    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
+  }
+  function hideAllEmbeddedPages(){
+    allStudioPages().forEach(el=>el.style.display='none');
+  }
+  function setStatus(msg, show=true){
+    const el=q('dashboardUploadStatus');
+    if(!el) return;
+    el.innerHTML=msg;
+    el.style.display=show?'block':'none';
+  }
+  function extension(name){
+    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
+    return m?m[1]:'';
+  }
+  function routeUploadedFile(file){
+    const ext=extension(file.name);
+    let studio='convert', label='Conversion Studio';
+    if(ext==='pdf' || /^image\//i.test(file.type)){
+      studio='pdf'; label='PDF Studio';
+    }else if(['xls','xlsx','csv'].includes(ext)){
+      studio='excel'; label='Excel Studio';
+    }else if(['ppt','pptx','odp'].includes(ext)){
+      studio='powerpoint'; label='PowerPoint Studio';
+    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
+      studio='convert'; label='Conversion Studio';
+    }
+    window.__docuforgePendingFile=file;
+    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(studio);
+    }catch(e){console.warn(e);}
+    document.body.classList.remove('dashboard-active');
+
+    /* For PDF/image, feed the existing PDF loader immediately. */
+    if(studio==='pdf'){
+      const dt=new DataTransfer();
+      dt.items.add(file);
+      const input=q('fileInput');
+      if(input){
+        input.files=dt.files;
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    }
+
+    /* For Excel, keep the file pending and open the Excel Studio.
+       The Excel module can use this reference when its import action is selected. */
+    setTimeout(()=>{
+      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
+      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    },80);
+  }
+
+  function wire(){
+    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
+    hideAllEmbeddedPages();
+
+    const upload=q('dashboardUploadFileTile');
+    const input=q('universalFileInput');
+    if(upload && input){
+      upload.addEventListener('click',()=>input.click());
+      input.addEventListener('change',()=>{
+        const file=input.files && input.files[0];
+        if(file) routeUploadedFile(file);
+        input.value='';
+      });
+    }
+
+    /* Make Dashboard truly clean even if another script changes a Studio's display. */
+    const observer=new MutationObserver(()=>{
+      if(document.body.classList.contains('dashboard-active')){
+        hideAllEmbeddedPages();
+        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
+        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
+        const grid=q('grid'); if(grid) grid.style.display='none';
+      }
+    });
+    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.17.40 — single navigation controller ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  function hideStudioPanels(){
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
+      p.style.display='none';
+      p.classList.remove('active');
+    });
+    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+  }
+  function dashboard(){
+    document.body.classList.add('dashboard-active');
+    hideStudioPanels();
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
+      .forEach(id=>{if($(id)) $(id).style.display='none';});
+    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
+    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
+  }
+  function studio(name){
+    document.body.classList.remove('dashboard-active');
+    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
+    if($('studioTabs')) $('studioTabs').style.display='none';
+    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    if($('ribbon')) $('ribbon').style.display='flex';
+    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
+
+    hideStudioPanels();
+    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    if(panel){
+      panel.style.display='flex';
+      panel.classList.add('active');
+    }
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(name);
+    }catch(e){console.warn('Existing studio loader:',e);}
+    // Re-assert our navigation after the legacy loader runs.
+    setTimeout(()=>{
+      if($('studioTabs')) $('studioTabs').style.display='none';
+      if($('ribbon')) $('ribbon').style.display='flex';
+      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    },50);
+  }
+
+  function wire(){
+    /* Always start clean. */
+    dashboard();
+
+    /* Main menu cards. */
+    document.addEventListener('click',e=>{
+      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      studio(tile.dataset.studio);
+    },true);
+
+    /* Upload File card. */
+    const dashUpload=$('dashboardUploadFileTile');
+    const input=$('universalFileInput');
+    if(dashUpload && input){
+      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Upload button inside any Studio. */
+    const studioUpload=$('studioUploadFileBtn');
+    if(studioUpload && input){
+      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Back to Main Menu. */
+    $('backToMainMenu')?.addEventListener('click',e=>{
+      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
+    },true);
+
+    /* Route uploaded file. */
+    input?.addEventListener('change',()=>{
+      const file=input.files?.[0];
+      if(!file) return;
+      const ext=(file.name.split('.').pop()||'').toLowerCase();
+      let target='convert';
+      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
+      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
+      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
+      studio(target);
+
+      /* Feed PDF/image files into the existing PDF input. */
+      if(target==='pdf'){
+        try{
+          const dt=new DataTransfer(); dt.items.add(file);
+          const pdfInput=$('fileInput');
+          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
+        }catch(e){console.warn(e);}
+      }
+      input.value='';
+    },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
 </body></html>`;
 }
 function showTranslationResult(original, translated, sourceLabel, targetLabel, baseName){
@@ -3031,7 +3478,7 @@ async function addBatesNumbering({ prefix, startNum, digits, position, size }){
    resolution and measures how much of it is near-white. */
 async function detectBlankPages(threshold){
   threshold = threshold || 0.995;
-  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes).slice(), disableWorker:false }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
   const blankIndices = [];
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -3145,7 +3592,7 @@ async function signPdf({ dataUrl, pageIndex, position, widthPt }){
    Tradeoff: the redacted page becomes a raster image, so its own text
    is no longer selectable/searchable afterward. */
 async function redactPage(pageIndex, boxes, renderScale){
-  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes).slice(), disableWorker:false }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
   const page = await pdf.getPage(pageIndex + 1);
   const viewport = page.getViewport({ scale: renderScale });
   const canvas = document.createElement('canvas');
@@ -3558,7 +4005,7 @@ async function cropPages(indices, margins){
 
 /* ---------- More PDF exports: Images, HTML, JSON ---------- */
 async function convertPdfToImagesZip(format, quality){
-  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes).slice(), disableWorker:false }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
   const zip = new JSZip();
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -3584,249 +4031,295 @@ async function buildPdfHtml(){
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
-h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.16.39 — single main menu; file requested by operation */
-#studioTabs{display:none !important;}
-body.dashboard-active #ribbon,
-body.dashboard-active #toolbar,
-body.dashboard-active #pageActionStrip,
-body.dashboard-active #dropzone,
-body.dashboard-active #grid,
-body.dashboard-active #noPdfBanner{display:none !important;}
-
-
-/* ===== v2026.08.16.39 — Studio submenu layout ===== */
-
-/* Dashboard contains ONLY the main menu. */
-body.dashboard-active #studioTabs,
-body.dashboard-active #ribbon,
-body.dashboard-active #toolbar,
-body.dashboard-active #pageActionStrip,
-body.dashboard-active #dropzone,
-body.dashboard-active #grid,
-body.dashboard-active #noPdfBanner{
-  display:none !important;
-}
-
-/* When a Studio is selected, its submenu is a normal vertical section,
-   not a horizontally scrolling ribbon. */
-body:not(.dashboard-active) #studioTabs{display:none !important;}
-body:not(.dashboard-active) #ribbon{
-  display:block !important;
-  width:100%;
-  overflow:visible !important;
-  padding:0 !important;
-  background:var(--surface-2);
-}
-
-/* Keep Undo / Redo / Reset as a compact top row. */
-body:not(.dashboard-active) #ribbon .ribbon-quick{
-  width:100%;
-  max-width:none;
-  display:flex !important;
-  flex-wrap:wrap;
-  justify-content:space-around;
-  align-items:center;
-  padding:12px 8px;
-  border-right:0;
-  border-bottom:1px solid var(--line);
-}
-
-/* Actual Studio submenu fills the screen width. */
-body:not(.dashboard-active) #ribbon .ribbon-panel.active{
-  display:grid !important;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-  width:100%;
-  padding:14px 12px 22px;
-  align-items:stretch;
-  overflow:visible !important;
-}
-
-/* Tool groups become clear submenu sections. */
-body:not(.dashboard-active) #ribbon .ribbon-panel.active .tool-group{
-  grid-column:1 / -1;
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
-  width:100%;
-  max-width:none;
-  padding:0;
-  border:0;
-}
-
-/* Section heading spans the whole submenu. */
-body:not(.dashboard-active) #ribbon .ribbon-panel.active .tool-group h2{
-  grid-column:1 / -1;
-  order:-1;
-  width:100%;
-  font-size:12px;
-  text-align:left;
-  padding:8px 4px 3px;
-  margin:0;
-}
-
-/* Each tool is a proper tappable submenu item. */
-body:not(.dashboard-active) #ribbon .ribbon-panel.active .tool-btn{
-  width:100%;
-  min-height:72px;
-  padding:10px 7px;
-  font-size:12px;
-  line-height:1.2;
-  white-space:normal;
-}
-
-/* Avoid the blank PDF work area before a file is selected. */
-body:not(.dashboard-active) #dropzone,
-body:not(.dashboard-active) #noPdfBanner,
-body:not(.dashboard-active) #grid{
-  display:none !important;
-}
-
-/* Do not show the old horizontal navigation anywhere. */
-#studioTabs{display:none !important;}
-
-
-/* ===== v2026.08.16.39 — submenu host / mobile fixes ===== */
-#studioSubmenuHost{
-  width:100%;
-  display:block;
-  margin:0;
-}
-#studioSubmenuHost .ribbon-panel{
-  display:none !important;
-}
-#studioSubmenuHost .ribbon-panel.active{
-  display:grid !important;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  width:100%;
-  padding:14px 12px 24px;
-  background:var(--surface-2);
-}
-#studioSubmenuHost .tool-group{
-  grid-column:1/-1;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  width:100%;
-  max-width:none;
-  padding:0;
-  border:0;
-}
-#studioSubmenuHost .tool-group h2{
-  grid-column:1/-1;
-  order:-1;
-  width:100%;
-  margin:4px 0;
-  padding:8px 4px 2px;
-  text-align:left;
-}
-#studioSubmenuHost .tool-btn{
-  width:100%;
-  min-height:72px;
-  padding:10px 7px;
-  white-space:normal;
-}
-#backToMainMenu{
-  background:var(--accent) !important;
-  color:var(--accent-ink) !important;
-  border:2px solid var(--accent) !important;
-  font-weight:800 !important;
-  box-shadow:0 3px 8px rgba(0,0,0,.15);
-}
-body.dashboard-active #studioSubmenuHost,
-body.dashboard-active #backToMainMenu{display:none !important;}
-@media(max-width:520px){
-  #studioSubmenuHost .tool-group{grid-template-columns:1fr 1fr;}
-  #studioSubmenuHost .tool-btn{font-size:12px;min-height:78px;}
-}
-
-
-/* ===== v2026.08.16.39 — upload continuation feedback ===== */
-#statusMsg{font-weight:600;}
-
-
-/* v2026.08.16.39 — clearer PDF compatibility diagnostics */
-.toast-wrap .toast{max-width:min(92vw,760px);white-space:normal;line-height:1.35;}
-
-
-/* v2026.08.16.39 — error messages must remain visible on iPhone */
-.toast-wrap{
-  position:fixed !important;
-  top:auto !important;
-  right:12px !important;
-  left:12px !important;
-  bottom:78px !important;
-  display:flex;
-  flex-direction:column;
-  align-items:stretch;
-  gap:8px;
-  z-index:99999 !important;
-  pointer-events:none;
-}
-.toast{
-  width:auto !important;
-  max-width:none !important;
-  box-sizing:border-box;
-  font-size:16px !important;
-  padding:14px 16px !important;
-  line-height:1.35 !important;
-  white-space:normal !important;
-  overflow-wrap:anywhere;
-  pointer-events:auto;
-}
-.toast.err{
-  background:#B63A20 !important;
-  color:#fff !important;
-}
-
-
-/* v38: error banner must never overlap the application header */
-.toast-wrap{
-  position:fixed !important;
-  top:auto !important;
-  bottom:88px !important;
-  left:12px !important;
-  right:12px !important;
-  z-index:2147483647 !important;
-}
-.toast{
-  position:relative !important;
-  top:auto !important;
-  max-height:34vh !important;
-  overflow:auto !important;
-  white-space:normal !important;
-  overflow-wrap:anywhere !important;
-  word-break:break-word !important;
-  line-height:1.35 !important;
-}
-
-
-/* v39: diagnostic/error banner — never cover the application header */
-.toast-wrap{
-  position:fixed !important;
-  top:auto !important;
-  bottom:96px !important;
-  left:12px !important;
-  right:12px !important;
-  width:auto !important;
-  z-index:2147483647 !important;
-  pointer-events:none !important;
-}
-.toast-wrap .toast,
-.toast.error,
-.toast.danger{
-  max-width:100% !important;
-  max-height:30vh !important;
-  overflow:auto !important;
-  white-space:normal !important;
-  overflow-wrap:anywhere !important;
-  word-break:break-word !important;
-}
-
-</style>
+h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}</style>
 </head><body><h1>${title}</h1>${body}
+<script>
+/* ===== DocuForge AI v2026.08.17.40 — navigation safety controller ===== */
+(function(){
+  function q(id){ return document.getElementById(id); }
+  function studioPanels(){
+    return Array.from(document.querySelectorAll('.ribbon-panel[data-studio-panel]'));
+  }
+  function showDashboard(){
+    document.body.classList.add('dashboard-active');
+    const ids=['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'];
+    ids.forEach(id=>{ const el=q(id); if(el) el.style.display='none'; });
+    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='grid';
+    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='block';
+    const recent=q('dashboardRecent'); if(recent) recent.style.display='block';
+    studioPanels().forEach(p=>p.style.display='none');
+    window.__docuforgeStudio='dashboard';
+  }
+  function showStudio(name){
+    document.body.classList.remove('dashboard-active');
+    const tabs=q('studioTabs'); if(tabs) tabs.style.display='flex';
+    const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='block';
+    const toolbar=q('toolbar'); if(toolbar) toolbar.style.display='none';
+    const strip=q('pageActionStrip'); if(strip) strip.style.display='none';
+    const drop=q('dropzone'); if(drop) drop.style.display='none';
+    const grid=q('grid'); if(grid) grid.style.display='none';
+    const banner=q('noPdfBanner'); if(banner) banner.style.display='none';
+    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='none';
+    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='none';
+    const recent=q('dashboardRecent'); if(recent) recent.style.display='none';
+
+    studioPanels().forEach(p=>{
+      p.style.display = (p.dataset.studioPanel===name) ? 'block' : 'none';
+      p.classList.toggle('active', p.dataset.studioPanel===name);
+    });
+    document.querySelectorAll('#studioTabs .studio-tab').forEach(t=>{
+      t.classList.toggle('active', t.dataset.studio===name);
+    });
+    window.__docuforgeStudio=name;
+
+    /* Let the app's own studio loader run when it is available. */
+    try{
+      if(typeof window.setStudio==='function'){
+        window.setStudio(name);
+      }
+    }catch(e){ console.warn('Studio loader recovered:',e); }
+
+    const r=q('ribbon');
+    if(r) setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}),30);
+  }
+
+  function wire(){
+    /* Always start on a clean Dashboard. */
+    showDashboard();
+
+    /* Main-menu cards. */
+    document.addEventListener('click',function(ev){
+      const tile=ev.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const name=tile.getAttribute('data-studio');
+      if(name) showStudio(name);
+    },true);
+
+    /* Upper studio tabs are only used after a Studio is opened. */
+    document.addEventListener('click',function(ev){
+      const tab=ev.target.closest('#studioTabs .studio-tab[data-studio]');
+      if(!tab) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const name=tab.getAttribute('data-studio');
+      if(name==='dashboard') showDashboard();
+      else if(name) showStudio(name);
+    },true);
+
+    /* Home icon returns to the Dashboard. */
+    const home=q('homeBtn') || q('brandHome') || q('homeButton');
+    if(home) home.addEventListener('click',function(ev){
+      ev.preventDefault(); ev.stopPropagation(); showDashboard();
+    },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.17.40 — Dashboard upload + Studio visibility controller ===== */
+(function(){
+  function q(id){return document.getElementById(id);}
+  function allStudioPages(){
+    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
+  }
+  function hideAllEmbeddedPages(){
+    allStudioPages().forEach(el=>el.style.display='none');
+  }
+  function setStatus(msg, show=true){
+    const el=q('dashboardUploadStatus');
+    if(!el) return;
+    el.innerHTML=msg;
+    el.style.display=show?'block':'none';
+  }
+  function extension(name){
+    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
+    return m?m[1]:'';
+  }
+  function routeUploadedFile(file){
+    const ext=extension(file.name);
+    let studio='convert', label='Conversion Studio';
+    if(ext==='pdf' || /^image\//i.test(file.type)){
+      studio='pdf'; label='PDF Studio';
+    }else if(['xls','xlsx','csv'].includes(ext)){
+      studio='excel'; label='Excel Studio';
+    }else if(['ppt','pptx','odp'].includes(ext)){
+      studio='powerpoint'; label='PowerPoint Studio';
+    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
+      studio='convert'; label='Conversion Studio';
+    }
+    window.__docuforgePendingFile=file;
+    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(studio);
+    }catch(e){console.warn(e);}
+    document.body.classList.remove('dashboard-active');
+
+    /* For PDF/image, feed the existing PDF loader immediately. */
+    if(studio==='pdf'){
+      const dt=new DataTransfer();
+      dt.items.add(file);
+      const input=q('fileInput');
+      if(input){
+        input.files=dt.files;
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    }
+
+    /* For Excel, keep the file pending and open the Excel Studio.
+       The Excel module can use this reference when its import action is selected. */
+    setTimeout(()=>{
+      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
+      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    },80);
+  }
+
+  function wire(){
+    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
+    hideAllEmbeddedPages();
+
+    const upload=q('dashboardUploadFileTile');
+    const input=q('universalFileInput');
+    if(upload && input){
+      upload.addEventListener('click',()=>input.click());
+      input.addEventListener('change',()=>{
+        const file=input.files && input.files[0];
+        if(file) routeUploadedFile(file);
+        input.value='';
+      });
+    }
+
+    /* Make Dashboard truly clean even if another script changes a Studio's display. */
+    const observer=new MutationObserver(()=>{
+      if(document.body.classList.contains('dashboard-active')){
+        hideAllEmbeddedPages();
+        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
+        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
+        const grid=q('grid'); if(grid) grid.style.display='none';
+      }
+    });
+    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.17.40 — single navigation controller ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  function hideStudioPanels(){
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
+      p.style.display='none';
+      p.classList.remove('active');
+    });
+    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+  }
+  function dashboard(){
+    document.body.classList.add('dashboard-active');
+    hideStudioPanels();
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
+      .forEach(id=>{if($(id)) $(id).style.display='none';});
+    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
+    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
+  }
+  function studio(name){
+    document.body.classList.remove('dashboard-active');
+    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
+    if($('studioTabs')) $('studioTabs').style.display='none';
+    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    if($('ribbon')) $('ribbon').style.display='flex';
+    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
+
+    hideStudioPanels();
+    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    if(panel){
+      panel.style.display='flex';
+      panel.classList.add('active');
+    }
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(name);
+    }catch(e){console.warn('Existing studio loader:',e);}
+    // Re-assert our navigation after the legacy loader runs.
+    setTimeout(()=>{
+      if($('studioTabs')) $('studioTabs').style.display='none';
+      if($('ribbon')) $('ribbon').style.display='flex';
+      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    },50);
+  }
+
+  function wire(){
+    /* Always start clean. */
+    dashboard();
+
+    /* Main menu cards. */
+    document.addEventListener('click',e=>{
+      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      studio(tile.dataset.studio);
+    },true);
+
+    /* Upload File card. */
+    const dashUpload=$('dashboardUploadFileTile');
+    const input=$('universalFileInput');
+    if(dashUpload && input){
+      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Upload button inside any Studio. */
+    const studioUpload=$('studioUploadFileBtn');
+    if(studioUpload && input){
+      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Back to Main Menu. */
+    $('backToMainMenu')?.addEventListener('click',e=>{
+      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
+    },true);
+
+    /* Route uploaded file. */
+    input?.addEventListener('change',()=>{
+      const file=input.files?.[0];
+      if(!file) return;
+      const ext=(file.name.split('.').pop()||'').toLowerCase();
+      let target='convert';
+      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
+      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
+      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
+      studio(target);
+
+      /* Feed PDF/image files into the existing PDF input. */
+      if(target==='pdf'){
+        try{
+          const dt=new DataTransfer(); dt.items.add(file);
+          const pdfInput=$('fileInput');
+          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
+        }catch(e){console.warn(e);}
+      }
+      input.value='';
+    },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
 </body></html>`;
 }
 async function buildPdfJson(){
@@ -3855,7 +4348,7 @@ async function buildPdfXml(){
    doesn't expose in this version. Said plainly rather than overclaiming
    "vector export". */
 async function convertPdfToSvgZip(){
-  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes).slice(), disableWorker:false }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
   const zip = new JSZip();
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -3991,8 +4484,327 @@ ${navPoints}
     const lines = groupIntoLines(p.items).map(lineToText);
     const bodyHtml = lines.map(l => `<p>${esc(l) || '&#160;'}</p>`).join('\n');
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title></head>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
+<style>
+/* ===== v2026.08.17.40 navigation ===== */
+#studioTabs{display:none !important;}
+#studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
+
+#backToMainMenu{
+  display:none;
+  width:calc(100% - 28px);
+  margin:10px 14px 8px;
+  min-height:54px;
+  border-radius:12px;
+  background:var(--accent) !important;
+  color:var(--accent-ink) !important;
+  border:none !important;
+  font-size:17px;
+  font-weight:800;
+  box-shadow:var(--shadow);
+}
+body:not(.dashboard-active) #backToMainMenu{display:block !important;}
+
+body.dashboard-active #ribbon,
+body.dashboard-active #toolbar,
+body.dashboard-active #pageActionStrip,
+body.dashboard-active #dropzone,
+body.dashboard-active #grid,
+body.dashboard-active #noPdfBanner,
+body.dashboard-active #backToMainMenu,
+body.dashboard-active #workspaceLayout{display:none !important;}
+
+body.dashboard-active #dashboardTiles{display:grid !important;}
+</style>
+
+</head>
 <body>${bodyHtml}
+<script>
+/* ===== DocuForge AI v2026.08.17.40 — navigation safety controller ===== */
+(function(){
+  function q(id){ return document.getElementById(id); }
+  function studioPanels(){
+    return Array.from(document.querySelectorAll('.ribbon-panel[data-studio-panel]'));
+  }
+  function showDashboard(){
+    document.body.classList.add('dashboard-active');
+    const ids=['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'];
+    ids.forEach(id=>{ const el=q(id); if(el) el.style.display='none'; });
+    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='grid';
+    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='block';
+    const recent=q('dashboardRecent'); if(recent) recent.style.display='block';
+    studioPanels().forEach(p=>p.style.display='none');
+    window.__docuforgeStudio='dashboard';
+  }
+  function showStudio(name){
+    document.body.classList.remove('dashboard-active');
+    const tabs=q('studioTabs'); if(tabs) tabs.style.display='flex';
+    const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='block';
+    const toolbar=q('toolbar'); if(toolbar) toolbar.style.display='none';
+    const strip=q('pageActionStrip'); if(strip) strip.style.display='none';
+    const drop=q('dropzone'); if(drop) drop.style.display='none';
+    const grid=q('grid'); if(grid) grid.style.display='none';
+    const banner=q('noPdfBanner'); if(banner) banner.style.display='none';
+    const tiles=q('dashboardTiles'); if(tiles) tiles.style.display='none';
+    const hint=q('dashboardNavigationHint'); if(hint) hint.style.display='none';
+    const recent=q('dashboardRecent'); if(recent) recent.style.display='none';
+
+    studioPanels().forEach(p=>{
+      p.style.display = (p.dataset.studioPanel===name) ? 'block' : 'none';
+      p.classList.toggle('active', p.dataset.studioPanel===name);
+    });
+    document.querySelectorAll('#studioTabs .studio-tab').forEach(t=>{
+      t.classList.toggle('active', t.dataset.studio===name);
+    });
+    window.__docuforgeStudio=name;
+
+    /* Let the app's own studio loader run when it is available. */
+    try{
+      if(typeof window.setStudio==='function'){
+        window.setStudio(name);
+      }
+    }catch(e){ console.warn('Studio loader recovered:',e); }
+
+    const r=q('ribbon');
+    if(r) setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}),30);
+  }
+
+  function wire(){
+    /* Always start on a clean Dashboard. */
+    showDashboard();
+
+    /* Main-menu cards. */
+    document.addEventListener('click',function(ev){
+      const tile=ev.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const name=tile.getAttribute('data-studio');
+      if(name) showStudio(name);
+    },true);
+
+    /* Upper studio tabs are only used after a Studio is opened. */
+    document.addEventListener('click',function(ev){
+      const tab=ev.target.closest('#studioTabs .studio-tab[data-studio]');
+      if(!tab) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const name=tab.getAttribute('data-studio');
+      if(name==='dashboard') showDashboard();
+      else if(name) showStudio(name);
+    },true);
+
+    /* Home icon returns to the Dashboard. */
+    const home=q('homeBtn') || q('brandHome') || q('homeButton');
+    if(home) home.addEventListener('click',function(ev){
+      ev.preventDefault(); ev.stopPropagation(); showDashboard();
+    },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.17.40 — Dashboard upload + Studio visibility controller ===== */
+(function(){
+  function q(id){return document.getElementById(id);}
+  function allStudioPages(){
+    return ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+            'aboutStudio','gstInvoiceStudio'].map(q).filter(Boolean);
+  }
+  function hideAllEmbeddedPages(){
+    allStudioPages().forEach(el=>el.style.display='none');
+  }
+  function setStatus(msg, show=true){
+    const el=q('dashboardUploadStatus');
+    if(!el) return;
+    el.innerHTML=msg;
+    el.style.display=show?'block':'none';
+  }
+  function extension(name){
+    const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
+    return m?m[1]:'';
+  }
+  function routeUploadedFile(file){
+    const ext=extension(file.name);
+    let studio='convert', label='Conversion Studio';
+    if(ext==='pdf' || /^image\//i.test(file.type)){
+      studio='pdf'; label='PDF Studio';
+    }else if(['xls','xlsx','csv'].includes(ext)){
+      studio='excel'; label='Excel Studio';
+    }else if(['ppt','pptx','odp'].includes(ext)){
+      studio='powerpoint'; label='PowerPoint Studio';
+    }else if(['doc','docx','odt','txt','rtf','html','htm'].includes(ext)){
+      studio='convert'; label='Conversion Studio';
+    }
+    window.__docuforgePendingFile=file;
+    setStatus('<strong>Selected:</strong> '+file.name+'<br>Opening '+label+' — choose the required tool.');
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(studio);
+    }catch(e){console.warn(e);}
+    document.body.classList.remove('dashboard-active');
+
+    /* For PDF/image, feed the existing PDF loader immediately. */
+    if(studio==='pdf'){
+      const dt=new DataTransfer();
+      dt.items.add(file);
+      const input=q('fileInput');
+      if(input){
+        input.files=dt.files;
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    }
+
+    /* For Excel, keep the file pending and open the Excel Studio.
+       The Excel module can use this reference when its import action is selected. */
+    setTimeout(()=>{
+      const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
+      if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    },80);
+  }
+
+  function wire(){
+    /* On Dashboard, Excel iframe and all other embedded Studio pages stay hidden. */
+    hideAllEmbeddedPages();
+
+    const upload=q('dashboardUploadFileTile');
+    const input=q('universalFileInput');
+    if(upload && input){
+      upload.addEventListener('click',()=>input.click());
+      input.addEventListener('change',()=>{
+        const file=input.files && input.files[0];
+        if(file) routeUploadedFile(file);
+        input.value='';
+      });
+    }
+
+    /* Make Dashboard truly clean even if another script changes a Studio's display. */
+    const observer=new MutationObserver(()=>{
+      if(document.body.classList.contains('dashboard-active')){
+        hideAllEmbeddedPages();
+        const tabs=q('studioTabs'); if(tabs) tabs.style.display='none';
+        const ribbon=q('ribbon'); if(ribbon) ribbon.style.display='none';
+        const grid=q('grid'); if(grid) grid.style.display='none';
+      }
+    });
+    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
+
+
+<script>
+/* ===== v2026.08.17.40 — single navigation controller ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  function hideStudioPanels(){
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
+      p.style.display='none';
+      p.classList.remove('active');
+    });
+    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+     'aboutStudio','gstInvoiceStudio'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+  }
+  function dashboard(){
+    document.body.classList.add('dashboard-active');
+    hideStudioPanels();
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout','backToMainMenu','studioUploadFileBtn']
+      .forEach(id=>{if($(id)) $(id).style.display='none';});
+    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
+    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu or upload a file.';
+  }
+  function studio(name){
+    document.body.classList.remove('dashboard-active');
+    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
+    if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
+    if($('studioTabs')) $('studioTabs').style.display='none';
+    if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    if($('ribbon')) $('ribbon').style.display='flex';
+    if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='inline-flex';
+
+    hideStudioPanels();
+    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    if(panel){
+      panel.style.display='flex';
+      panel.classList.add('active');
+    }
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(name);
+    }catch(e){console.warn('Existing studio loader:',e);}
+    // Re-assert our navigation after the legacy loader runs.
+    setTimeout(()=>{
+      if($('studioTabs')) $('studioTabs').style.display='none';
+      if($('ribbon')) $('ribbon').style.display='flex';
+      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+    },50);
+  }
+
+  function wire(){
+    /* Always start clean. */
+    dashboard();
+
+    /* Main menu cards. */
+    document.addEventListener('click',e=>{
+      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      studio(tile.dataset.studio);
+    },true);
+
+    /* Upload File card. */
+    const dashUpload=$('dashboardUploadFileTile');
+    const input=$('universalFileInput');
+    if(dashUpload && input){
+      dashUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Upload button inside any Studio. */
+    const studioUpload=$('studioUploadFileBtn');
+    if(studioUpload && input){
+      studioUpload.addEventListener('click',e=>{e.preventDefault();input.click();},true);
+    }
+
+    /* Back to Main Menu. */
+    $('backToMainMenu')?.addEventListener('click',e=>{
+      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
+    },true);
+
+    /* Route uploaded file. */
+    input?.addEventListener('change',()=>{
+      const file=input.files?.[0];
+      if(!file) return;
+      const ext=(file.name.split('.').pop()||'').toLowerCase();
+      let target='convert';
+      if(ext==='pdf'||file.type.startsWith('image/')) target='pdf';
+      else if(['xls','xlsx','csv'].includes(ext)) target='excel';
+      else if(['ppt','pptx','odp'].includes(ext)) target='powerpoint';
+      studio(target);
+
+      /* Feed PDF/image files into the existing PDF input. */
+      if(target==='pdf'){
+        try{
+          const dt=new DataTransfer(); dt.items.add(file);
+          const pdfInput=$('fileInput');
+          if(pdfInput){pdfInput.files=dt.files;pdfInput.dispatchEvent(new Event('change',{bubbles:true}));}
+        }catch(e){console.warn(e);}
+      }
+      input.value='';
+    },true);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  else wire();
+})();
+</script>
 
 </body></html>`);
   });
@@ -4338,7 +5150,7 @@ async function openZoom(index){
   await renderZoom();
 }
 async function renderZoom(){
-  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes).slice(), disableWorker:false }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
   const page = await pdf.getPage(zoomPageIndex + 1);
   const viewport = page.getViewport({ scale: zoomScale });
   const canvas = $('zoomCanvas');
@@ -4467,7 +5279,6 @@ function showPdfResult(title, blob, filename, message){
 
 /* ---------- Wire up sidebar tools ---------- */
 $('btnOpen').addEventListener('click', async () => {
-  pendingToolId = null;
   if(!workingBytes){
     $('fileInput').click();
     return;
@@ -4645,56 +5456,21 @@ $('btnMetadata').addEventListener('click', async () => {
 
 $('btnOcrImage').addEventListener('click', () => {
   openModal('Extract text from image', `
-    <div class="field">
-      <label>Select image</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button type="button" class="btn primary" id="ocrGalleryBtn">🖼️ Gallery / Photos</button>
-        <button type="button" class="btn ghost" id="ocrCameraBtn">📷 Camera</button>
-        <button type="button" class="btn ghost" id="ocrFilesBtn">📁 Files</button>
-      </div>
-      <input type="file" id="ocrImgGallery" accept="image/*" class="sr-only">
-      <input type="file" id="ocrImgCamera" accept="image/*" capture="environment" class="sr-only">
-      <input type="file" id="ocrImgFiles" accept=".jpg,.jpeg,.png,.webp,.bmp,.gif,image/*" class="sr-only">
-      <div id="ocrSelectedName" class="hint" style="margin-top:8px;">No image selected.</div>
+    <div class="field"><label>Image file (JPG, PNG, WEBP, BMP…)</label><input type="file" id="ocrImgFile" accept="image/*"></div>
+    <div class="field"><label>Language</label>
+      ${ocrLangOptions('ocrImgLang')}
     </div>
-    <div class="field"><label>Language</label>${ocrLangOptions('ocrImgLang')}</div>
-    <p class="hint">Choose an image from Photos/Gallery, take a new photo, or browse Files. OCR runs in your browser.</p>
+    <p class="hint">Runs entirely in your browser. The first time you use a language, your browser downloads a small recognition model — no document or image content is ever sent anywhere.</p>
   `, async () => {
-    const sources=['ocrImgGallery','ocrImgCamera','ocrImgFiles'];
-    let file=null;
-    for(const id of sources){
-      const f=document.getElementById(id)?.files?.[0];
-      if(f){file=f;break;}
+    const file = document.getElementById('ocrImgFile').files[0];
+    const lang = document.getElementById('ocrImgLang').value;
+    if(!file){ toast('Choose an image first.', true); return; }
+    const text = await runOcrOnImageFile(file, lang);
+    if(text !== null){
+      const fname = (file.name.replace(/\.[^.]+$/, '') || 'extracted') + '.txt';
+      showTextResult('Extracted text', text, fname, true);
     }
-    const lang=document.getElementById('ocrImgLang').value;
-    if(!file){toast('Choose an image first.',true);return;}
-    setStatus('Reading image…'); showProgress(10);
-    try{
-      const text=await runOcrOnImageFile(file,lang);
-      if(text!==null){
-        const fname=(file.name.replace(/\.[^.]+$/,'')||'extracted')+'.txt';
-        showTextResult('Extracted text',text,fname);
-      }
-    }catch(e){
-      console.error(e); toast('Could not extract text from that image.',true);
-    }finally{showProgress(null);}
   });
-
-  setTimeout(()=>{
-    const wire=(buttonId,inputId)=>{
-      document.getElementById(buttonId)?.addEventListener('click',()=>{
-        document.getElementById(inputId)?.click();
-      });
-      document.getElementById(inputId)?.addEventListener('change',e=>{
-        const f=e.target.files?.[0];
-        const n=document.getElementById('ocrSelectedName');
-        if(n) n.textContent=f ? 'Selected: '+f.name : 'No image selected.';
-      });
-    };
-    wire('ocrGalleryBtn','ocrImgGallery');
-    wire('ocrCameraBtn','ocrImgCamera');
-    wire('ocrFilesBtn','ocrImgFiles');
-  },0);
 });
 
 $('btnOcrPdf').addEventListener('click', () => {
@@ -5527,57 +6303,29 @@ $('btnEncrypt').addEventListener('click', () => {
   });
 });
 
-async function openEncryptedPdfFromFile(file, password, continueAfterOpen){
-  setStatus('Opening password-protected PDF…'); showProgress(10);
-  try{
-    const buf=new Uint8Array(await file.arrayBuffer()).slice();
-    const doc=await rebuildPdfFromPdfJs(buf,password);
-    const bytes=await doc.save();
-
-    $('outName').value=file.name.replace(/\.pdf$/i,'') || 'document';
-    currentProjectId='proj_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-    setToolsEnabled(true);
-    await commit(bytes,`Opened password-protected "${file.name}".`);
-
-    if(typeof continueAfterOpen==='function') continueAfterOpen();
-    else setStudio('pdf');
-    toast('PDF opened successfully.',false);
-    return true;
-  }catch(e){
-    console.error('Protected PDF open failed:',e);
-    const msg=String(e && e.message || e);
-    if(/password|incorrect|invalid/i.test(msg)){
-      toast('The PDF password was not accepted. Please check the password and try again.',true);
-    }else{
-      toast('The protected PDF could not be opened: '+msg,true);
-    }
-    return false;
-  }finally{ showProgress(null); }
-}
-
-function askPasswordForExistingFile(file, afterOpen){
-  openModal('Password required', `
-    <p class="hint" style="margin:0;">This PDF is password-protected.</p>
-    <p style="margin:8px 0;font-weight:700;">${String(file.name).replace(/[<>&"']/g,'')}</p>
-    <div class="field"><label>Password</label><input type="password" id="autoPwPdfPassword" autocomplete="off"></div>
-  `, async () => {
-    const password=document.getElementById('autoPwPdfPassword')?.value || '';
-    if(!password){toast('Enter the PDF password.',true);return;}
-    await openEncryptedPdfFromFile(file,password,afterOpen);
-  });
-}
-
 $('btnOpenEncrypted').addEventListener('click', () => {
   openModal('Open password-protected PDF', `
-    <p class="hint" style="margin:0;">Choose the protected PDF and enter its password. The file is processed locally in your browser.</p>
-    <div class="field"><label>PDF</label><input type="file" id="pwPdfFile" accept="application/pdf"></div>
-    <div class="field"><label>Password</label><input type="password" id="pwPdfPassword" autocomplete="off"></div>
+    <p class="hint" style="margin:0;">Beta: uses the same community fork as "Set password" — less battle-tested than the rest of this app. Decrypts the file and loads it as a normal working copy; it won't stay password-protected here unless you re-apply "Set password" before exporting.</p>
+    <div class="field"><label>Password-protected PDF</label><input type="file" id="pwPdfFile" accept="application/pdf"></div>
+    <div class="field"><label>Password</label><input type="password" id="pwPdfPassword"></div>
   `, async () => {
-    const file=document.getElementById('pwPdfFile')?.files?.[0];
-    const password=document.getElementById('pwPdfPassword')?.value || '';
-    if(!file){toast('Choose a PDF first.',true);return;}
-    if(!password){toast('Enter the PDF password.',true);return;}
-    await openEncryptedPdfFromFile(file,password,()=>setStudio('pdf'));
+    const file = document.getElementById('pwPdfFile').files[0];
+    const password = document.getElementById('pwPdfPassword').value;
+    if(!file){ toast('Choose a file.', true); return; }
+    if(!password){ toast('Enter the password.', true); return; }
+    setStatus('Decrypting PDF…'); showProgress(20);
+    try{
+      const buf = new Uint8Array(await file.arrayBuffer());
+      const decryptedBytes = await decryptPdfBytes(buf, password);
+      $('outName').value = file.name.replace(/\.pdf$/i, '') || 'document';
+      currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+      setToolsEnabled(true);
+      await commit(decryptedBytes, `Opened and decrypted "${file.name}".`);
+      setStudio('pdf');
+    } catch(e){
+      console.error(e);
+      toast('Could not open that PDF — check the password is correct: ' + (e && e.message ? e.message : 'unknown error'), true);
+    } finally { showProgress(null); }
   });
 });
 
@@ -5621,7 +6369,7 @@ $('btnRedact').addEventListener('click', () => {
     document.getElementById('redactLoadPage').addEventListener('click', async () => {
       const pageNum = parseInt(document.getElementById('redactPageNum').value) || 1;
       try{
-        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(workingBytes).slice(), disableWorker:false }).promise;
+        const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
         if(pageNum < 1 || pageNum > pdf.numPages){ toast('Page number out of range.', true); return; }
         const page = await pdf.getPage(pageNum);
         const viewport = page.getViewport({ scale });
@@ -6326,23 +7074,7 @@ $('landingPage').style.display = 'none';
 $('appView').style.display = 'block';
 
 /* ---------- Studio navigation (top tabs + ribbon) ---------- */
-let currentStudio = (typeof window !== 'undefined' && window.currentStudio) ? window.currentStudio : null;
-/* v39: PDF Studio state and byte-copy helpers.
-   These must exist before any PDF.js/pdf-lib handler can be invoked. */
-function ensureStudio(studio){
-  if(studio) currentStudio = studio;
-  if(!currentStudio) currentStudio = 'pdf';
-  if(typeof window !== 'undefined') window.currentStudio = currentStudio;
-  return currentStudio;
-}
-function clonePdfBytes(bytes){
-  if(bytes instanceof ArrayBuffer) return bytes.slice(0);
-  if(ArrayBuffer.isView(bytes)){
-    return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-  }
-  return new Uint8Array(bytes || []).slice().buffer;
-}
-
+let currentStudio = 'dashboard';
 function updateDashboardTilesVisibility(){
   const showDash = currentStudio === 'dashboard' && !workingBytes;
   $('dashboardNavigationHint').style.display = showDash ? 'block' : 'none';
@@ -6493,7 +7225,6 @@ function setStudio(name){
     // Hard inline cleanup so no stale PDF editor element can occupy space.
     ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout']
       .forEach(id => { if($(id)) $(id).style.display='none'; });
-    if($('workspaceLayout')) $('workspaceLayout').style.display='flex';
     if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
     if($('dashboardRecent')) $('dashboardRecent').style.display='block';
   }
@@ -7146,100 +7877,132 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 </script>
 
 
-
 <script>
-/* ===== DocuForge AI v2026.08.16.39 — reliable Studio submenu host ===== */
+/* ===== DocuForge AI v2026.08.17.40 — clean main-menu navigation =====
+   Navigation-only layer. The stable v26 PDF/OCR/conversion engines are
+   intentionally not modified here. */
 (function(){
-  const $=id=>document.getElementById(id);
-  const host=()=>$('studioSubmenuHost');
-
-  function allPanels(){
-    return Array.from(document.querySelectorAll('.ribbon-panel[data-studio-panel]'));
-  }
+  const $ = id => document.getElementById(id);
 
   function hideAllPanels(){
-    allPanels().forEach(p=>{
-      p.classList.remove('active');
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
       p.style.display='none';
+      p.classList.remove('active');
     });
-    const h=host();
-    if(h) h.innerHTML='';
+    ['excelStudio','exportStudio','settingsStudio','readerStudio','helpStudio',
+     'aboutStudio','gstInvoiceStudio'].forEach(id=>{
+      if($(id)) $(id).style.display='none';
+    });
   }
 
-  function showDashboard(){
+  function dashboard(){
     document.body.classList.add('dashboard-active');
+    currentStudio='dashboard';
     hideAllPanels();
-    ['ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'].forEach(id=>{
-      const el=$(id); if(el) el.style.display='none';
-    });
-    if($('backToMainMenu')) $('backToMainMenu').style.display='none';
+
     if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
     if($('dashboardRecent')) $('dashboardRecent').style.display='block';
     if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='block';
+
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid',
+     'noPdfBanner','workspaceLayout','backToMainMenu'].forEach(id=>{
+      if($(id)) $(id).style.display='none';
+    });
     if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu to begin.';
   }
 
-  function showStudio(name){
+  function studio(name){
     document.body.classList.remove('dashboard-active');
+    currentStudio=name;
+
     if($('dashboardTiles')) $('dashboardTiles').style.display='none';
     if($('dashboardRecent')) $('dashboardRecent').style.display='none';
     if($('dashboardNavigationHint')) $('dashboardNavigationHint').style.display='none';
 
-    try{ if(typeof window.setStudio==='function') window.setStudio(name); }catch(e){ console.warn(e); }
-
-    const h=host();
     hideAllPanels();
-    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
 
-    if(panel && h){
-      /* Move the real panel, rather than cloning it, so every existing
-         event listener attached to its buttons remains intact. */
-      h.appendChild(panel);
-      panel.classList.add('active');
-      panel.style.display='grid';
-    }
+    // No second horizontal main-menu row.
+    if($('studioTabs')) $('studioTabs').style.display='none';
 
     if($('backToMainMenu')){
       $('backToMainMenu').style.display='block';
       $('backToMainMenu').classList.add('primary');
-      $('backToMainMenu').style.cssText += ';display:block!important;width:calc(100% - 24px);margin:10px 12px;padding:14px 18px;background:var(--accent);color:var(--accent-ink);border:2px solid var(--accent);font-weight:800;font-size:17px;border-radius:12px;text-align:center;';
+    }
+    if($('ribbon')) $('ribbon').style.display='flex';
+
+    const panel=document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    if(panel){
+      panel.style.display='flex';
+      panel.classList.add('active');
     }
 
-    /* Hide the old ribbon container; the selected panel is now in our host. */
-    if($('ribbon')) $('ribbon').style.display='none';
-    ['toolbar','pageActionStrip','dropzone','grid','noPdfBanner'].forEach(id=>{
-      const el=$(id); if(el) el.style.display='none';
-    });
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(name);
+    }catch(e){
+      console.warn('Studio initialiser recovered:',e);
+    }
 
-    if($('statusMsg')) $('statusMsg').textContent='Choose a tool from the '+name+' Studio submenu.';
-    h?.scrollIntoView({behavior:'smooth',block:'start'});
+    setTimeout(()=>{
+      if($('studioTabs')) $('studioTabs').style.display='none';
+      if($('backToMainMenu')) $('backToMainMenu').style.display='block';
+      if($('studioUploadFileBtn')) $('studioUploadFileBtn').style.display='none';
+    },80);
+
+    if($('statusMsg')){
+      $('statusMsg').textContent = name==='pdf'
+        ? 'PDF Studio — choose a tool. The selected tool will ask for the file when required.'
+        : 'Choose a tool from this Studio submenu.';
+    }
   }
 
   function wire(){
-    showDashboard();
+    dashboard();
 
+    // Main Dashboard → selected Studio submenu.
     document.addEventListener('click',e=>{
       const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
       if(!tile) return;
       e.preventDefault();
       e.stopImmediatePropagation();
-      showStudio(tile.dataset.studio);
+      studio(tile.dataset.studio);
     },true);
 
+    // Prominent Back to Main Menu.
     $('backToMainMenu')?.addEventListener('click',e=>{
       e.preventDefault();
       e.stopImmediatePropagation();
-      showDashboard();
+      dashboard();
       window.scrollTo({top:0,behavior:'smooth'});
     },true);
+
+    // Help and Ask Me remain directly available on the main Dashboard.
+    $('dashboardHelpTile')?.addEventListener('click',e=>{
+      e.preventDefault(); e.stopImmediatePropagation();
+      if(typeof openHelp==='function') openHelp();
+      else if(typeof showHelp==='function') showHelp();
+      else studio('help');
+    },true);
+
+    $('dashboardAskTile')?.addEventListener('click',e=>{
+      e.preventDefault(); e.stopImmediatePropagation();
+      if(typeof openAskMe==='function') openAskMe();
+      else if(typeof showAskMe==='function') showAskMe();
+      else {
+        const ask=document.querySelector('#askMeBtn,#askBtn,.ask-me');
+        if(ask) ask.click(); else studio('help');
+      }
+    },true);
+
+    // Defensive cleanup of any legacy generic upload controls.
+    $('dashboardUploadFileTile')?.remove();
+    $('studioUploadFileBtn')?.remove();
+    if($('studioTabs')) $('studioTabs').style.display='none';
   }
 
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire,{once:true});
   else wire();
 })();
 </script>
 
 </body>
 </html>
-  releasePdfJsDocument(pdf);
-
