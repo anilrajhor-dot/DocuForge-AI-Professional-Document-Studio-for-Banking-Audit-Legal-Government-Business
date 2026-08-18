@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.18.43 usability refinements ===== */
+/* ===== v2026.08.18.44 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.18.43 PDF workflow ===== */
+/* ===== v2026.08.18.44 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.18.43 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.18.44 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.18.43 dashboard cleanup ===== */
+/* ===== v2026.08.18.44 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.18.43: clean Dashboard ===== */
+/* ===== v2026.08.18.44: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.18.43: Dashboard is a true main menu ===== */
+/* ===== v2026.08.18.44: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.18.43: hard dashboard/studio separation ===== */
+/* ===== v2026.08.18.44: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.18.43: Dashboard upload entry ===== */
+/* ===== v2026.08.18.44: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.18.43 — one navigation system only ===== */
+/* ===== v2026.08.18.44 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.18.43';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.18.44';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.18.43</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.18.44</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -3464,7 +3464,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.18.43 — single main menu; file requested by operation */
+/* v2026.08.18.44 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3641,7 +3641,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.18.43 navigation ===== */
+/* ===== DocuForge AI v2026.08.18.44 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -3714,6 +3714,43 @@ body:not(.dashboard-active) .ribbon-panel.active{display:flex !important;}
 
 <style id="docuforge-v43-ppt-markdown">
 #btnPptxToMarkdown{font-weight:700;}
+</style>
+
+
+<style id="docuforge-v44-back-home-fix">
+  /* v44: Back to Main Menu must always be visible inside a studio,
+     clearly highlighted, and hidden only on the dashboard. */
+  #backToMainMenu{
+    position:relative !important;
+    z-index:100 !important;
+    box-sizing:border-box !important;
+    display:none !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:calc(100% - 40px) !important;
+    min-height:64px !important;
+    margin:16px 20px !important;
+    padding:14px 18px !important;
+    border:0 !important;
+    border-radius:14px !important;
+    background:#c45d18 !important;
+    color:#ffffff !important;
+    -webkit-text-fill-color:#ffffff !important;
+    font-size:20px !important;
+    font-weight:800 !important;
+    line-height:1.2 !important;
+    text-align:center !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    box-shadow:0 3px 10px rgba(0,0,0,.16) !important;
+    cursor:pointer !important;
+  }
+  body:not(.dashboard-active) #backToMainMenu{
+    display:flex !important;
+  }
+  body.dashboard-active #backToMainMenu{
+    display:none !important;
+  }
 </style>
 
 </head>
@@ -6862,7 +6899,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* DocuForge AI v2026.08.18.43 — navigation repair */
+/* DocuForge AI v2026.08.18.44 — navigation repair */
 (function(){
   const $=id=>document.getElementById(id);
 
@@ -6903,8 +6940,14 @@ $('dashboardAskTile')?.addEventListener('click', () => {
     });
 
     if($('backToMainMenu')){
-      $('backToMainMenu').style.display='flex';
-      $('backToMainMenu').classList.add('primary');
+      const back = $('backToMainMenu');
+      back.style.setProperty('display','flex','important');
+      back.style.setProperty('background','#c45d18','important');
+      back.style.setProperty('color','#ffffff','important');
+      back.style.setProperty('-webkit-text-fill-color','#ffffff','important');
+      back.style.setProperty('visibility','visible','important');
+      back.style.setProperty('opacity','1','important');
+      back.classList.add('primary');
     }
     window.scrollTo(0,0);
   }
