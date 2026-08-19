@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.18.44 usability refinements ===== */
+/* ===== v2026.08.18.45 usability refinements ===== */
 #studioMoreBtn{display:none;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.18.44 PDF workflow ===== */
+/* ===== v2026.08.18.45 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.18.44 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.18.45 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.18.44 dashboard cleanup ===== */
+/* ===== v2026.08.18.45 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.18.44: clean Dashboard ===== */
+/* ===== v2026.08.18.45: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.18.44: Dashboard is a true main menu ===== */
+/* ===== v2026.08.18.45: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.18.44: hard dashboard/studio separation ===== */
+/* ===== v2026.08.18.45: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.18.44: Dashboard upload entry ===== */
+/* ===== v2026.08.18.45: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.18.44 — one navigation system only ===== */
+/* ===== v2026.08.18.45 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.18.44';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.18.45';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.18.44</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.18.45</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1505,16 +1505,134 @@ function updateUndoRedoButtons(){
 
 /* ---------- Loading / merging files ---------- */
 async function loadPdfSafely(buf){
+  // First let PDF.js validate/open the file. This is much more tolerant of
+  // real-world PDFs than trying pdf-lib first.
   try{
-    return await PDFDocument.load(buf);
-  } catch(e){
-    if(e && e.message && /encrypt/i.test(e.message)){
-      throw new Error('This PDF is password-protected. Use Security Studio → "Open password-protected PDF" first, then try again.');
-    }
+    const task = pdfjsLib.getDocument({ data: buf.slice() });
+    const pdf = await new Promise((resolve, reject) => {
+      task.onPassword = () => {
+        const err = new Error('This PDF is password-protected.');
+        err.name = 'PasswordException';
+        err.passwordRequired = true;
+        try{ task.destroy(); }catch(_){}
+        reject(err);
+      };
+      task.promise.then(resolve, reject);
+    });
+    try{ await pdf.destroy(); }catch(_){}
+  }catch(e){
     throw e;
   }
+
+  // Then load it with pdf-lib for normal editable/merge operations.
+  try{
+    return await PDFDocument.load(buf);
+  }catch(e){
+    // Some valid PDFs render perfectly in PDF.js but cannot be parsed by
+    // pdf-lib. The caller will use the PDF.js raster fallback in that case.
+    const err = new Error('PDF.js opened this PDF, but the editing engine could not parse it.');
+    err.name = 'PdfLibCompatibilityError';
+    err.original = e;
+    throw err;
+  }
 }
-window.docuforgeHasPdf = function(){ return !!workingBytes; };
+
+async function rasterizePdfToWorkingPdf(bytes, password, filename){
+  const loadingTask = pdfjsLib.getDocument({
+    data: bytes.slice(),
+    password: password || undefined
+  });
+
+  const pdf = await new Promise((resolve, reject) => {
+    loadingTask.onPassword = (updatePassword, reason) => {
+      const err = new Error(reason === 2 ? 'Incorrect password.' : 'This PDF needs a password.');
+      err.name = 'PasswordException';
+      err.passwordRequired = reason === 1;
+      err.incorrect = reason === 2;
+      // Keep the loading task alive for a supplied password.
+      if(typeof updatePassword === 'function') err.updatePassword = updatePassword;
+      reject(err);
+    };
+    loadingTask.promise.then(resolve, reject);
+  });
+
+  try{
+    const doc = await PDFDocument.create();
+    const scale = 1.6;
+    for(let i=1;i<=pdf.numPages;i++){
+      setStatus(`Preparing PDF page ${i} of ${pdf.numPages}…`);
+      showProgress(10 + Math.round((i/pdf.numPages)*80));
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({scale});
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.ceil(viewport.width));
+      canvas.height = Math.max(1, Math.ceil(viewport.height));
+      const ctx = canvas.getContext('2d', {alpha:false});
+      await page.render({canvasContext:ctx, viewport, intent:'display'}).promise;
+
+      const blob = await new Promise((resolve,reject) =>
+        canvas.toBlob(b => b ? resolve(b) : reject(new Error('Could not rasterize PDF page.')),
+          'image/jpeg', 0.90)
+      );
+      const img = await doc.embedJpg(await blob.arrayBuffer());
+      const pageW = viewport.width / scale;
+      const pageH = viewport.height / scale;
+      const outPage = doc.addPage([pageW, pageH]);
+      outPage.drawImage(img,{x:0,y:0,width:pageW,height:pageH});
+      canvas.width = 1; canvas.height = 1;
+    }
+    return await doc.save();
+  }finally{
+    try{ await pdf.destroy(); }catch(_){}
+  }
+}
+
+async function askPasswordAndOpenPdf(file, originalBytes, message){
+  return new Promise(resolve => {
+    openModal('PDF password required', `
+      <p class="hint" style="margin:0 0 10px;">
+        ${message || 'This PDF is password-protected.'}
+      </p>
+      <div class="field">
+        <label>PDF file</label>
+        <div style="font-weight:700;">${String(file.name).replace(/[<>&"]/g,'')}</div>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="docuForgeOpenPassword" autocomplete="current-password" placeholder="Enter PDF password">
+      </div>
+      <p class="hint">After the correct password is entered, the PDF will be opened in DocuForge AI. If the PDF uses a format the editing engine cannot parse, it will be safely opened as page images so you can still work with it.</p>
+    `, async () => {
+      const pw = $('docuForgeOpenPassword')?.value || '';
+      if(!pw){
+        toast('Please enter the PDF password.', true);
+        // Reopen so the user can enter it without losing the file.
+        setTimeout(() => askPasswordAndOpenPdf(file, originalBytes, 'Please enter the password to open this PDF.'), 0);
+        resolve(false);
+        return;
+      }
+      try{
+        setStatus('Opening password-protected PDF…');
+        showProgress(10);
+        const bytes = await rasterizePdfToWorkingPdf(originalBytes, pw, file.name);
+        $('outName').value = file.name.replace(/\.pdf$/i,'') || 'document';
+        currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+        setToolsEnabled(true);
+        await commit(bytes, `Opened password-protected PDF "${file.name}".`);
+        setStudio('pdf');
+        resolve(true);
+      }catch(e){
+        console.error(e);
+        toast('The password may be incorrect, or the PDF could not be rendered: ' + (e?.message || 'unknown error'), true);
+        setTimeout(() => askPasswordAndOpenPdf(file, originalBytes, 'The PDF could not be opened with that password. Please try again.'), 0);
+        resolve(false);
+      }finally{
+        showProgress(null);
+      }
+    });
+  });
+}
+
 async function loadFiles(fileList){
   const isPdfFile = f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
   const isImageFile = f => f.type.startsWith('image/') || /\.(jpe?g|png|gif|webp|bmp|heic|heif)$/i.test(f.name);
@@ -1526,23 +1644,54 @@ async function loadFiles(fileList){
     if(!workingBytes){
       $('outName').value = allFiles[0].name.replace(/\.[^.]+$/,'') || 'document';
       currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+
       if(isPdfFile(allFiles[0])){
-        const firstBuf = await allFiles[0].arrayBuffer();
-        doc = await loadPdfSafely(firstBuf);
-        startIdx = 1;
+        const firstBuf = new Uint8Array(await allFiles[0].arrayBuffer());
+        try{
+          doc = await loadPdfSafely(firstBuf);
+          startIdx = 1;
+        }catch(e){
+          if(e?.name === 'PasswordException' || e?.passwordRequired){
+            await askPasswordAndOpenPdf(allFiles[0], firstBuf, 'This PDF is password-protected. Enter the password to open it.');
+            return;
+          }
+          // Valid PDF.js files that pdf-lib cannot edit are rasterized instead
+          // of being incorrectly reported as corrupted.
+          try{
+            const check = await pdfjsLib.getDocument({data:firstBuf.slice()}).promise;
+            try{ await check.destroy(); }catch(_){}
+            const rasterBytes = await rasterizePdfToWorkingPdf(firstBuf, '', allFiles[0].name);
+            setToolsEnabled(true);
+            await commit(rasterBytes, `Opened "${allFiles[0].name}" using compatibility mode.`);
+            return;
+          }catch(renderErr){
+            console.error(renderErr);
+            throw e;
+          }
+        }
       } else {
         doc = await PDFDocument.create();
       }
     } else {
       doc = await PDFDocument.load(workingBytes);
     }
+
     const ptPerPx = 72 / 96;
     for(let i = startIdx; i < allFiles.length; i++){
       showProgress(10 + Math.round(((i+1)/allFiles.length)*70));
       const f = allFiles[i];
       if(isPdfFile(f)){
-        const buf = await f.arrayBuffer();
-        const src = await loadPdfSafely(buf);
+        const buf = new Uint8Array(await f.arrayBuffer());
+        let src;
+        try{
+          src = await loadPdfSafely(buf);
+        }catch(e){
+          if(e?.name === 'PasswordException' || e?.passwordRequired){
+            await askPasswordAndOpenPdf(f, buf, 'This additional PDF is password-protected. Open it separately with its password, then insert it.');
+            return;
+          }
+          throw e;
+        }
         const copied = await doc.copyPages(src, src.getPageIndices());
         copied.forEach(p => doc.addPage(p));
       } else {
@@ -1555,12 +1704,15 @@ async function loadFiles(fileList){
     const bytes = await doc.save();
     setToolsEnabled(true);
     await commit(bytes, `Loaded ${allFiles.length} file${allFiles.length>1?'s':''} (${doc.getPageCount()} pages total).`);
-  } catch(e){
+  }catch(e){
     console.error(e);
-    toast((e && e.message && /password-protected/.test(e.message)) ? e.message : 'Could not open one of those files — it may be corrupted, an unsupported format, or password protected.', true);
-  } finally { showProgress(null); }
+    const detail = e?.original?.message || e?.message || 'unknown error';
+    toast(`Could not open the PDF. ${detail}`, true);
+    setStatus('PDF open failed. The file may be unsupported, damaged, or password-protected.');
+  }finally{
+    showProgress(null);
+  }
 }
-
 function updateSelectionUI(){
   const count = selected.size;
   const total = grid.children.length;
@@ -3464,7 +3616,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.18.44 — single main menu; file requested by operation */
+/* v2026.08.18.45 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3641,7 +3793,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.18.44 navigation ===== */
+/* ===== DocuForge AI v2026.08.18.45 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -6899,7 +7051,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* DocuForge AI v2026.08.18.44 — navigation repair */
+/* DocuForge AI v2026.08.18.45 — navigation repair */
 (function(){
   const $=id=>document.getElementById(id);
 
