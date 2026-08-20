@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.20.49 usability refinements ===== */
+/* ===== v2026.08.20.50 usability refinements ===== */
 #studioMoreBtn{display:none !important;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.49 PDF workflow ===== */
+/* ===== v2026.08.20.50 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.20.49 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.20.50 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.49 dashboard cleanup ===== */
+/* ===== v2026.08.20.50 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.20.49: clean Dashboard ===== */
+/* ===== v2026.08.20.50: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.20.49: Dashboard is a true main menu ===== */
+/* ===== v2026.08.20.50: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.20.49: hard dashboard/studio separation ===== */
+/* ===== v2026.08.20.50: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.20.49: Dashboard upload entry ===== */
+/* ===== v2026.08.20.50: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.20.49 — one navigation system only ===== */
+/* ===== v2026.08.20.50 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.20.49';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.20.50';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.49</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.50</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -3626,7 +3626,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.20.49 — single main menu; file requested by operation */
+/* v2026.08.20.50 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3803,7 +3803,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.20.49 navigation ===== */
+/* ===== DocuForge AI v2026.08.20.50 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -3913,6 +3913,20 @@ body:not(.dashboard-active) .ribbon-panel.active{display:flex !important;}
   body.dashboard-active #backToMainMenu{
     display:none !important;
   }
+</style>
+
+
+<style id="df50NavigationCss">
+body.dashboard-active #dashboardTiles{display:grid !important;}
+body.dashboard-active #workspaceLayout,
+body.dashboard-active #ribbon,
+body.dashboard-active #backToMainMenu{display:none !important;}
+body:not(.dashboard-active) #backToMainMenu{
+ display:flex !important;align-items:center !important;justify-content:center !important;
+ min-height:56px !important;width:calc(100% - 32px) !important;margin:12px 16px !important;
+ background:#c45d18 !important;color:#fff !important;border:0 !important;border-radius:12px !important;
+ font-size:18px !important;font-weight:800 !important;visibility:visible !important;opacity:1 !important;
+}
 </style>
 
 </head>
@@ -7138,7 +7152,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* DocuForge AI v2026.08.20.49 — navigation repair */
+/* DocuForge AI v2026.08.20.50 — navigation repair */
 (function(){
   const $=id=>document.getElementById(id);
 
@@ -7216,62 +7230,106 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 </script>
 
 
+
+
+
 <script>
-/* v49: upload UI only; existing v46 navigation is intentionally untouched. */
+/* DocuForge AI v2026.08.20.50 — main menu navigation repair.
+   This controller handles ONLY Dashboard -> Studio navigation. */
 (function(){
- const $=id=>document.getElementById(id);
- let studio='';
- function accept(n){
-  if(n==='pdf'||n==='ocr')return '.pdf,application/pdf,image/*';
-  if(n==='translation')return '.pdf,.docx,.txt,.md,*/*';
-  if(n==='powerpoint')return '.ppt,.pptx,*/*';
-  if(n==='spreadsheet'||n==='excel')return '.xlsx,.xls,.csv,*/*';
-  if(n==='reader')return '.pdf,.epub,*/*';
-  return '*/*';
- }
- function detect(){
-  if(document.body.classList.contains('dashboard-active')){
-   $('df49UploadPanel')?.classList.remove('df49Show'); return;
+  const $=id=>document.getElementById(id);
+
+  function openStudio(name){
+    document.body.classList.remove('dashboard-active');
+
+    if($('dashboardTiles')) $('dashboardTiles').style.setProperty('display','none','important');
+    if($('dashboardRecent')) $('dashboardRecent').style.setProperty('display','none','important');
+
+    // Hide dashboard-only content.
+    ['dashboardNavigationHint','dashboardUploadStatus'].forEach(id=>{
+      if($(id)) $(id).style.display='none';
+    });
+
+    // Show the workspace and the Back button.
+    if($('workspaceLayout')) $('workspaceLayout').style.setProperty('display','block','important');
+    if($('ribbon')) $('ribbon').style.setProperty('display','flex','important');
+    if($('backToMainMenu')) $('backToMainMenu').style.setProperty('display','flex','important');
+
+    // Hide the obsolete upper menu.
+    if($('studioTabs')) $('studioTabs').style.display='none';
+
+    // Activate the requested submenu directly.
+    const panels=document.querySelectorAll('.ribbon-panel[data-studio-panel]');
+    let found=false;
+    panels.forEach(panel=>{
+      const active=(panel.dataset.studioPanel===name);
+      panel.classList.toggle('active',active);
+      if(active){
+        panel.style.setProperty('display','flex','important');
+        found=true;
+      }else{
+        panel.style.removeProperty('display');
+      }
+    });
+
+    // Use legacy studio setup only for its internal state, not navigation.
+    try{
+      if(typeof window.setStudio==='function') window.setStudio(name);
+    }catch(e){ console.warn('setStudio:',e); }
+
+    // Reassert the selected panel because legacy setStudio may change styles.
+    setTimeout(()=>{
+      panels.forEach(panel=>{
+        const active=(panel.dataset.studioPanel===name);
+        panel.classList.toggle('active',active);
+        if(active) panel.style.setProperty('display','flex','important');
+        else panel.style.removeProperty('display');
+      });
+      if($('studioTabs')) $('studioTabs').style.display='none';
+      if($('backToMainMenu')) $('backToMainMenu').style.setProperty('display','flex','important');
+    },50);
+
+    if(!found) console.warn('No submenu panel found for:',name);
   }
-  const p=document.querySelector('.ribbon-panel.active[data-studio-panel]');
-  if(!p)return;
-  studio=p.dataset.studioPanel||'';
-  const panel=$('df49UploadPanel');
-  if(panel){
-   panel.classList.add('df49Show');
-   const input=$('df49UploadInput');
-   if(input)input.accept=accept(studio);
+
+  function goHome(){
+    document.body.classList.add('dashboard-active');
+    if($('dashboardTiles')) $('dashboardTiles').style.setProperty('display','grid','important');
+    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
+    ['workspaceLayout','ribbon','toolbar','pageActionStrip','dropzone','grid',
+     'noPdfBanner','backToMainMenu'].forEach(id=>{
+      if($(id)) $(id).style.display='none';
+    });
+    document.querySelectorAll('.ribbon-panel').forEach(p=>p.classList.remove('active'));
+    window.scrollTo(0,0);
   }
- }
- function send(file){
-  $('df49FileName').textContent=file.name;
-  const ids={
-   pdf:['fileInput','universalFileInput'],
-   ocr:['ocrFileInput','fileInput','universalFileInput'],
-   translation:['translationFileInput','fileInput','universalFileInput'],
-   powerpoint:['pptxFileInput','fileInput','universalFileInput'],
-   spreadsheet:['spreadsheetFileInput','fileInput','universalFileInput'],
-   excel:['spreadsheetFileInput','fileInput','universalFileInput']
-  }[studio]||['fileInput','universalFileInput'];
-  for(const id of ids){
-   const target=$(id); if(!target)continue;
-   try{
-    const dt=new DataTransfer();dt.items.add(file);target.files=dt.files;
-    target.dispatchEvent(new Event('change',{bubbles:true}));return;
-   }catch(e){}
+
+  function wire(){
+    // Capture phase ensures this still works if an older handler exists.
+    document.addEventListener('click',function(e){
+      const tile=e.target.closest('#dashboardTiles button[data-studio]');
+      if(!tile) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      openStudio(tile.getAttribute('data-studio'));
+    },true);
+
+    const back=$('backToMainMenu');
+    if(back){
+      back.addEventListener('click',function(e){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        goHome();
+      },true);
+    }
+
+    // Start on Dashboard.
+    goHome();
   }
- }
- function wire(){
-  $('df49UploadBtn')?.addEventListener('click',()=>{
-   const i=$('df49UploadInput');if(i){i.accept=accept(studio);i.click();}
-  });
-  $('df49UploadInput')?.addEventListener('change',function(){
-   Array.from(this.files||[]).forEach(send);this.value='';
-  });
-  new MutationObserver(detect).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class','style']});
-  setTimeout(detect,250);
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
+
+  if(document.readyState==='loading')
+    document.addEventListener('DOMContentLoaded',wire,{once:true});
+  else wire();
 })();
 </script>
 
