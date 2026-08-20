@@ -687,6 +687,136 @@ body:not(.dashboard-active) #workspaceLayout{display:block !important;}
 body:not(.dashboard-active) #backToMainMenu{display:block;}
 
 </style>
+
+<style id="docuforge-v64-navigation-stability">
+/* v64: stable single-page navigation.  Dashboard is the only landing state;
+   every Studio gets a visible submenu or a safe fallback instead of a blank page. */
+#dfStudioFallback{display:none;margin:12px 20px 28px;padding:20px;border:1px solid var(--line,#ddd);border-radius:14px;background:var(--surface,#fff);box-shadow:var(--shadow,0 2px 8px rgba(0,0,0,.08));}
+body:not(.dashboard-active) #dfStudioFallback.show{display:block;}
+#dfStudioFallback h2{margin:0 0 8px;font-size:22px;}
+#dfStudioFallback p{margin:0 0 14px;color:var(--ink-soft,#59645f);}
+#dfStudioFallback .df-fallback-actions{display:flex;gap:10px;flex-wrap:wrap;}
+#dfStudioFallback button{padding:11px 16px;border-radius:10px;border:1px solid var(--line,#ddd);background:var(--surface,#fff);font-weight:700;cursor:pointer;}
+#dfStudioFallback .primary{background:#c45d18;color:#fff;border-color:#c45d18;}
+/* Never allow an empty active ribbon to occupy the whole screen. */
+body:not(.dashboard-active) #ribbon{min-height:0;}
+body:not(.dashboard-active) .ribbon-panel.active{display:flex !important;visibility:visible !important;opacity:1 !important;}
+</style>
+<script>
+/* DocuForge AI v2026.08.20.64 — navigation stability layer */
+(function(){
+  const $=id=>document.getElementById(id);
+  const labels={
+    pdf:'PDF Studio',ocr:'OCR & Image Studio',translate:'Translation Studio',convert:'Conversion Studio',
+    powerpoint:'PowerPoint Studio',ai:'AI Studio',website:'Website Studio',spreadsheet:'Spreadsheet Studio',
+    security:'Security Studio',batch:'Batch Studio',excel:'Excel',gstinvoice:'GST Invoice',help:'Help',
+    settings:'Settings',reader:'Reader',export:'Export',about:'About'
+  };
+  const noPanel=new Set(['excel','gstinvoice','help','settings','reader','export','about']);
+
+  function removeFallback(){ const x=$('dfStudioFallback'); if(x) x.classList.remove('show'); }
+  function showFallback(name){
+    let x=$('dfStudioFallback');
+    if(!x){
+      x=document.createElement('section'); x.id='dfStudioFallback';
+      const back=$('backToMainMenu');
+      if(back && back.parentNode) back.insertAdjacentElement('afterend',x);
+      else document.body.appendChild(x);
+    }
+    const label=labels[name]||name||'Studio';
+    x.innerHTML=`<h2>${label}</h2><p>The Studio submenu is ready. Choose a file or return to the Main Menu.</p><div class="df-fallback-actions"><button type="button" class="primary" id="dfFallbackChoose">📂 Choose File</button><button type="button" id="dfFallbackView">👁️ View File</button></div>`;
+    x.classList.add('show');
+    $('dfFallbackChoose').onclick=()=>{
+      const btn=document.querySelector('.ribbon-panel.active .tool-btn[data-requires-file="true"], .ribbon-panel.active .tool-btn');
+      if(btn){ btn.click(); return; }
+      const choose=$('studioUploadChoose'); if(choose){ $('studioUploadScreen').dataset.requested='1'; choose.click(); }
+    };
+    $('dfFallbackView').onclick=()=>document.querySelector('.common-view-file-btn')?.click();
+  }
+
+  function enforceStudio(name){
+    if(!name || name==='dashboard') return;
+    document.body.classList.remove('dashboard-active');
+    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
+    if($('studioTabs')) $('studioTabs').style.display='none';
+    if($('backToMainMenu')){
+      $('backToMainMenu').style.setProperty('display','flex','important');
+      $('backToMainMenu').style.setProperty('background','#c45d18','important');
+      $('backToMainMenu').style.setProperty('color','#fff','important');
+      $('backToMainMenu').style.setProperty('-webkit-text-fill-color','#fff','important');
+      $('backToMainMenu').style.setProperty('visibility','visible','important');
+      $('backToMainMenu').style.setProperty('opacity','1','important');
+    }
+    const panels=[...document.querySelectorAll('.ribbon-panel[data-studio-panel]')];
+    let matched=false;
+    panels.forEach(p=>{
+      const on=p.dataset.studioPanel===name;
+      p.classList.toggle('active',on);
+      if(on){ p.style.setProperty('display','flex','important'); p.style.setProperty('visibility','visible','important'); matched=true; }
+      else p.style.removeProperty('display');
+    });
+    removeFallback();
+    if(!matched && noPanel.has(name)) showFallback(name);
+    else if(!matched) showFallback(name);
+    if($('statusMsg')) $('statusMsg').textContent='Choose a tool from the '+(labels[name]||name)+' submenu.';
+    window.scrollTo(0,0);
+  }
+
+  function installWrapper(){
+    const original=window.setStudio;
+    if(typeof original==='function' && !window.__df64Wrapped){
+      window.__df64Wrapped=true;
+      window.__df64CoreSetStudio=original;
+      window.setStudio=function(name){
+        try{ original(name); }catch(e){ console.error('setStudio core error',e); }
+        if(name==='dashboard'){
+          document.body.classList.add('dashboard-active');
+          removeFallback();
+          if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+          if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+          if($('backToMainMenu')) $('backToMainMenu').style.setProperty('display','none','important');
+          if($('studioUploadScreen')){ $('studioUploadScreen').dataset.requested=''; $('studioUploadScreen').style.display='none'; }
+          if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu to begin.';
+          window.scrollTo(0,0);
+        }else enforceStudio(name);
+      };
+    }
+  }
+
+  function goDashboard(){ installWrapper(); if(typeof window.setStudio==='function') window.setStudio('dashboard'); }
+  function goStudio(name){ installWrapper(); if(typeof window.setStudio==='function') window.setStudio(name); }
+
+  function wire(){
+    installWrapper();
+    /* Final capture handlers guarantee iPhone taps reach the intended destination. */
+    document.addEventListener('click',e=>{
+      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(!tile) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      goStudio(tile.dataset.studio);
+    },true);
+    document.addEventListener('click',e=>{
+      const tab=e.target.closest('#studioTabs .studio-tab[data-studio]');
+      if(!tab) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      goStudio(tab.dataset.studio);
+    },true);
+    document.addEventListener('click',e=>{
+      const back=e.target.closest('#backToMainMenu');
+      if(!back) return;
+      e.preventDefault(); e.stopImmediatePropagation(); goDashboard();
+    },true);
+    $('menuToggle')?.addEventListener('click',()=>goDashboard(),true);
+
+    /* Never restore a Studio after a fresh page load or BFCache return. */
+    const land=()=>setTimeout(()=>goDashboard(),80);
+    window.addEventListener('pageshow',land);
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',land,{once:true}); else land();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire,{once:true}); else wire();
+})();
+</script>
 </head>
 <body>
 <script>const DOCUFORGE_BUILD = '2026.08.20.61';</script>
@@ -700,7 +830,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.63</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.64</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
