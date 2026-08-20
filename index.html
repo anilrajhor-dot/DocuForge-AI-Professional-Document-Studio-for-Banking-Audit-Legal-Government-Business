@@ -703,7 +703,7 @@ body:not(.dashboard-active) #ribbon{min-height:0;}
 body:not(.dashboard-active) .ribbon-panel.active{display:flex !important;visibility:visible !important;opacity:1 !important;}
 </style>
 <script>
-/* DocuForge AI v2026.08.20.65 — navigation stability layer */
+/* DocuForge AI v2026.08.20.66 — navigation stability layer */
 (function(){
   const $=id=>document.getElementById(id);
   const labels={
@@ -819,7 +819,7 @@ body:not(.dashboard-active) .ribbon-panel.active{display:flex !important;visibil
 </script>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.20.65';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.20.66';</script>
 <div id="dfBootGuard" style="display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:100000;background:#fff3cd;color:#4b3b00;border:1px solid #e0b84b;border-radius:12px;padding:12px 14px;font:600 13px/1.4 system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.15)">DocuForge AI is loading. If a library is unavailable, the menus will still remain usable; PDF-specific tools may require an internet connection on first use.</div>
 
 <div id="docuForgeTopBrand" style="
@@ -831,7 +831,7 @@ body:not(.dashboard-active) .ribbon-panel.active{display:flex !important;visibil
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.65</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.66</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -7804,6 +7804,43 @@ $('dashboardAskTile')?.addEventListener('click', () => {
     const guard=document.getElementById('dfBootGuard');
     if(guard && e && e.error){ guard.textContent='DocuForge AI loaded with a script error. The affected tool can be reported from the Help/diagnostics area: '+(e.error.message||e.message||'Unknown error'); guard.style.display='block'; }
   });
+})();
+</script>
+<script>
+/* DocuForge AI v2026.08.20.66 — FINAL navigation repair */
+(function(){
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const studioNames={pdf:'PDF Studio',ocr:'OCR & Image Studio',translate:'Translation Studio',convert:'Conversion Studio',powerpoint:'PowerPoint Studio',ai:'AI Studio',excel:'Excel Studio',gstinvoice:'GST Invoice',website:'Website Studio',security:'Security Studio',batch:'Batch Studio',reader:'Reader',export:'Export',help:'Help',settings:'Settings',about:'About'};
+  function mainMenu(){
+    document.body.classList.add('dashboard-active'); window.__docuForgeCurrentStudio='dashboard';
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'].forEach(id=>{const e=$(id);if(e)e.style.display='none';});
+    const w=$('workspaceLayout');if(w){w.style.display='flex';w.style.visibility='visible';w.style.opacity='1';}
+    const t=$('dashboardTiles');if(t){t.style.display='grid';t.style.visibility='visible';t.style.opacity='1';}
+    const r=$('dashboardRecent');if(r)r.style.display='block';
+    const b=$('backToMainMenu');if(b)b.style.display='none';
+    const u=$('studioUploadScreen');if(u){u.dataset.requested='';u.style.display='none';}
+    document.querySelectorAll('.ribbon-panel').forEach(p=>{p.classList.remove('active');p.style.removeProperty('display');});
+    if($('statusMsg'))$('statusMsg').textContent='Ready. Choose a menu to begin.'; window.scrollTo(0,0);
+  }
+  function openStudio(name){
+    if(!name)return; document.body.classList.remove('dashboard-active'); window.__docuForgeCurrentStudio=name;
+    const w=$('workspaceLayout');if(w){w.style.display='block';w.style.visibility='visible';w.style.opacity='1';}
+    const t=$('dashboardTiles');if(t)t.style.display='none'; const r=$('dashboardRecent');if(r)r.style.display='none';
+    const ribbon=$('ribbon');if(ribbon)ribbon.style.display='flex';
+    document.querySelectorAll('.ribbon-panel').forEach(p=>{const on=p.dataset.studioPanel===name;p.classList.toggle('active',on);if(on){p.style.setProperty('display','flex','important');p.style.setProperty('visibility','visible','important');p.style.setProperty('opacity','1','important');}else p.style.removeProperty('display');});
+    const b=$('backToMainMenu');if(b){b.style.setProperty('display','flex','important');b.style.setProperty('visibility','visible','important');b.style.setProperty('opacity','1','important');b.style.setProperty('background','#c45d18','important');b.style.setProperty('color','#fff','important');}
+    if($('statusMsg'))$('statusMsg').textContent='Choose a tool from the '+(studioNames[name]||name)+' submenu.';window.scrollTo(0,0);
+  }
+  function route(name){try{if(typeof window.setStudio==='function')window.setStudio(name);}catch(e){console.warn(e);} if(name==='dashboard')mainMenu();else openStudio(name);}
+  function wire(){
+    document.querySelectorAll('#dashboardTiles .main-menu-tile[data-studio]').forEach(tile=>{
+      tile.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();route(tile.dataset.studio);},true);
+    });
+    const back=$('backToMainMenu');if(back)back.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();route('dashboard');},true);
+    const home=$('menuToggle');if(home)home.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();route('dashboard');},true);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
 })();
 </script>
 </body>
