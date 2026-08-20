@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.20.47 usability refinements ===== */
+/* ===== v2026.08.20.48 usability refinements ===== */
 #studioMoreBtn{display:none !important;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.47 PDF workflow ===== */
+/* ===== v2026.08.20.48 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.20.47 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.20.48 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.47 dashboard cleanup ===== */
+/* ===== v2026.08.20.48 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.20.47: clean Dashboard ===== */
+/* ===== v2026.08.20.48: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.20.47: Dashboard is a true main menu ===== */
+/* ===== v2026.08.20.48: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.20.47: hard dashboard/studio separation ===== */
+/* ===== v2026.08.20.48: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.20.47: Dashboard upload entry ===== */
+/* ===== v2026.08.20.48: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.20.47 — one navigation system only ===== */
+/* ===== v2026.08.20.48 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.20.47';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.20.48';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.47</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.48</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -3622,7 +3622,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.20.47 — single main menu; file requested by operation */
+/* v2026.08.20.48 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3799,7 +3799,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.20.47 navigation ===== */
+/* ===== DocuForge AI v2026.08.20.48 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -7144,87 +7144,11 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 
-<script>
-/* DocuForge AI v2026.08.20.47 — navigation repair */
-(function(){
-  const $=id=>document.getElementById(id);
 
-  function dashboard(){
-    document.body.classList.add('dashboard-active');
-    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid',
-     'noPdfBanner','workspaceLayout','backToMainMenu'].forEach(id=>{
-      const el=$(id); if(el) el.style.display='none';
-    });
-    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
-    document.querySelectorAll('.ribbon-panel').forEach(p=>{
-      p.classList.remove('active');
-      p.style.removeProperty('display');
-    });
-    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu to begin.';
-    window.scrollTo(0,0);
-  }
-
-  function studio(name){
-    document.body.classList.remove('dashboard-active');
-    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
-
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(name);
-    }catch(e){ console.error(e); }
-
-    if($('workspaceLayout')) $('workspaceLayout').style.display='block';
-    if($('ribbon')) $('ribbon').style.display='flex';
-    if($('studioTabs')) $('studioTabs').style.display='none';
-
-    document.querySelectorAll('.ribbon-panel').forEach(p=>{
-      const active=p.dataset.studioPanel===name;
-      p.classList.toggle('active',active);
-      if(active) p.style.setProperty('display','flex','important');
-      else p.style.removeProperty('display');
-    });
-
-    if($('backToMainMenu')){
-      const back = $('backToMainMenu');
-      back.style.setProperty('display','flex','important');
-      back.style.setProperty('background','#c45d18','important');
-      back.style.setProperty('color','#ffffff','important');
-      back.style.setProperty('-webkit-text-fill-color','#ffffff','important');
-      back.style.setProperty('visibility','visible','important');
-      back.style.setProperty('opacity','1','important');
-      back.classList.add('primary');
-    }
-    window.scrollTo(0,0);
-  }
-
-  function wire(){
-    dashboard();
-
-    document.addEventListener('click',function(e){
-      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      studio(tile.dataset.studio);
-    },true);
-
-    $('backToMainMenu')?.addEventListener('click',function(e){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      dashboard();
-    },true);
-  }
-
-  if(document.readyState==='loading')
-    document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
 
 
 <script>
-/* v2026.08.20.47 — file upload screen for every Studio */
+/* v2026.08.20.48 — file upload screen for every Studio */
 (function(){
  const $=id=>document.getElementById(id);
  const hints={
@@ -7324,4 +7248,136 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 </script>
 
 </body>
+
+<script>
+/* DocuForge AI v2026.08.20.48 — persistent Studio upload bar */
+(function(){
+  const $=id=>document.getElementById(id);
+  let activeStudio='';
+
+  function ensureBar(){
+    let bar=$('df48UploadBar');
+    if(bar) return bar;
+    bar=document.createElement('div');
+    bar.id='df48UploadBar';
+    bar.innerHTML=
+      '<div class="df48-upload-title">📂 Upload / Select File</div>'+
+      '<div class="df48-upload-row">'+
+      '<button type="button" id="df48UploadBtn">📂 Choose File</button>'+
+      '<input type="file" id="df48UploadInput" hidden>'+
+      '<span id="df48FileName">No file selected</span>'+
+      '</div>';
+    document.body.appendChild(bar);
+    $('df48UploadBtn').addEventListener('click',function(){
+      const i=$('df48UploadInput');
+      i.accept=acceptFor(activeStudio);
+      i.multiple=['pdf','ocr','batch'].includes(activeStudio);
+      i.click();
+    });
+    $('df48UploadInput').addEventListener('change',function(){
+      const fs=Array.from(this.files||[]);
+      if(fs.length){
+        $('df48FileName').textContent=fs.length===1?fs[0].name:(fs.length+' files selected');
+        fs.forEach(passToEngine);
+      }
+      this.value='';
+    });
+    return bar;
+  }
+
+  function acceptFor(n){
+    if(n==='pdf'||n==='ocr') return '.pdf,application/pdf,image/*';
+    if(n==='translation') return '.pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown';
+    if(n==='convert') return '.pdf,.docx,.xlsx,.xls,.csv,.pptx,.html,.txt,.md,*/*';
+    if(n==='powerpoint') return '.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation';
+    if(n==='spreadsheet'||n==='excel') return '.xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    if(n==='reader') return '.pdf,.epub,application/pdf,application/epub+zip';
+    return '*/*';
+  }
+
+  function passToEngine(file){
+    const map={
+      pdf:['fileInput','universalFileInput'],
+      ocr:['ocrFileInput','fileInput','universalFileInput'],
+      translation:['translationFileInput','fileInput','universalFileInput'],
+      convert:['conversionFileInput','fileInput','universalFileInput'],
+      powerpoint:['pptxFileInput','fileInput','universalFileInput'],
+      spreadsheet:['spreadsheetFileInput','fileInput','universalFileInput'],
+      excel:['spreadsheetFileInput','fileInput','universalFileInput'],
+      reader:['readerFileInput','fileInput','universalFileInput'],
+      security:['fileInput','universalFileInput'],
+      batch:['batchFileInput','fileInput','universalFileInput']
+    };
+    for(const id of (map[activeStudio]||['fileInput','universalFileInput'])){
+      const input=$(id);
+      if(!input) continue;
+      try{
+        const dt=new DataTransfer();
+        dt.items.add(file);
+        input.files=dt.files;
+        input.dispatchEvent(new Event('change',{bubbles:true}));
+        return;
+      }catch(e){}
+    }
+  }
+
+  function show(name){
+    activeStudio=name||'';
+    const bar=ensureBar();
+    bar.classList.add('visible');
+    document.body.classList.add('df48-in-studio');
+  }
+
+  function hide(){
+    const bar=$('df48UploadBar');
+    if(bar) bar.classList.remove('visible');
+    document.body.classList.remove('df48-in-studio');
+  }
+
+  function wire(){
+    ensureBar();
+
+    document.addEventListener('click',function(e){
+      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+      if(tile) setTimeout(()=>show(tile.dataset.studio),0);
+    },true);
+
+    document.addEventListener('click',function(e){
+      if(e.target.closest('#backToMainMenu')) setTimeout(hide,0);
+    },true);
+
+    const observer=new MutationObserver(function(){
+      const active=document.querySelector('.ribbon-panel.active[data-studio-panel]');
+      if(active && !document.body.classList.contains('dashboard-active')){
+        show(active.dataset.studioPanel);
+      }
+    });
+    observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class','style']});
+  }
+
+  if(document.readyState==='loading')
+    document.addEventListener('DOMContentLoaded',wire,{once:true});
+  else wire();
+})();
+</script>
+<style id="df48UploadCss">
+#df48UploadBar{
+  display:none;
+  position:relative;
+  z-index:2147483000;
+  margin:10px 14px 8px;
+  padding:14px;
+  border:2px solid #c45d18;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 4px 14px rgba(0,0,0,.14);
+}
+#df48UploadBar.visible{display:block !important;}
+.df48-upload-title{font-size:18px;font-weight:800;margin-bottom:9px;}
+.df48-upload-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+#df48UploadBtn{min-height:48px;padding:11px 18px;border:0;border-radius:11px;background:#c45d18;color:#fff;font-size:16px;font-weight:800;}
+#df48FileName{font-size:14px;font-weight:600;overflow-wrap:anywhere;}
+body.dashboard-active #df48UploadBar{display:none !important;}
+</style>
+
 </html>
