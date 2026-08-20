@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.20.59 usability refinements ===== */
+/* ===== v2026.08.20.60 usability refinements ===== */
 #studioMoreBtn{display:none !important;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.59 PDF workflow ===== */
+/* ===== v2026.08.20.60 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.20.59 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.20.60 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.59 dashboard cleanup ===== */
+/* ===== v2026.08.20.60 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.20.59: clean Dashboard ===== */
+/* ===== v2026.08.20.60: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.20.59: Dashboard is a true main menu ===== */
+/* ===== v2026.08.20.60: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.20.59: hard dashboard/studio separation ===== */
+/* ===== v2026.08.20.60: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.20.59: Dashboard upload entry ===== */
+/* ===== v2026.08.20.60: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.20.59 — one navigation system only ===== */
+/* ===== v2026.08.20.60 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.20.59';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.20.60';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.59</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.60</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -818,7 +818,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 <h2>Extract &amp; split</h2>
 <button class="tool-btn" id="btnExtract"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="16" x="4" y="4"></rect><path d="M9 12h6"></path></svg> Extract selected → new PDF</button>
 <button class="tool-btn" id="btnSplit"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="7" x="3" y="4"></rect><rect height="16" rx="1" width="7" x="14" y="4"></rect></svg> Split into files…</button>
-<button class="tool-btn" id="btnPdfCompare"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="7" x="3" y="4"></rect><rect height="16" rx="1" width="7" x="14" y="4"></rect><path d="M12 4v16"></path></svg> Compare two PDFs…</button>
+<button class="tool-btn" id="btnPdfCompare"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="7" x="3" y="4"></rect><rect height="16" rx="1" width="7" x="14" y="4"></rect><path d="M12 4v16"></path></svg> Compare two files…</button>
 </div>
 <div class="tool-group">
 <h2>Enhance</h2>
@@ -2314,6 +2314,58 @@ async function getPdfFullTextLines(bytes){
   }
   return lines;
 }
+
+/* ---------- Universal file comparison ----------
+   Compare common document formats by extracting their textual/content representation.
+   PDF: pdf.js | DOCX: Mammoth | XLSX/XLS/CSV: SheetJS | PPTX: JSZip/XML | TXT/MD/HTML: text. */
+function compareExt(name){ return (String(name).split('.').pop() || '').toLowerCase(); }
+function stripHtmlForCompare(s){
+  return String(s).replace(/<script[\s\S]*?<\/script>/gi,' ')
+    .replace(/<style[\s\S]*?<\/style>/gi,' ')
+    .replace(/<[^>]+>/g,' ')
+    .replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>')
+    .replace(/\s+/g,' ').trim();
+}
+function normaliseCompareLines(text){
+  return String(text || '').replace(/\r/g,'').split('\n').map(s=>s.replace(/\t+/g,'\t').trim()).filter(Boolean);
+}
+async function getPptxTextLines(bytes){
+  const zip = await JSZip.loadAsync(bytes);
+  const names = Object.keys(zip.files).filter(n => /^ppt\/slides\/slide\d+\.xml$/i.test(n))
+    .sort((a,b)=>{ const na=+(a.match(/slide(\d+)\.xml/i)||[,0])[1], nb=+(b.match(/slide(\d+)\.xml/i)||[,0])[1]; return na-nb; });
+  const out=[];
+  for(const n of names){
+    const xml=await zip.file(n).async('text');
+    const vals=[];
+    const re=/<a:t[^>]*>([\s\S]*?)<\/a:t>/gi; let m;
+    while((m=re.exec(xml))) vals.push(m[1].replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"'));
+    if(vals.length) out.push('Slide '+((n.match(/slide(\d+)\.xml/i)||[, '?'])[1])+': '+vals.join(' '));
+  }
+  return out;
+}
+async function getUniversalFileLines(file){
+  const ext=compareExt(file.name);
+  const bytes=new Uint8Array(await file.arrayBuffer());
+  if(ext==='pdf') return await getPdfFullTextLines(bytes);
+  if(ext==='docx'){
+    await loadLib('mammoth');
+    const r=await mammoth.extractRawText({arrayBuffer:bytes.buffer});
+    return normaliseCompareLines(r.value);
+  }
+  if(['xlsx','xls','csv'].includes(ext)){
+    await loadLib('xlsx');
+    const wb=XLSX.read(bytes,{type:'array'}); const out=[];
+    wb.SheetNames.forEach(sn=>{ out.push('Sheet: '+sn); const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:''}); rows.forEach(r=>{const line=r.map(v=>String(v ?? '').trim()).join(' | ').trim(); if(line) out.push(line);}); });
+    return out;
+  }
+  if(ext==='pptx') return await getPptxTextLines(bytes);
+  if(['txt','md','markdown','html','htm','xml','json','rtf'].includes(ext)){
+    const text=new TextDecoder('utf-8').decode(bytes);
+    return normaliseCompareLines(['html','htm'].includes(ext)?stripHtmlForCompare(text):text);
+  }
+  throw new Error('Unsupported file type. Use PDF, DOCX, XLSX/XLS, CSV, PPTX, TXT, Markdown or HTML.');
+}
+function universalCompareAccept(){ return '.pdf,.docx,.xlsx,.xls,.csv,.pptx,.txt,.md,.markdown,.html,.htm,.xml,.json,.rtf'; }
 function diffLines(linesA, linesB){
   const n = linesA.length, m = linesB.length;
   const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
@@ -3624,7 +3676,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.20.59 — single main menu; file requested by operation */
+/* v2026.08.20.60 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3801,7 +3853,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.20.59 navigation ===== */
+/* ===== DocuForge AI v2026.08.20.60 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -4476,29 +4528,28 @@ $('btnSplit').addEventListener('click', () => {
 });
 
 $('btnPdfCompare').addEventListener('click', () => {
-  openModal('Compare two PDFs', `
+  openModal('Compare two files', `
     <div class="field row">
-      <div><label>PDF A</label><input type="file" id="cmpFileA" accept=".pdf"></div>
-      <div><label>PDF B</label><input type="file" id="cmpFileB" accept=".pdf"></div>
+      <div><label>File A</label><input type="file" id="cmpFileA" accept="${universalCompareAccept()}"></div>
+      <div><label>File B</label><input type="file" id="cmpFileB" accept="${universalCompareAccept()}"></div>
     </div>
-    <p class="hint">Compares extracted text line by line, not visually. Very large documents (thousands of distinct lines) may take a few seconds.</p>
+    <p class="hint"><b>Supported:</b> PDF, Word (.docx), Excel (.xlsx/.xls), PowerPoint (.pptx), CSV, TXT, Markdown, HTML, XML, JSON and RTF.</p>
+    <p class="hint">The comparison is content/text based. It identifies added, removed and unchanged lines. Formatting and visual layout are not compared.</p>
   `, async () => {
     const fileA = document.getElementById('cmpFileA').files[0];
     const fileB = document.getElementById('cmpFileB').files[0];
     if(!fileA || !fileB){ toast('Choose both files.', true); return; }
-    setStatus('Comparing PDFs…'); showProgress(10);
+    setStatus('Comparing files…'); showProgress(10);
     try{
-      const bytesA = new Uint8Array(await fileA.arrayBuffer());
-      const bytesB = new Uint8Array(await fileB.arrayBuffer());
-      const linesA = await getPdfFullTextLines(bytesA);
-      const linesB = await getPdfFullTextLines(bytesB);
-      if(!linesA.length && !linesB.length){ toast('Neither PDF has extractable text — both look scanned. Run OCR first.', true); return; }
-      if(linesA.length > 3000 || linesB.length > 3000) toast('One of these PDFs is quite large — comparison may take a moment.', false);
-      showProgress(50);
+      const extA=compareExt(fileA.name), extB=compareExt(fileB.name);
+      const linesA = await getUniversalFileLines(fileA); showProgress(35);
+      const linesB = await getUniversalFileLines(fileB); showProgress(60);
+      if(!linesA.length && !linesB.length){ toast('No extractable text/content was found in either file.', true); return; }
+      if(linesA.length > 5000 || linesB.length > 5000) toast('One of these files is large — comparison may take a moment.', false);
       const diff = diffLines(linesA, linesB);
       showCompareResult(diff, fileA.name, fileB.name);
-      setStatus('Comparison complete.');
-    } catch(e){ console.error(e); toast('Could not compare those files.', true); }
+      setStatus(`Comparison complete (${extA.toUpperCase()} vs ${extB.toUpperCase()}).`);
+    } catch(e){ console.error(e); toast(e.message || 'Could not compare those files.', true); }
     finally { showProgress(null); }
   });
 });
@@ -7161,7 +7212,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* v2026.08.20.59 — upload screen only; v46 navigation untouched */
+/* v2026.08.20.60 — upload screen only; v46 navigation untouched */
 (function(){
  const $=id=>document.getElementById(id);
  let activeStudio='';
@@ -7304,7 +7355,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* v2026.08.20.59 — clear tool upload request when leaving a Studio */
+/* v2026.08.20.60 — clear tool upload request when leaving a Studio */
 (function(){
   const box=document.getElementById('studioUploadScreen');
   if(!box)return;
@@ -7318,7 +7369,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 <script>
-/* DocuForge AI v2026.08.20.59 — single navigation controller */
+/* DocuForge AI v2026.08.20.60 — single navigation controller */
 (function(){
   const $ = id => document.getElementById(id);
   function dashboard(){
