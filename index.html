@@ -473,7 +473,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.20.61 usability refinements ===== */
+/* ===== v2026.08.20.62 usability refinements ===== */
 #studioMoreBtn{display:none !important;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -505,7 +505,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.61 PDF workflow ===== */
+/* ===== v2026.08.20.62 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -514,7 +514,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.20.61 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.20.62 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -540,7 +540,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.61 dashboard cleanup ===== */
+/* ===== v2026.08.20.62 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -576,7 +576,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.20.61: clean Dashboard ===== */
+/* ===== v2026.08.20.62: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -600,7 +600,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.20.61: Dashboard is a true main menu ===== */
+/* ===== v2026.08.20.62: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -612,7 +612,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.20.61: hard dashboard/studio separation ===== */
+/* ===== v2026.08.20.62: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -633,7 +633,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.20.61: Dashboard upload entry ===== */
+/* ===== v2026.08.20.62: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -650,7 +650,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.20.61 — one navigation system only ===== */
+/* ===== v2026.08.20.62 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -700,7 +700,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.61</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.62</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -3758,7 +3758,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.20.61 — single main menu; file requested by operation */
+/* v2026.08.20.62 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3935,7 +3935,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.20.61 navigation ===== */
+/* ===== DocuForge AI v2026.08.20.62 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -5306,6 +5306,27 @@ $('btnTranslateText').addEventListener('click', () => {
   }, 0);
 });
 
+/* v2026.08.20.62 — clean PDF text extraction before translation/viewing.
+   Some PDFs store each character as a separate positioned text item. PDF.js
+   therefore returns strings such as "P R I N T / S A V E A S P D F". That is
+   not a translation problem; it is a PDF text-layout artefact. Collapse only
+   the clearly character-spaced runs, while leaving normal word spacing intact. */
+function normalizeExtractedPdfText(text){
+  let s=String(text||'').replace(/\u00a0/g,' ');
+  // Collapse runs of single Latin letters separated by spaces: P R I N T -> PRINT.
+  // Repeat because a long heading may contain several adjacent runs.
+  for(let i=0;i<3;i++){
+    s=s.replace(/\b(?:[A-Za-z]\s+){2,}[A-Za-z]\b/g, m=>m.replace(/\s+/g,''));
+  }
+  // The same issue sometimes occurs with digits in account/phone references.
+  for(let i=0;i<2;i++){
+    s=s.replace(/\b(?:\d\s+){2,}\d\b/g, m=>m.replace(/\s+/g,''));
+  }
+  // Remove excessive spaces before common punctuation introduced by extraction.
+  s=s.replace(/\s+([,.;:!?])/g,'$1');
+  return s;
+}
+
 async function extractTextFromAnyFile(file){
   const ext = (file.name.split('.').pop() || '').toLowerCase();
   if(ext === 'pdf'){
@@ -5319,7 +5340,7 @@ async function extractTextFromAnyFile(file){
         .map(it => ({ str: it.str, x: it.transform[4], y: it.transform[5], width: it.width || 0 }));
       parts.push(`--- Page ${i} ---\n` + groupIntoLines(items).map(lineToText).join('\n'));
     }
-    const joined = parts.join('\n\n');
+    const joined = normalizeExtractedPdfText(parts.join('\n\n'));
     if(!joined.replace(/---.*?---/g, '').trim()) throw new Error('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.');
     return joined;
   } else if(ext === 'docx'){
@@ -7296,7 +7317,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* v2026.08.20.61 — upload screen only; v46 navigation untouched */
+/* v2026.08.20.62 — upload screen only; v46 navigation untouched */
 (function(){
  const $=id=>document.getElementById(id);
  let activeStudio='';
@@ -7439,7 +7460,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* v2026.08.20.61 — clear tool upload request when leaving a Studio */
+/* v2026.08.20.62 — clear tool upload request when leaving a Studio */
 (function(){
   const box=document.getElementById('studioUploadScreen');
   if(!box)return;
@@ -7453,7 +7474,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 <script>
-/* DocuForge AI v2026.08.20.61 — single navigation controller */
+/* DocuForge AI v2026.08.20.62 — single navigation controller */
 (function(){
   const $ = id => document.getElementById(id);
   function dashboard(){
@@ -7534,6 +7555,77 @@ $('dashboardAskTile')?.addEventListener('click', () => {
     return report;
   };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{wire();dashboard();},{once:true}); else {wire();dashboard();}
+})();
+</script>
+
+<script>
+/* DocuForge AI v2026.08.20.62 — common View File control in every Studio submenu.
+   The control never replaces the tool-specific Choose File action. It gives the
+   user a consistent way to inspect the currently selected/loaded file. */
+(function(){
+  const $=id=>document.getElementById(id);
+  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function currentFile(){ return window.__docuForgeStudioFile || null; }
+  async function viewFile(){
+    const f=currentFile();
+    if(workingBytes){
+      try{
+        if(typeof openReaderPdf==='function'){ await openReaderPdf(workingBytes, ($('outName')?.value||'document')+'_view'); return; }
+        const u=URL.createObjectURL(new Blob([workingBytes],{type:'application/pdf'}));
+        window.open(u,'_blank','noopener'); setTimeout(()=>URL.revokeObjectURL(u),60000); return;
+      }catch(e){ toast(e?.message||'Could not open the PDF viewer.',true); return; }
+    }
+    if(!f){ toast('Choose a file first, then tap View File.',true); return; }
+    const ext=(f.name.split('.').pop()||'').toLowerCase();
+    try{
+      if(f.type.startsWith('image/') || ['txt','md','csv','html','htm'].includes(ext)){
+        const u=URL.createObjectURL(f); window.open(u,'_blank','noopener'); setTimeout(()=>URL.revokeObjectURL(u),60000); return;
+      }
+      if(ext==='docx'){
+        await loadLib('mammoth');
+        const r=await mammoth.convertToHtml({arrayBuffer:await f.arrayBuffer()});
+        openModal('View — '+f.name, `<div style="max-height:65vh;overflow:auto;line-height:1.55;padding:8px;background:var(--bg);border:1px solid var(--line);border-radius:8px;">${r.value||'<p>No readable content.</p>'}</div>`);
+        return;
+      }
+      if(['pptx','ppt'].includes(ext)){
+        // Reuse the existing PowerPoint text extractor when available.
+        if(typeof extractPptxSlides==='function'){
+          const slides=await extractPptxSlides(f);
+          const html=slides.map((x,i)=>`<section style="padding:12px;border-bottom:1px solid var(--line)"><h3>Slide ${i+1}: ${esc(x.title||'Untitled')}</h3>${(x.bullets||[]).map(b=>`<div>• ${esc(b)}</div>`).join('')}</section>`).join('');
+          openModal('View — '+f.name, `<div style="max-height:65vh;overflow:auto;">${html||'<p>No readable slide text.</p>'}</div>`);
+          return;
+        }
+      }
+      if(['xlsx','xls'].includes(ext) && typeof XLSX!=='undefined'){
+        const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});
+        const html=wb.SheetNames.map(n=>`<h3>${esc(n)}</h3>${XLSX.utils.sheet_to_html(wb.Sheets[n],{header:'',footer:''})}`).join('');
+        openModal('View — '+f.name, `<div style="max-height:65vh;overflow:auto;">${html}</div>`); return;
+      }
+      // Last resort: use the browser's local object URL. Some browsers can preview
+      // additional formats; if not, the user still gets a clear message.
+      const u=URL.createObjectURL(f); const w=window.open(u,'_blank','noopener');
+      if(!w) toast('The browser could not open a preview for this file type.',true);
+      setTimeout(()=>URL.revokeObjectURL(u),60000);
+    }catch(e){ console.error(e); toast('Could not create a local preview: '+(e?.message||'unknown error'),true); }
+  }
+  function install(){
+    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(panel=>{
+      if(panel.querySelector('.common-view-file-btn')) return;
+      const wrap=document.createElement('div');
+      wrap.className='common-view-file-wrap';
+      wrap.style.cssText='display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);width:fit-content;max-width:100%;';
+      wrap.innerHTML=`<button type="button" class="tool-btn common-view-file-btn" style="min-width:140px;"><span>👁️</span> View File</button><span class="common-view-file-name" style="font-size:12px;color:var(--ink-soft);">No file selected</span>`;
+      wrap.querySelector('button').addEventListener('click',viewFile);
+      const title=panel.querySelector('.ribbon-title, h2, h3');
+      if(title && title.parentElement===panel) title.insertAdjacentElement('afterend',wrap); else panel.insertBefore(wrap,panel.firstChild);
+    });
+  }
+  function sync(){
+    const name=currentFile()?.name || (workingBytes ? (($('outName')?.value||'document')+'.pdf') : 'No file selected');
+    document.querySelectorAll('.common-view-file-name').forEach(e=>e.textContent=name);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{install();sync();}); else {install();sync();}
+  new MutationObserver(()=>{install();sync();}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
 })();
 </script>
 </body>
