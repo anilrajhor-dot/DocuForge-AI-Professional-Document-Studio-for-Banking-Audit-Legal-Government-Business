@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.20.46 usability refinements ===== */
+/* ===== v2026.08.20.47 usability refinements ===== */
 #studioMoreBtn{display:none !important;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.46 PDF workflow ===== */
+/* ===== v2026.08.20.47 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.20.46 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.20.47 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.46 dashboard cleanup ===== */
+/* ===== v2026.08.20.47 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.20.46: clean Dashboard ===== */
+/* ===== v2026.08.20.47: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.20.46: Dashboard is a true main menu ===== */
+/* ===== v2026.08.20.47: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.20.46: hard dashboard/studio separation ===== */
+/* ===== v2026.08.20.47: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.20.46: Dashboard upload entry ===== */
+/* ===== v2026.08.20.47: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.20.46 — one navigation system only ===== */
+/* ===== v2026.08.20.47 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.20.46';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.20.47';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.46</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.47</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1091,6 +1091,17 @@ function openGstInvoiceApp(){
   }
 }
 </script>
+
+
+<div id="studioFileUploadPanel" class="studio-file-upload-panel" style="display:none;">
+  <div class="studio-file-upload-title">📂 Select / Upload File</div>
+  <div class="studio-file-upload-subtitle" id="studioFileUploadHint">Select the file required for this Studio.</div>
+  <div class="studio-file-upload-actions">
+    <button type="button" id="studioFileUploadBtn" class="btn primary">📂 Upload / Select File</button>
+    <input type="file" id="studioUniversalUploadInput" hidden>
+    <span id="studioSelectedFileName" class="studio-selected-file">No file selected</span>
+  </div>
+</div>
 
 <div class="layout" id="workspaceLayout">
   <main>
@@ -3611,7 +3622,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.20.46 — single main menu; file requested by operation */
+/* v2026.08.20.47 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3788,7 +3799,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.20.46 navigation ===== */
+/* ===== DocuForge AI v2026.08.20.47 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -3898,6 +3909,17 @@ body:not(.dashboard-active) .ribbon-panel.active{display:flex !important;}
   body.dashboard-active #backToMainMenu{
     display:none !important;
   }
+</style>
+
+
+<style id="docuforge-v47-upload">
+#studioFileUploadPanel{display:none;margin:10px 14px 8px;padding:14px;border:1px solid var(--border,#d8dde6);border-radius:14px;background:var(--panel,#fff);box-shadow:var(--shadow,0 2px 8px rgba(0,0,0,.08));}
+body:not(.dashboard-active) #studioFileUploadPanel{display:block !important;}
+body.dashboard-active #studioFileUploadPanel{display:none !important;}
+.studio-file-upload-title{font-size:17px;font-weight:800;margin-bottom:4px;}
+.studio-file-upload-subtitle{font-size:13px;opacity:.78;margin-bottom:10px;}
+.studio-file-upload-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.studio-selected-file{font-size:13px;font-weight:600;overflow-wrap:anywhere;}
 </style>
 
 </head>
@@ -7123,7 +7145,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* DocuForge AI v2026.08.20.46 — navigation repair */
+/* DocuForge AI v2026.08.20.47 — navigation repair */
 (function(){
   const $=id=>document.getElementById(id);
 
@@ -7197,6 +7219,107 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   if(document.readyState==='loading')
     document.addEventListener('DOMContentLoaded',wire);
   else wire();
+})();
+</script>
+
+
+<script>
+/* v2026.08.20.47 — file upload screen for every Studio */
+(function(){
+ const $=id=>document.getElementById(id);
+ const hints={
+  pdf:'Upload PDF files or photos for PDF operations.',
+  ocr:'Upload a PDF or image for OCR and image tools.',
+  translation:'Upload PDF, Word, TXT or Markdown for translation.',
+  convert:'Upload the source document you want to convert.',
+  powerpoint:'Upload a PowerPoint file for PowerPoint tools.',
+  ai:'Upload the document for the selected AI tool.',
+  spreadsheet:'Upload Excel or CSV data.',
+  excel:'Upload Excel or CSV data.',
+  security:'Upload the PDF/document for security tools.',
+  batch:'Upload the files you want to process together.',
+  reader:'Upload a PDF or EPUB to read.',
+  website:'Upload a source document when required.',
+  export:'Upload/select the document to export.',
+  gst:'Upload the supporting document/data when required.',
+  help:'Upload a document only when the selected help function requires one.'
+ };
+
+ function dashboard(){
+  document.body.classList.add('dashboard-active');
+  ['studioFileUploadPanel','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','backToMainMenu'].forEach(id=>{if($(id))$(id).style.display='none';});
+  if($('dashboardTiles'))$('dashboardTiles').style.display='grid';
+  if($('dashboardRecent'))$('dashboardRecent').style.display='block';
+ }
+ function studio(name){
+  document.body.classList.remove('dashboard-active');
+  if($('dashboardTiles'))$('dashboardTiles').style.display='none';
+  if($('dashboardRecent'))$('dashboardRecent').style.display='none';
+  if($('studioFileUploadPanel')){
+   $('studioFileUploadPanel').style.display='block';
+   $('studioFileUploadHint').textContent=hints[name]||'Select the file required for this Studio.';
+   $('studioFileUploadPanel').dataset.currentStudio=name;
+  }
+  if($('workspaceLayout'))$('workspaceLayout').style.display='block';
+  if($('ribbon'))$('ribbon').style.display='flex';
+  if($('studioTabs'))$('studioTabs').style.display='none';
+  if($('backToMainMenu'))$('backToMainMenu').style.setProperty('display','flex','important');
+  try{if(typeof window.setStudio==='function')window.setStudio(name);}catch(e){console.warn(e);}
+  setTimeout(()=>{
+   if($('studioFileUploadPanel'))$('studioFileUploadPanel').style.setProperty('display','block','important');
+   if($('backToMainMenu'))$('backToMainMenu').style.setProperty('display','flex','important');
+   if($('studioTabs'))$('studioTabs').style.display='none';
+  },100);
+ }
+ function acceptFor(name){
+  if(name==='pdf'||name==='ocr')return '.pdf,application/pdf,image/*';
+  if(name==='translation')return '.pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown';
+  if(name==='convert')return '.pdf,.docx,.xlsx,.xls,.csv,.pptx,.html,.txt,.md,*/*';
+  if(name==='powerpoint')return '.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation';
+  if(name==='spreadsheet'||name==='excel')return '.xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  if(name==='reader')return '.pdf,.epub,application/pdf,application/epub+zip';
+  return '*/*';
+ }
+ function passToEngine(file){
+  const name=$('studioFileUploadPanel')?.dataset.currentStudio||'';
+  if($('studioSelectedFileName'))$('studioSelectedFileName').textContent=file.name;
+  const ids={
+   pdf:['fileInput','universalFileInput'], ocr:['ocrFileInput','fileInput','universalFileInput'],
+   translation:['translationFileInput','fileInput','universalFileInput'],
+   convert:['conversionFileInput','fileInput','universalFileInput'],
+   powerpoint:['pptxFileInput','fileInput','universalFileInput'],
+   spreadsheet:['spreadsheetFileInput','fileInput','universalFileInput'],
+   excel:['spreadsheetFileInput','fileInput','universalFileInput'],
+   reader:['readerFileInput','fileInput','universalFileInput'],
+   security:['fileInput','universalFileInput'], batch:['batchFileInput','fileInput','universalFileInput']
+  }[name]||['fileInput','universalFileInput'];
+  for(const id of ids){
+   const input=$(id); if(!input)continue;
+   try{
+    const dt=new DataTransfer();dt.items.add(file);input.files=dt.files;
+    input.dispatchEvent(new Event('change',{bubbles:true}));return;
+   }catch(e){}
+  }
+ }
+ function wire(){
+  dashboard();
+  document.addEventListener('click',e=>{
+   const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+   if(!tile)return;e.preventDefault();e.stopImmediatePropagation();studio(tile.dataset.studio);
+  },true);
+  $('backToMainMenu')?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();dashboard();},true);
+  $('studioFileUploadBtn')?.addEventListener('click',e=>{
+   e.preventDefault();e.stopImmediatePropagation();
+   const name=$('studioFileUploadPanel')?.dataset.currentStudio||'';
+   const input=$('studioUniversalUploadInput');if(!input)return;
+   input.accept=acceptFor(name);input.multiple=(name==='pdf'||name==='ocr'||name==='batch');input.click();
+  },true);
+  $('studioUniversalUploadInput')?.addEventListener('change',()=>{
+   Array.from($('studioUniversalUploadInput').files||[]).forEach(passToEngine);
+   $('studioUniversalUploadInput').value='';
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
 })();
 </script>
 
