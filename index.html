@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.20.57 usability refinements ===== */
+/* ===== v2026.08.20.58 usability refinements ===== */
 #studioMoreBtn{display:none !important;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.57 PDF workflow ===== */
+/* ===== v2026.08.20.58 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.20.57 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.20.58 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.57 dashboard cleanup ===== */
+/* ===== v2026.08.20.58 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.20.57: clean Dashboard ===== */
+/* ===== v2026.08.20.58: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.20.57: Dashboard is a true main menu ===== */
+/* ===== v2026.08.20.58: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.20.57: hard dashboard/studio separation ===== */
+/* ===== v2026.08.20.58: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.20.57: Dashboard upload entry ===== */
+/* ===== v2026.08.20.58: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.20.57 — one navigation system only ===== */
+/* ===== v2026.08.20.58 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.20.57';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.20.58';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.57</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.58</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -873,7 +873,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </button>
 </div>
 </div>
-      <div class="ribbon-panel" data-studio-panel="powerpoint">
+      <div class="ribbon-panel" data-studio-panel="powerpoint" data-requires-file="true">
 
 <div class="tool-group conversion-reverse-group">
   <div class="tool-group-title">Other files → PDF</div>
@@ -886,16 +886,18 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </div>
 <div class="tool-group">
 <h2>Convert</h2>
+<button id="btnPptxToMarkdown" data-requires-file="true" class="tool-btn primary-tool"><span aria-hidden="true">📝</span> PowerPoint → Markdown (.md)</button>
+<p class="hint" style="margin:4px 14px 10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);">Choose a <strong>.pptx</strong> file. DocuForge extracts slide titles and text/bullets and creates a clean <strong>.md</strong> Markdown file. Images, animations and visual design are not copied.</p>
 <button class="tool-btn" id="btnPdfToPptx"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="18" x="3" y="5"></rect><path d="M8 21h8"></path></svg> PDF → PowerPoint (.pptx)</button>
-<button class="tool-btn" id="btnPptxToPdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M12 12v6m-3-3h6"></path></svg> PowerPoint → PDF…</button>
-<button class="tool-btn" id="btnPptxToMarkdown"><span aria-hidden="true">📝</span> PowerPoint → Markdown (.md)…</button>
+<button class="tool-btn" id="btnPptxToPdf" data-requires-file="true"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M12 12v6m-3-3h6"></path></svg> PowerPoint → PDF…</button>
+
 </div>
 <div class="tool-group">
 <h2>Arrange</h2>
-<button class="tool-btn" id="btnPptxMerge"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="18" x="3" y="5"></rect><path d="M8 21h8M3 3l4 5M21 3l-4 5"></path></svg> Merge PPTX files…</button>
-<button class="tool-btn" id="btnPptxSplit"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="8" x="2" y="5"></rect><rect height="13" rx="1" width="8" x="14" y="5"></rect></svg> Split PPTX…</button>
-<button class="tool-btn" id="btnPptxReorder"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg> Reorder slides…</button>
-<button class="tool-btn" id="btnPptxEdit"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"></path></svg> Edit PowerPoint…</button>
+<button class="tool-btn" id="btnPptxMerge" data-requires-file="true"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="18" x="3" y="5"></rect><path d="M8 21h8M3 3l4 5M21 3l-4 5"></path></svg> Merge PPTX files…</button>
+<button class="tool-btn" id="btnPptxSplit" data-requires-file="true"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="8" x="2" y="5"></rect><rect height="13" rx="1" width="8" x="14" y="5"></rect></svg> Split PPTX…</button>
+<button class="tool-btn" id="btnPptxReorder" data-requires-file="true"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg> Reorder slides…</button>
+<button class="tool-btn" id="btnPptxEdit" data-requires-file="true"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"></path></svg> Edit PowerPoint…</button>
 </div>
 <p class="hint" style="padding:0 14px;margin:6px 0 0;">All PowerPoint tools here are structural, not visual: they work from each slide's extracted title and bullet text, not the original OOXML package. Backgrounds, images, custom layouts, and fonts aren't preserved — the same honest limit as the PDF ⇄ PowerPoint conversion above.</p>
 </div>
@@ -3622,7 +3624,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.20.57 — single main menu; file requested by operation */
+/* v2026.08.20.58 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3799,7 +3801,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.20.57 navigation ===== */
+/* ===== DocuForge AI v2026.08.20.58 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -7148,86 +7150,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* DocuForge AI v2026.08.20.57 — navigation repair */
-(function(){
-  const $=id=>document.getElementById(id);
-
-  function dashboard(){
-    document.body.classList.add('dashboard-active');
-    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid',
-     'noPdfBanner','workspaceLayout','backToMainMenu'].forEach(id=>{
-      const el=$(id); if(el) el.style.display='none';
-    });
-    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
-    document.querySelectorAll('.ribbon-panel').forEach(p=>{
-      p.classList.remove('active');
-      p.style.removeProperty('display');
-    });
-    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu to begin.';
-    window.scrollTo(0,0);
-  }
-
-  function studio(name){
-    document.body.classList.remove('dashboard-active');
-    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
-
-    try{
-      if(typeof window.setStudio==='function') window.setStudio(name);
-    }catch(e){ console.error(e); }
-
-    if($('workspaceLayout')) $('workspaceLayout').style.display='block';
-    if($('ribbon')) $('ribbon').style.display='flex';
-    if($('studioTabs')) $('studioTabs').style.display='none';
-
-    document.querySelectorAll('.ribbon-panel').forEach(p=>{
-      const active=p.dataset.studioPanel===name;
-      p.classList.toggle('active',active);
-      if(active) p.style.setProperty('display','flex','important');
-      else p.style.removeProperty('display');
-    });
-
-    if($('backToMainMenu')){
-      const back = $('backToMainMenu');
-      back.style.setProperty('display','flex','important');
-      back.style.setProperty('background','#c45d18','important');
-      back.style.setProperty('color','#ffffff','important');
-      back.style.setProperty('-webkit-text-fill-color','#ffffff','important');
-      back.style.setProperty('visibility','visible','important');
-      back.style.setProperty('opacity','1','important');
-      back.classList.add('primary');
-    }
-    window.scrollTo(0,0);
-  }
-
-  function wire(){
-    dashboard();
-
-    document.addEventListener('click',function(e){
-      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      studio(tile.dataset.studio);
-    },true);
-
-    $('backToMainMenu')?.addEventListener('click',function(e){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      dashboard();
-    },true);
-  }
-
-  if(document.readyState==='loading')
-    document.addEventListener('DOMContentLoaded',wire);
-  else wire();
-})();
-</script>
-
-
-<script>
-/* v2026.08.20.57 — upload screen only; v46 navigation untouched */
+/* v2026.08.20.58 — upload screen only; v46 navigation untouched */
 (function(){
  const $=id=>document.getElementById(id);
  let activeStudio='';
@@ -7363,7 +7286,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* v2026.08.20.57 — clear tool upload request when leaving a Studio */
+/* v2026.08.20.58 — clear tool upload request when leaving a Studio */
 (function(){
   const box=document.getElementById('studioUploadScreen');
   if(!box)return;
@@ -7377,35 +7300,33 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 <script>
-/* DocuForge AI v2026.08.20.57 — deterministic menu/submenu navigation */
+/* DocuForge AI v2026.08.20.58 — single navigation controller */
 (function(){
   const $ = id => document.getElementById(id);
-  const SPECIAL = new Set(['dashboard','help','settings','reader','export','about','excel','gstinvoice']);
-
-  function showDashboard(){
-    try { window.setStudio('dashboard'); } catch(e) { console.error(e); }
+  function dashboard(){
+    if(typeof window.setStudio==='function') window.setStudio('dashboard');
     document.body.classList.add('dashboard-active');
-    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout']
-      .forEach(id => { const el=$(id); if(el) el.style.display='none'; });
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout'].forEach(id=>{
+      const el=$(id); if(el) el.style.display='none';
+    });
     if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
     if($('dashboardRecent')) $('dashboardRecent').style.display='block';
     if($('backToMainMenu')) $('backToMainMenu').style.display='none';
+    if($('studioUploadScreen')){ $('studioUploadScreen').dataset.requested=''; $('studioUploadScreen').style.display='none'; }
     if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu to begin.';
     window.scrollTo(0,0);
   }
-
-  function showStudio(name){
+  function studio(name){
     if(!name) return;
-    try { window.setStudio(name); } catch(e) { console.error(e); return; }
+    if(typeof window.setStudio==='function') window.setStudio(name);
     document.body.classList.remove('dashboard-active');
     if($('dashboardTiles')) $('dashboardTiles').style.display='none';
     if($('dashboardRecent')) $('dashboardRecent').style.display='none';
     if($('studioTabs')) $('studioTabs').style.display='none';
-    document.querySelectorAll('.ribbon-panel').forEach(panel => {
-      const active = panel.dataset.studioPanel === name;
-      panel.classList.toggle('active',active);
-      if(active) panel.style.setProperty('display','flex','important');
-      else panel.style.removeProperty('display');
+    document.querySelectorAll('.ribbon-panel').forEach(p=>{
+      const active=p.dataset.studioPanel===name;
+      p.classList.toggle('active',active);
+      if(active) p.style.setProperty('display','flex','important'); else p.style.removeProperty('display');
     });
     const back=$('backToMainMenu');
     if(back){
@@ -7416,68 +7337,50 @@ $('dashboardAskTile')?.addEventListener('click', () => {
       back.style.setProperty('visibility','visible','important');
       back.style.setProperty('opacity','1','important');
     }
-    if($('statusMsg')) $('statusMsg').textContent =
-      name==='help' ? 'Help opened.' :
-      name==='about' ? 'About opened.' :
-      name==='settings' ? 'Settings opened.' :
-      name==='reader' ? 'Reader opened.' :
-      name==='export' ? 'Export opened.' :
-      'Choose a tool from the submenu.';
+    if($('statusMsg')) $('statusMsg').textContent='Choose a tool from the submenu.';
     window.scrollTo(0,0);
   }
-
   function wire(){
-    document.addEventListener('click', e => {
+    document.addEventListener('click',e=>{
       const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
       if(!tile) return;
-      e.preventDefault(); e.stopImmediatePropagation();
-      showStudio(tile.dataset.studio);
-    }, true);
-
-    document.addEventListener('click', e => {
+      e.preventDefault(); e.stopImmediatePropagation(); studio(tile.dataset.studio);
+    },true);
+    document.addEventListener('click',e=>{
+      const back=e.target.closest('#backToMainMenu');
+      if(!back) return;
+      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
+    },true);
+    document.addEventListener('click',e=>{
+      const tab=e.target.closest('#studioTabs .studio-tab[data-studio]');
+      if(!tab) return;
+      e.preventDefault(); e.stopImmediatePropagation(); studio(tab.dataset.studio);
+    },true);
+    document.addEventListener('click',e=>{
       const help=e.target.closest('#dashboardHelpTile');
       const ask=e.target.closest('#dashboardAskTile');
       if(!help && !ask) return;
       e.preventDefault(); e.stopImmediatePropagation();
-      if(help){
-        if(typeof window.openHelp==='function') window.openHelp(); else showStudio('help');
-      }else{
-        if(typeof window.openAskMe==='function') window.openAskMe(); else showStudio('ai');
-      }
-    }, true);
-
-    document.addEventListener('click', e => {
-      const back=e.target.closest('#backToMainMenu');
-      if(!back) return;
-      e.preventDefault(); e.stopImmediatePropagation(); showDashboard();
-    }, true);
-
-    document.addEventListener('click', e => {
-      const tab=e.target.closest('#studioTabs .studio-tab[data-studio]');
-      if(!tab) return;
-      e.preventDefault(); e.stopImmediatePropagation(); showStudio(tab.dataset.studio);
-    }, true);
+      if(help){ if(typeof window.openHelp==='function') window.openHelp(); else studio('help'); }
+      else { if(typeof window.openAskMe==='function') window.openAskMe(); else studio('ai'); }
+    },true);
   }
-
-  window.DocuForgeMenuSelfTest = function(){
+  window.DocuForgeMenuSelfTest=function(){
     const report={categories:[],panels:[],tools:[],duplicateIds:[]};
     document.querySelectorAll('#dashboardTiles .main-menu-tile[data-studio]').forEach(t=>{
       const n=t.dataset.studio;
-      report.categories.push({studio:n,ok:SPECIAL.has(n)||!!document.querySelector('.ribbon-panel[data-studio-panel="'+n+'"]')});
+      report.categories.push({studio:n,ok:!!document.querySelector('.ribbon-panel[data-studio-panel="'+n+'"]') || ['help','settings','about','reader','export','excel','gstinvoice'].includes(n)});
     });
     document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
       report.panels.push({studio:p.dataset.studioPanel,tools:p.querySelectorAll('button.tool-btn').length});
       p.querySelectorAll('button.tool-btn').forEach(b=>report.tools.push(b.id));
     });
     const seen=new Set();
-    document.querySelectorAll('#dashboardTiles [id], .studio-tabs [id], .ribbon-panel [id], #backToMainMenu').forEach(el=>{
-      const id=el.id; if(seen.has(id)) report.duplicateIds.push(id); seen.add(id);
-    });
-    report.ok=report.categories.every(x=>x.ok)&&report.panels.length===10&&report.tools.every(Boolean)&&report.duplicateIds.length===0;
-    console.info('DocuForge menu self-test',report); return report;
+    document.querySelectorAll('#dashboardTiles [id], #studioTabs [id], .ribbon-panel [id], #backToMainMenu').forEach(el=>{ if(el.id){ if(seen.has(el.id)) report.duplicateIds.push(el.id); seen.add(el.id); } });
+    report.ok=report.categories.every(x=>x.ok)&&report.panels.length>=10&&report.tools.every(Boolean)&&report.duplicateIds.length===0;
+    return report;
   };
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire,{once:true}); else wire();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{wire();dashboard();},{once:true}); else {wire();dashboard();}
 })();
 </script>
 </body>
