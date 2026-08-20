@@ -11,8 +11,6 @@ sion" content="2026.08.16.17">
 <meta name="description" content="Merge, split, rotate, reorder and edit PDFs entirely in your browser. Nothing is ever uploaded.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -475,7 +473,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.20.60 usability refinements ===== */
+/* ===== v2026.08.20.61 usability refinements ===== */
 #studioMoreBtn{display:none !important;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +505,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.60 PDF workflow ===== */
+/* ===== v2026.08.20.61 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +514,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.20.60 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.20.61 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +540,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.60 dashboard cleanup ===== */
+/* ===== v2026.08.20.61 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +576,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.20.60: clean Dashboard ===== */
+/* ===== v2026.08.20.61: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +600,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.20.60: Dashboard is a true main menu ===== */
+/* ===== v2026.08.20.61: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +612,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.20.60: hard dashboard/studio separation ===== */
+/* ===== v2026.08.20.61: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +633,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.20.60: Dashboard upload entry ===== */
+/* ===== v2026.08.20.61: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +650,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.20.60 — one navigation system only ===== */
+/* ===== v2026.08.20.61 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +689,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.20.60';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.20.61';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +700,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.60</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.61</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -750,6 +748,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
     Your documents never leave this device
   </div>
+  <div id="offlineStatus" title="Offline-ready browser mode" style="font-size:10px;font-weight:700;letter-spacing:.2px;padding:5px 8px;border:1px solid rgba(255,255,255,.28);border-radius:999px;color:#F4F2EA;white-space:nowrap;">● Local</div>
   <button class="icon-btn" id="darkToggle" aria-label="Toggle dark mode">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
   </button>
@@ -778,7 +777,9 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
       <button class="studio-tab" data-studio="about"><span class="st-icon">ℹ️</span> About</button>
 </div>
 
-    <div id="noPdfBanner" style="display:none;background:var(--accent);color:var(--accent-ink);padding:8px 16px;font-size:12.5px;font-weight:600;text-align:center;;display:none">
+    <div id="offlineCapabilityNote" style="display:none;background:#113B34;color:#F4F2EA;padding:7px 14px;font-size:11px;text-align:center;border-bottom:1px solid rgba(255,255,255,.15);">Offline mode: navigation, local file selection, conversions and editing remain on-device. AI and online translation need internet; English ↔ Hindi translation has an offline fallback.</div>
+
+<div id="noPdfBanner" style="display:none;background:var(--accent);color:var(--accent-ink);padding:8px 16px;font-size:12.5px;font-weight:600;text-align:center;;display:none">
       📄 Most tools below need a PDF open first — tap <strong>Open / Merge PDFs</strong> in PDF Studio, or a Dashboard tile, to get started.
     </div>
 
@@ -1251,6 +1252,16 @@ function openGstInvoiceApp(){
 
 </div><!-- /#appView -->
 
+<script>
+/* Offline-safe core dependency guards. If a CDN library is unavailable, the
+   application UI and navigation still initialise; affected tools report a
+   clear local/offline limitation instead of crashing the whole app. */
+window.PDFLib = window.PDFLib || { PDFDocument:null, degrees:()=>0, rgb:()=>null, StandardFonts:{} };
+window.pdfjsLib = window.pdfjsLib || { GlobalWorkerOptions:{}, getDocument:()=>{ throw new Error('PDF engine is unavailable offline. Open this file once while connected to load the PDF engine, or use non-PDF tools.'); } };
+window.Sortable = window.Sortable || { create:()=>({destroy(){}}) };
+window.JSZip = window.JSZip || function(){ throw new Error('ZIP engine is unavailable offline. Open this file once while connected to load the ZIP engine.'); };
+window.JSZip.loadAsync = async function(){ throw new Error('ZIP engine is unavailable offline.'); };
+</script>
 <script>
 const { PDFDocument, degrees, rgb, StandardFonts } = PDFLib;
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -2688,45 +2699,109 @@ function ocrCodeForTranslationLanguage(lang){
   return OCR_BY_TRANSLATION_LANG[lang] || 'eng';
 }
 
-async function translateChunk(text, source, target, email){
+
+/* ---------- Offline translation fallback ----------
+   The online translator remains available when connected. When offline,
+   DocuForge uses a compact local phrase/word engine so the Translation
+   Studio still works without a network. It is intentionally conservative:
+   it translates supported common English/Hindi phrases and otherwise keeps
+   the original wording rather than pretending an inaccurate translation is
+   correct. */
+const OFFLINE_TRANSLATIONS = {
+  en_hi: {
+    'hello':'नमस्ते','hi':'नमस्ते','good morning':'सुप्रभात','good afternoon':'शुभ दोपहर','good evening':'शुभ संध्या','thank you':'धन्यवाद','thanks':'धन्यवाद','please':'कृपया','welcome':'स्वागत है','yes':'हाँ','no':'नहीं','today':'आज','tomorrow':'कल','yesterday':'कल','name':'नाम','address':'पता','date':'तारीख','time':'समय','amount':'राशि','total':'कुल','balance':'शेष','payment':'भुगतान','invoice':'चालान','customer':'ग्राहक','supplier':'आपूर्तिकर्ता','document':'दस्तावेज़','documents':'दस्तावेज़','file':'फ़ाइल','files':'फ़ाइलें','page':'पृष्ठ','pages':'पृष्ठ','report':'रिपोर्ट','statement':'विवरण','account':'खाता','bank':'बैंक','loan':'ऋण','interest':'ब्याज','principal':'मूलधन','profit':'लाभ','loss':'हानि','sales':'बिक्री','purchase':'खरीद','expense':'व्यय','income':'आय','business':'व्यवसाय','company':'कंपनी','member':'सदस्य','members':'सदस्य','meeting':'बैठक','help':'सहायता','question':'प्रश्न','answer':'उत्तर','open':'खोलें','close':'बंद करें','save':'सहेजें','download':'डाउनलोड करें','upload':'अपलोड करें','choose file':'फ़ाइल चुनें','compare':'तुलना करें','translation':'अनुवाद','translate':'अनुवाद करें','powerpoint':'पावरपॉइंट','excel':'एक्सेल','word':'वर्ड','pdf':'पीडीएफ','image':'छवि','text':'पाठ','success':'सफलता','error':'त्रुटि','ready':'तैयार','completed':'पूरा हुआ','complete':'पूरा','processing':'प्रसंस्करण जारी है','please wait':'कृपया प्रतीक्षा करें','your documents never leave this device':'आपके दस्तावेज़ इस डिवाइस से बाहर नहीं जाते हैं','choose the file required for this tool':'इस टूल के लिए आवश्यक फ़ाइल चुनें'
+  },
+  hi_en: {
+    'नमस्ते':'hello','सुप्रभात':'good morning','शुभ दोपहर':'good afternoon','शुभ संध्या':'good evening','धन्यवाद':'thank you','कृपया':'please','स्वागत है':'welcome','हाँ':'yes','नहीं':'no','आज':'today','कल':'tomorrow','नाम':'name','पता':'address','तारीख':'date','समय':'time','राशि':'amount','कुल':'total','शेष':'balance','भुगतान':'payment','चालान':'invoice','ग्राहक':'customer','आपूर्तिकर्ता':'supplier','दस्तावेज़':'document','दस्तावेज':'document','फ़ाइल':'file','फाइल':'file','फ़ाइलें':'files','पृष्ठ':'page','रिपोर्ट':'report','विवरण':'statement','खाता':'account','बैंक':'bank','ऋण':'loan','ब्याज':'interest','मूलधन':'principal','लाभ':'profit','हानि':'loss','बिक्री':'sales','खरीद':'purchase','व्यय':'expense','आय':'income','व्यवसाय':'business','कंपनी':'company','सदस्य':'member','बैठक':'meeting','सहायता':'help','प्रश्न':'question','उत्तर':'answer','खोलें':'open','बंद करें':'close','सहेजें':'save','डाउनलोड करें':'download','अपलोड करें':'upload','फ़ाइल चुनें':'choose file','तुलना करें':'compare','अनुवाद':'translation','अनुवाद करें':'translate','पावरपॉइंट':'powerpoint','एक्सेल':'excel','वर्ड':'word','पीडीएफ':'pdf','छवि':'image','पाठ':'text','सफलता':'success','त्रुटि':'error','तैयार':'ready','पूरा हुआ':'completed','पूरा':'complete','कृपया प्रतीक्षा करें':'please wait'
+  }
+};
+function offlineTranslateText(text, source, target){
+  if(!String(text||'').trim()) return '';
+  const src = source==='auto' ? detectTranslationSource(text,'en') : source;
+  if(src===target) return text;
+  const dict = OFFLINE_TRANSLATIONS[`${src}_${target}`];
+  if(!dict) throw new Error(`Offline translation is currently available for English ↔ Hindi only. Connect to the internet for other language pairs.`);
+  const keys = Object.keys(dict).sort((a,b)=>b.length-a.length);
+  let out = String(text);
+  // Protect case/spacing while replacing phrases first.
+  if(src==='en'){
+    for(const k of keys){ out = out.replace(new RegExp(`(^|[^A-Za-z])${k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?=$|[^A-Za-z])`,'gi'), m=>m.replace(k,dict[k])); }
+  }else{
+    for(const k of keys){ out = out.split(k).join(dict[k]); }
+  }
+  return out;
+}
+function isOnline(){ return navigator.onLine !== false; }
+function updateOfflineStatus(){
+  const el=document.getElementById('offlineStatus'); const note=document.getElementById('offlineCapabilityNote'); if(!el)return;
+  const online=isOnline(); el.textContent=online?'● Online':'● Offline';
+  el.style.background=online?'rgba(72,170,112,.18)':'rgba(196,93,24,.28)';
+  if(note) note.style.display=online?'none':'block';
+}
+
+window.addEventListener('online',updateOfflineStatus); window.addEventListener('offline',updateOfflineStatus);
+setTimeout(updateOfflineStatus,0);
+
+async function translateChunk(text, source, target, email, offlineOnly=false){
   if(!text.trim()) return '';
   const effectiveSource = source === 'auto' ? detectTranslationSource(text, 'en') : source;
   if(effectiveSource === target) return text;
-  const langpair = encodeURIComponent(`${effectiveSource}|${target}`);
-  let url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langpair}`;
-  if(email) url += `&de=${encodeURIComponent(email)}`;
-  const res = await fetch(url);
-  if(!res.ok) throw new Error('Translation service unavailable.');
-  const data = await res.json();
-  if(data.responseStatus && Number(data.responseStatus) !== 200){
-    throw new Error(data.responseDetails || 'Translation limit reached.');
-  }
-  return data.responseData?.translatedText || '';
+  if(offlineOnly || !isOnline()) return offlineTranslateText(text, effectiveSource, target);
+
+  // Prefer Google's public translation endpoint for better contextual
+  // sentence translation, then fall back to MyMemory if it is unavailable.
+  try{
+    const url=`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${encodeURIComponent(effectiveSource)}&tl=${encodeURIComponent(target)}&dt=t&q=${encodeURIComponent(text)}`;
+    const res=await fetch(url,{cache:'no-store'});
+    if(res.ok){
+      const data=await res.json();
+      const translated=(Array.isArray(data)&&Array.isArray(data[0]))
+        ? data[0].map(x=>Array.isArray(x)?x[0]:'').join('') : '';
+      if(translated.trim()) return translated;
+    }
+  }catch(e){ console.warn('Google translation unavailable',e); }
+
+  try{
+    const langpair=encodeURIComponent(`${effectiveSource}|${target}`);
+    let url=`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langpair}`;
+    if(email) url+=`&de=${encodeURIComponent(email)}`;
+    const res=await fetch(url,{cache:'no-store'});
+    if(res.ok){
+      const data=await res.json();
+      if(!data.responseStatus || Number(data.responseStatus)===200){
+        const translated=data.responseData?.translatedText||'';
+        if(translated.trim()) return translated;
+      }
+    }
+  }catch(e){ console.warn('MyMemory translation unavailable',e); }
+
+  return offlineTranslateText(text,effectiveSource,target);
 }
-async function translateFullText(text, source, target, email, onProgress){
-  const lines = text.split('\n');
-  const out = [];
-  for(let i = 0; i < lines.length; i++){
-    const line = lines[i];
-    if(!line.trim()){ out.push(''); continue; }
-    if(line.length <= 480){
-      out.push(await translateChunk(line, source, target, email));
-    } else {
-      const sentences = line.match(/[^.!?]+[.!?]*\s*/g) || [line];
-      let buf = '', parts = [];
-      for(const s of sentences){
-        if((buf + s).length > 450 && buf){ parts.push(buf); buf = ''; }
-        buf += s;
+async function translateFullText(text, source, target, email, onProgress, offlineOnly=false){
+  const chunks = String(text).split(/\n\s*\n/);
+  const out=[];
+  for(let i=0;i<chunks.length;i++){
+    const block=chunks[i];
+    if(!block.trim()){ out.push(''); continue; }
+    // Keep sentences together where possible; this gives substantially better
+    // context than translating every short line independently.
+    const parts=[];
+    if(block.length<=850) parts.push(block);
+    else{
+      const sentences=block.match(/[^.!?।]+[.!?।]+\s*/g)||[block];
+      let buf='';
+      for(const sentence of sentences){
+        if(buf && (buf.length+sentence.length)>780){ parts.push(buf); buf=''; }
+        buf+=sentence;
       }
       if(buf) parts.push(buf);
-      const translatedParts = [];
-      for(const part of parts){ translatedParts.push(await translateChunk(part, source, target, email)); await sleep(200); }
-      out.push(translatedParts.join(' '));
     }
-    if(onProgress) onProgress(i + 1, lines.length);
-    await sleep(200);
+    const translatedParts=[];
+    for(const part of parts){ translatedParts.push(await translateChunk(part,source,target,email,offlineOnly)); }
+    out.push(translatedParts.join(' '));
+    if(onProgress) onProgress(i+1,chunks.length);
   }
-  return out.join('\n');
+  return out.join('\n\n');
 }
 function buildBilingualHtml(original, translated, sourceLabel, targetLabel){
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -3204,9 +3279,16 @@ function setupSignaturePad(canvas){
   ['pointerup','pointerleave','pointercancel'].forEach(evt => canvas.addEventListener(evt, () => { drawing = false; }));
   return () => { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height); };
 }
+
+function dataUrlToArrayBuffer(dataUrl){
+  const b64=String(dataUrl).split(',')[1]||'';
+  const bin=atob(b64); const out=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) out[i]=bin.charCodeAt(i);
+  return out.buffer;
+}
 async function signPdf({ dataUrl, pageIndex, position, widthPt }){
   await withDoc(async (doc) => {
-    const pngBuf = await (await fetch(dataUrl)).arrayBuffer();
+    const pngBuf = dataUrlToArrayBuffer(dataUrl);
     const img = await doc.embedPng(pngBuf);
     const pages = doc.getPages();
     const page = pages[pageIndex];
@@ -3246,7 +3328,7 @@ async function redactPage(pageIndex, boxes, renderScale){
   await page.render({ canvasContext: ctx, viewport }).promise;
   ctx.fillStyle = '#000';
   boxes.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
-  const pngBytes = await (await fetch(canvas.toDataURL('image/png'))).arrayBuffer();
+  const pngBytes = dataUrlToArrayBuffer(canvas.toDataURL('image/png'));
   await withDoc(async (doc) => {
     const img = await doc.embedPng(pngBytes);
     const pages = doc.getPages();
@@ -3676,7 +3758,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.20.60 — single main menu; file requested by operation */
+/* v2026.08.20.61 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3853,7 +3935,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.20.60 navigation ===== */
+/* ===== DocuForge AI v2026.08.20.61 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -5158,6 +5240,7 @@ $('btnTranslateText').addEventListener('click', () => {
       <div><label>Target language</label><select id="trTarget">${langOptions(false)}</select></div>
     </div>
     <p class="hint" style="margin-top:-4px;">For an English photo → Hindi, keep Source as Auto-detect and select <strong>Hindi</strong> as Target. For a Hindi photo → English, select <strong>Hindi</strong> as Source.</p>
+    <div class="field"><label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="trOfflineOnly"> Offline only — never use an online translation service</label><p class="hint">Offline translation is built in for English ↔ Hindi. Other language pairs need internet access.</p></div>
     <div class="field"><label>Email (optional — raises the free daily translation limit)</label><input type="text" id="trEmail" placeholder="you@example.com"></div>
     <p class="hint">You can type/paste text, upload a PDF/DOCX/TXT/MD from Files, or upload a photo from Photos/Gallery. Only the extracted text is sent to the translation service.</p>
   `, async () => {
@@ -5166,12 +5249,13 @@ $('btnTranslateText').addEventListener('click', () => {
     const source = document.getElementById('trSource').value;
     const target = document.getElementById('trTarget').value;
     const email = document.getElementById('trEmail').value.trim();
-    setStatus('Translating…'); showProgress(10);
+    const offlineOnly = !!document.getElementById('trOfflineOnly')?.checked;
+    setStatus(offlineOnly ? 'Translating offline…' : (navigator.onLine === false ? 'Offline — using local translation…' : 'Translating…')); showProgress(10);
     try{
-      const translated = await translateFullText(text, source, target, email, (d,t) => showProgress(Math.round((d/t)*100)));
+      const translated = await translateFullText(text, source, target, email, (d,t) => showProgress(Math.round((d/t)*100)), offlineOnly);
       showTranslationResult(text, translated, langName(source), langName(target), 'translation');
       setStatus('Translation complete.');
-    } catch(e){ console.error(e); toast('Translation failed — the free service may be rate-limited. Try again shortly, or add your email above to raise the limit.', true); }
+    } catch(e){ console.error(e); toast(e?.message || 'Translation failed. Check the selected languages or use Offline only for English ↔ Hindi.', true); }
     finally { showProgress(null); }
   });
 
@@ -5379,10 +5463,10 @@ $('btnTranslatePdf').addEventListener('click', () => {
     const text = chosenPages.map(p => `--- Page ${p.pageIndex+1} ---\n` + groupIntoLines(p.items).map(lineToText).join('\n')).join('\n\n');
     setStatus('Translating PDF text…'); showProgress(10);
     try{
-      const translated = await translateFullText(text, source, target, email, (d,t) => showProgress(Math.round((d/t)*100)));
+      const translated = await translateFullText(text, source, target, email, (d,t) => showProgress(Math.round((d/t)*100)), offlineOnly);
       showTranslationResult(text, translated, langName(source), langName(target), ($('outName').value || 'document') + '_translated');
       setStatus('Translation complete.');
-    } catch(e){ console.error(e); toast('Translation failed — the free service may be rate-limited. Try again shortly, or add your email above to raise the limit.', true); }
+    } catch(e){ console.error(e); toast(e?.message || 'Translation failed. Check the selected languages or use Offline only for English ↔ Hindi.', true); }
     finally { showProgress(null); }
   });
 });
@@ -7212,7 +7296,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* v2026.08.20.60 — upload screen only; v46 navigation untouched */
+/* v2026.08.20.61 — upload screen only; v46 navigation untouched */
 (function(){
  const $=id=>document.getElementById(id);
  let activeStudio='';
@@ -7355,7 +7439,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* v2026.08.20.60 — clear tool upload request when leaving a Studio */
+/* v2026.08.20.61 — clear tool upload request when leaving a Studio */
 (function(){
   const box=document.getElementById('studioUploadScreen');
   if(!box)return;
@@ -7369,7 +7453,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 <script>
-/* DocuForge AI v2026.08.20.60 — single navigation controller */
+/* DocuForge AI v2026.08.20.61 — single navigation controller */
 (function(){
   const $ = id => document.getElementById(id);
   function dashboard(){
