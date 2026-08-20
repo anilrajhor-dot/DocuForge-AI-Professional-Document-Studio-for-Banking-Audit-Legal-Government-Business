@@ -475,8 +475,8 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.18.45 usability refinements ===== */
-#studioMoreBtn{display:none;}
+/* ===== v2026.08.20.46 usability refinements ===== */
+#studioMoreBtn{display:none !important;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
   .studio-tabs{scrollbar-width:none;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.18.45 PDF workflow ===== */
+/* ===== v2026.08.20.46 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.18.45 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.20.46 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.18.45 dashboard cleanup ===== */
+/* ===== v2026.08.20.46 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.18.45: clean Dashboard ===== */
+/* ===== v2026.08.20.46: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.18.45: Dashboard is a true main menu ===== */
+/* ===== v2026.08.20.46: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.18.45: hard dashboard/studio separation ===== */
+/* ===== v2026.08.20.46: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.18.45: Dashboard upload entry ===== */
+/* ===== v2026.08.20.46: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.18.45 — one navigation system only ===== */
+/* ===== v2026.08.20.46 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.18.45';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.20.46';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.18.45</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.46</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1434,17 +1434,12 @@ function updatePdfUploadAction(){
   const btn = $('btnOpen');
   const group = $('pdfAddPagesGroup');
   if(!btn) return;
-  if(workingBytes){
-    btn.innerHTML = '<span aria-hidden="true">📤</span> Share merged PDF';
-    btn.title = 'Share the currently loaded merged PDF. Use Insert PDF at page… only when you need to add another file.';
-    if(group) group.querySelector('h2').textContent = 'Current project';
-  }else{
-    btn.innerHTML = '<span aria-hidden="true">📂</span> Upload PDF / Photos';
-    btn.title = 'Upload one or more PDF files or photos to start the project.';
-    if(group) group.querySelector('h2').textContent = 'Start project';
-  }
-}
-function setToolsEnabled(on){
+  btn.innerHTML = '<span aria-hidden="true">📂</span> Upload / Add PDF or Photos';
+  btn.title = workingBytes
+    ? 'Upload another PDF or photo to add it to the current project.'
+    : 'Upload one or more PDF files or photos to start the project.';
+  if(group) group.querySelector('h2').textContent = workingBytes ? 'Add pages' : 'Start project';
+}function setToolsEnabled(on){
   PDF_REQUIRED_IDS.forEach(id=>{
     $(id).title = on ? '' : 'Tap to open a PDF first — this tool needs one loaded.';
   });
@@ -3616,7 +3611,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.18.45 — single main menu; file requested by operation */
+/* v2026.08.20.46 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3793,7 +3788,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.18.45 navigation ===== */
+/* ===== DocuForge AI v2026.08.20.46 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -4381,13 +4376,7 @@ function showPdfResult(title, blob, filename, message){
 
 /* ---------- Wire up sidebar tools ---------- */
 $('btnOpen').addEventListener('click', async () => {
-  if(!workingBytes){
-    $('fileInput').click();
-    return;
-  }
-  const filename = `${$('outName').value || 'document'}_merged.pdf`;
-  const blob = new Blob([workingBytes], {type:'application/pdf'});
-  showPdfResult('Merge result', blob, filename, 'The currently loaded documents are ready as one merged PDF.');
+  $('fileInput').click();
 });
 $('fileInput').addEventListener('change', (e) => { loadFiles(e.target.files); e.target.value=''; });
 
@@ -6517,6 +6506,89 @@ function computeStats(data){
   return { n, sum, avg, min, max };
 }
 
+$('btnExcelChart').addEventListener('click', () => {
+  openModal('Excel / CSV → Chart', `
+    <div class="field"><label>Spreadsheet file</label><input type="file" id="chartFile" accept=".xlsx,.xls,.csv"></div>
+    <div id="chartColumnsArea"></div>
+    <p class="hint">Uses the first sheet. Columns marked 🔢 look numeric and useful; ⚠️ marks a row-number-style column — a poor choice for either axis. Sample values are shown so you can tell columns apart before picking.</p>
+  `, async () => {
+    const rows = window.__chartRows;
+    if(!rows){ toast('Choose a spreadsheet file first.', true); return; }
+    const xIdx = parseInt(document.getElementById('chartX').value);
+    const yIdx = parseInt(document.getElementById('chartY').value);
+    let type = document.getElementById('chartType').value;
+    const body = rows.slice(1).filter(r => r[xIdx] !== undefined && r[xIdx] !== '');
+    const labels = body.map(r => String(r[xIdx]));
+    const rawData = body.map(r => { const v = parseFloat(r[yIdx]); return isNaN(v) ? null : v; });
+    const validCount = rawData.filter(v => v !== null).length;
+    if(!labels.length){ toast('No data rows found.', true); return; }
+    const colInfo = window.__chartColInfo;
+    if(colInfo && colInfo[yIdx] && colInfo[yIdx].isSequential){
+      toast('That Y-axis column looks like a row number/ID (values just count upward) rather than real data — the chart will just be a straight ramp. Pick a column with actual varying values instead.', true);
+      return;
+    }
+    if(validCount === 0){
+      toast('That Y-axis column doesn\u2019t contain usable numbers for every row — pick a column marked 🔢 in the list instead.', true);
+      return;
+    }
+    if(validCount < labels.length * 0.5){
+      toast(`Only ${validCount} of ${labels.length} rows in that column have numbers — the rest will show as 0. Check you picked the right column.`, false);
+    }
+    const data = rawData.map(v => v === null ? 0 : v);
+    if(data.every(v => v === 0)){
+      toast('Every value in that column is 0 — this is almost certainly the wrong column. Check the sample values shown in the Y-axis dropdown and pick one with real numbers.', true);
+      return;
+    }
+    const pieLikeTypes = ['pie', 'doughnut', 'polarArea', 'radar'];
+    if(pieLikeTypes.includes(type) && labels.length > 20){
+      toast(`This chart type doesn\u2019t work with ${labels.length} categories — showing as a bar chart instead.`, false);
+      type = 'bar';
+    }
+    showChartResult(labels, data, type, String(rows[0][yIdx] ?? 'Value'));
+  });
+  setTimeout(() => {
+    document.getElementById('chartFile').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if(!file) return;
+      try{
+        await loadLib('xlsx');
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, { type:'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:'' });
+        if(!rows.length){ toast('Could not read any data from that file.', true); return; }
+        window.__chartRows = rows;
+        const headers = rows[0];
+        const colInfo = headers.map((h, i) => analyzeColumn(rows, i));
+        window.__chartColInfo = colInfo;
+        // Y default: prefer numeric, non-sequential, high-nonzero-density columns
+        let bestYIdx = headers.length - 1, bestYScore = -Infinity;
+        colInfo.forEach((info, i) => {
+          const score = info.pctNumeric + info.pctNonzero - (info.isSequential ? 1000 : 0);
+          if(score > bestYScore){ bestYScore = score; bestYIdx = i; }
+        });
+        // X default: prefer the first clearly non-numeric (categorical) column
+        let bestXIdx = 0;
+        const catIdx = colInfo.findIndex(info => info.pctNumeric < 50);
+        if(catIdx >= 0) bestXIdx = catIdx;
+        const optLabel = (h, i) => {
+          const info = colInfo[i];
+          const marker = info.isSequential ? '\u26a0\ufe0f ' : (info.pctNumeric >= 70 ? '\ud83d\udd22 ' : '');
+          const sample = info.samples.length ? ` \u2014 e.g. ${info.samples.join(', ')}` : '';
+          return `${marker}${String(h)}${sample}`;
+        };
+        document.getElementById('chartColumnsArea').innerHTML = `
+          <div class="field row">
+            <div><label>X-axis (labels)</label><select id="chartX">${headers.map((h,i) => `<option value="${i}" ${i === bestXIdx ? 'selected' : ''}>${escapeXml(optLabel(h,i))}</option>`).join('')}</select></div>
+            <div><label>Y-axis (values)</label><select id="chartY">${headers.map((h,i) => `<option value="${i}" ${i === bestYIdx ? 'selected' : ''}>${escapeXml(optLabel(h,i))}</option>`).join('')}</select></div>
+          </div>
+          <div class="field"><label>Chart type</label><select id="chartType"><option value="bar">Bar (vertical)</option><option value="hbar">Bar (horizontal)</option><option value="line">Line</option><option value="area">Area (filled line)</option><option value="pie">Pie</option><option value="doughnut">Doughnut</option><option value="radar">Radar</option><option value="polarArea">Polar area</option></select></div>
+        `;
+      } catch(err){ console.error(err); toast('Could not read that spreadsheet.', true); }
+    });
+  }, 0);
+});
+
 /* ---------- Project milestone tracker ----------
    Distinct from the general Excel/CSV chart tool: each point here is a
    milestone with its own free-text note/reason (e.g. "delayed — vendor
@@ -7051,7 +7123,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* DocuForge AI v2026.08.18.45 — navigation repair */
+/* DocuForge AI v2026.08.20.46 — navigation repair */
 (function(){
   const $=id=>document.getElementById(id);
 
