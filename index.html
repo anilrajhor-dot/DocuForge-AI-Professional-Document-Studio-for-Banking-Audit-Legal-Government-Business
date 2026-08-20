@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.20.53 usability refinements ===== */
+/* ===== v2026.08.20.54 usability refinements ===== */
 #studioMoreBtn{display:none !important;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.53 PDF workflow ===== */
+/* ===== v2026.08.20.54 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.20.53 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.20.54 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.53 dashboard cleanup ===== */
+/* ===== v2026.08.20.54 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.20.53: clean Dashboard ===== */
+/* ===== v2026.08.20.54: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.20.53: Dashboard is a true main menu ===== */
+/* ===== v2026.08.20.54: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.20.53: hard dashboard/studio separation ===== */
+/* ===== v2026.08.20.54: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.20.53: Dashboard upload entry ===== */
+/* ===== v2026.08.20.54: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.20.53 — one navigation system only ===== */
+/* ===== v2026.08.20.54 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.20.53';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.20.54';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.53</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.54</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -3613,7 +3613,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.20.53 — single main menu; file requested by operation */
+/* v2026.08.20.54 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3790,7 +3790,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.20.53 navigation ===== */
+/* ===== DocuForge AI v2026.08.20.54 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -7137,7 +7137,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* DocuForge AI v2026.08.20.53 — navigation repair */
+/* DocuForge AI v2026.08.20.54 — navigation repair */
 (function(){
   const $=id=>document.getElementById(id);
 
@@ -7216,10 +7216,11 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* v2026.08.20.53 — upload screen only; v46 navigation untouched */
+/* v2026.08.20.54 — upload screen only; v46 navigation untouched */
 (function(){
  const $=id=>document.getElementById(id);
  let activeStudio='';
+ let pendingToolId='';
  const accept={
   pdf:'.pdf,application/pdf,image/*',ocr:'.pdf,application/pdf,image/*',
   translate:'.pdf,.docx,.txt,.md,*/*',convert:'.pdf,.docx,.xlsx,.xls,.csv,.pptx,.html,.txt,.md,*/*',
@@ -7234,6 +7235,10 @@ $('dashboardAskTile')?.addEventListener('click', () => {
    box.style.display='none';return;
   }
   activeStudio=panel.dataset.studioPanel||'';
+  if(!box.dataset.requested){
+   box.style.display='none';
+   return;
+  }
   box.style.display='block';
   if($('studioUploadHint'))$('studioUploadHint').textContent=
    activeStudio==='pdf'?'Choose the document for this PDF Studio. It will be loaded automatically.':
@@ -7254,8 +7259,13 @@ $('dashboardAskTile')?.addEventListener('click', () => {
     try{
       await loadFiles([file]);
       if(workingBytes){
-        setStatus(`Loaded "${file.name}". Choose a PDF Studio tool.`);
+        setStatus(`Loaded "${file.name}".`);
         if($('studioUploadName'))$('studioUploadName').textContent=`✓ ${file.name} — loaded`;
+        const next=pendingToolId;
+        pendingToolId='';
+        const box=$('studioUploadScreen');
+        if(box){ box.dataset.requested=''; box.style.display='none'; }
+        if(next) setTimeout(()=>$(next)?.click(),80);
       }
     }catch(e){
       console.error(e);
@@ -7284,7 +7294,42 @@ $('dashboardAskTile')?.addEventListener('click', () => {
    }catch(e){}
   }
 }
+ function requestFileForTool(id){
+  const panel=document.querySelector('.ribbon-panel.active[data-studio-panel]');
+  if(!panel)return false;
+  activeStudio=panel.dataset.studioPanel||'';
+  const box=$('studioUploadScreen');
+  if(!box)return false;
+  pendingToolId=id;
+  box.dataset.requested='1';
+  box.style.display='block';
+  if($('studioUploadName'))$('studioUploadName').textContent='No file selected';
+  const hint=$('studioUploadHint');
+  if(hint) hint.textContent =
+    activeStudio==='pdf' ? 'Choose the PDF for this tool. It will be loaded automatically.' :
+    activeStudio==='ocr' ? 'Choose the PDF or image for this OCR tool.' :
+    activeStudio==='powerpoint' ? 'Choose the PowerPoint file for this tool.' :
+    activeStudio==='excel' ? 'Choose the Excel/CSV file for this tool.' :
+    'Choose the file required for this tool.';
+  $('studioUploadChoose')?.scrollIntoView({behavior:'smooth',block:'center'});
+  setStatus('Choose a file to continue.');
+  return true;
+ }
+
+ function installToolFileGate(){
+  document.addEventListener('click',function(e){
+    const btn=e.target.closest('.tool-btn');
+    if(!btn || !PDF_REQUIRED_IDS.includes(btn.id) || workingBytes) return;
+    const panel=btn.closest('.ribbon-panel');
+    if(!panel || !panel.classList.contains('active')) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    requestFileForTool(btn.id);
+  },true);
+ }
+
  function wire(){
+  installToolFileGate();
   $('studioUploadChoose')?.addEventListener('click',()=>{
    const i=$('studioUploadInput');if(i){i.accept=accept[activeStudio]||'*/*';i.multiple=['pdf','ocr'].includes(activeStudio);i.click();}
   });
@@ -7296,5 +7341,20 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 
+
+<script>
+/* v2026.08.20.54 — clear tool upload request when leaving a Studio */
+(function(){
+  const box=document.getElementById('studioUploadScreen');
+  if(!box)return;
+  new MutationObserver(()=>{
+    const active=document.querySelector('.ribbon-panel.active[data-studio-panel]');
+    if(!active || document.body.classList.contains('dashboard-active')){
+      box.dataset.requested='';
+      box.style.display='none';
+    }
+  }).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class','style']});
+})();
+</script>
 </body>
 </html>
