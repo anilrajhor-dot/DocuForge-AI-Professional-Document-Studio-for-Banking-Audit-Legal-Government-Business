@@ -475,7 +475,7 @@ body.dark .studio-tab.active{color:var(--pine);}
   header .tag{display:none;}
 }
 
-/* ===== v2026.08.20.58 usability refinements ===== */
+/* ===== v2026.08.20.59 usability refinements ===== */
 #studioMoreBtn{display:none !important;}
 @media(max-width:720px){
   #studioMoreBtn{display:flex;position:sticky;right:0;background:var(--surface);z-index:2;}
@@ -507,7 +507,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.58 PDF workflow ===== */
+/* ===== v2026.08.20.59 PDF workflow ===== */
 #dashboardNavigationHint{display:none;}
 @media(max-width:720px){
   #pageActionStrip{flex-wrap:wrap;gap:6px;}
@@ -516,7 +516,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== GST Invoice Studio integration — v2026.08.20.58 ===== */
+/* ===== GST Invoice Studio integration — v2026.08.20.59 ===== */
 .gst-invoice-studio-page{
   padding:14px 18px 28px;
   max-width:none;
@@ -542,7 +542,7 @@ body.dark .studio-tab.active{color:var(--pine);}
 }
 
 
-/* ===== v2026.08.20.58 dashboard cleanup ===== */
+/* ===== v2026.08.20.59 dashboard cleanup ===== */
 body.dashboard-active #pdfStudioWorkspace,
 body.dashboard-active #pdfWorkspace,
 body.dashboard-active #pdfEditor,
@@ -578,7 +578,7 @@ body.dashboard-active .pdf-canvas-wrap {
 #topHelpMenu,#topAskMeMenu{font-weight:700;}
 
 
-/* ===== v2026.08.20.58: clean Dashboard ===== */
+/* ===== v2026.08.20.59: clean Dashboard ===== */
 body.dashboard-active #noPdfBanner,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -602,7 +602,7 @@ body.dashboard-active main{
 }
 
 
-/* ===== v2026.08.20.58: Dashboard is a true main menu ===== */
+/* ===== v2026.08.20.59: Dashboard is a true main menu ===== */
 body.dashboard-active #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -614,7 +614,7 @@ body.dashboard-active #workspaceLayout{display:flex !important;}
 body.dashboard-active #workspaceLayout main{padding-top:0 !important;}
 
 
-/* ===== v2026.08.20.58: hard dashboard/studio separation ===== */
+/* ===== v2026.08.20.59: hard dashboard/studio separation ===== */
 body.dashboard-active #studioTabs,
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -635,7 +635,7 @@ body.dashboard-active #dashboardNavigationHint {
 }
 
 
-/* ===== v2026.08.20.58: Dashboard upload entry ===== */
+/* ===== v2026.08.20.59: Dashboard upload entry ===== */
 #dashboardUploadFileTile{
   border:2px solid var(--accent);
   background:var(--surface);
@@ -652,7 +652,7 @@ body.dashboard-active #gstInvoiceStudio{
 }
 
 
-/* ===== v2026.08.20.58 — one navigation system only ===== */
+/* ===== v2026.08.20.59 — one navigation system only ===== */
 #studioTabs{
   display:none !important;
 }
@@ -691,7 +691,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.20.58';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.20.59';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -702,7 +702,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.58</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.59</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -3624,7 +3624,7 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.20.58 — single main menu; file requested by operation */
+/* v2026.08.20.59 — single main menu; file requested by operation */
 #studioTabs{display:none !important;}
 body.dashboard-active #ribbon,
 body.dashboard-active #toolbar,
@@ -3801,7 +3801,7 @@ ${navPoints}
     zip.file(`OEBPS/chap${i+1}.xhtml`, `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Page ${i+1}</title>
 <style id="docuforge-v41-navigation-fix">
-/* ===== DocuForge AI v2026.08.20.58 navigation ===== */
+/* ===== DocuForge AI v2026.08.20.59 navigation ===== */
 #studioTabs{display:none !important;}
 #studioUploadFileBtn,#dashboardUploadFileTile{display:none !important;}
 
@@ -4839,6 +4839,12 @@ $('btnPptxToPdf').addEventListener('click', () => {
 
 
 $('btnPptxToMarkdown').addEventListener('click', () => {
+  const suppliedFile = window.__docuForgeStudioFile || null;
+  if(suppliedFile){
+    window.__docuForgeStudioFile = null;
+    convertPptxToMarkdownFile(suppliedFile);
+    return;
+  }
   openModal('PowerPoint → Markdown', `
     <div class="field">
       <label>PowerPoint file (.pptx)</label>
@@ -4851,7 +4857,12 @@ $('btnPptxToMarkdown').addEventListener('click', () => {
   `, async () => {
     const file = document.getElementById('pptxMarkdownFile')?.files?.[0];
     if(!file){ toast('Choose a .pptx file first.', true); return; }
+    await convertPptxToMarkdownFile(file);
+  });
+});
 
+async function convertPptxToMarkdownFile(file){
+    if(!file){ toast('Choose a .pptx file first.', true); return; }
     setStatus('Converting PowerPoint to Markdown…');
     showProgress(20);
     try{
@@ -4861,7 +4872,7 @@ $('btnPptxToMarkdown').addEventListener('click', () => {
       const lines = [];
       const escMd = text => String(text || '')
         .replace(/\\/g, '\\\\')
-        .replace(/([`*_{}\[\]()#+\-.!|>])/g, '\\$1');
+        .replace(/([`*_{}\[\]()+#\-.!|>])/g, '\\$1');
 
       slides.forEach((slide, i) => {
         if(i > 0) lines.push('');
@@ -4900,8 +4911,8 @@ ${lines.join('\n')}
     } finally {
       showProgress(null);
     }
-  });
-});
+}
+
 
 $('btnPptxMerge').addEventListener('click', () => {
   openModal('Merge PowerPoint files', `
@@ -7150,7 +7161,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* v2026.08.20.58 — upload screen only; v46 navigation untouched */
+/* v2026.08.20.59 — upload screen only; v46 navigation untouched */
 (function(){
  const $=id=>document.getElementById(id);
  let activeStudio='';
@@ -7177,7 +7188,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   if($('studioUploadHint'))$('studioUploadHint').textContent=
    activeStudio==='pdf'?'Choose the document for this PDF Studio. It will be loaded automatically.':
    activeStudio==='ocr'?'Upload a PDF or image for OCR and image tools.':
-   activeStudio==='powerpoint'?'Upload a PowerPoint file for PowerPoint tools.':
+   activeStudio==='powerpoint'?'Choose the PowerPoint file. The selected file will be passed directly to the tool you requested.':
    activeStudio==='excel'?'Upload an Excel or CSV file.':
    'Upload the file required for this Studio.';
  }
@@ -7208,24 +7219,24 @@ $('dashboardAskTile')?.addEventListener('click', () => {
     return;
   }
 
-  const ids={
-   ocr:['ocrFileInput','fileInput','universalFileInput'],
-   translate:['translationFileInput','fileInput','universalFileInput'],
-   convert:['conversionFileInput','fileInput','universalFileInput'],
-   powerpoint:['pptxFileInput','fileInput','universalFileInput'],
-   excel:['spreadsheetFileInput','fileInput','universalFileInput'],
-   security:['fileInput','universalFileInput'],reader:['readerFileInput','fileInput','universalFileInput']
-  }[activeStudio]||['fileInput','universalFileInput'];
-
-  for(const id of ids){
-   const t=$(id);if(!t)continue;
-   try{
-     const d=new DataTransfer();
-     d.items.add(file);
-     t.files=d.files;
-     t.dispatchEvent(new Event('change',{bubbles:true}));
-     return;
-   }catch(e){}
+  // Non-PDF studios do not need the PDF editor's workingBytes. Keep the
+  // selected file as the pending Studio file and immediately resume the
+  // operation that requested it. This fixes the iPhone flow where the old
+  // code displayed the filename but had no pptxFileInput to receive it.
+  if(activeStudio !== 'pdf'){
+    window.__docuForgeStudioFile = file;
+    const next = pendingToolId;
+    pendingToolId = '';
+    const box = $('studioUploadScreen');
+    if(box){ box.dataset.requested=''; box.style.display='none'; }
+    if(next){
+      const btn = $(next);
+      if(btn){
+        btn.dataset.studioFileReady = '1';
+        setTimeout(() => btn.click(), 60);
+      }
+    }
+    return;
   }
 }
  function btnLabel(id){
@@ -7263,6 +7274,13 @@ $('dashboardAskTile')?.addEventListener('click', () => {
       btn.dataset.requiresFile === 'true' ||
       btn.closest('.ribbon-panel[data-requires-file="true"]');
     if(!needsFile) return;
+    // A Studio upload has already supplied the requested file. Allow the
+    // operation's normal click handler to run once instead of reopening the
+    // upload screen.
+    if(btn.dataset.studioFileReady === '1'){
+      delete btn.dataset.studioFileReady;
+      return;
+    }
     const panel=btn.closest('.ribbon-panel');
     if(!panel || !panel.classList.contains('active')) return;
     e.preventDefault();
@@ -7286,7 +7304,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 
 
 <script>
-/* v2026.08.20.58 — clear tool upload request when leaving a Studio */
+/* v2026.08.20.59 — clear tool upload request when leaving a Studio */
 (function(){
   const box=document.getElementById('studioUploadScreen');
   if(!box)return;
@@ -7300,7 +7318,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 <script>
-/* DocuForge AI v2026.08.20.58 — single navigation controller */
+/* DocuForge AI v2026.08.20.59 — single navigation controller */
 (function(){
   const $ = id => document.getElementById(id);
   function dashboard(){
