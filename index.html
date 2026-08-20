@@ -700,7 +700,7 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.62</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.63</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1265,6 +1265,14 @@ window.JSZip.loadAsync = async function(){ throw new Error('ZIP engine is unavai
 <script>
 const { PDFDocument, degrees, rgb, StandardFonts } = PDFLib;
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+/* v63: Local-file/iPhone safe PDF.js opener. Workerless mode avoids failures when a local HTML file cannot load the PDF.js worker. */
+async function dfGetPdfJs(data, password){
+  if(!window.pdfjsLib || typeof pdfjsLib.getDocument !== 'function') throw new Error('PDF engine is unavailable. Please open DocuForge once while connected to load the PDF engine.');
+  const params={data: data.slice ? data.slice() : data, disableWorker:true, useWorkerFetch:false, isEvalSupported:false};
+  if(password !== undefined && password !== null) params.password=password;
+  return await pdfjsLib.getDocument(params).promise;
+}
+
 
 /* ---------- Lazy library loading ----------
    Tesseract, XLSX, Mammoth, Chart.js, and jsQR are only needed by
@@ -1524,7 +1532,7 @@ async function loadPdfSafely(buf){
   // First let PDF.js validate/open the file. This is much more tolerant of
   // real-world PDFs than trying pdf-lib first.
   try{
-    const task = pdfjsLib.getDocument({ data: buf.slice() });
+    const task = dfGetPdfJs(buf);
     const pdf = await new Promise((resolve, reject) => {
       task.onPassword = (updatePassword, reason) => {
         const err = new Error(reason === 2 ? 'Incorrect PDF password.' : 'This PDF is password-protected.');
@@ -1559,7 +1567,10 @@ async function loadPdfSafely(buf){
 async function rasterizePdfToWorkingPdf(bytes, password, filename){
   const loadingTask = pdfjsLib.getDocument({
     data: bytes.slice(),
-    password: password || undefined
+    password: password || undefined,
+    disableWorker:true,
+    useWorkerFetch:false,
+    isEvalSupported:false
   });
 
   const pdf = await new Promise((resolve, reject) => {
@@ -1677,7 +1688,7 @@ async function loadFiles(fileList){
           // Valid PDF.js files that pdf-lib cannot edit are rasterized instead
           // of being incorrectly reported as corrupted.
           try{
-            const check = await pdfjsLib.getDocument({data:firstBuf.slice()}).promise;
+            const check = await dfGetPdfJs(firstBuf).promise;
             try{ await check.destroy(); }catch(_){}
             const rasterBytes = await rasterizePdfToWorkingPdf(firstBuf, '', allFiles[0].name);
             setToolsEnabled(true);
@@ -1751,7 +1762,7 @@ async function renderThumbnails(){
   if(!workingBytes){ showProgress(null); return; }
   let pdf;
   try{
-    pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
+    pdf = await dfGetPdfJs(workingBytes).promise;
   } catch(e){
     console.error(e); toast('Could not render the PDF for preview.', true); showProgress(null); return;
   }
@@ -2150,7 +2161,7 @@ async function runOcrOnPdfPages(lang, pageIndices){
   const results = [];
   try{
     await loadLib('tesseract');
-    const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
+    const pdf = await dfGetPdfJs(workingBytes).promise;
     for(let i = 0; i < pageIndices.length; i++){
       const pageNum = pageIndices[i] + 1;
       setStatus(`OCR — rendering page ${pageNum} (${i+1}/${pageIndices.length})…`);
@@ -2216,7 +2227,7 @@ async function buildSearchablePdf(results){
    and exact for born-digital PDFs, but returns nothing for scans (no text
    layer to read), in which case each tool tells the user to OCR first. */
 async function getPdfPagesTextItems(){
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
+  const pdf = await dfGetPdfJs(workingBytes).promise;
   const pages = [];
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -2281,7 +2292,7 @@ async function collectPdfRows(){
 }
 function getPdfDocumentSafely(bytes, password){
   return new Promise((resolve, reject) => {
-    const loadingTask = pdfjsLib.getDocument({ data: bytes.slice(), password: password || undefined });
+    const loadingTask = pdfjsLib.getDocument({ data: bytes.slice(), password: password || undefined, disableWorker:true, useWorkerFetch:false, isEvalSupported:false });
     loadingTask.onPassword = (updatePassword, reason) => {
       // reason 1 = password needed, 2 = password was wrong. Either way, surface
       // this explicitly rather than letting the task hang waiting for a retry
@@ -2314,7 +2325,7 @@ async function collectRowsFromPdfBytes(bytes, password, gapThreshold){
    partway through will shift everything after it in the diff. Good for
    catching wording/content changes between two versions of a document. */
 async function getPdfFullTextLines(bytes){
-  const pdf = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+  const pdf = await dfGetPdfJs(bytes).promise;
   const lines = [];
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -3197,7 +3208,7 @@ async function addBatesNumbering({ prefix, startNum, digits, position, size }){
    resolution and measures how much of it is near-white. */
 async function detectBlankPages(threshold){
   threshold = threshold || 0.995;
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
+  const pdf = await dfGetPdfJs(workingBytes).promise;
   const blankIndices = [];
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -3318,7 +3329,7 @@ async function signPdf({ dataUrl, pageIndex, position, widthPt }){
    Tradeoff: the redacted page becomes a raster image, so its own text
    is no longer selectable/searchable afterward. */
 async function redactPage(pageIndex, boxes, renderScale){
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
+  const pdf = await dfGetPdfJs(workingBytes).promise;
   const page = await pdf.getPage(pageIndex + 1);
   const viewport = page.getViewport({ scale: renderScale });
   const canvas = document.createElement('canvas');
@@ -3459,7 +3470,7 @@ async function compressBytesForBatch(bytes){
 }
 async function ocrBytesForBatch(bytes, lang){
   await loadLib('tesseract');
-  const pdf = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+  const pdf = await dfGetPdfJs(bytes).promise;
   const results = [];
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -3490,7 +3501,7 @@ async function ocrBytesForBatch(bytes, lang){
   return await doc.save();
 }
 async function pdfBytesToTextLines(bytes){
-  const pdf = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+  const pdf = await dfGetPdfJs(bytes).promise;
   const pages = [];
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -3731,7 +3742,7 @@ async function cropPages(indices, margins){
 
 /* ---------- More PDF exports: Images, HTML, JSON ---------- */
 async function convertPdfToImagesZip(format, quality){
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
+  const pdf = await dfGetPdfJs(workingBytes).promise;
   const zip = new JSZip();
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -3797,7 +3808,7 @@ async function buildPdfXml(){
    doesn't expose in this version. Said plainly rather than overclaiming
    "vector export". */
 async function convertPdfToSvgZip(){
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
+  const pdf = await dfGetPdfJs(workingBytes).promise;
   const zip = new JSZip();
   for(let i = 1; i <= pdf.numPages; i++){
     const page = await pdf.getPage(i);
@@ -4285,7 +4296,7 @@ async function openReaderPdf(bytes, key){
   $('readerPdfView').innerHTML = '<p class="hint">Loading…</p>';
   try{
     const dataForPdfjs = bytes instanceof Uint8Array ? bytes.slice() : new Uint8Array(bytes);
-    readerPdfDoc = await pdfjsLib.getDocument({ data: dataForPdfjs }).promise;
+    readerPdfDoc = await dfGetPdfJs(dataForPdfjs);
     readerPdfPageCount = readerPdfDoc.numPages;
     if(!readerPdfPageCount) throw new Error('This PDF has no pages.');
     const saved = readerFileKey ? readerLoadProgress(readerFileKey) : null;
@@ -4406,7 +4417,7 @@ async function openZoom(index){
   await renderZoom();
 }
 async function renderZoom(){
-  const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
+  const pdf = await dfGetPdfJs(workingBytes).promise;
   const page = await pdf.getPage(zoomPageIndex + 1);
   const viewport = page.getViewport({ scale: zoomScale });
   const canvas = $('zoomCanvas');
@@ -5331,7 +5342,7 @@ async function extractTextFromAnyFile(file){
   const ext = (file.name.split('.').pop() || '').toLowerCase();
   if(ext === 'pdf'){
     const bytes = new Uint8Array(await file.arrayBuffer());
-    const pdf = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+    const pdf = await dfGetPdfJs(bytes).promise;
     const parts = [];
     for(let i = 1; i <= pdf.numPages; i++){
       const page = await pdf.getPage(i);
@@ -5720,7 +5731,7 @@ $('btnRedact').addEventListener('click', () => {
     document.getElementById('redactLoadPage').addEventListener('click', async () => {
       const pageNum = parseInt(document.getElementById('redactPageNum').value) || 1;
       try{
-        const pdf = await pdfjsLib.getDocument({ data: workingBytes.slice() }).promise;
+        const pdf = await dfGetPdfJs(workingBytes).promise;
         if(pageNum < 1 || pageNum > pdf.numPages){ toast('Page number out of range.', true); return; }
         const page = await pdf.getPage(pageNum);
         const viewport = page.getViewport({ scale });
@@ -7350,6 +7361,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
  }
  async function pass(file){
   if(!file)return;
+  window.__docuForgeStudioFile = file;
   if($('studioUploadName'))$('studioUploadName').textContent=file.name;
 
   // PDF Studio: the Studio upload card is the primary input. Load the file
@@ -7570,10 +7582,16 @@ $('dashboardAskTile')?.addEventListener('click', () => {
     const f=currentFile();
     if(workingBytes){
       try{
-        if(typeof openReaderPdf==='function'){ await openReaderPdf(workingBytes, ($('outName')?.value||'document')+'_view'); return; }
-        const u=URL.createObjectURL(new Blob([workingBytes],{type:'application/pdf'}));
-        window.open(u,'_blank','noopener'); setTimeout(()=>URL.revokeObjectURL(u),60000); return;
-      }catch(e){ toast(e?.message||'Could not open the PDF viewer.',true); return; }
+        const blob=new Blob([workingBytes],{type:'application/pdf'});
+        const u=URL.createObjectURL(blob);
+        const modal=document.createElement('div');
+        modal.className='modal-backdrop';
+        modal.innerHTML=`<div class="modal" style="width:min(96vw,1100px);height:92vh;padding:0;display:flex;flex-direction:column;"><div class="modal-head"><h2>View — ${esc($('outName')?.value||'document')}.pdf</h2><button type="button" class="icon-btn" aria-label="Close">×</button></div><div style="flex:1;background:#666;min-height:0;"><iframe title="PDF preview" src="${u}" style="width:100%;height:100%;border:0;background:white;"></iframe></div></div>`;
+        document.body.appendChild(modal);
+        modal.querySelector('button').onclick=()=>{URL.revokeObjectURL(u);modal.remove();};
+        modal.addEventListener('click',e=>{if(e.target===modal){URL.revokeObjectURL(u);modal.remove();}});
+        return;
+      }catch(e){ toast(e?.message||'Could not open the PDF preview.',true); return; }
     }
     if(!f){ toast('Choose a file first, then tap View File.',true); return; }
     const ext=(f.name.split('.').pop()||'').toLowerCase();
