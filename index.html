@@ -12,10 +12,10 @@ sion" content="2026.08.16.17">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23113B34%22/><text x=%2250%22 y=%2266%22 font-size=%2252%22 text-anchor=%22middle%22 fill=%22%23F2A65A%22 font-family=%22Georgia%22>D</text></svg>">
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22PDF%20Workbench%22,%22short_name%22:%22PDF%20Workbench%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F6F5F1%22,%22theme_color%22:%22%23113B34%22}">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
 /* ============ Design tokens ============
@@ -703,7 +703,7 @@ body:not(.dashboard-active) #ribbon{min-height:0;}
 body:not(.dashboard-active) .ribbon-panel.active{display:flex !important;visibility:visible !important;opacity:1 !important;}
 </style>
 <script>
-/* DocuForge AI v2026.08.20.64 — navigation stability layer */
+/* DocuForge AI v2026.08.20.65 — navigation stability layer */
 (function(){
   const $=id=>document.getElementById(id);
   const labels={
@@ -819,7 +819,8 @@ body:not(.dashboard-active) .ribbon-panel.active{display:flex !important;visibil
 </script>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.20.61';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.20.65';</script>
+<div id="dfBootGuard" style="display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:100000;background:#fff3cd;color:#4b3b00;border:1px solid #e0b84b;border-radius:12px;padding:12px 14px;font:600 13px/1.4 system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.15)">DocuForge AI is loading. If a library is unavailable, the menus will still remain usable; PDF-specific tools may require an internet connection on first use.</div>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -830,7 +831,7 @@ body:not(.dashboard-active) .ribbon-panel.active{display:flex !important;visibil
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.64</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.65</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1393,7 +1394,20 @@ window.JSZip = window.JSZip || function(){ throw new Error('ZIP engine is unavai
 window.JSZip.loadAsync = async function(){ throw new Error('ZIP engine is unavailable offline.'); };
 </script>
 <script>
-const { PDFDocument, degrees, rgb, StandardFonts } = PDFLib;
+let PDFDocument, degrees, rgb, StandardFonts;
+function refreshDocuForgeLibraries(){
+  const lib=window.PDFLib || {};
+  PDFDocument=lib.PDFDocument || null;
+  degrees=lib.degrees || (n=>n);
+  rgb=lib.rgb || (()=>null);
+  StandardFonts=lib.StandardFonts || {};
+  if(window.pdfjsLib?.GlobalWorkerOptions) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  window.__docuForgeLibrariesReady=!!(PDFDocument && window.pdfjsLib && typeof pdfjsLib.getDocument==='function' && window.JSZip);
+  return window.__docuForgeLibrariesReady;
+}
+refreshDocuForgeLibraries();
+window.addEventListener('DOMContentLoaded',refreshDocuForgeLibraries,{once:true});
+window.addEventListener('load',refreshDocuForgeLibraries,{once:true});
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 /* v63: Local-file/iPhone safe PDF.js opener. Workerless mode avoids failures when a local HTML file cannot load the PDF.js worker. */
 async function dfGetPdfJs(data, password){
@@ -7774,6 +7788,22 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{install();sync();}); else {install();sync();}
   new MutationObserver(()=>{install();sync();}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
+})();
+</script>
+<script>
+(function(){
+  function bootGuard(){
+    const app=document.getElementById('docuForgeTopBrand') || document.getElementById('appView');
+    const guard=document.getElementById('dfBootGuard');
+    if(!guard) return;
+    // If the document body is present, hide the guard. It exists only to prevent a silent blank screen.
+    if(app) guard.style.display='none';
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bootGuard,{once:true}); else bootGuard();
+  window.addEventListener('error',function(e){
+    const guard=document.getElementById('dfBootGuard');
+    if(guard && e && e.error){ guard.textContent='DocuForge AI loaded with a script error. The affected tool can be reported from the Help/diagnostics area: '+(e.error.message||e.message||'Unknown error'); guard.style.display='block'; }
+  });
 })();
 </script>
 </body>
