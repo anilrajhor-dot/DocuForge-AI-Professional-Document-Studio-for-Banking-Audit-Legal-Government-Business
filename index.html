@@ -725,7 +725,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '2026.08.21.80';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.21.82';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -736,7 +736,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.21.81</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.21.82</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1099,7 +1099,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.21.77 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.21.82 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -1289,7 +1289,7 @@ function openGstInvoiceApp(){
 </div><!-- /#appView -->
 
 <script>
-/* v2026.08.21.81 — PDF.js LoadingTask fix + dependency guards. A missing CDN library must never prevent
+/* v2026.08.21.82 — PDF.js LoadingTask fix + dependency guards. A missing CDN library must never prevent
    the main menu/submenus from initialising. Affected document operations show
    a clear error only when the user actually invokes them. */
 window.PDFLib = window.PDFLib || { PDFDocument:null, degrees:()=>0, rgb:()=>null, StandardFonts:{} };
@@ -2794,6 +2794,31 @@ function buildBilingualHtml(original, translated, sourceLabel, targetLabel){
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Translation</title>
 <style>body{font-family:sans-serif;margin:24px;} table{width:100%;border-collapse:collapse;} td{border:1px solid #ccc;padding:8px;vertical-align:top;width:50%;white-space:pre-wrap;} th{background:#113B34;color:#fff;padding:8px;text-align:left;}</style>
 </head><body><h1>Translation</h1><table><tr><th>${esc(sourceLabel)}</th><th>${esc(targetLabel)}</th></tr>${rows}</table>
+<style id="docuforge-v82-mobile-file-controls">
+.df-filebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 14px 12px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);position:relative;z-index:25}
+.df-filebar .df-filebar-title{font-weight:800;font-size:13px;white-space:nowrap}.df-filebar .df-filebar-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.df-filebar button{min-height:40px;white-space:nowrap}.df-filebar .df-file-name{font-size:12px;color:var(--ink-soft);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 160px}.df-filebar .df-view-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink)}.df-filebar .df-view-btn:disabled{opacity:.45}
+@media(max-width:720px){.df-filebar{margin:8px 10px 10px;padding:10px;display:block}.df-filebar .df-filebar-title{display:block;margin-bottom:7px}.df-filebar .df-filebar-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}.df-filebar .df-file-name{display:block;margin-top:7px;width:100%}.df-filebar button{width:100%;font-size:13px}.ribbon{display:block!important;overflow:visible!important;padding:7px 8px 12px;min-height:0}.ribbon-panel.active{display:block!important;width:100%}.ribbon .tool-group,.ribbon-quick{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:8px 2px;border-right:0;border-bottom:1px solid var(--line);max-width:none;width:100%}.ribbon-quick{grid-template-columns:repeat(3,minmax(0,1fr))}.ribbon .tool-group h2{grid-column:1/-1;order:99;width:auto;margin:4px 0 0}.ribbon .tool-btn,.ribbon-quick .tool-btn{width:100%;min-height:64px;margin:0;padding:7px 5px;font-size:11px}}
+</style>
+<script>
+/* v2026.08.21.82: mobile-safe file bar; no MutationObserver. */
+(function(){
+ const $=id=>document.getElementById(id), FILE_STUDIOS=new Set(['pdf','ocr','translate','convert','powerpoint','excel','reader','security','batch']); let active='',input=null;
+ const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ function file(){return window.__docuForgeStudioFile||null} function hasWorking(){try{return !!workingBytes}catch(_){return false}} function name(){const f=file();return f?.name||(hasWorking()?(($('outName')?.value||'document')+'.pdf'):'No file selected')}
+ function accept(s){return ({pdf:'.pdf,application/pdf,image/*',ocr:'.pdf,application/pdf,image/*',translate:'.pdf,.docx,.txt,.md,.csv,.html,.htm,image/*',convert:'.pdf,.docx,.xlsx,.xls,.csv,.pptx,.ppt,.html,.htm,.txt,.md,.markdown',powerpoint:'.pptx,.ppt',excel:'.xlsx,.xls,.csv',reader:'.pdf,.epub',security:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.txt,.md',batch:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.csv,.txt,.md,.html,.htm'})[s]||'*/*'}
+ function label(s){return ({pdf:'PDF',ocr:'OCR',translate:'Translation',convert:'Conversion',powerpoint:'PowerPoint',excel:'Excel',reader:'Reader',security:'Security',batch:'Batch'})[s]||s}
+ function ensureInput(){if(input)return input;input=document.createElement('input');input.type='file';input.hidden=true;document.body.appendChild(input);input.onchange=async()=>{const fs=Array.from(input.files||[]);input.value='';if(!fs.length)return;try{if(active==='pdf'){await loadFiles(fs);window.__docuForgeStudioFile=fs[0]}else window.__docuForgeStudioFile=fs[0];sync();setStatus(`Loaded "${fs[0].name}".`)}catch(e){console.error(e);toast(e?.message||'Could not load the file.',true)}};return input}
+ function preview(){const f=file();if(hasWorking()){const u=URL.createObjectURL(new Blob([workingBytes],{type:'application/pdf'}));const m=document.createElement('div');m.className='modal-backdrop show';m.innerHTML=`<div class="modal" style="width:min(96vw,1000px);height:90vh;max-width:1000px;display:flex;flex-direction:column;padding:0;overflow:hidden"><div class="modal-head"><h3>View File</h3><button type="button" class="icon-btn">×</button></div><iframe title="PDF preview" src="${u}" style="flex:1;width:100%;border:0;background:#fff"></iframe></div>`;document.body.appendChild(m);const close=()=>{URL.revokeObjectURL(u);m.remove()};m.querySelector('.icon-btn').onclick=close;m.onclick=e=>{if(e.target===m)close()};return}if(!f){toast('Choose a file first.',true);return}const ext=(f.name.split('.').pop()||'').toLowerCase();if(['txt','md','csv'].includes(ext)){f.text().then(t=>openModal('View — '+f.name,`<pre style="max-height:70vh;overflow:auto;white-space:pre-wrap;word-break:break-word">${esc(t)}</pre>`));return}if(f.type.startsWith('image/')){const u=URL.createObjectURL(f);openModal('View — '+f.name,`<img src="${u}" alt="${esc(f.name)}" style="max-width:100%;height:auto">`);return}const u=URL.createObjectURL(f),w=window.open(u,'_blank','noopener');if(!w)toast('This file type cannot be previewed in this browser.',true);setTimeout(()=>URL.revokeObjectURL(u),60000)}
+ function make(panel){if(panel.querySelector('.df-filebar'))return;panel.querySelectorAll('.common-view-file-wrap').forEach(e=>e.remove());const b=document.createElement('div');b.className='df-filebar';b.innerHTML='<div class="df-filebar-title">📂 File</div><div class="df-filebar-actions"><button type="button" class="btn primary df-choose">Choose File</button><button type="button" class="btn df-view" disabled>👁 View File</button></div><div class="df-file-name">No file selected</div>';panel.insertBefore(b,panel.firstChild);b.querySelector('.df-choose').onclick=()=>{const i=ensureInput();i.accept=accept(active);i.multiple=active==='pdf'||active==='ocr'||active==='batch';i.click()};b.querySelector('.df-view').onclick=preview}
+ function sync(){const n=name(),has=!!file()||hasWorking();document.querySelectorAll('.df-filebar').forEach(b=>{b.querySelector('.df-file-name').textContent=n;b.querySelector('.df-view').disabled=!has})}
+ function activate(s){active=s||window.__docuForgeCurrentStudio||'';document.querySelectorAll('.df-filebar').forEach(b=>{const p=b.closest('.ribbon-panel');b.style.display=(active!=='dashboard'&&FILE_STUDIOS.has(active)&&p?.classList.contains('active'))?'':'none'});sync()}
+ function install(){document.querySelectorAll('.common-view-file-wrap').forEach(e=>e.remove());document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(make);activate(window.__docuForgeCurrentStudio||'dashboard')}
+ window.__df82ActivateFileBar=activate;window.__df82SyncFileBar=sync;
+ const boot=()=>{install();let tries=0;const t=setInterval(()=>{if(typeof window.setStudio==='function'||++tries>100){clearInterval(t);if(typeof window.setStudio==='function'){const old=window.setStudio;window.setStudio=function(s){const r=old.apply(this,arguments);setTimeout(()=>activate(s),0);return r}}}},10)};
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+</script>
+
 </body></html>`;
 }
 function showTranslationResult(original, translated, sourceLabel, targetLabel, baseName){
