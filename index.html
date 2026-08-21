@@ -712,7 +712,7 @@ body:not(.dashboard-active) #ribbon { margin-bottom:0 !important; }
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.21.71';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.21.73';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -723,7 +723,7 @@ body:not(.dashboard-active) #ribbon { margin-bottom:0 !important; }
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.21.71</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.21.73</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1086,7 +1086,7 @@ body:not(.dashboard-active) #ribbon { margin-bottom:0 !important; }
     <div id="aboutStudio" class="studio-page" style="display:none">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.21.71 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.21.73 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -7513,5 +7513,41 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   new MutationObserver(()=>{install();sync();}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
 })();
 </script>
-</body>
+<script>
+/* DocuForge AI v2026.08.21.73 — isolated navigation safety layer. */
+(function(){
+  function goHome(){
+    try{
+      if(typeof setStudio === 'function') setStudio('dashboard');
+      document.body.classList.add('dashboard-active');
+      ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'].forEach(id=>{
+        const el=document.getElementById(id); if(el) el.style.setProperty('display','none','important');
+      });
+      const tiles=document.getElementById('dashboardTiles');
+      if(tiles) tiles.style.setProperty('display','grid','important');
+      const recent=document.getElementById('dashboardRecent');
+      if(recent) recent.style.display='block';
+      const back=document.getElementById('backToMainMenu');
+      if(back) back.style.setProperty('display','none','important');
+      if(typeof setStatus==='function') setStatus('Main Menu');
+      window.scrollTo(0,0);
+    }catch(err){ console.error('DocuForge navigation:',err); }
+  }
+  function wire(){
+    const back=document.getElementById('backToMainMenu');
+    if(back && !back.dataset.df73Wired){
+      back.dataset.df73Wired='1';
+      back.type='button';
+      back.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();goHome();},false);
+    }
+    const home=document.getElementById('menuToggle');
+    if(home && !home.dataset.df73Wired){
+      home.dataset.df73Wired='1';
+      home.addEventListener('click',function(e){e.preventDefault();goHome();},false);
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire,{once:true}); else wire();
+  window.__docuForgeGoHome=goHome;
+})();
+</script>\n</body>
 </html>
