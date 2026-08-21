@@ -689,15 +689,9 @@ body:not(.dashboard-active) #workspaceLayout{display:block !important;}
 body:not(.dashboard-active) #backToMainMenu{display:block;}
 
 </style>
-<style id="docuforge-v68-final-stability">
-body.df-embedded-studio #ribbon,body.df-embedded-studio #toolbar,body.df-embedded-studio #pageActionStrip,body.df-embedded-studio #dropzone,body.df-embedded-studio #grid,body.df-embedded-studio #noPdfBanner{display:none!important;}
-body.df-embedded-studio .studio-page,body.df-embedded-studio .reader-page{display:block!important;visibility:visible!important;opacity:1!important;}
-body.dashboard-active #workspaceLayout,body:not(.dashboard-active) #workspaceLayout{min-height:0!important;}
-#backToMainMenu{background:#c45d18!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:0!important;font-weight:800!important;min-height:52px!important;box-shadow:0 3px 10px rgba(0,0,0,.16)!important;}
-</style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.20.68';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.21.69';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -708,7 +702,7 @@ body.dashboard-active #workspaceLayout,body:not(.dashboard-active) #workspaceLay
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.68</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.21.69</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -965,7 +959,7 @@ body.dashboard-active #workspaceLayout,body:not(.dashboard-active) #workspaceLay
       <iframe id="excelDashboardFrame" title="Excel to Dashboard" loading="lazy"></iframe>
     </div>
 
-    <div id="exportStudio" style="display:none;max-width:640px;margin:0 auto;padding:28px 24px;">
+    <div id="exportStudio" style="display:none;max-width:640px;margin:0 auto;padding:28px 24px;;display:none !important;">
       <h2 style="font-family:var(--font-display);margin-bottom:6px;">Export</h2>
       <p class="hint" style="margin:0 0 18px;">One-click access to every export format for the PDF currently open. Each tile jumps to its full tool if it needs more options.</p>
       <div class="dashboard-grid">
@@ -980,7 +974,7 @@ body.dashboard-active #workspaceLayout,body:not(.dashboard-active) #workspaceLay
       </div>
     </div>
 
-    <div id="settingsStudio" class="studio-page" style="display:none">
+    <div id="settingsStudio" class="studio-page" style="display:none !important">
       <h2>Settings</h2>
       <div class="tool-group">
 <div class="tool-group">
@@ -1002,7 +996,7 @@ body.dashboard-active #workspaceLayout,body:not(.dashboard-active) #workspaceLay
       </div>
     </div>
 
-    <div id="readerStudio" class="reader-page" style="display:none">
+    <div id="readerStudio" class="reader-page" style="display:none !important">
       <div class="reader-toolbar">
         <button class="btn ghost" id="readerOpenBtn" type="button">Open PDF or EPUB…</button>
         <button class="btn ghost" id="readerUseCurrentBtn" type="button">Read current PDF</button>
@@ -1068,10 +1062,10 @@ body.dashboard-active #workspaceLayout,body:not(.dashboard-active) #workspaceLay
       <p>Tap the <strong>?</strong> button in the bottom corner any time — type or speak a question and it'll try to answer directly, or point you to the right tool.</p>
     </div>
 
-    <div id="aboutStudio" class="studio-page" style="display:none">
+    <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.20.68 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.16.17 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -1261,7 +1255,7 @@ function openGstInvoiceApp(){
 </div><!-- /#appView -->
 
 <script>
-/* v2026.08.20.67 — dependency guards. A missing CDN library must never prevent
+/* v2026.08.21.69 — dependency guards. A missing CDN library must never prevent
    the main menu/submenus from initialising. Affected document operations show
    a clear error only when the user actually invokes them. */
 window.PDFLib = window.PDFLib || { PDFDocument:null, degrees:()=>0, rgb:()=>null, StandardFonts:{} };
@@ -6449,24 +6443,60 @@ function openExcelDashboard(){
   }
 }
 function setStudio(name){
-  const embedded=new Set(['excel','gstinvoice','help','settings','reader','export','about']);
-  const isDashboard=name==='dashboard', isEmbedded=embedded.has(name);
-  window.__docuForgeCurrentStudio=name;
-  document.body.classList.toggle('dashboard-active',isDashboard);
-  document.body.classList.toggle('df-embedded-studio',isEmbedded&&!isDashboard);
-  const show=(id,v)=>{const e=$(id);if(e)e.style.setProperty('display',v,'important');};
-  if(isDashboard){['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'].forEach(id=>show(id,'none'));show('workspaceLayout','flex');show('dashboardTiles','grid');show('dashboardRecent','block');}
-  else if(isEmbedded){['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'].forEach(id=>show(id,'none'));show('workspaceLayout','block');show('dashboardTiles','none');show('dashboardRecent','none');}
-  else{show('studioTabs','none');show('ribbon','flex');show('toolbar',workingBytes?'flex':'none');if($('pageActionStrip'))$('pageActionStrip').style.removeProperty('display');show('dropzone',workingBytes?'none':'block');show('noPdfBanner',workingBytes?'none':'block');if($('grid'))$('grid').style.removeProperty('display');show('workspaceLayout','block');show('dashboardTiles','none');show('dashboardRecent','none');}
-  document.querySelectorAll('.studio-tab').forEach(t=>t.classList.toggle('active',t.dataset.studio===name));
-  document.querySelectorAll('.ribbon-panel').forEach(p=>{const a=!isEmbedded&&p.dataset.studioPanel===name;p.classList.toggle('active',a);if(a)p.style.setProperty('display','flex','important');else p.style.removeProperty('display');});
-  const pages={settings:'settingsStudio',about:'aboutStudio',help:'helpStudio',reader:'readerStudio',export:'exportStudio',excel:'excelStudio',gstinvoice:'gstInvoiceStudio'};
-  Object.entries(pages).forEach(([k,id])=>{const e=$(id);if(e)e.style.setProperty('display',k===name?'block':'none','important');});
-  if(name==='excel'&&typeof openExcelDashboard==='function')openExcelDashboard();if(name==='gstinvoice'&&typeof openGstInvoiceApp==='function')openGstInvoiceApp();
-  if(typeof updateDashboardTilesVisibility==='function')updateDashboardTilesVisibility();
-  if($('backToMainMenu'))$('backToMainMenu').style.setProperty('display',isDashboard?'none':'flex','important');
-}
+  const isDashboard = name === 'dashboard';
+  window.__docuForgeCurrentStudio = name;
+  document.body.classList.toggle('dashboard-active', isDashboard);
 
+  // The Dashboard is ONLY the main menu. The editor/ribbon appears only after
+  // a Studio is selected.
+  const studioTabs = $('studioTabs');
+  const ribbon = $('ribbon');
+  const toolbar = $('toolbar');
+  const pageStrip = $('pageActionStrip');
+  const dropzone = $('dropzone');
+  const gridEl = $('grid');
+  const banner = $('noPdfBanner');
+  const workspace = $('workspaceLayout');
+
+  if(studioTabs) studioTabs.style.display = isDashboard ? 'none' : 'flex';
+  if(ribbon) ribbon.style.display = isDashboard ? 'none' : '';
+  if(toolbar) toolbar.style.display = isDashboard ? 'none' : (workingBytes ? 'flex' : 'none');
+  if(pageStrip) pageStrip.style.display = isDashboard ? 'none' : '';
+  if(dropzone) dropzone.style.display = isDashboard ? 'none' : (workingBytes ? 'none' : 'block');
+  if(banner) banner.style.display = isDashboard ? 'none' : (workingBytes ? 'none' : 'block');
+  if(gridEl) gridEl.style.display = isDashboard ? 'none' : '';
+  if(workspace) workspace.style.display = isDashboard ? 'none' : '';
+
+  document.querySelectorAll('.studio-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.studio === name)
+  );
+  document.querySelectorAll('.ribbon-panel').forEach(panel =>
+    panel.classList.toggle('active', panel.dataset.studioPanel === name)
+  );
+
+  if($('settingsStudio')) $('settingsStudio').classList.toggle('active', name === 'settings');
+  if($('aboutStudio')) $('aboutStudio').classList.toggle('active', name === 'about');
+  if($('helpStudio')) $('helpStudio').classList.toggle('active', name === 'help');
+  if($('readerStudio')) $('readerStudio').classList.toggle('active', name === 'reader');
+  if($('exportStudio')) $('exportStudio').style.display = name === 'export' ? 'block' : 'none';
+  if($('excelStudio')) $('excelStudio').classList.toggle('active', name === 'excel');
+  if($('gstInvoiceStudio')) $('gstInvoiceStudio').classList.toggle('active', name === 'gstinvoice');
+
+  // These two embedded Studios need their own initialisers.
+  if(name === 'excel' && typeof openExcelDashboard === 'function') openExcelDashboard();
+  if(name === 'gstinvoice' && typeof openGstInvoiceApp === 'function') openGstInvoiceApp();
+
+  updateDashboardTilesVisibility();
+
+  if(isDashboard){
+    // Hard inline cleanup so no stale PDF editor element can occupy space.
+    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout']
+      .forEach(id => { if($(id)) $(id).style.display='none'; });
+    if($('workspaceLayout')) $('workspaceLayout').style.display='flex';
+    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
+    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
+  }
+}
 document.querySelectorAll('.studio-tab').forEach(t => {
   t.addEventListener('click', () => setStudio(t.dataset.studio));
 });
@@ -7166,7 +7196,6 @@ $('dashboardAskTile')?.addEventListener('click', () => $('topAskMeMenu')?.click(
     }
     if(typeof openAskMe === 'function') { openAskMe(); return; }
     if(typeof showAskMe === 'function') { showAskMe(); return; }
-    if($('floatingHelpBtn')) { $('floatingHelpBtn').click(); return; }
     if(typeof openModal === 'function') {
       openModal('Ask me', `
         <p class="hint">Ask about how to use any DocuForge AI menu or tool.</p>
@@ -7191,11 +7220,10 @@ $('dashboardHelpTile')?.addEventListener('click', () => {
   setStudio('help');
 });
 $('dashboardAskTile')?.addEventListener('click', () => {
-  const p=$('floatingHelpPanel'), b=$('floatingHelpBtn');
-  if(p&&b){ if(!p.classList.contains('show')) b.click(); setTimeout(()=>$('floatingHelpInput')?.focus(),50); return; }
-  if(typeof openAskMe==='function') return openAskMe();
-  if(typeof showAskMe==='function') return showAskMe();
-  toast('Ask Me is unavailable in this build.',true);
+  if(typeof openAskMe === 'function') return openAskMe();
+  if(typeof showAskMe === 'function') return showAskMe();
+  const ask = document.querySelector('#askMeBtn, #askBtn, .ask-me');
+  if(ask) ask.click();
 });
 
 </script>
@@ -7446,7 +7474,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 <script>
-/* v2026.08.20.67 — offline status indicator only. It does not alter menu routing. */
+/* v2026.08.21.69 — offline status indicator only. It does not alter menu routing. */
 (function(){
   function update(){
     const el=document.getElementById('offlineStatus');
@@ -7535,13 +7563,6 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{install();sync();}); else {install();sync();}
   new MutationObserver(()=>{install();sync();}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
-})();
-</script>
-<script id="docuforge-v68-final-navigation">
-(function(){
- const $=id=>document.getElementById(id);
- function home(){if(typeof window.setStudio==='function')window.setStudio('dashboard');document.body.classList.add('dashboard-active');['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'].forEach(id=>{const e=$(id);if(e)e.style.setProperty('display','none','important');});if($('workspaceLayout'))$('workspaceLayout').style.setProperty('display','flex','important');if($('dashboardTiles'))$('dashboardTiles').style.setProperty('display','grid','important');if($('dashboardRecent'))$('dashboardRecent').style.setProperty('display','block','important');if($('backToMainMenu'))$('backToMainMenu').style.setProperty('display','none','important');window.scrollTo(0,0);}
- document.addEventListener('click',e=>{const b=e.target.closest('#backToMainMenu');if(b){e.preventDefault();e.stopImmediatePropagation();home();}},true);window.DocuForgeFinalNavigation={home};
 })();
 </script>
 </body>
