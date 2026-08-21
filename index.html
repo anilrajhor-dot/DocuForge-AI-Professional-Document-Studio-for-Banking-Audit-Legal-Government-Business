@@ -712,7 +712,7 @@ body:not(.dashboard-active) #ribbon { margin-bottom:0 !important; }
 </style>
 </head>
 <body>
-<script>const DOCUFORGE_BUILD = '2026.08.21.70';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.21.71';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -723,7 +723,7 @@ body:not(.dashboard-active) #ribbon { margin-bottom:0 !important; }
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.20.69</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.21.71</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1086,7 +1086,7 @@ body:not(.dashboard-active) #ribbon { margin-bottom:0 !important; }
     <div id="aboutStudio" class="studio-page" style="display:none">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.20.69 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.21.71 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -7406,91 +7406,21 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 </script>
 
 
-
 <script>
-/* DocuForge AI v2026.08.20.60 — single navigation controller */
+/* v2026.08.20.60 — clear tool upload request when leaving a Studio */
 (function(){
-  const $ = id => document.getElementById(id);
-  function dashboard(){
-    if(typeof window.setStudio==='function') window.setStudio('dashboard');
-    document.body.classList.add('dashboard-active');
-    ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner','workspaceLayout'].forEach(id=>{
-      const el=$(id); if(el) el.style.display='none';
-    });
-    if($('dashboardTiles')) $('dashboardTiles').style.display='grid';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='block';
-    if($('backToMainMenu')) $('backToMainMenu').style.display='none';
-    if($('studioUploadScreen')){ $('studioUploadScreen').dataset.requested=''; $('studioUploadScreen').style.display='none'; }
-    if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu to begin.';
-    window.scrollTo(0,0);
-  }
-  function studio(name){
-    if(!name) return;
-    if(typeof window.setStudio==='function') window.setStudio(name);
-    document.body.classList.remove('dashboard-active');
-    if($('dashboardTiles')) $('dashboardTiles').style.display='none';
-    if($('dashboardRecent')) $('dashboardRecent').style.display='none';
-    if($('studioTabs')) $('studioTabs').style.display='none';
-    document.querySelectorAll('.ribbon-panel').forEach(p=>{
-      const active=p.dataset.studioPanel===name;
-      p.classList.toggle('active',active);
-      if(active) p.style.setProperty('display','flex','important'); else p.style.removeProperty('display');
-    });
-    const back=$('backToMainMenu');
-    if(back){
-      back.style.setProperty('display','flex','important');
-      back.style.setProperty('background','#c45d18','important');
-      back.style.setProperty('color','#fff','important');
-      back.style.setProperty('-webkit-text-fill-color','#fff','important');
-      back.style.setProperty('visibility','visible','important');
-      back.style.setProperty('opacity','1','important');
+  const box=document.getElementById('studioUploadScreen');
+  if(!box)return;
+  new MutationObserver(()=>{
+    const active=document.querySelector('.ribbon-panel.active[data-studio-panel]');
+    if(!active || document.body.classList.contains('dashboard-active')){
+      box.dataset.requested='';
+      box.style.display='none';
     }
-    if($('statusMsg')) $('statusMsg').textContent='Choose a tool from the submenu.';
-    window.scrollTo(0,0);
-  }
-  function wire(){
-    document.addEventListener('click',e=>{
-      const tile=e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
-      if(!tile) return;
-      e.preventDefault(); e.stopImmediatePropagation(); studio(tile.dataset.studio);
-    },true);
-    document.addEventListener('click',e=>{
-      const back=e.target.closest('#backToMainMenu');
-      if(!back) return;
-      e.preventDefault(); e.stopImmediatePropagation(); dashboard();
-    },true);
-    document.addEventListener('click',e=>{
-      const tab=e.target.closest('#studioTabs .studio-tab[data-studio]');
-      if(!tab) return;
-      e.preventDefault(); e.stopImmediatePropagation(); studio(tab.dataset.studio);
-    },true);
-    document.addEventListener('click',e=>{
-      const help=e.target.closest('#dashboardHelpTile');
-      const ask=e.target.closest('#dashboardAskTile');
-      if(!help && !ask) return;
-      e.preventDefault(); e.stopImmediatePropagation();
-      if(help){ if(typeof window.openHelp==='function') window.openHelp(); else studio('help'); }
-      else { if(typeof window.openAskMe==='function') window.openAskMe(); else studio('ai'); }
-    },true);
-  }
-  window.DocuForgeMenuSelfTest=function(){
-    const report={categories:[],panels:[],tools:[],duplicateIds:[]};
-    document.querySelectorAll('#dashboardTiles .main-menu-tile[data-studio]').forEach(t=>{
-      const n=t.dataset.studio;
-      report.categories.push({studio:n,ok:!!document.querySelector('.ribbon-panel[data-studio-panel="'+n+'"]') || ['help','settings','about','reader','export','excel','gstinvoice'].includes(n)});
-    });
-    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(p=>{
-      report.panels.push({studio:p.dataset.studioPanel,tools:p.querySelectorAll('button.tool-btn').length});
-      p.querySelectorAll('button.tool-btn').forEach(b=>report.tools.push(b.id));
-    });
-    const seen=new Set();
-    document.querySelectorAll('#dashboardTiles [id], #studioTabs [id], .ribbon-panel [id], #backToMainMenu').forEach(el=>{ if(el.id){ if(seen.has(el.id)) report.duplicateIds.push(el.id); seen.add(el.id); } });
-    report.ok=report.categories.every(x=>x.ok)&&report.panels.length>=10&&report.tools.every(Boolean)&&report.duplicateIds.length===0;
-    return report;
-  };
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{wire();dashboard();},{once:true}); else {wire();dashboard();}
+  }).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
 })();
 </script>
+
 <script>
 /* v2026.08.20.67 — offline status indicator only. It does not alter menu routing. */
 (function(){
@@ -7580,7 +7510,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
     document.querySelectorAll('.common-view-file-name').forEach(e=>e.textContent=name);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{install();sync();}); else {install();sync();}
-  new MutationObserver(()=>{install();sync();}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
+  new MutationObserver(()=>{install();sync();}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
 })();
 </script>
 </body>
