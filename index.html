@@ -725,7 +725,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '2026.08.21.82';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.23.85';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -736,7 +736,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.23.84</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.23.85</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -6544,6 +6544,18 @@ document.querySelectorAll('.studio-tab').forEach(t => {
   t.addEventListener('click', () => setStudio(t.dataset.studio));
 });
 
+/* v85: Back to Main Menu — single reliable handler. */
+const backToMainMenuBtn = $('backToMainMenu');
+if(backToMainMenuBtn){
+  backToMainMenuBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setStudio('dashboard');
+    window.scrollTo({top:0, behavior:'smooth'});
+    if(typeof setStatus === 'function') setStatus('Back to Main Menu.');
+  });
+}
+
 /* ---------- Dashboard category shortcuts ---------- */
 const DASHBOARD_TILE_STUDIOS = {
   btnSplit: 'pdf',
@@ -7576,12 +7588,12 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 .df84-filebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);width:100%;box-sizing:border-box}.df84-file-title{font-weight:800}.df84-file-name{font-size:12px;color:var(--ink-soft);flex:1;min-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media(max-width:720px){.df84-filebar{display:grid;grid-template-columns:1fr 1fr;gap:7px}.df84-file-title,.df84-file-name{grid-column:1/-1}.df84-filebar button{width:100%;min-height:46px}}
 </style>
 <script>
-/* v2026.08.23.84 — convenience shortcuts, no capture-phase navigation. */
+/* v2026.08.23.85 — dashboard-only convenience shortcuts. */
 (function(){
   function install(){
-    const dash=document.getElementById('dashboardTiles');if(!dash||document.getElementById('df84QuickActions'))return;
-    const box=document.createElement('div');box.id='df84QuickActions';box.className='df84-quick';
-    box.innerHTML='<h2>Quick Actions</h2><div class="df84-quick-grid"><button type="button" data-q="upload">📂 Upload File</button><button type="button" data-q="compare">🔍 Compare Files</button><button type="button" data-q="ppt">📽️ PPT → Markdown</button><button type="button" data-q="recent">🕘 Recent Files</button></div><p>Core navigation, file selection and local document handling remain available offline; AI/online translation may require internet.</p>';
+    const dash=document.getElementById('dashboardTiles');if(!dash||document.getElementById('df85QuickActions'))return;
+    const box=document.createElement('div');box.id='df85QuickActions';box.className='df85-quick';
+    box.innerHTML='<h2>Quick Actions</h2><div class="df85-quick-grid"><button type="button" data-q="upload">📂 Upload File</button><button type="button" data-q="compare">🔍 Compare Files</button><button type="button" data-q="ppt">📽️ PPT → Markdown</button><button type="button" data-q="recent">🕘 Recent Files</button></div><p>Core navigation, file selection and local document handling remain available offline; AI/online translation may require internet.</p>';
     dash.parentNode.insertBefore(box,dash);
     box.addEventListener('click',e=>{const b=e.target.closest('button[data-q]');if(!b)return;const q=b.dataset.q;if(q==='recent'){document.getElementById('dashboardRecent')?.scrollIntoView({behavior:'smooth',block:'start'});return;}if(q==='compare'){window.setStudio?.('convert');if(typeof window.setStatus==='function')window.setStatus('Open Compare Files in Conversion Studio.');return;}if(q==='ppt'){window.setStudio?.('powerpoint');if(typeof window.setStatus==='function')window.setStatus('Open PowerPoint → Markdown.');return;}if(q==='upload'){const el=document.querySelector('#dashboardUploadFileTile');if(el){el.click();return;}if(typeof window.setStatus==='function')window.setStatus('Choose a Studio to upload a file.');}});
   }
@@ -7589,7 +7601,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 <style>
-.df84-quick{margin:10px 20px 14px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}.df84-quick h2{margin:0 0 10px;font-size:20px}.df84-quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.df84-quick-grid button{min-height:52px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-weight:800;padding:7px;cursor:pointer}.df84-quick p{margin:9px 0 0;font-size:12px;color:var(--ink-soft)}@media(max-width:720px){.df84-quick{margin:8px 10px 12px}.df84-quick-grid{grid-template-columns:1fr 1fr}.df84-quick-grid button{min-height:58px;font-size:12px}}
+body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quick{margin:10px 20px 14px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}.df85-quick h2{margin:0 0 10px;font-size:20px}.df85-quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.df85-quick-grid button{min-height:52px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-weight:800;padding:7px;cursor:pointer}.df85-quick p{margin:9px 0 0;font-size:12px;color:var(--ink-soft)}@media(max-width:720px){.df85-quick{margin:8px 10px 12px}.df85-quick-grid{grid-template-columns:1fr 1fr}.df85-quick-grid button{min-height:58px;font-size:12px}}
 </style>
 </body>
 </html>
