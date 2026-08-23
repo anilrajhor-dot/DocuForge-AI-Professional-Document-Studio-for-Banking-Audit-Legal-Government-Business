@@ -725,7 +725,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '2026.08.23.83';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.21.82';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -736,7 +736,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.23.83</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.23.84</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1289,7 +1289,7 @@ function openGstInvoiceApp(){
 </div><!-- /#appView -->
 
 <script>
-/* v2026.08.23.83 — PDF.js LoadingTask fix + dependency guards. A missing CDN library must never prevent
+/* v2026.08.21.82 — PDF.js LoadingTask fix + dependency guards. A missing CDN library must never prevent
    the main menu/submenus from initialising. Affected document operations show
    a clear error only when the user actually invokes them. */
 window.PDFLib = window.PDFLib || { PDFDocument:null, degrees:()=>0, rgb:()=>null, StandardFonts:{} };
@@ -2799,7 +2799,7 @@ function buildBilingualHtml(original, translated, sourceLabel, targetLabel){
 .df-filebar .df-filebar-title{font-weight:800;font-size:13px;white-space:nowrap}.df-filebar .df-filebar-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.df-filebar button{min-height:40px;white-space:nowrap}.df-filebar .df-file-name{font-size:12px;color:var(--ink-soft);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 160px}.df-filebar .df-view-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink)}.df-filebar .df-view-btn:disabled{opacity:.45}
 @media(max-width:720px){.df-filebar{margin:8px 10px 10px;padding:10px;display:block}.df-filebar .df-filebar-title{display:block;margin-bottom:7px}.df-filebar .df-filebar-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}.df-filebar .df-file-name{display:block;margin-top:7px;width:100%}.df-filebar button{width:100%;font-size:13px}.ribbon{display:block!important;overflow:visible!important;padding:7px 8px 12px;min-height:0}.ribbon-panel.active{display:block!important;width:100%}.ribbon .tool-group,.ribbon-quick{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:8px 2px;border-right:0;border-bottom:1px solid var(--line);max-width:none;width:100%}.ribbon-quick{grid-template-columns:repeat(3,minmax(0,1fr))}.ribbon .tool-group h2{grid-column:1/-1;order:99;width:auto;margin:4px 0 0}.ribbon .tool-btn,.ribbon-quick .tool-btn{width:100%;min-height:64px;margin:0;padding:7px 5px;font-size:11px}}
 </style>
->
+
 
 </body></html>`;
 }
@@ -6577,7 +6577,20 @@ function studioLabel(name){
   return labels[name] || name;
 }
 
-/* Main-menu navigation is installed once at the end of the document. */
+/* Dashboard main-menu navigation — delegated so every card works reliably on iPhone/laptop. */
+document.addEventListener('click', (e) => {
+  const tile = e.target.closest('#dashboardTiles .main-menu-tile[data-studio]');
+  if(!tile) return;
+  e.preventDefault();
+  const studio = tile.dataset.studio;
+  if(!studio) return;
+  setStudio(studio);
+  setTimeout(() => {
+    const panel = document.querySelector(`.ribbon-panel[data-studio-panel="${studio}"]`);
+    if(panel) panel.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 50);
+  if(typeof setStatus === 'function') setStatus('Opened ' + studioLabel(studio) + ' Studio. Choose a tool from the submenu.');
+});
 
 $('exportPdfTile').addEventListener('click', () => {
   if(!workingBytes){ toast('Open a PDF first.', true); return; }
@@ -7184,6 +7197,8 @@ $('dropzone').style.display='none';
 $('noPdfBanner').style.display='none';
 
 
+$('dashboardHelpTile')?.addEventListener('click', () => $('topHelpMenu')?.click());
+$('dashboardAskTile')?.addEventListener('click', () => $('topAskMeMenu')?.click());
 
 /* ===== Main menu Help / Ask Me ===== */
 (function wireTopHelpAsk(){
@@ -7241,6 +7256,18 @@ $('noPdfBanner').style.display='none';
   });
 })();
 
+
+$('dashboardHelpTile')?.addEventListener('click', () => {
+  if(typeof openHelp === 'function') return openHelp();
+  if(typeof showHelp === 'function') return showHelp();
+  setStudio('help');
+});
+$('dashboardAskTile')?.addEventListener('click', () => {
+  if(typeof openAskMe === 'function') return openAskMe();
+  if(typeof showAskMe === 'function') return showAskMe();
+  const ask = document.querySelector('#askMeBtn, #askBtn, .ask-me');
+  if(ask) ask.click();
+});
 
 </script>
 
@@ -7401,15 +7428,7 @@ $('noPdfBanner').style.display='none';
 </script>
 
 
-<script>
-/* v2026.08.20.60 — clear tool upload request when leaving a Studio */
-(function(){
-  const box=document.getElementById('studioUploadScreen');
-  if(!box)return;
-  // No MutationObserver: navigation explicitly clears the upload request.
-  // Watching style/class here caused a self-triggering feedback loop in Safari.
-})();
-</script>
+
 
 <script>
 /* v2026.08.21.80 — offline status indicator only. It does not alter menu routing. */
@@ -7507,107 +7526,70 @@ $('noPdfBanner').style.display='none';
 </script>
 
 <script>
-/* DocuForge AI v2026.08.23.83 — FINAL MAIN-MENU NAVIGATION REPAIR
-   One navigation path only. Capture-phase handler prevents old/stale tile handlers
-   from competing with each other. No MutationObserver and no smooth scrolling. */
+/* DocuForge AI v2026.08.23.84 — stable universal file bar. */
 (function(){
-  const $ = id => document.getElementById(id);
-  const studioNames = new Set([
-    'pdf','ocr','translate','convert','powerpoint','ai','excel','gstinvoice',
-    'website','security','batch','reader','export','help','settings','about'
-  ]);
-  let busy = false;
-
-  function openStudio(name){
-    if(!studioNames.has(name)) return;
-    if(busy) return;
-    busy = true;
-    try{
-      if(typeof window.setStudio === 'function') window.setStudio(name);
-      else return;
-      document.body.classList.remove('dashboard-active');
-      document.body.classList.add('studio-active');
-
-      const tiles = $('dashboardTiles');
-      const recent = $('dashboardRecent');
-      if(tiles) tiles.style.display='none';
-      if(recent) recent.style.display='none';
-
-      const ribbon = $('ribbon');
-      if(ribbon) ribbon.style.display='flex';
-      document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(panel=>{
-        const active = panel.dataset.studioPanel === name;
-        panel.classList.toggle('active', active);
-        if(active) panel.style.setProperty('display','flex','important');
-        else panel.style.removeProperty('display');
-      });
-
-      const back = $('backToMainMenu');
-      if(back){
-        back.style.setProperty('display','flex','important');
-        back.style.setProperty('visibility','visible','important');
-        back.style.setProperty('opacity','1','important');
-      }
-      const upload = $('studioUploadScreen');
-      if(upload){ upload.dataset.requested=''; }
-      if($('statusMsg')) $('statusMsg').textContent='Choose a tool from the submenu.';
-      window.scrollTo(0,0);
-    }catch(err){
-      console.error('DocuForge navigation error:',err);
-      if(typeof toast==='function') toast('Could not open this menu. Please try again.',true);
-    }finally{
-      setTimeout(()=>busy=false,120);
+  const $=id=>document.getElementById(id);
+  const FILE_STUDIOS=new Set(['pdf','ocr','translate','convert','powerpoint','excel','reader','security','batch']);
+  let active=''; let input=null;
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  function currentFile(){return window.__docuForgeStudioFile||null;}
+  function hasWorking(){try{return !!window.workingBytes;}catch(e){return false;}}
+  function fileName(){const f=currentFile();if(f&&f.name)return f.name;return hasWorking()?(($('outName')?.value||'document')+'.pdf'):'No file selected';}
+  function acceptFor(s){return ({pdf:'.pdf,application/pdf,image/*',ocr:'.pdf,application/pdf,image/*',translate:'.pdf,.docx,.txt,.md,.csv,.html,.htm,image/*',convert:'.pdf,.docx,.xlsx,.xls,.csv,.pptx,.ppt,.html,.htm,.txt,.md,.markdown',powerpoint:'.pptx,.ppt',excel:'.xlsx,.xls,.csv',reader:'.pdf,.epub',security:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.txt,.md',batch:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.csv,.txt,.md,.html,.htm'})[s]||'*/*';}
+  function ensureInput(){
+    if(input)return input;
+    input=document.createElement('input');input.type='file';input.hidden=true;document.body.appendChild(input);
+    input.addEventListener('change',async function(){
+      const fs=Array.from(input.files||[]);input.value='';if(!fs.length)return;
+      try{if(active==='pdf'&&typeof window.loadFiles==='function')await window.loadFiles(fs);window.__docuForgeStudioFile=fs[0];sync();if(typeof window.setStatus==='function')window.setStatus('Loaded "'+fs[0].name+'".');}
+      catch(e){console.error(e);if(typeof window.toast==='function')window.toast((e&&e.message)||'Could not load the file.',true);}
+    });return input;
+  }
+  function preview(){
+    const f=currentFile();
+    if(hasWorking()){
+      try{const u=URL.createObjectURL(new Blob([window.workingBytes],{type:'application/pdf'}));const m=document.createElement('div');m.className='modal-backdrop show';m.innerHTML='<div class="modal" style="width:min(96vw,1000px);height:90vh;max-width:1000px;display:flex;flex-direction:column;padding:0;overflow:hidden"><div class="modal-head"><h3>View File</h3><button type="button" class="icon-btn">×</button></div><iframe title="PDF preview" src="'+u+'" style="flex:1;width:100%;border:0;background:#fff"></iframe></div>';document.body.appendChild(m);const close=()=>{URL.revokeObjectURL(u);m.remove();};m.querySelector('.icon-btn').onclick=close;m.onclick=e=>{if(e.target===m)close();};return;}catch(e){if(typeof window.toast==='function')window.toast('Could not open the PDF preview.',true);return;}
     }
+    if(!f){if(typeof window.toast==='function')window.toast('Choose a file first.',true);return;}
+    const ext=(f.name.split('.').pop()||'').toLowerCase();
+    if(['txt','md','csv'].includes(ext)){f.text().then(t=>{if(typeof window.openModal==='function')window.openModal('View — '+f.name,'<pre style="max-height:70vh;overflow:auto;white-space:pre-wrap;word-break:break-word">'+esc(t)+'</pre>');});return;}
+    if(f.type&&f.type.startsWith('image/')){const u=URL.createObjectURL(f);if(typeof window.openModal==='function')window.openModal('View — '+f.name,'<img src="'+u+'" alt="'+esc(f.name)+'" style="max-width:100%;height:auto">');return;}
+    const u=URL.createObjectURL(f);const w=window.open(u,'_blank','noopener');if(!w&&typeof window.toast==='function')window.toast('This file type cannot be previewed in this browser.',true);setTimeout(()=>URL.revokeObjectURL(u),60000);
   }
-
-  function goHome(){
-    if(busy) return;
-    busy=true;
-    try{
-      if(typeof window.setStudio === 'function') window.setStudio('dashboard');
-      document.body.classList.add('dashboard-active');
-      document.body.classList.remove('studio-active');
-      const tiles=$('dashboardTiles'), recent=$('dashboardRecent');
-      if(tiles) tiles.style.display='grid';
-      if(recent) recent.style.display='block';
-      ['studioTabs','ribbon','toolbar','pageActionStrip','dropzone','grid','noPdfBanner'].forEach(id=>{
-        const el=$(id); if(el) el.style.display='none';
-      });
-      const back=$('backToMainMenu');
-      if(back) back.style.display='none';
-      const upload=$('studioUploadScreen');
-      if(upload){upload.dataset.requested='';upload.style.display='none';}
-      if($('statusMsg')) $('statusMsg').textContent='Ready. Choose a menu to begin.';
-      window.scrollTo(0,0);
-    }catch(err){
-      console.error('DocuForge home navigation error:',err);
-    }finally{setTimeout(()=>busy=false,120);}
+  function make(panel){
+    if(panel.querySelector('.df84-filebar'))return;
+    const b=document.createElement('div');b.className='df84-filebar';
+    b.innerHTML='<div class="df84-file-title">📂 Current file</div><button type="button" class="btn primary df84-choose">Choose File</button><button type="button" class="btn df84-view" disabled>👁 View File</button><span class="df84-file-name">No file selected</span>';
+    panel.insertBefore(b,panel.firstChild);
+    b.querySelector('.df84-choose').onclick=()=>{const i=ensureInput();i.accept=acceptFor(active);i.multiple=active==='pdf'||active==='ocr'||active==='batch';i.click();};
+    b.querySelector('.df84-view').onclick=preview;
   }
-
-  window.DocuForgeOpenStudio=openStudio;
-  window.DocuForgeGoHome=goHome;
-
-  function install(){
-    document.addEventListener('click', function(e){
-      const tile=e.target && e.target.closest ? e.target.closest('#dashboardTiles .main-menu-tile[data-studio]') : null;
-      if(!tile) return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      openStudio(tile.dataset.studio);
-    }, true);
-
-    document.addEventListener('click', function(e){
-      const back=e.target && e.target.closest ? e.target.closest('#backToMainMenu') : null;
-      if(!back) return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      goHome();
-    }, true);
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install,{once:true});
-  else install();
+  function sync(){const n=fileName(),has=!!currentFile()||hasWorking();document.querySelectorAll('.df84-filebar').forEach(b=>{b.querySelector('.df84-file-name').textContent=n;b.querySelector('.df84-view').disabled=!has;});}
+  function activate(studio){active=studio||window.__docuForgeCurrentStudio||'';document.querySelectorAll('.df84-filebar').forEach(b=>{const p=b.closest('.ribbon-panel');b.style.display=(FILE_STUDIOS.has(active)&&p&&p.classList.contains('active'))?'flex':'none';});sync();}
+  function install(){document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(make);activate(window.__docuForgeCurrentStudio||'dashboard');}
+  function hook(){if(typeof window.setStudio!=='function'||window.setStudio.__df84Wrapped)return;const original=window.setStudio;function wrapped(studio){const r=original.apply(this,arguments);setTimeout(()=>activate(studio),0);return r;}wrapped.__df84Wrapped=true;window.setStudio=wrapped;}
+  const boot=()=>{install();let tries=0;const t=setInterval(()=>{if(typeof window.setStudio==='function'){hook();clearInterval(t);activate(window.__docuForgeCurrentStudio||'dashboard');}else if(++tries>200)clearInterval(t);},10);};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 </script>
+<style>
+.df84-filebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);width:100%;box-sizing:border-box}.df84-file-title{font-weight:800}.df84-file-name{font-size:12px;color:var(--ink-soft);flex:1;min-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media(max-width:720px){.df84-filebar{display:grid;grid-template-columns:1fr 1fr;gap:7px}.df84-file-title,.df84-file-name{grid-column:1/-1}.df84-filebar button{width:100%;min-height:46px}}
+</style>
+<script>
+/* v2026.08.23.84 — convenience shortcuts, no capture-phase navigation. */
+(function(){
+  function install(){
+    const dash=document.getElementById('dashboardTiles');if(!dash||document.getElementById('df84QuickActions'))return;
+    const box=document.createElement('div');box.id='df84QuickActions';box.className='df84-quick';
+    box.innerHTML='<h2>Quick Actions</h2><div class="df84-quick-grid"><button type="button" data-q="upload">📂 Upload File</button><button type="button" data-q="compare">🔍 Compare Files</button><button type="button" data-q="ppt">📽️ PPT → Markdown</button><button type="button" data-q="recent">🕘 Recent Files</button></div><p>Core navigation, file selection and local document handling remain available offline; AI/online translation may require internet.</p>';
+    dash.parentNode.insertBefore(box,dash);
+    box.addEventListener('click',e=>{const b=e.target.closest('button[data-q]');if(!b)return;const q=b.dataset.q;if(q==='recent'){document.getElementById('dashboardRecent')?.scrollIntoView({behavior:'smooth',block:'start'});return;}if(q==='compare'){window.setStudio?.('convert');if(typeof window.setStatus==='function')window.setStatus('Open Compare Files in Conversion Studio.');return;}if(q==='ppt'){window.setStudio?.('powerpoint');if(typeof window.setStatus==='function')window.setStatus('Open PowerPoint → Markdown.');return;}if(q==='upload'){const el=document.querySelector('#dashboardUploadFileTile');if(el){el.click();return;}if(typeof window.setStatus==='function')window.setStatus('Choose a Studio to upload a file.');}});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+})();
+</script>
+<style>
+.df84-quick{margin:10px 20px 14px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}.df84-quick h2{margin:0 0 10px;font-size:20px}.df84-quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.df84-quick-grid button{min-height:52px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-weight:800;padding:7px;cursor:pointer}.df84-quick p{margin:9px 0 0;font-size:12px;color:var(--ink-soft)}@media(max-width:720px){.df84-quick{margin:8px 10px 12px}.df84-quick-grid{grid-template-columns:1fr 1fr}.df84-quick-grid button{min-height:58px;font-size:12px}}
+</style>
 </body>
 </html>
-
