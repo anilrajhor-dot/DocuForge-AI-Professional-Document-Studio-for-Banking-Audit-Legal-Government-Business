@@ -742,7 +742,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.24.89</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.24.90</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1157,9 +1157,6 @@ function openGstInvoiceApp(){
       Then choose the required tool. No document is selected until a tool asks for one.
     </div><div id="dashboardUploadStatus" class="hint" style="display:none;margin:0 14px 12px;text-align:center;"></div>
 <div id="dashboardTiles" class="dashboard-grid dashboard-main-menu" style="display:grid">
-      <button class="dash-tile main-menu-tile" id="dashboardHelpTile" type="button">
-        <span class="dt-icon">❓</span><span>Help</span><small>How to use DocuForge AI</small><strong>Open Help →</strong>
-      </button>
       <button class="dash-tile main-menu-tile" id="dashboardAskTile" type="button">
         <span class="dt-icon">💬</span><span>Ask Me</span><small>Ask questions about any tool</small><strong>Ask now →</strong>
       </button>
@@ -1235,7 +1232,7 @@ function openGstInvoiceApp(){
       </div>
     </div>
 
-    <div class="dropzone" id="dropzone" style="display:none">
+    <div class="dropzone" id="dropzone" style="display:none !important">
       <h2>Drop PDFs or photos here</h2>
       <p>Use the single “Choose File” button above, or drag and drop files here. This area is used only by PDF Studio. Select one file to start a project, or several to merge them in order. Photos become pages automatically.</p>
       <div class="stamp">FILES STAY ON THIS DEVICE</div>
@@ -1529,7 +1526,7 @@ function updatePdfUploadAction(){
   $('toolbar').style.display = (on && !isDashboard) ? 'flex' : 'none';
   grid.classList.toggle('empty-hide', !on || isDashboard);
   const activeStudioName = window.__docuForgeCurrentStudio || document.body.dataset.studio || 'pdf';
-  $('dropzone').style.display = (isDashboard || activeStudioName !== 'pdf' || on) ? 'none' : 'block';
+  $('dropzone').style.display = 'none';
   $('noPdfBanner').style.display = (isDashboard || activeStudioName !== 'pdf' || on) ? 'none' : 'block';
   $('ribbon').style.display = isDashboard ? 'none' : '';
   $('pageActionStrip').style.display = isDashboard ? 'none' : '';
@@ -2450,7 +2447,7 @@ function diffLines(linesA, linesB){
   while(j < m){ result.push({ type:'added', text: linesB[j] }); j++; }
   return result;
 }
-/* v2026.08.24.89 — Compare Files: side-by-side line comparison + word-level highlighting. */
+/* v2026.08.24.90 — Compare Files: side-by-side line comparison + word-level highlighting. */
 function compareTokenise(text){
   // Keep words, numbers and punctuation separately so small wording changes are visible.
   return String(text || '').match(/[\p{L}\p{N}_]+(?:['’\-][\p{L}\p{N}_]+)*|\s+|[^\s\p{L}\p{N}_]/gu) || [];
@@ -7635,12 +7632,12 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 <script>
-/* v2026.08.24.87 — legacy duplicate common View File injector disabled.
+/* v2026.08.24.90 — legacy duplicate common View File injector disabled.
    The universal Studio file bar below is the single source for Choose File + View File. */
 </script>
 
 <script>
-/* DocuForge AI v2026.08.24.87 — stable universal file bar. */
+/* DocuForge AI v2026.08.24.90 — stable universal file bar. */
 (function(){
   const $=id=>document.getElementById(id);
   const FILE_STUDIOS=new Set(['pdf','ocr','translate','convert','powerpoint','excel','reader','security','batch']);
@@ -7687,10 +7684,11 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 <style>
-.df84-filebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);width:100%;box-sizing:border-box}.df84-file-title{font-weight:800}.df84-file-name{font-size:12px;color:var(--ink-soft);flex:1;min-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media(max-width:720px){.df84-filebar{display:grid;grid-template-columns:1fr 1fr;gap:7px}.df84-file-title,.df84-file-name{grid-column:1/-1}.df84-filebar button{width:100%;min-height:46px}}
+/* v90: one uploader per Studio. The older injected Current File bar is retained in source for compatibility but hidden. */
+.df84-filebar{display:none !important;}
 </style>
 <script>
-/* v2026.08.24.87 — dashboard-only convenience shortcuts. */
+/* v2026.08.24.90 — dashboard-only convenience shortcuts. */
 (function(){
   function install(){
     const dash=document.getElementById('dashboardTiles');if(!dash||document.getElementById('df85QuickActions'))return;
@@ -7708,7 +7706,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 <script>
 /* ================================================================
-   DocuForge AI v2026.08.24.89 — document comparison word-highlighting upgrade
+   DocuForge AI v2026.08.24.90 — document comparison word-highlighting upgrade
    1) View File never navigates away from the Studio.
    2) Choosing another PDF/photo while a project is open asks exactly
       where it should be inserted: before a page or at the end.
@@ -7815,7 +7813,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
   function patchUniversalFilePicker(){
     // Locate the v87 universal file-bar's PDF picker and replace its change
     // behaviour without creating another file input.
-    const scriptText=[...document.scripts].find(x=>x.textContent.includes('DocuForge AI v2026.08.24.87 — stable universal file bar.'));
+    const scriptText=[...document.scripts].find(x=>x.textContent.includes('DocuForge AI v2026.08.24.90 — stable universal file bar.'));
     // We cannot alter a closed-over handler, so use capture on the actual
     // dynamically-created .df84-choose button and prevent the old click.
     document.addEventListener('click',e=>{
