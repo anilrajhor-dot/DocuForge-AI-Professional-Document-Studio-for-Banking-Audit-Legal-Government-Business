@@ -731,7 +731,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '2026.08.24.87';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.24.89';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -742,7 +742,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.24.87</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.24.89</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -2450,40 +2450,117 @@ function diffLines(linesA, linesB){
   while(j < m){ result.push({ type:'added', text: linesB[j] }); j++; }
   return result;
 }
-function showCompareResult(diff, nameA, nameB){
-  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const added = diff.filter(d => d.type === 'added').length;
-  const removed = diff.filter(d => d.type === 'removed').length;
-  const rowsHtml = diff.map(d => {
-    const style = d.type === 'added' ? 'background:rgba(60,160,60,.15);'
-      : d.type === 'removed' ? 'background:rgba(200,60,60,.15);text-decoration:line-through;' : '';
-    const prefix = d.type === 'added' ? '+ ' : d.type === 'removed' ? '\u2212 ' : '  ';
-    return `<div style="${style}padding:2px 6px;font-family:var(--font-mono);font-size:11.5px;white-space:pre-wrap;">${prefix}${esc(d.text)}</div>`;
+/* v2026.08.24.89 — Compare Files: side-by-side line comparison + word-level highlighting. */
+function compareTokenise(text){
+  // Keep words, numbers and punctuation separately so small wording changes are visible.
+  return String(text || '').match(/[\p{L}\p{N}_]+(?:['’\-][\p{L}\p{N}_]+)*|\s+|[^\s\p{L}\p{N}_]/gu) || [];
+}
+function wordDiff(a,b){
+  const A=compareTokenise(a), B=compareTokenise(b);
+  const n=A.length,m=B.length;
+  // Guard against pathological lines.
+  if(n>600 || m>600) return {aHtml:escCompare(a,'removed'),bHtml:escCompare(b,'added'),changed:true,added:m,removed:n};
+  const dp=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let i=n-1;i>=0;i--) for(let j=m-1;j>=0;j--) dp[i][j]=A[i]===B[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+  const aa=[],bb=[]; let i=0,j=0,added=0,removed=0;
+  const push=(arr,t,cls)=>arr.push({t,cls});
+  while(i<n&&j<m){
+    if(A[i]===B[j]){push(aa,A[i],'same');push(bb,B[j],'same');i++;j++;}
+    else if(dp[i+1][j]>=dp[i][j+1]){push(aa,A[i],'removed');if(/[\p{L}\p{N}_]/u.test(A[i])) removed++;i++;}
+    else{push(bb,B[j],'added');if(/[\p{L}\p{N}_]/u.test(B[j])) added++;j++;}
+  }
+  while(i<n){const t=A[i++];push(aa,t,'removed');if(/[\p{L}\p{N}_]/u.test(t)) removed++;}
+  while(j<m){const t=B[j++];push(bb,t,'added');if(/[\p{L}\p{N}_]/u.test(t)) added++;}
+  return {aHtml:renderTokenRuns(aa),bHtml:renderTokenRuns(bb),changed:true,added,removed};
+}
+function escCompare(s,cls=''){
+  const e=String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return cls?`<mark class="cmp-${cls}">${e}</mark>`:e;
+}
+function renderTokenRuns(runs){
+  return runs.map(r=>{
+    const e=String(r.t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return r.cls==='same'?e:`<mark class="cmp-${r.cls}">${e}</mark>`;
   }).join('');
-  openModal('Comparison result', `
-    <div style="display:flex;gap:16px;font-size:12.5px;">
-      <span style="color:#2e8b2e;">+ ${added} added</span>
-      <span style="color:#b33;">\u2212 ${removed} removed</span>
+}
+function groupCompareDiff(diff){
+  const out=[]; let i=0;
+  while(i<diff.length){
+    if(diff[i].type==='same'){out.push({type:'same',a:diff[i].text,b:diff[i].text});i++;continue;}
+    const removed=[],added=[];
+    while(i<diff.length && diff[i].type!=='same'){
+      if(diff[i].type==='removed') removed.push(diff[i].text); else if(diff[i].type==='added') added.push(diff[i].text); i++;
+    }
+    const count=Math.max(removed.length,added.length);
+    for(let k=0;k<count;k++) out.push({type:'change',a:removed[k]??'',b:added[k]??''});
+  }
+  return out;
+}
+function showCompareResult(diff, nameA, nameB){
+  const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const groups=groupCompareDiff(diff);
+  let addedWords=0, removedWords=0, changedBlocks=0;
+  const rows=groups.map((g,idx)=>{
+    if(g.type==='same') return `<div class="cmp-row same"><div class="cmp-num">${idx+1}</div><div>${esc(g.a)}</div><div>${esc(g.b)}</div></div>`;
+    const wd=wordDiff(g.a,g.b); addedWords+=wd.added||0; removedWords+=wd.removed||0; changedBlocks++;
+    return `<div class="cmp-row changed"><div class="cmp-num">${idx+1}</div><div>${wd.aHtml||esc(g.a)}</div><div>${wd.bHtml||esc(g.b)}</div></div>`;
+  }).join('');
+  const sameCount=groups.filter(g=>g.type==='same').length;
+  const css=`
+    .cmp-summary{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px;font-size:12px}
+    .cmp-pill{padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+    .cmp-grid{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface);font-size:12px}
+    .cmp-head,.cmp-row{display:grid;grid-template-columns:38px minmax(0,1fr) minmax(0,1fr)}
+    .cmp-head{position:sticky;top:0;background:var(--surface-2);font-weight:700;border-bottom:1px solid var(--line);z-index:1}
+    .cmp-head>div,.cmp-row>div{padding:7px 9px;border-right:1px solid var(--line);white-space:pre-wrap;overflow-wrap:anywhere}
+    .cmp-head>div:last-child,.cmp-row>div:last-child{border-right:0}
+    .cmp-row{border-bottom:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+    .cmp-row.changed>div:not(.cmp-num){background:rgba(255,193,7,.10)}
+    .cmp-num{color:var(--ink-soft);font-family:var(--font-mono);text-align:right;background:var(--surface-2)}
+    .cmp-added{background:rgba(60,170,80,.28);border-radius:3px;padding:1px 2px}
+    .cmp-removed{background:rgba(210,65,65,.28);border-radius:3px;padding:1px 2px;text-decoration:line-through}
+    .cmp-help{font-size:11.5px;color:var(--ink-soft);margin:8px 0}
+    @media(max-width:700px){.cmp-head,.cmp-row{grid-template-columns:30px minmax(0,1fr) minmax(0,1fr)}.cmp-head>div,.cmp-row>div{padding:6px;font-size:11px}}
+  `;
+  openModal('Document comparison', `
+    <style>${css}</style>
+    <div><b>${esc(nameA)}</b> &nbsp;vs&nbsp; <b>${esc(nameB)}</b></div>
+    <div class="cmp-summary">
+      <span class="cmp-pill">🔴 ${removedWords} words removed</span>
+      <span class="cmp-pill">🟢 ${addedWords} words added</span>
+      <span class="cmp-pill">🟡 ${changedBlocks} changed lines/blocks</span>
+      <span class="cmp-pill">✓ ${sameCount} unchanged</span>
     </div>
-    <div style="max-height:400px;overflow-y:auto;border:1px solid var(--line);border-radius:4px;background:var(--bg);">${rowsHtml}</div>
-    <button class="btn ghost" id="cmpDownload" type="button" style="align-self:flex-start;">Download report (.html)</button>
-  `, async () => {});
-  $('modalConfirm').style.display = 'none';
-  $('modalCancel').textContent = 'Close';
-  setTimeout(() => {
-    document.getElementById('cmpDownload').addEventListener('click', () => {
-      const bodyHtml = diff.map(d => {
-        const cls = d.type === 'added' ? 'added' : d.type === 'removed' ? 'removed' : 'same';
-        const prefix = d.type === 'added' ? '+ ' : d.type === 'removed' ? '\u2212 ' : '  ';
-        return `<div class="${cls}">${prefix}${esc(d.text)}</div>`;
+    <div class="cmp-help">Red = deleted/old wording &nbsp; Green = added/new wording. Changed words are highlighted directly inside the two versions.</div>
+    <div class="cmp-grid" style="max-height:52vh;overflow:auto">
+      <div class="cmp-head"><div>#</div><div>File A — original</div><div>File B — revised</div></div>
+      ${rows}
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+      <button class="btn primary" id="cmpPrev" type="button">↑ Previous difference</button>
+      <button class="btn primary" id="cmpNext" type="button">↓ Next difference</button>
+      <button class="btn ghost" id="cmpDownload" type="button">Download comparison (.html)</button>
+    </div>
+  `, async()=>{});
+  $('modalConfirm').style.display='none';
+  $('modalCancel').textContent='Close';
+  setTimeout(()=>{
+    const sc=document.querySelector('.cmp-grid');
+    const changes=[...document.querySelectorAll('.cmp-row.changed')]; let pos=-1;
+    const jump=(dir)=>{ if(!changes.length)return; pos=(pos+dir+changes.length)%changes.length; changes[pos].scrollIntoView({block:'center'}); };
+    document.getElementById('cmpPrev')?.addEventListener('click',()=>jump(-1));
+    document.getElementById('cmpNext')?.addEventListener('click',()=>jump(1));
+    document.getElementById('cmpDownload')?.addEventListener('click',()=>{
+      const body=groups.map((g,idx)=>{
+        if(g.type==='same') return `<tr><td>${idx+1}</td><td>${esc(g.a)}</td><td>${esc(g.b)}</td></tr>`;
+        const wd=wordDiff(g.a,g.b);
+        return `<tr class="changed"><td>${idx+1}</td><td>${wd.aHtml}</td><td>${wd.bHtml}</td></tr>`;
       }).join('');
-      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Comparison: ${esc(nameA)} vs ${esc(nameB)}</title>
-<style>body{font-family:ui-monospace,monospace;font-size:13px;margin:24px;} .added{background:#d7f5d7;} .removed{background:#f8d7d7;text-decoration:line-through;}</style>
-</head><body><h2>${esc(nameA)} vs ${esc(nameB)}</h2>${bodyHtml}
-<\/body><\/html>`;
-      downloadBlob(new Blob([html], {type:'text/html'}), 'comparison.html');
+      const html=`<!doctype html><html><head><meta charset="utf-8"><title>Comparison</title><style>
+      body{font-family:Arial,sans-serif;margin:24px;color:#222}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #ccc;padding:7px;vertical-align:top;white-space:pre-wrap;overflow-wrap:anywhere}th{background:#eee}.changed td{background:#fff8d9}.cmp-added{background:#bff0c5}.cmp-removed{background:#f5bcbc;text-decoration:line-through}.cmp-added,.cmp-removed{border-radius:3px;padding:1px 2px}</style></head><body><h2>Document Comparison</h2><p><b>${esc(nameA)}</b> vs <b>${esc(nameB)}</b></p><table><thead><tr><th style="width:40px">#</th><th>${esc(nameA)}</th><th>${esc(nameB)}</th></tr></thead><tbody>${body}</tbody></table></body></html>`;
+      downloadBlob(new Blob([html],{type:'text/html'}),'document-comparison.html');
     });
-  }, 0);
+  },0);
 }
 
 /* ---------- Conversion output sharing ---------- */
@@ -4606,7 +4683,7 @@ $('btnPdfCompare').addEventListener('click', () => {
       <div><label>File B</label><input type="file" id="cmpFileB" accept="${universalCompareAccept()}"></div>
     </div>
     <p class="hint"><b>Supported:</b> PDF, Word (.docx), Excel (.xlsx/.xls), PowerPoint (.pptx), CSV, TXT, Markdown, HTML, XML, JSON and RTF.</p>
-    <p class="hint">The comparison is content/text based. It identifies added, removed and unchanged lines. Formatting and visual layout are not compared.</p>
+    <p class="hint">The comparison checks the actual document text/content. Differences are shown side-by-side with changed words highlighted: red = removed/old wording, green = added/new wording. PDF, Word, Excel, PowerPoint and common text formats are supported.</p>
   `, async () => {
     const fileA = document.getElementById('cmpFileA').files[0];
     const fileB = document.getElementById('cmpFileB').files[0];
@@ -7631,7 +7708,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 <script>
 /* ================================================================
-   DocuForge AI v2026.08.24.88 — PDF insertion + in-app preview fix
+   DocuForge AI v2026.08.24.89 — document comparison word-highlighting upgrade
    1) View File never navigates away from the Studio.
    2) Choosing another PDF/photo while a project is open asks exactly
       where it should be inserted: before a page or at the end.
