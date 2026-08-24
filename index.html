@@ -725,7 +725,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '2026.08.23.85';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.23.86';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -736,7 +736,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.23.85</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.23.86</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1229,8 +1229,8 @@ function openGstInvoiceApp(){
     </div>
 
     <div class="dropzone" id="dropzone" style="display:none">
-      <h2>Drop PDFs or photos here, or click to choose files</h2>
-      <p>Select one file to start a project, or several to merge them in order. Photos (from your camera or library) become pages automatically.</p>
+      <h2>Drop PDFs or photos here</h2>
+      <p>Use the single “Choose File” button above, or drag and drop files here. Select one file to start a project, or several to merge them in order. Photos (from your camera or library) become pages automatically.</p>
       <div class="stamp">FILES STAY ON THIS DEVICE</div>
     </div>
 
@@ -6314,7 +6314,7 @@ $('btnDownload').addEventListener('click', () => {
 
 /* ---------- Dropzone ---------- */
 const dz = $('dropzone');
-dz.addEventListener('click', () => $('fileInput').click());
+/* v86: do not bind a second click-to-choose action here. Use the single universal Choose File button above. */
 dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag'); });
 dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
 dz.addEventListener('drop', (e) => { e.preventDefault(); dz.classList.remove('drag'); loadFiles(e.dataTransfer.files); });
@@ -7459,86 +7459,12 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 <script>
-/* DocuForge AI v2026.08.21.80 — common View File control in every Studio submenu.
-   The control never replaces the tool-specific Choose File action. It gives the
-   user a consistent way to inspect the currently selected/loaded file. */
-(function(){
-  const $=id=>document.getElementById(id);
-  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-  function currentFile(){ return window.__docuForgeStudioFile || null; }
-  async function viewFile(){
-    const f=currentFile();
-    if(workingBytes){
-      try{
-        const blob=new Blob([workingBytes],{type:'application/pdf'});
-        const u=URL.createObjectURL(blob);
-        const modal=document.createElement('div');
-        modal.className='modal-backdrop';
-        modal.innerHTML=`<div class="modal" style="width:min(96vw,1100px);height:92vh;padding:0;display:flex;flex-direction:column;"><div class="modal-head"><h2>View — ${esc($('outName')?.value||'document')}.pdf</h2><button type="button" class="icon-btn" aria-label="Close">×</button></div><div style="flex:1;background:#666;min-height:0;"><iframe title="PDF preview" src="${u}" style="width:100%;height:100%;border:0;background:white;"></iframe></div></div>`;
-        document.body.appendChild(modal);
-        modal.querySelector('button').onclick=()=>{URL.revokeObjectURL(u);modal.remove();};
-        modal.addEventListener('click',e=>{if(e.target===modal){URL.revokeObjectURL(u);modal.remove();}});
-        return;
-      }catch(e){ toast(e?.message||'Could not open the PDF preview.',true); return; }
-    }
-    if(!f){ toast('Choose a file first, then tap View File.',true); return; }
-    const ext=(f.name.split('.').pop()||'').toLowerCase();
-    try{
-      if(f.type.startsWith('image/') || ['txt','md','csv','html','htm'].includes(ext)){
-        const u=URL.createObjectURL(f); window.open(u,'_blank','noopener'); setTimeout(()=>URL.revokeObjectURL(u),60000); return;
-      }
-      if(ext==='docx'){
-        await loadLib('mammoth');
-        const r=await mammoth.convertToHtml({arrayBuffer:await f.arrayBuffer()});
-        openModal('View — '+f.name, `<div style="max-height:65vh;overflow:auto;line-height:1.55;padding:8px;background:var(--bg);border:1px solid var(--line);border-radius:8px;">${r.value||'<p>No readable content.</p>'}</div>`);
-        return;
-      }
-      if(['pptx','ppt'].includes(ext)){
-        // Reuse the existing PowerPoint text extractor when available.
-        if(typeof extractPptxSlides==='function'){
-          const slides=await extractPptxSlides(f);
-          const html=slides.map((x,i)=>`<section style="padding:12px;border-bottom:1px solid var(--line)"><h3>Slide ${i+1}: ${esc(x.title||'Untitled')}</h3>${(x.bullets||[]).map(b=>`<div>• ${esc(b)}</div>`).join('')}</section>`).join('');
-          openModal('View — '+f.name, `<div style="max-height:65vh;overflow:auto;">${html||'<p>No readable slide text.</p>'}</div>`);
-          return;
-        }
-      }
-      if(['xlsx','xls'].includes(ext) && typeof XLSX!=='undefined'){
-        const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});
-        const html=wb.SheetNames.map(n=>`<h3>${esc(n)}</h3>${XLSX.utils.sheet_to_html(wb.Sheets[n],{header:'',footer:''})}`).join('');
-        openModal('View — '+f.name, `<div style="max-height:65vh;overflow:auto;">${html}</div>`); return;
-      }
-      // Last resort: use the browser's local object URL. Some browsers can preview
-      // additional formats; if not, the user still gets a clear message.
-      const u=URL.createObjectURL(f); const w=window.open(u,'_blank','noopener');
-      if(!w) toast('The browser could not open a preview for this file type.',true);
-      setTimeout(()=>URL.revokeObjectURL(u),60000);
-    }catch(e){ console.error(e); toast('Could not create a local preview: '+(e?.message||'unknown error'),true); }
-  }
-  function install(){
-    document.querySelectorAll('.ribbon-panel[data-studio-panel]').forEach(panel=>{
-      if(panel.querySelector('.common-view-file-btn')) return;
-      const wrap=document.createElement('div');
-      wrap.className='common-view-file-wrap';
-      wrap.style.cssText='display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);width:fit-content;max-width:100%;';
-      wrap.innerHTML=`<button type="button" class="tool-btn common-view-file-btn" style="min-width:140px;"><span>👁️</span> View File</button><span class="common-view-file-name" style="font-size:12px;color:var(--ink-soft);">No file selected</span>`;
-      wrap.querySelector('button').addEventListener('click',viewFile);
-      const title=panel.querySelector('.ribbon-title, h2, h3');
-      if(title && title.parentElement===panel) title.insertAdjacentElement('afterend',wrap); else panel.insertBefore(wrap,panel.firstChild);
-    });
-  }
-  function sync(){
-    const name=currentFile()?.name || (workingBytes ? (($('outName')?.value||'document')+'.pdf') : 'No file selected');
-    document.querySelectorAll('.common-view-file-name').forEach(e=>e.textContent=name);
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{install();sync();}); else {install();sync();}
-  // All Studio panels are present at startup, so a persistent observer is unnecessary.
-  // The old observer watched the DOM while sync() changed text, creating repeated
-  // mutations and freezing the page on iPhone Safari.
-})();
+/* v2026.08.23.86 — legacy duplicate common View File injector disabled.
+   The universal Studio file bar below is the single source for Choose File + View File. */
 </script>
 
 <script>
-/* DocuForge AI v2026.08.23.84 — stable universal file bar. */
+/* DocuForge AI v2026.08.23.86 — stable universal file bar. */
 (function(){
   const $=id=>document.getElementById(id);
   const FILE_STUDIOS=new Set(['pdf','ocr','translate','convert','powerpoint','excel','reader','security','batch']);
@@ -7588,7 +7514,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 .df84-filebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);width:100%;box-sizing:border-box}.df84-file-title{font-weight:800}.df84-file-name{font-size:12px;color:var(--ink-soft);flex:1;min-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media(max-width:720px){.df84-filebar{display:grid;grid-template-columns:1fr 1fr;gap:7px}.df84-file-title,.df84-file-name{grid-column:1/-1}.df84-filebar button{width:100%;min-height:46px}}
 </style>
 <script>
-/* v2026.08.23.85 — dashboard-only convenience shortcuts. */
+/* v2026.08.23.86 — dashboard-only convenience shortcuts. */
 (function(){
   function install(){
     const dash=document.getElementById('dashboardTiles');if(!dash||document.getElementById('df85QuickActions'))return;
