@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta name="application-ver
-sion" content="2026.08.21.80">
+sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -703,6 +703,12 @@ body:not(.dashboard-active) #workspaceLayout{display:block !important;}
 body:not(.dashboard-active) #backToMainMenu{display:block;}
 
 </style>
+<style id="docuforge-v87-studio-isolation">
+/* v87: the generic PDF drop zone belongs ONLY to PDF Studio.
+   Other Studios use the single shared Studio Upload card. */
+body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #dropzone{display:none !important;}
+body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{display:none !important;}
+</style>
 </head>
 <body>
 <script>
@@ -725,7 +731,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '2026.08.23.86';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.24.87';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -736,7 +742,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.23.86</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.24.87</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -826,6 +832,7 @@ window.DFStorage = (function(){
     <div style="font-size:18px;font-weight:800;margin-bottom:5px;">📂 Upload File</div>
     <div id="studioUploadHint" style="font-size:13px;opacity:.75;margin-bottom:11px;">Upload the file required for this Studio.</div>
     <button type="button" id="studioUploadChoose" class="btn primary">📂 Choose File</button>
+    <button type="button" id="studioUploadView" class="btn ghost" disabled>👁 View File</button>
     <input id="studioUploadInput" type="file" hidden>
     <span id="studioUploadName" style="font-size:13px;font-weight:600;margin-left:10px;">No file selected</span>
   </div>
@@ -1230,7 +1237,7 @@ function openGstInvoiceApp(){
 
     <div class="dropzone" id="dropzone" style="display:none">
       <h2>Drop PDFs or photos here</h2>
-      <p>Use the single “Choose File” button above, or drag and drop files here. Select one file to start a project, or several to merge them in order. Photos (from your camera or library) become pages automatically.</p>
+      <p>Use the single “Choose File” button above, or drag and drop files here. This area is used only by PDF Studio. Select one file to start a project, or several to merge them in order. Photos become pages automatically.</p>
       <div class="stamp">FILES STAY ON THIS DEVICE</div>
     </div>
 
@@ -1521,8 +1528,9 @@ function updatePdfUploadAction(){
   const isDashboard = window.__docuForgeCurrentStudio === 'dashboard';
   $('toolbar').style.display = (on && !isDashboard) ? 'flex' : 'none';
   grid.classList.toggle('empty-hide', !on || isDashboard);
-  $('dropzone').style.display = (on || isDashboard) ? 'none' : 'block';
-  $('noPdfBanner').style.display = (on || isDashboard) ? 'none' : 'block';
+  const activeStudioName = window.__docuForgeCurrentStudio || document.body.dataset.studio || 'pdf';
+  $('dropzone').style.display = (isDashboard || activeStudioName !== 'pdf' || on) ? 'none' : 'block';
+  $('noPdfBanner').style.display = (isDashboard || activeStudioName !== 'pdf' || on) ? 'none' : 'block';
   $('ribbon').style.display = isDashboard ? 'none' : '';
   $('pageActionStrip').style.display = isDashboard ? 'none' : '';
   updatePdfUploadAction();
@@ -4686,16 +4694,19 @@ $('btnMetadata').addEventListener('click', async () => {
 });
 
 $('btnOcrImage').addEventListener('click', () => {
+  const f = window.__docuForgeStudioFile;
+  if(!f || !String(f.type||'').startsWith('image/')){
+    toast('Choose an image with the Upload File button above first.', true);
+    return;
+  }
   openModal('Extract text from image', `
-    <div class="field"><label>Image file (JPG, PNG, WEBP, BMP…)</label><input type="file" id="ocrImgFile" accept="image/*"></div>
-    <div class="field"><label>Language</label>
-      ${ocrLangOptions('ocrImgLang')}
-    </div>
-    <p class="hint">Runs entirely in your browser. The first time you use a language, your browser downloads a small recognition model — no document or image content is ever sent anywhere.</p>
+    <p class="hint">Selected file: <strong>${escapeXml(f.name)}</strong></p>
+    <div class="field"><label>Language</label>${ocrLangOptions('ocrImgLang')}</div>
+    <p class="hint">Runs OCR in your browser. The first use of a language may download its recognition model.</p>
   `, async () => {
-    const file = document.getElementById('ocrImgFile').files[0];
+    const file = window.__docuForgeStudioFile;
     const lang = document.getElementById('ocrImgLang').value;
-    if(!file){ toast('Choose an image first.', true); return; }
+    if(!file || !String(file.type||'').startsWith('image/')){ toast('Please choose an image first.', true); return; }
     const text = await runOcrOnImageFile(file, lang);
     if(text !== null){
       const fname = (file.name.replace(/\.[^.]+$/, '') || 'extracted') + '.txt';
@@ -4704,22 +4715,26 @@ $('btnOcrImage').addEventListener('click', () => {
   });
 });
 
-$('btnOcrPdf').addEventListener('click', () => {
+$('btnOcrPdf').addEventListener('click', async () => {
+  if(!workingBytes){
+    const f=window.__docuForgeStudioFile;
+    if(f && (f.type==='application/pdf' || /\.pdf$/i.test(f.name))){
+      try{ await loadFiles([f]); }catch(e){ toast(e?.message || 'Could not open the selected PDF.', true); return; }
+    }
+  }
+  if(!workingBytes){ toast('Choose a PDF with the Upload File button above first.', true); return; }
   openModal('Make this PDF searchable', `
-    <div class="field"><label>Pages</label>
-      <select id="ocrPdfScope"><option value="all">All pages</option><option value="selected">Selected pages only</option></select>
-    </div>
-    <div class="field"><label>Language</label>
-      ${ocrLangOptions('ocrPdfLang')}
-    </div>
-    <p class="hint">Recognizes the text on each page and adds an invisible, selectable text layer — the page looks exactly the same, but becomes searchable and copyable. Works best on clear scans; large files take a little while since every page is processed right here in your browser.</p>
+    <p class="hint">Current PDF: <strong>${escapeXml(($('studioUploadName')?.textContent||$('outName')?.value||'selected PDF'))}</strong></p>
+    <div class="field"><label>Pages</label><select id="ocrPdfScope"><option value="all">All pages</option><option value="selected">Selected pages only</option></select></div>
+    <div class="field"><label>Language</label>${ocrLangOptions('ocrPdfLang')}</div>
+    <p class="hint">Adds an invisible, selectable text layer. The original page appearance is preserved.</p>
   `, async () => {
     const scope = document.getElementById('ocrPdfScope').value;
     const lang = document.getElementById('ocrPdfLang').value;
     const doc = await PDFDocument.load(workingBytes);
     const total = doc.getPageCount();
     const pageIndices = scope === 'selected' ? selectedIndices() : Array.from({ length: total }, (_, i) => i);
-    if(!pageIndices.length){ toast('No pages to process — select some pages first, or choose "All pages".', true); return; }
+    if(!pageIndices.length){ toast('No pages to process — select some pages first, or choose All pages.', true); return; }
     const results = await runOcrOnPdfPages(lang, pageIndices);
     if(!results) return;
     await buildSearchablePdf(results); logConversion('Made PDF searchable (OCR)', $('outName').value);
@@ -5717,19 +5732,21 @@ $('btnRedact').addEventListener('click', () => {
 });
 
 $('btnImagesToPdf').addEventListener('click', () => {
+  const f=window.__docuForgeStudioFile;
+  if(!f || !String(f.type||'').startsWith('image/')){
+    toast('Choose one or more images with the Upload File button above first.', true);
+    return;
+  }
+  const files = window.__docuForgeStudioFiles?.length ? window.__docuForgeStudioFiles : [f];
   openModal('Combine images into PDF', `
-    <div class="field"><label>Images (added in the order selected)</label><input type="file" id="imgFiles" accept="image/*" multiple></div>
+    <p class="hint">${files.length} image${files.length===1?'':'s'} selected.</p>
     <p class="hint">Each image becomes one page, sized to match the image so nothing is cropped or stretched.</p>
   `, async () => {
-    const files = Array.from(document.getElementById('imgFiles').files || []);
-    if(!files.length){ toast('Choose at least one image.', true); return; }
-    setStatus('Building PDF from images…'); showProgress(15);
     try{
       const bytes = await buildImagesPdf(files);
       downloadBlob(new Blob([bytes], { type:'application/pdf' }), (files.length === 1 ? files[0].name.replace(/\.[^.]+$/, '') : 'images') + '.pdf');
       setStatus('Created PDF from images.');
     } catch(e){ console.error(e); toast('Could not build a PDF from those images.', true); }
-    finally { showProgress(null); }
   });
 });
 
@@ -6006,14 +6023,19 @@ $('btnAiTools').addEventListener('click', () => {
 });
 
 $('btnImageTable').addEventListener('click', () => {
+  const f=window.__docuForgeStudioFile;
+  if(!f || !String(f.type||'').startsWith('image/')){
+    toast('Choose an image with the Upload File button above first.', true);
+    return;
+  }
   openModal('Extract table from image', `
-    <div class="field"><label>Image</label><input type="file" id="tblImgFile" accept="image/*"></div>
+    <p class="hint">Selected file: <strong>${escapeXml(f.name)}</strong></p>
     <div class="field"><label>Language</label>${ocrLangOptions('tblImgLang')}</div>
-    <p class="hint">Runs OCR, then groups words into rows/columns by their position on the page — works best on a clear, reasonably aligned table.</p>
+    <p class="hint">Runs OCR, then groups words into rows and columns by position.</p>
   `, async () => {
-    const file = document.getElementById('tblImgFile').files[0];
+    const file = window.__docuForgeStudioFile;
     const lang = document.getElementById('tblImgLang').value;
-    if(!file){ toast('Choose an image first.', true); return; }
+    if(!file || !String(file.type||'').startsWith('image/')){ toast('Please choose an image first.', true); return; }
     setStatus('Extracting table…'); showProgress(20);
     try{
       const rows = await extractTableFromImage(file, lang);
@@ -6161,12 +6183,17 @@ $('btnReadAloud').addEventListener('click', async () => {
 });
 
 $('btnQrReader').addEventListener('click', () => {
+  const f=window.__docuForgeStudioFile;
+  if(!f || !String(f.type||'').startsWith('image/')){
+    toast('Choose an image containing the QR code with the Upload File button above first.', true);
+    return;
+  }
   openModal('Read QR code', `
-    <div class="field"><label>Image containing a QR code</label><input type="file" id="qrFile" accept="image/*"></div>
-    <p class="hint">Reads standard QR codes from a photo or screenshot. 1D barcodes (UPC/EAN/Code128) aren't supported.</p>
+    <p class="hint">Selected file: <strong>${escapeXml(f.name)}</strong></p>
+    <p class="hint">Reads standard QR codes from a photo or screenshot.</p>
   `, async () => {
-    const file = document.getElementById('qrFile').files[0];
-    if(!file){ toast('Choose an image first.', true); return; }
+    const file = window.__docuForgeStudioFile;
+    if(!file || !String(file.type||'').startsWith('image/')){ toast('Please choose an image first.', true); return; }
     try{
       await loadLib('jsqr');
       const img = await loadImageFromBytes(new Uint8Array(await file.arrayBuffer()), file.type || 'image/png');
@@ -6487,7 +6514,13 @@ function openExcelDashboard(){
 }
 function setStudio(name){
   const isDashboard = name === 'dashboard';
+  const previousStudio = window.__docuForgeCurrentStudio;
+  document.body.dataset.studio = name;
   window.__docuForgeCurrentStudio = name;
+  if(previousStudio && previousStudio !== name){
+    window.__docuForgeStudioFile = null;
+    window.__docuForgeStudioFiles = [];
+  }
   document.body.classList.toggle('dashboard-active', isDashboard);
 
   // The Dashboard is ONLY the main menu. The editor/ribbon appears only after
@@ -6505,7 +6538,7 @@ function setStudio(name){
   if(ribbon) ribbon.style.display = isDashboard ? 'none' : '';
   if(toolbar) toolbar.style.display = isDashboard ? 'none' : (workingBytes ? 'flex' : 'none');
   if(pageStrip) pageStrip.style.display = isDashboard ? 'none' : '';
-  if(dropzone) dropzone.style.display = isDashboard ? 'none' : (workingBytes ? 'none' : 'block');
+  if(dropzone) dropzone.style.display = (isDashboard || name !== 'pdf') ? 'none' : (workingBytes ? 'none' : 'block');
   if(banner) banner.style.display = isDashboard ? 'none' : (workingBytes ? 'none' : 'block');
   if(gridEl) gridEl.style.display = isDashboard ? 'none' : '';
   if(workspace) workspace.style.display = isDashboard ? 'none' : '';
@@ -6530,6 +6563,7 @@ function setStudio(name){
   if(name === 'gstinvoice' && typeof openGstInvoiceApp === 'function') openGstInvoiceApp();
 
   updateDashboardTilesVisibility();
+  if(typeof window.__docuForgeSyncStudioUpload === 'function') window.__docuForgeSyncStudioUpload();
 
   if(isDashboard){
     // Hard inline cleanup so no stale PDF editor element can occupy space.
@@ -7315,6 +7349,10 @@ $('dashboardAskTile')?.addEventListener('click', () => {
    box.style.display='none';return;
   }
   box.style.display='block';
+  if($('dropzone') && activeStudio !== 'pdf') $('dropzone').style.display='none';
+  if($('noPdfBanner') && activeStudio !== 'pdf') $('noPdfBanner').style.display='none';
+  if($('studioUploadName') && window.__docuForgeStudioFile) $('studioUploadName').textContent = '✓ ' + window.__docuForgeStudioFile.name;
+  if($('studioUploadView')) $('studioUploadView').disabled = !window.__docuForgeStudioFile;
   if($('studioUploadHint'))$('studioUploadHint').textContent=
    activeStudio==='pdf'?'Choose the PDF for this PDF Studio. It will be loaded automatically.':
    activeStudio==='ocr'?'Choose a PDF or image for OCR and image tools.':
@@ -7327,9 +7365,11 @@ $('dashboardAskTile')?.addEventListener('click', () => {
    activeStudio==='batch'?'Choose one or more files for batch processing.':
    'Choose the file required for this Studio.';
  }
+ window.__docuForgeSyncStudioUpload = sync;
  async function pass(file){
   if(!file)return;
   if($('studioUploadName'))$('studioUploadName').textContent=file.name;
+  if($('studioUploadView'))$('studioUploadView').disabled=false;
 
   // PDF Studio: the Studio upload card is the primary input. Load the file
   // directly instead of copying it into a hidden <input>. The old DataTransfer
@@ -7359,11 +7399,31 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   // operation that requested it. This fixes the iPhone flow where the old
   // code displayed the filename but had no pptxFileInput to receive it.
   if(activeStudio !== 'pdf'){
-    window.__docuForgeStudioFile = file;
     const next = pendingToolId;
+    // Store one file for normal single-file tools; retain all files for the
+    // image-to-PDF tool, which explicitly supports multiple images.
+    window.__docuForgeStudioFile = file;
+    if(next === 'btnImagesToPdf'){
+      const chosen = Array.from($('studioUploadInput')?.files || []);
+      if(chosen.length) window.__docuForgeStudioFiles = chosen;
+    } else {
+      window.__docuForgeStudioFiles = [file];
+    }
+    // PDF-required tools in OCR/other Studios must load the selected PDF into
+    // the common PDF engine before their existing processing code runs.
+    if(next && PDF_REQUIRED_IDS.includes(next) && (file.type==='application/pdf' || /\.pdf$/i.test(file.name))){
+      try{ await loadFiles([file]); }catch(e){ toast(e?.message || 'Could not open the selected PDF.', true); return; }
+    }
+    if(next && PDF_REQUIRED_IDS.includes(next) && !(file.type==='application/pdf' || /\.pdf$/i.test(file.name))){
+      if(next !== 'btnOcrImage' && next !== 'btnImageTable' && next !== 'btnQrReader'){
+        toast('This tool requires a PDF. Choose a PDF with the Upload File button above.', true);
+        return;
+      }
+    }
     pendingToolId = '';
     const box = $('studioUploadScreen');
-    if(box){ box.dataset.requested=''; box.style.display='none'; }
+    if(box){ box.dataset.requested=''; }
+    if($('studioUploadName')) $('studioUploadName').textContent = `✓ ${file.name}`;
     if(next){
       const btn = $(next);
       if(btn){
@@ -7405,7 +7465,10 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   document.addEventListener('click',function(e){
     const btn=e.target.closest('.tool-btn');
     if(!btn || workingBytes) return;
-    const needsFile = PDF_REQUIRED_IDS.includes(btn.id) ||
+    const SHARED_FILE_TOOL_IDS = new Set([
+      'btnOcrImage','btnOcrPdf','btnImageTable','btnImagesToPdf','btnQrReader'
+    ]);
+    const needsFile = PDF_REQUIRED_IDS.includes(btn.id) || SHARED_FILE_TOOL_IDS.has(btn.id) ||
       btn.dataset.requiresFile === 'true' ||
       btn.closest('.ribbon-panel[data-requires-file="true"]');
     if(!needsFile) return;
@@ -7418,6 +7481,31 @@ $('dashboardAskTile')?.addEventListener('click', () => {
     }
     const panel=btn.closest('.ribbon-panel');
     if(!panel || !panel.classList.contains('active')) return;
+
+    const shared = window.__docuForgeStudioFile;
+    const isImage = !!shared && String(shared.type||'').startsWith('image/');
+    const isPdf = !!shared && (shared.type==='application/pdf' || /\.pdf$/i.test(shared.name||''));
+    const imageTool = SHARED_FILE_TOOL_IDS.has(btn.id) && ['btnOcrImage','btnImageTable','btnImagesToPdf','btnQrReader'].includes(btn.id);
+
+    // If the user already chose a suitable file in the Studio upload card,
+    // do NOT show another picker. This was the source of the repeated
+    // "Drop PDFs or photos" / second file-window behaviour.
+    if(shared && ((imageTool && isImage) || (btn.id==='btnOcrPdf' && isPdf))){
+      return;
+    }
+    if(PDF_REQUIRED_IDS.includes(btn.id) && isPdf && !workingBytes){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      loadFiles([shared]).then(() => {
+        if(workingBytes){
+          btn.dataset.studioFileReady='1';
+          btn.click();
+        } else {
+          toast('Could not open the selected PDF.', true);
+        }
+      }).catch(err => toast(err?.message || 'Could not open the selected PDF.', true));
+      return;
+    }
     e.preventDefault();
     e.stopImmediatePropagation();
     requestFileForTool(btn.id);
@@ -7427,7 +7515,18 @@ $('dashboardAskTile')?.addEventListener('click', () => {
  function wire(){
   installToolFileGate();
   $('studioUploadChoose')?.addEventListener('click',()=>{
-   const i=$('studioUploadInput');if(i){i.accept=accept[activeStudio]||'*/*';i.multiple=['pdf','ocr'].includes(activeStudio);i.click();}
+   const i=$('studioUploadInput');if(i){i.accept = pendingToolId==='btnImagesToPdf' ? 'image/*' : (accept[activeStudio]||'*/*'); i.multiple = pendingToolId==='btnImagesToPdf'; i.click();}
+  });
+  $('studioUploadView')?.addEventListener('click',()=>{
+    const f=window.__docuForgeStudioFile;
+    if(!f){ toast('No file selected.', true); return; }
+    try{
+      const url=URL.createObjectURL(f);
+      const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener';
+      if(f.type==='application/pdf' || /\.pdf$/i.test(f.name||'')) a.download='';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),30000);
+    }catch(e){ toast('Could not open the selected file for viewing.', true); }
   });
   $('studioUploadInput')?.addEventListener('change',function(){Array.from(this.files||[]).forEach(pass);this.value='';});
   // Deliberately no MutationObserver here. The previous observer watched class/style
@@ -7459,12 +7558,12 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 })();
 </script>
 <script>
-/* v2026.08.23.86 — legacy duplicate common View File injector disabled.
+/* v2026.08.24.87 — legacy duplicate common View File injector disabled.
    The universal Studio file bar below is the single source for Choose File + View File. */
 </script>
 
 <script>
-/* DocuForge AI v2026.08.23.86 — stable universal file bar. */
+/* DocuForge AI v2026.08.24.87 — stable universal file bar. */
 (function(){
   const $=id=>document.getElementById(id);
   const FILE_STUDIOS=new Set(['pdf','ocr','translate','convert','powerpoint','excel','reader','security','batch']);
@@ -7514,7 +7613,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 .df84-filebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);width:100%;box-sizing:border-box}.df84-file-title{font-weight:800}.df84-file-name{font-size:12px;color:var(--ink-soft);flex:1;min-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media(max-width:720px){.df84-filebar{display:grid;grid-template-columns:1fr 1fr;gap:7px}.df84-file-title,.df84-file-name{grid-column:1/-1}.df84-filebar button{width:100%;min-height:46px}}
 </style>
 <script>
-/* v2026.08.23.86 — dashboard-only convenience shortcuts. */
+/* v2026.08.24.87 — dashboard-only convenience shortcuts. */
 (function(){
   function install(){
     const dash=document.getElementById('dashboardTiles');if(!dash||document.getElementById('df85QuickActions'))return;
@@ -7528,6 +7627,162 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 </script>
 <style>
 body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quick{margin:10px 20px 14px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}.df85-quick h2{margin:0 0 10px;font-size:20px}.df85-quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.df85-quick-grid button{min-height:52px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-weight:800;padding:7px;cursor:pointer}.df85-quick p{margin:9px 0 0;font-size:12px;color:var(--ink-soft)}@media(max-width:720px){.df85-quick{margin:8px 10px 12px}.df85-quick-grid{grid-template-columns:1fr 1fr}.df85-quick-grid button{min-height:58px;font-size:12px}}
+</style>
+
+<script>
+/* ================================================================
+   DocuForge AI v2026.08.24.88 — PDF insertion + in-app preview fix
+   1) View File never navigates away from the Studio.
+   2) Choosing another PDF/photo while a project is open asks exactly
+      where it should be inserted: before a page or at the end.
+   3) The universal PDF Choose File is therefore a real "Add PDF" flow,
+      not a second hidden Open/Merge flow.
+   ================================================================ */
+(function(){
+  const $ = id => document.getElementById(id);
+  function isPdf(f){ return !!f && (f.type==='application/pdf' || /\.pdf$/i.test(f.name||'')); }
+  function getWorking(){ try { return (typeof workingBytes!=='undefined' && workingBytes) ? workingBytes : null; } catch(_) { return null; } }
+  function showInsertChoice(file){
+    if(!file || typeof window.openModal!=='function') return false;
+    let total=0;
+    try { total = getWorking() ? 1 : 0; } catch(_) {}
+    try {
+      if(getWorking() && typeof PDFDocument!=='undefined'){
+        // getPageCount is async; the modal is opened immediately with a safe
+        // default, then the field is updated when the current page count is known.
+        PDFDocument.load(getWorking()).then(doc=>{
+          const n=doc.getPageCount();
+          const pos=document.getElementById('df88InsertPos');
+          if(pos){ pos.max=String(n+1); pos.value=String(n+1); }
+          const hint=document.getElementById('df88InsertHint');
+          if(hint) hint.textContent='Current document has '+n+' page'+(n===1?'':'s')+'. Enter 1 to insert before page 1, or '+(n+1)+' to add at the end.';
+        }).catch(()=>{});
+      }
+    } catch(_) {}
+    const html=`
+      <div class="field">
+        <label>File to add</label>
+        <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font-weight:700;word-break:break-word">📄 ${String(file.name||'Selected file').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}</div>
+      </div>
+      <div class="field">
+        <label>Where should it be added?</label>
+        <div class="radio-row" style="display:flex;gap:16px;flex-wrap:wrap">
+          <label><input type="radio" name="df88AddMode" value="end" checked> Add at end</label>
+          <label><input type="radio" name="df88AddMode" value="page"> Insert before a page</label>
+        </div>
+      </div>
+      <div class="field" id="df88PageField" style="display:none">
+        <label>Insert before page number</label>
+        <input type="number" id="df88InsertPos" min="1" value="1" inputmode="numeric" style="width:100%;box-sizing:border-box">
+        <p class="hint" id="df88InsertHint">Enter the page number before which the selected file should be inserted.</p>
+      </div>
+      <p class="hint">The selected PDF/photo will be added to the current project. Nothing will replace or delete your existing pages.</p>`;
+    window.openModal('Add PDF / Photo to current document', html, async ()=>{
+      const mode=document.querySelector('input[name="df88AddMode"]:checked')?.value||'end';
+      let pos;
+      if(mode==='end'){
+        try{ const doc=await PDFDocument.load(getWorking()); pos=doc.getPageCount(); }
+        catch(_){ pos=999999; }
+      }else{
+        const raw=parseInt(document.getElementById('df88InsertPos')?.value,10);
+        if(!Number.isFinite(raw)||raw<1){ toast('Enter a valid page number.',true); return; }
+        pos=raw-1;
+      }
+      await window.insertPdfAt(file,pos);
+    });
+    setTimeout(()=>{
+      document.querySelectorAll('input[name="df88AddMode"]').forEach(r=>r.addEventListener('change',()=>{
+        const pageMode=document.querySelector('input[name="df88AddMode"]:checked')?.value==='page';
+        const field=document.getElementById('df88PageField'); if(field) field.style.display=pageMode?'block':'none';
+      }));
+    },20);
+    return true;
+  }
+  function previewInApp(file, bytes, title){
+    try{
+      const blob=bytes ? new Blob([bytes],{type:'application/pdf'}) : file;
+      const url=URL.createObjectURL(blob);
+      const m=document.createElement('div');
+      m.className='modal-backdrop show';
+      m.style.zIndex='99999';
+      m.innerHTML='<div class="modal" style="width:min(96vw,1000px);height:90vh;max-width:1000px;display:flex;flex-direction:column;padding:0;overflow:hidden">'+
+        '<div class="modal-head"><h3>'+String(title||'View File').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))+'</h3><button type="button" class="icon-btn" aria-label="Close">×</button></div>'+
+        '<iframe title="Document preview" src="'+url+'" style="flex:1;width:100%;height:100%;border:0;background:#fff"></iframe></div>';
+      document.body.appendChild(m);
+      const close=()=>{ try{URL.revokeObjectURL(url);}catch(_){} m.remove(); };
+      m.querySelector('.icon-btn').onclick=close;
+      m.addEventListener('click',e=>{if(e.target===m)close();});
+      return true;
+    }catch(e){ toast('Could not open the file preview.',true); return false; }
+  }
+  function patchPdfAddButton(){
+    document.addEventListener('click',e=>{
+      const btn=e.target.closest('#btnOpen');
+      if(!btn || !getWorking()) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      const input=document.createElement('input'); input.type='file'; input.accept='.pdf,application/pdf,image/*'; input.multiple=true; input.hidden=true;
+      document.body.appendChild(input);
+      input.addEventListener('change',async()=>{
+        const files=Array.from(input.files||[]); input.remove(); if(!files.length) return;
+        for(const f of files){
+          if(!isPdf(f) && !(f.type||'').startsWith('image/')){toast('Choose PDF or image files only.',true);continue;}
+          showInsertChoice(f);
+          // One position choice per selected file keeps the flow predictable on iPhone.
+          // If multiple files were selected, the user can add each at the desired position.
+          break;
+        }
+      },{once:true});
+      input.click();
+    },true);
+  }
+  function patchUniversalFilePicker(){
+    // Locate the v87 universal file-bar's PDF picker and replace its change
+    // behaviour without creating another file input.
+    const scriptText=[...document.scripts].find(x=>x.textContent.includes('DocuForge AI v2026.08.24.87 — stable universal file bar.'));
+    // We cannot alter a closed-over handler, so use capture on the actual
+    // dynamically-created .df84-choose button and prevent the old click.
+    document.addEventListener('click',e=>{
+      const btn=e.target.closest('.df84-filebar .df84-choose');
+      if(!btn) return;
+      const bar=btn.closest('.df84-filebar');
+      const panel=btn.closest('.ribbon-panel[data-studio-panel]');
+      const studio=panel?.dataset.studioPanel;
+      if(studio!=='pdf') return;
+      // Existing project: the PDF picker should be an Add/Insert operation.
+      if(getWorking() && typeof window.openModal==='function'){
+        e.preventDefault(); e.stopImmediatePropagation();
+        const input=document.createElement('input'); input.type='file'; input.accept='.pdf,application/pdf,image/*'; input.hidden=true;
+        document.body.appendChild(input);
+        input.addEventListener('change',async()=>{
+          const f=input.files?.[0]; input.remove(); if(!f) return;
+          if(!isPdf(f) && !(f.type||'').startsWith('image/')){toast('Choose a PDF or image.',true);return;}
+          showInsertChoice(f);
+        },{once:true});
+        input.click();
+      }
+    },true);
+  }
+  function patchViewButtons(){
+    // Override the universal View File button at capture phase so it never
+    // uses window.open/new navigation on iPhone.
+    document.addEventListener('click',e=>{
+      const btn=e.target.closest('.df84-filebar .df84-view, #studioUploadView');
+      if(!btn || btn.disabled) return;
+      const f=window.__docuForgeStudioFile;
+      if(f && isPdf(f)){
+        e.preventDefault(); e.stopImmediatePropagation();
+        if(getWorking()) previewInApp(f,getWorking(),'View current PDF');
+        else f.arrayBuffer().then(buf=>previewInApp(f,buf,'View '+f.name)).catch(()=>toast('Could not open the PDF preview.',true));
+      }
+    },true);
+  }
+  function init(){ patchPdfAddButton(); patchUniversalFilePicker(); patchViewButtons(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
+})();
+</script>
+<style>
+/* v88: make the add/insert workflow unmistakable on small screens. */
+#df88PageField input{font-size:18px;min-height:46px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink)}
 </style>
 </body>
 </html>
