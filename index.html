@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta name="application-ver
-sion" content="2026.08.24.88">
+sion" content="2026.08.24.89">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -1156,6 +1156,20 @@ function openGstInvoiceApp(){
       <strong>Main menu:</strong> Tap any category to open its <strong>Studio submenu</strong>. Use <strong>Help</strong> for guidance or <strong>Ask me</strong> for questions.
       Then choose the required tool. No document is selected until a tool asks for one.
     </div><div id="dashboardUploadStatus" class="hint" style="display:none;margin:0 14px 12px;text-align:center;"></div>
+
+<div id="df89QuickActions" aria-label="Quick actions" style="
+  display:flex;gap:8px;flex-wrap:wrap;margin:0 14px 12px;
+  position:relative;z-index:1300;">
+  <button class="btn ghost" id="df89DashboardBtn" type="button" style="min-height:44px;flex:1 1 150px;">
+    🏠 Current Dashboard
+  </button>
+  <button class="btn ghost" id="df89MailBtn" type="button" style="min-height:44px;flex:1 1 110px;">
+    ✉️ Mail
+  </button>
+  <button class="btn primary" id="df89ShareBtn" type="button" style="min-height:44px;flex:1 1 110px;">
+    📤 Share
+  </button>
+</div>
 <div id="dashboardTiles" class="dashboard-grid dashboard-main-menu" style="display:grid">
       <button class="dash-tile main-menu-tile" id="dashboardAskTile" type="button">
         <span class="dt-icon">💬</span><span>Ask Me</span><small>Ask questions about any tool</small><strong>Ask now →</strong>
@@ -6664,6 +6678,18 @@ if(backToMainMenuBtn){
   });
 }
 
+
+/* v89: delegated navigation safety net for mobile taps. */
+document.addEventListener('click', (e)=>{
+  const back = e.target.closest('#backToMainMenu');
+  if(!back) return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  setStudio('dashboard');
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(typeof setStatus === 'function') setStatus('Current Dashboard.');
+}, true);
+
 /* ---------- Dashboard category shortcuts ---------- */
 const DASHBOARD_TILE_STUDIOS = {
   btnSplit: 'pdf',
@@ -6779,6 +6805,205 @@ function computeStats(data){
   return { n, sum, avg, min, max };
 }
 
+
+function df89Esc(value){
+  return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function df89Num(v){
+  if(typeof v === 'number' && Number.isFinite(v)) return v;
+  const n = parseFloat(String(v ?? '').replace(/,/g,'').replace(/%/g,''));
+  return Number.isFinite(n) ? n : null;
+}
+function df89Fmt(v){
+  if(v === null || v === undefined || !Number.isFinite(Number(v))) return '—';
+  const n = Number(v);
+  return Math.abs(n) >= 1000000 ? n.toLocaleString(undefined,{maximumFractionDigits:2})
+       : n.toLocaleString(undefined,{maximumFractionDigits:2});
+}
+function df89Pct(delta, base){
+  if(base === null || base === undefined || !Number.isFinite(base) || base === 0) return null;
+  return (delta / base) * 100;
+}
+function df89ExplainVariation(labels, data, index, yLabel, rows, xIdx, yIdx){
+  const current = Number(data[index]);
+  const currentLabel = labels[index];
+  const previousIndex = index > 0 ? index - 1 : null;
+  const previous = previousIndex === null ? null : Number(data[previousIndex]);
+  const delta = previous === null ? null : current - previous;
+  const pct = previous === null ? null : df89Pct(delta, previous);
+
+  let html = `
+    <div class="df89-chart-detail" role="status" aria-live="polite">
+      <div style="font-size:12px;color:var(--ink-soft);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.4px;">
+        Selected parameter
+      </div>
+      <strong style="font-size:16px;">${df89Esc(currentLabel)}</strong>
+      <div style="margin-top:3px;color:var(--ink-soft);">${df89Esc(yLabel)}</div>
+      <div class="df89-kpi-row">
+        <div class="df89-kpi"><span>Current</span><strong>${df89Fmt(current)}</strong></div>
+        <div class="df89-kpi"><span>Previous</span><strong>${previous === null ? '—' : df89Fmt(previous)}</strong></div>
+        <div class="df89-kpi"><span>Change</span><strong>${delta === null ? '—' : (delta > 0 ? '+' : '') + df89Fmt(delta) + (pct === null ? '' : ` (${pct > 0 ? '+' : ''}${pct.toFixed(1)}%)`)}</strong></div>
+      </div>
+  `;
+
+  if(previous === null){
+    html += `<div><strong>Comparison:</strong> This is the first data point, so there is no previous period/category to compare with.</div>`;
+  }else{
+    const direction = delta > 0 ? 'increased' : delta < 0 ? 'decreased' : 'remained unchanged';
+    html += `<div><strong>Variation:</strong> ${df89Esc(yLabel)} ${direction} from ${df89Fmt(previous)} to ${df89Fmt(current)}.</div>`;
+  }
+
+  // If source rows contain other numeric columns, identify the largest movements
+  // as supporting drivers. This is data-derived, not a fabricated narrative.
+  const drivers = [];
+  if(Array.isArray(rows) && rows.length > 2 && Number.isInteger(yIdx)){
+    const headers = rows[0] || [];
+    const prevRow = previousIndex === null ? null : rows[previousIndex + 1];
+    const curRow = rows[index + 1];
+    if(prevRow && curRow){
+      for(let c=0;c<headers.length;c++){
+        if(c === xIdx || c === yIdx) continue;
+        const a = df89Num(prevRow[c]), b = df89Num(curRow[c]);
+        if(a === null || b === null || a === b) continue;
+        const d = b - a;
+        const p = df89Pct(d, a);
+        drivers.push({name:String(headers[c] ?? `Column ${c+1}`), a, b, d, p});
+      }
+      drivers.sort((a,b) => Math.abs(b.p ?? b.d) - Math.abs(a.p ?? a.d));
+    }
+  }
+  if(drivers.length){
+    html += `<div style="margin-top:10px;"><strong>Largest related movements:</strong></div>`;
+    drivers.slice(0,3).forEach(d => {
+      const dir = d.d > 0 ? '↑' : '↓';
+      html += `<div class="df89-driver"><strong>${dir} ${df89Esc(d.name)}</strong>: ${df89Fmt(d.a)} → ${df89Fmt(d.b)}`
+            + `${d.p === null ? '' : ` (${d.p > 0 ? '+' : ''}${d.p.toFixed(1)}%)`}</div>`;
+    });
+  }else{
+    html += `<div style="margin-top:10px;color:var(--ink-soft);"><strong>Reason for variation:</strong> The source data does not contain another comparable numeric driver, so the explanation is limited to the selected parameter's movement.</div>`;
+  }
+  html += `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+        <button class="btn ghost" id="df89MailChart" type="button">✉️ Mail summary</button>
+        <button class="btn ghost" id="df89ShareChart" type="button">📤 Share summary</button>
+      </div>
+    </div>`;
+  return html;
+}
+
+function df89BuildChartSummary(labels, data, index, yLabel, rows, xIdx, yIdx){
+  const current = Number(data[index]);
+  const previous = index > 0 ? Number(data[index-1]) : null;
+  const delta = previous === null ? null : current - previous;
+  const pct = previous === null ? null : df89Pct(delta, previous);
+  let summary = `${yLabel}: ${labels[index]} — current ${df89Fmt(current)}.`;
+  if(previous !== null){
+    summary += ` Previous ${df89Fmt(previous)}; change ${delta > 0 ? '+' : ''}${df89Fmt(delta)}`
+             + `${pct === null ? '' : ` (${pct > 0 ? '+' : ''}${pct.toFixed(1)}%)`}.`;
+  }else{
+    summary += ` No previous data point is available for comparison.`;
+  }
+  return summary;
+}
+
+function showChartResult(labels, data, type, yLabel, rows=[], xIdx=null, yIdx=null){
+  openModal('Chart result', `
+    <div style="background:var(--surface);padding:10px;border:1px solid var(--line);border-radius:10px;position:relative;height:320px;">
+      <canvas id="df89ChartCanvas" aria-label="Interactive chart"></canvas>
+    </div>
+    <p class="hint" style="margin:9px 0 0;">Tap any bar, point or segment to see comparative figures and a data-based reason for the variation.</p>
+    <div id="df89ChartDetail" style="display:none;"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+      <button class="btn ghost" id="df89ChartPng" type="button">Download chart as PNG</button>
+    </div>
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+
+  setTimeout(async () => {
+    try{
+      await loadLib('chartjs');
+      if(Chart.registerables){ try{ Chart.register(...Chart.registerables); }catch(e){} }
+      const canvas = document.getElementById('df89ChartCanvas');
+      if(!canvas) return;
+      const existing = Chart.getChart ? Chart.getChart(canvas) : null;
+      if(existing) existing.destroy();
+
+      const palette = ['#B65C1F','#113B34','#6B7280','#7C3AED','#0F766E','#A16207'];
+      const isPie = ['pie','doughnut','polarArea'].includes(type);
+      const chart = new Chart(canvas.getContext('2d'), {
+        type: type === 'hbar' ? 'bar' : type,
+        data: {
+          labels,
+          datasets: [{
+            label: yLabel,
+            data,
+            backgroundColor: isPie ? labels.map((_,i)=>palette[i % palette.length]) : '#B65C1F',
+            borderColor: '#113B34',
+            borderWidth: 1,
+            tension: .25,
+            pointRadius: 5,
+            pointHoverRadius: 7
+          }]
+        },
+        options: {
+          responsive:true,
+          maintainAspectRatio:false,
+          indexAxis: type === 'hbar' ? 'y' : 'x',
+          plugins:{
+            legend:{display:isPie},
+            tooltip:{enabled:true}
+          },
+          interaction:{mode:'nearest', intersect:true},
+          onClick:(evt,elements)=>{
+            if(!elements || !elements.length) return;
+            const idx = elements[0].index;
+            const detail = document.getElementById('df89ChartDetail');
+            if(!detail) return;
+            detail.style.display='block';
+            detail.innerHTML = df89ExplainVariation(labels,data,idx,yLabel,rows,xIdx,yIdx);
+
+            const mailBtn = document.getElementById('df89MailChart');
+            const shareBtn = document.getElementById('df89ShareChart');
+            const summary = df89BuildChartSummary(labels,data,idx,yLabel,rows,xIdx,yIdx);
+
+            mailBtn?.addEventListener('click', ()=>{
+              const subject = encodeURIComponent(`DocuForge chart summary — ${labels[idx]}`);
+              const body = encodeURIComponent(summary);
+              window.location.href = `mailto:?subject=${subject}&body=${body}`;
+            });
+
+            shareBtn?.addEventListener('click', async ()=>{
+              try{
+                if(navigator.share){
+                  await navigator.share({title:`${yLabel} — ${labels[idx]}`, text:summary});
+                }else{
+                  const subject = encodeURIComponent(`DocuForge chart summary — ${labels[idx]}`);
+                  const body = encodeURIComponent(summary);
+                  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+                }
+              }catch(e){
+                if(e && e.name === 'AbortError') return;
+                toast('Could not open the share options. Try again.', true);
+              }
+            });
+          }
+        }
+      });
+
+      document.getElementById('df89ChartPng')?.addEventListener('click', ()=>{
+        try{
+          downloadBlob(dataUrlToBlob(canvas.toDataURL('image/png')), 'chart.png');
+        }catch(e){ toast('Could not export the chart image.', true); }
+      });
+    }catch(e){
+      console.error(e);
+      toast('Could not render the chart: ' + (e?.message || 'unknown error'), true);
+    }
+  },0);
+}
+
 $('btnExcelChart').addEventListener('click', () => {
   openModal('Excel / CSV → Chart', `
     <div class="field"><label>Spreadsheet file</label><input type="file" id="chartFile" accept=".xlsx,.xls,.csv"></div>
@@ -6817,7 +7042,7 @@ $('btnExcelChart').addEventListener('click', () => {
       toast(`This chart type doesn\u2019t work with ${labels.length} categories — showing as a bar chart instead.`, false);
       type = 'bar';
     }
-    showChartResult(labels, data, type, String(rows[0][yIdx] ?? 'Value'));
+    showChartResult(labels, data, type, String(rows[0][yIdx] ?? 'Value'), rows, xIdx, yIdx);
   });
   setTimeout(() => {
     document.getElementById('chartFile').addEventListener('change', async (e) => {
@@ -7316,6 +7541,45 @@ $('pageActionStrip').style.display='none';
 $('dropzone').style.display='none';
 $('noPdfBanner').style.display='none';
 
+
+
+/* v89: reliable Dashboard / Mail / Share quick actions. */
+(function wireV89QuickActions(){
+  const dash = document.getElementById('df89DashboardBtn');
+  const mail = document.getElementById('df89MailBtn');
+  const share = document.getElementById('df89ShareBtn');
+
+  dash?.addEventListener('click', (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    setStudio('dashboard');
+    window.scrollTo({top:0, behavior:'smooth'});
+    if(typeof setStatus === 'function') setStatus('Current Dashboard.');
+  });
+
+  mail?.addEventListener('click', (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    const subject = encodeURIComponent('DocuForge AI');
+    const body = encodeURIComponent('Sent from DocuForge AI.');
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  });
+
+  share?.addEventListener('click', async (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    try{
+      const shareText = 'DocuForge AI — document and PDF toolkit';
+      if(navigator.share){
+        await navigator.share({title:'DocuForge AI', text:shareText});
+      }else{
+        const subject = encodeURIComponent('DocuForge AI');
+        const body = encodeURIComponent(shareText);
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+      }
+    }catch(err){
+      if(err && err.name === 'AbortError') return;
+      toast('Could not open the share options. Try again.', true);
+    }
+  });
+})();
 
 $('dashboardHelpTile')?.addEventListener('click', () => $('topHelpMenu')?.click());
 $('dashboardAskTile')?.addEventListener('click', () => $('topAskMeMenu')?.click());
