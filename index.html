@@ -709,6 +709,10 @@ body:not(.dashboard-active) #backToMainMenu{display:block;}
 body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #dropzone{display:none !important;}
 body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{display:none !important;}
 </style>
+<style id="docuforge-v96-financial-analysis">
+#btnPdfFinancialAnalysis{font-weight:800;}
+@media(max-width:720px){#btnPdfFinancialAnalysis{min-height:56px;white-space:normal;line-height:1.25;}}
+</style>
 </head>
 <body>
 <script>
@@ -731,7 +735,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '2026.08.26.95';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.26.96';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -742,7 +746,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.95</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.96</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -899,6 +903,8 @@ window.DFStorage = (function(){
       <strong>Two-way conversion:</strong> PDF → Word/Excel/CSV/Text/HTML/JSON/XML and more, and <strong>Word, Excel, PowerPoint, HTML, CSV, TXT and Markdown → PDF</strong>.
     </div>
 <div class="tool-group">
+<button class="tool-btn primary-tool" id="btnPdfFinancialAnalysis" data-requires-file="true">📊 PDF → Financial Analysis Excel (Year-wise)</button>
+<p class="hint" style="margin:4px 14px 10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);">Creates a year-wise financial model: one row per financial year, with financial heads as columns, period-end date, calculated Current Assets/Liabilities, Total Debt/Equity, Current Ratio, Debt-equity and Net Working Capital.</p>
 <button class="tool-btn" id="btnPdfToWord"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M8 13h8M8 17h8"></path></svg> PDF → Word (.docx)</button>
 <button class="tool-btn" id="btnPdfToExcel"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16"></path></svg> PDF → Excel (.xlsx)</button>
 <button class="tool-btn" id="btnPdfToCsv"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16M15 4v16"></path></svg> PDF → CSV</button>
@@ -4961,6 +4967,145 @@ $('btnPdfToCsv').addEventListener('click', async () => {
     setStatus('Exported CSV.');
   } finally { showProgress(null); }
 });
+
+
+/* ---------- PDF → Financial Analysis Excel (year-wise / transposed) ----------
+   Creates the structured format used for financial/CMA analysis: one row per
+   fiscal year and one financial head per column. It intentionally reuses the
+   already validated table extraction above, so the normal PDF → Excel mapping
+   remains the source of truth. */
+function financialAnalysisYearEnd(fy){
+  const m=String(fy||'').match(/FY\s*(\d{4})\s*[-–]\s*(\d{2,4})/i);
+  if(!m) return '';
+  const start=Number(m[1]);
+  const end2=m[2].length===2 ? Number(String(start).slice(0,2)+m[2]) : Number(m[2]);
+  return `${end2}-03-31`;
+}
+function financialAnalysisNum(v){
+  if(typeof v==='number') return v;
+  const n=normaliseCellNumber(v);
+  return (typeof n==='number' && Number.isFinite(n)) ? n : (String(v??'').trim()==='' ? '' : v);
+}
+function financialAnalysisTableMap(sheets){
+  const map={};
+  for(const sh of sheets||[]){
+    const rows=sh.rows||[];
+    if(!rows.length) continue;
+    const header=rows[0]||[];
+    const years=header.slice(1).filter(x=>/^FY\s*\d{4}\s*[-–]\s*\d{2,4}$/i.test(String(x||'')));
+    const rowMap={};
+    for(const r of rows.slice(1)){
+      const label=String(r?.[0]??'').trim();
+      if(!label) continue;
+      rowMap[label]=r.slice(1).map(financialAnalysisNum);
+    }
+    map[sh.name]={years,rowMap};
+  }
+  return map;
+}
+function financialAnalysisValue(map, label, yearIndex, aliases=[]){
+  const candidates=[label,...aliases];
+  for(const c of candidates){
+    for(const sh of Object.values(map)){
+      const arr=sh.rowMap?.[c];
+      if(arr && arr[yearIndex]!==undefined && arr[yearIndex]!=='' ) return arr[yearIndex];
+    }
+  }
+  return '';
+}
+async function buildFinancialAnalysisWorkbook(){
+  const {sheets,hasText}=await collectPdfWorkbookTables();
+  if(!hasText) throw new Error('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.');
+  const map=financialAnalysisTableMap(sheets);
+  const yearCandidates=[];
+  for(const sh of Object.values(map)) for(const y of sh.years||[]) if(!yearCandidates.includes(y)) yearCandidates.push(y);
+  if(!yearCandidates.length) throw new Error('Could not identify financial-year columns in this PDF.');
+  yearCandidates.sort((a,b)=>Number(String(b).match(/\d{4}/)?.[0]||0)-Number(String(a).match(/\d{4}/)?.[0]||0));
+
+  const headers=[
+    'Fiscal Year','Period End Date','Revenue from operations','Other income','Total income',
+    'Cost of materials consumed','Purchases of stock-in-trade','Changes in inventories',
+    'Employee benefits expense','Finance costs','Depreciation and amortisation','Other expenses',
+    'Total expenses','Profit before tax','Tax expense','Profit after tax','Share capital',
+    'Reserves and surplus','Non-current borrowings','Current borrowings','Trade payables',
+    'Other current liabilities','Total equity and liabilities','Property, plant and equipment',
+    'Non-current investments','Inventories','Trade receivables','Cash and cash equivalents',
+    'Other current assets','Total assets','Net cash from operating activities',
+    'Net cash used in investing activities','Net cash used in financing activities',
+    'Net increase in cash','Closing cash and cash equivalents','Current Assets','Current Liabilities',
+    'Total Debt','Total Equity','Current ratio (x)','Debt-equity ratio (x)','Net working capital'
+  ];
+  const rows=[headers];
+  const col={}; headers.forEach((h,i)=>col[h]=i+1); // Excel column numbers, 1-based
+  for(const fy of yearCandidates){
+    const yi=Object.values(map).find(sh=>(sh.years||[]).includes(fy))?.years.indexOf(fy) ?? 0;
+    const r=Array(headers.length).fill('');
+    r[0]=fy; r[1]=financialAnalysisYearEnd(fy);
+    const sourceLabels=headers.slice(2,35);
+    sourceLabels.forEach((label,j)=>{ r[j+2]=financialAnalysisValue(map,label,yi); });
+    rows.push(r);
+  }
+  // Formula-derived analysis columns. Formulas reference the row's own source values.
+  for(let ri=2;ri<=rows.length;ri++){
+    const c=(n)=>XLSX.utils.encode_col(n-1)+(ri);
+    const r=rows[ri-1];
+    r[col['Current Assets']-1]=`=${c(col['Inventories'])}+${c(col['Trade receivables'])}+${c(col['Cash and cash equivalents'])}+${c(col['Other current assets'])}`;
+    r[col['Current Liabilities']-1]=`=${c(col['Current borrowings'])}+${c(col['Trade payables'])}+${c(col['Other current liabilities'])}`;
+    r[col['Total Debt']-1]=`=${c(col['Non-current borrowings'])}+${c(col['Current borrowings'])}`;
+    r[col['Total Equity']-1]=`=${c(col['Share capital'])}+${c(col['Reserves and surplus'])}`;
+    r[col['Current ratio (x)']-1]=`=IFERROR(${c(col['Current Assets'])}/${c(col['Current Liabilities'])},0)`;
+    r[col['Debt-equity ratio (x)']-1]=`=IFERROR(${c(col['Total Debt'])}/${c(col['Total Equity'])},0)`;
+    r[col['Net working capital']-1]=`=${c(col['Current Assets'])}-${c(col['Current Liabilities'])}`;
+  }
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!freeze']={xSplit:2,ySplit:1};
+  ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:rows.length-1,c:headers.length-1}})};
+  ws['!cols']=headers.map((h,i)=>({wch:i<2?18:(h.length>30?28:20)}));
+  for(let c=0;c<headers.length;c++){
+    const addr=XLSX.utils.encode_cell({r:0,c});
+    if(ws[addr]) ws[addr].s={font:{bold:true},fill:{fgColor:{rgb:'D9EAF7'}},alignment:{wrapText:true,vertical:'center'}};
+  }
+  for(let r=1;r<rows.length;r++){
+    const dateAddr=XLSX.utils.encode_cell({r,c:1});
+    if(ws[dateAddr]) ws[dateAddr].t='s';
+    for(let c=2;c<headers.length;c++){
+      const cell=ws[XLSX.utils.encode_cell({r,c})];
+      if(cell && typeof cell.v==='number') cell.z='#,##0.00;[Red]-#,##0.00';
+    }
+    const ratioCols=['Current ratio (x)','Debt-equity ratio (x)'];
+    for(const label of ratioCols){ const c=col[label]-1; const cell=ws[XLSX.utils.encode_cell({r,c})]; if(cell) cell.z='0.00'; }
+  }
+  XLSX.utils.book_append_sheet(wb,ws,'Financials by Year');
+  const noteRows=[
+    ['Data source and methodology notes'],[''],
+    ['Source: financial tables extracted from the selected PDF. This workbook restructures the statements into one row per financial year for analysis.'],
+    ['Period End Date assumes the standard 31 March Indian fiscal year-end from the FY label.'],
+    ['Current Assets, Current Liabilities, Total Debt, Total Equity, Current Ratio, Debt-equity Ratio and Net Working Capital are Excel formulas derived from the underlying extracted figures.']
+  ];
+  const notes=XLSX.utils.aoa_to_sheet(noteRows); notes['!cols']=[{wch:120}];
+  if(notes.A1) notes.A1.s={font:{bold:true}};
+  XLSX.utils.book_append_sheet(wb,notes,'Notes');
+  return wb;
+}
+$('btnPdfFinancialAnalysis')?.addEventListener('click', async()=>{
+  setStatus('Building year-wise Financial Analysis Excel…'); showProgress(20);
+  try{
+    await loadLib('xlsx');
+    const wb=await buildFinancialAnalysisWorkbook();
+    const out=XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true,bookSST:false});
+    const base=($('outName').value||'document').replace(/\.[^.]+$/,'');
+    conversionOutput(new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),base+'_Financial_Analysis.xlsx','PDF → Financial Analysis Excel');
+    setStatus(`Created year-wise Financial Analysis workbook with ${Math.max(0,wb.Sheets['Financials by Year']?.['!ref']?yearCandidatesCount(wb):0)} financial year row(s).`);
+    logConversion('PDF → Financial Analysis Excel',base+'_Financial_Analysis');
+  }catch(e){ console.error(e); toast('Financial Analysis Excel failed: '+(e?.message||'unknown error'),true); }
+  finally{ showProgress(null); }
+});
+function yearCandidatesCount(wb){
+  const ws=wb.Sheets['Financials by Year'];
+  if(!ws?.['!ref']) return 0;
+  const r=XLSX.utils.decode_range(ws['!ref']); return Math.max(0,r.e.r);
+}
 
 $('btnPdfToExcel').addEventListener('click', async () => {
   setStatus('Detecting PDF tables and building Excel workbook…'); showProgress(20);
