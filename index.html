@@ -731,7 +731,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '2026.08.26.93';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.26.94';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -742,7 +742,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.93</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.94</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -2363,43 +2363,42 @@ function inferNumericColumnStarts(lines, headerIndex, expectedCount){
   return starts.map(c=>c.x);
 }
 function inferPdfTableColumns(lines){
-  const header=lines.find(l=>/\bParticulars\b/i.test(lineToText(l)) || /^\s*KPI\b/i.test(lineToText(l)));
-  if(!header) return null;
+  const headerIndex = lines.findIndex(l=>/\bParticulars\b/i.test(lineToText(l)) || /^\s*KPI\b/i.test(lineToText(l)));
+  if(headerIndex<0) return null;
+  const header=lines[headerIndex];
   const text=lineToText(header);
   const isRatio=/^\s*KPI\b/i.test(text);
   const toks=header.items;
   if(isRatio){
-    const anchors=[
-      toks.find(it=>/^KPI$/i.test(it.str))?.x ?? 136,
-      toks.find(it=>it.str==='2025-26')?.x ?? 407,
-      toks.find(it=>it.str==='2024-25')?.x ?? 517,
-      toks.find(it=>/^Unit$/i.test(it.str))?.x ?? 627
-    ];
-    return {anchors, headerIndex:lines.indexOf(header), isRatio};
+    const numeric=inferNumericColumnStarts(lines, headerIndex, 2);
+    const unit=toks.find(it=>/^Unit$/i.test(it.str));
+    const kpi=toks.find(it=>/^KPI$/i.test(it.str));
+    const y1=numeric[0] ?? 482;
+    const y2=numeric[1] ?? 592;
+    const unitX=unit?.x ?? 679;
+    return {
+      headerIndex, isRatio,
+      headerLabels:['KPI','FY 2025-26','FY 2024-25','Unit'],
+      dataAnchors:[kpi?.x ?? 136,y1,y2,unitX]
+    };
   }
-  const particular=toks.find(it=>/^Particulars$/i.test(it.str))?.x ?? 122;
-  const numeric=inferNumericColumnStarts(lines, lines.indexOf(header), 2);
-  const y1=numeric[0] ?? (toks.find(it=>it.str==='2025-26')?.x ?? 512);
-  const y2=numeric[1] ?? (toks.find(it=>it.str==='2024-25')?.x ?? 622);
-  return {anchors:[particular,y1,y2], headerIndex:lines.indexOf(header), isRatio};
+  const numeric=inferNumericColumnStarts(lines, headerIndex, 2);
+  const particular=toks.find(it=>/^Particulars$/i.test(it.str));
+  const y1=numeric[0] ?? 583;
+  const y2=numeric[1] ?? 693;
+  return {
+    headerIndex, isRatio:false,
+    headerLabels:['Particulars','FY 2025-26','FY 2024-25'],
+    dataAnchors:[particular?.x ?? 122,y1,y2]
+  };
 }
 function itemsToAnchoredCells(items, anchors){
   const cells=Array.from({length:anchors.length},()=>[]);
   for(const it of items){
     let idx=0;
-    if(anchors.length===3){
-      // Three-column financial tables: Particulars | FY 2025-26 | FY 2024-25.
-      // The old logic used the midpoint between the *last two* anchors as
-      // the first boundary, which incorrectly put both year values into the
-      // FY 2024-25 cell. Use the normal adjacent-anchor boundaries instead.
-      const m01=(anchors[0]+anchors[1])/2;
-      const m12=(anchors[1]+anchors[2])/2;
-      idx = it.x < m01 ? 0 : (it.x < m12 ? 1 : 2);
-    }else{
-      const mids=anchors.slice(0,-1).map((a,i)=>(a+anchors[i+1])/2);
-      idx=it.x<mids[0]?0:it.x<mids[1]?1:it.x<mids[2]?2:3;
-    }
-    cells[idx].push(it);
+    const mids=anchors.slice(0,-1).map((a,i)=>(a+anchors[i+1])/2);
+    while(idx<mids.length && it.x>=mids[idx]) idx++;
+    cells[Math.min(idx,anchors.length-1)].push(it);
   }
   return cells.map((arr,idx)=>{
     if(!arr.length) return '';
@@ -2427,12 +2426,12 @@ async function collectPdfWorkbookTables(){
     }
     const rows=[];
     // Preserve the real table header, then only table rows below it.
-    const headerCells=itemsToAnchoredCells(lines[inferred.headerIndex].items,inferred.anchors);
+    const headerCells=inferred.headerLabels.slice();
     rows.push(headerCells);
     for(let i=inferred.headerIndex+1;i<lines.length;i++){
       const line=lines[i];
       if(!line.items.length) continue;
-      const cells=itemsToAnchoredCells(line.items,inferred.anchors);
+      const cells=itemsToAnchoredCells(line.items,inferred.dataAnchors);
       if(cells.some(c=>String(c??'').trim()!=='')) rows.push(cells);
     }
     sheets.push({name:pageTitleFromLines(lines,pi),rows});
