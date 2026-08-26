@@ -746,7 +746,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.98</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.99</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -4982,11 +4982,10 @@ $('btnPdfToCsv').addEventListener('click', async () => {
 });
 
 
-/* ---------- PDF → Financial Analysis Excel (year-wise / transposed) ----------
-   Creates the structured format used for financial/CMA analysis: one row per
-   fiscal year and one financial head per column. It intentionally reuses the
-   already validated table extraction above, so the normal PDF → Excel mapping
-   remains the source of truth. */
+/* ---------- PDF → Financial Analysis Excel (year-wise / credit-analysis) ----------
+   Version 99: creates a practical year-wise financial-analysis workbook while
+   keeping extracted/source figures separate from calculated analysis. No figure
+   is invented when the source PDF does not contain the required head. */
 function financialAnalysisYearEnd(fy){
   const m=String(fy||'').match(/FY\s*(\d{4})\s*[-–]\s*(\d{2,4})/i);
   if(!m) return '';
@@ -5002,38 +5001,58 @@ function financialAnalysisNum(v){
 function financialAnalysisTableMap(sheets){
   const map={};
   for(const sh of sheets||[]){
-    const rows=sh.rows||[];
-    if(!rows.length) continue;
+    const rows=sh.rows||[]; if(!rows.length) continue;
     const header=rows[0]||[];
-    const years=header.slice(1).filter(x=>/^FY\s*\d{4}\s*[-–]\s*\d{2,4}$/i.test(String(x||'')));
+    const years=header.slice(1).map(x=>String(x??'').trim()).filter(x=>/^FY\s*\d{4}\s*[-–]\s*\d{2,4}$/i.test(x));
     const rowMap={};
     for(const r of rows.slice(1)){
-      const label=String(r?.[0]??'').trim();
-      if(!label) continue;
+      const label=String(r?.[0]??'').trim(); if(!label) continue;
       rowMap[label]=r.slice(1).map(financialAnalysisNum);
     }
-    map[sh.name]={years,rowMap};
+    map[sh.name]={years,rowMap,rows};
   }
   return map;
 }
-function financialAnalysisValue(map, label, yearIndex, aliases=[]){
+function financialAnalysisValue(map,label,yearIndex,aliases=[]){
   const candidates=[label,...aliases];
   for(const c of candidates){
     for(const sh of Object.values(map)){
       const arr=sh.rowMap?.[c];
-      if(arr && arr[yearIndex]!==undefined && arr[yearIndex]!=='' ) return arr[yearIndex];
+      if(arr && arr[yearIndex]!==undefined && arr[yearIndex]!=='') return arr[yearIndex];
     }
   }
   return '';
+}
+function financialAnalysisFindYears(map){
+  const out=[];
+  for(const sh of Object.values(map)) for(const y of sh.years||[]) if(!out.includes(y)) out.push(y);
+  return out.sort((a,b)=>Number(String(b).match(/\d{4}/)?.[0]||0)-Number(String(a).match(/\d{4}/)?.[0]||0));
+}
+function faFormulaSheet(wb,name,rows,widths){
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!freeze']={xSplit:1,ySplit:1};
+  ws['!cols']=widths.map(w=>({wch:w}));
+  if(rows.length && rows[0]){
+    for(let c=0;c<rows[0].length;c++){
+      const cell=ws[XLSX.utils.encode_cell({r:0,c})];
+      if(cell) cell.s={font:{bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:'0D2A25'}},alignment:{wrapText:true,vertical:'center'}};
+    }
+  }
+  XLSX.utils.book_append_sheet(wb,ws,name);
+  return ws;
+}
+function faNumFmt(ws,rows,fromRow=1){
+  for(let r=fromRow;r<rows.length;r++) for(let c=0;c<rows[r].length;c++){
+    const cell=ws[XLSX.utils.encode_cell({r,c})];
+    if(cell && typeof cell.v==='number') cell.z='#,##0.00;[Red]-#,##0.00';
+  }
 }
 async function buildFinancialAnalysisWorkbook(){
   const {sheets,hasText}=await collectPdfWorkbookTables();
   if(!hasText) throw new Error('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.');
   const map=financialAnalysisTableMap(sheets);
-  const yearCandidates=[];
-  for(const sh of Object.values(map)) for(const y of sh.years||[]) if(!yearCandidates.includes(y)) yearCandidates.push(y);
-  if(!yearCandidates.length) throw new Error('Could not identify financial-year columns in this PDF.');
-  yearCandidates.sort((a,b)=>Number(String(b).match(/\d{4}/)?.[0]||0)-Number(String(a).match(/\d{4}/)?.[0]||0));
+  const yearCandidates=financialAnalysisFindYears(map);
+  if(!yearCandidates.length) throw new Error('Could not identify financial-year columns. The PDF table must contain headings such as FY 2025-26 / FY 2024-25.');
 
   const headers=[
     'Fiscal Year','Period End Date','Revenue from operations','Other income','Total income',
@@ -5045,106 +5064,161 @@ async function buildFinancialAnalysisWorkbook(){
     'Non-current investments','Inventories','Trade receivables','Cash and cash equivalents',
     'Other current assets','Total assets','Net cash from operating activities',
     'Net cash used in investing activities','Net cash used in financing activities',
-    'Net increase in cash','Closing cash and cash equivalents','Current Assets','Current Liabilities',
-    'Total Debt','Total Equity','Current ratio (x)','Debt-equity ratio (x)','Net working capital'
+    'Net increase in cash','Closing cash and cash equivalents'
   ];
-  const rows=[headers];
-  const col={}; headers.forEach((h,i)=>col[h]=i+1); // Excel column numbers, 1-based
+  const aliases={
+    'Profit before tax':['Profit before exceptional items and tax','Profit before tax for the period/year'],
+    'Tax expense':['Tax expense (current + deferred)','Tax expense'],
+    'Profit after tax':['Net profit','Net Profit for the period/year'],
+    'Reserves and surplus':['Reserves & surplus','Other Equity','Other equity'],
+    'Non-current borrowings':['Long-term borrowings','Non-current borrowings'],
+    'Current borrowings':['Short-term borrowings','Current borrowings'],
+    'Trade payables':['Trade payables','Trade Payables'],
+    'Other current liabilities':['Other current liabilities','Other Current Liabilities'],
+    'Property, plant and equipment':['Property, plant and equipment','Property Plant & Equipment','PPE'],
+    'Non-current investments':['Non-current investments','Non Current Investments'],
+    'Inventories':['Inventories','Inventory'],
+    'Trade receivables':['Trade receivables','Trade Receivables','Debtors'],
+    'Cash and cash equivalents':['Cash and cash equivalents','Cash & cash equivalents','Cash and bank balances','Cash & Bank'],
+    'Other current assets':['Other current assets','Other Current Assets'],
+    'Total assets':['Total assets','Total Assets'],
+    'Net cash from operating activities':['Net cash from operating activities','Cash generated from operations','Net cash flow from operating activities'],
+    'Net cash used in investing activities':['Net cash used in investing activities','Net cash from investing activities','Cash flow from investing activities'],
+    'Net cash used in financing activities':['Net cash used in financing activities','Net cash from financing activities','Cash flow from financing activities'],
+    'Net increase in cash':['Net increase/(decrease) in cash','Net increase in cash and cash equivalents','Net increase in cash'],
+    'Closing cash and cash equivalents':['Closing cash and cash equivalents','Cash and cash equivalents at end of year','Closing cash']
+  };
+  const sourceRows=[headers];
+  const sourceMap=[];
   for(const fy of yearCandidates){
-    const yi=Object.values(map).find(sh=>(sh.years||[]).includes(fy))?.years.indexOf(fy) ?? 0;
-    const r=Array(headers.length).fill('');
-    r[0]=fy; r[1]=financialAnalysisYearEnd(fy);
-    const sourceLabels=headers.slice(2,35);
-    sourceLabels.forEach((label,j)=>{ r[j+2]=financialAnalysisValue(map,label,yi); });
-    rows.push(r);
+    let yi=-1;
+    for(const sh of Object.values(map)){ const idx=(sh.years||[]).indexOf(fy); if(idx>=0){yi=idx;break;} }
+    if(yi<0) yi=0;
+    const r=[fy,financialAnalysisYearEnd(fy)];
+    for(const h of headers.slice(2)) r.push(financialAnalysisValue(map,h,yi,aliases[h]||[]));
+    sourceRows.push(r); sourceMap.push({fy,yi});
   }
-  // Formula-derived analysis columns. Formulas reference the row's own source values.
-  for(let ri=2;ri<=rows.length;ri++){
-    const c=(n)=>XLSX.utils.encode_col(n-1)+(ri);
-    const r=rows[ri-1];
-    r[col['Current Assets']-1]=`=${c(col['Inventories'])}+${c(col['Trade receivables'])}+${c(col['Cash and cash equivalents'])}+${c(col['Other current assets'])}`;
-    r[col['Current Liabilities']-1]=`=${c(col['Current borrowings'])}+${c(col['Trade payables'])}+${c(col['Other current liabilities'])}`;
-    r[col['Total Debt']-1]=`=${c(col['Non-current borrowings'])}+${c(col['Current borrowings'])}`;
-    r[col['Total Equity']-1]=`=${c(col['Share capital'])}+${c(col['Reserves and surplus'])}`;
-    r[col['Current ratio (x)']-1]=`=IFERROR(${c(col['Current Assets'])}/${c(col['Current Liabilities'])},0)`;
-    r[col['Debt-equity ratio (x)']-1]=`=IFERROR(${c(col['Total Debt'])}/${c(col['Total Equity'])},0)`;
-    r[col['Net working capital']-1]=`=${c(col['Current Assets'])}-${c(col['Current Liabilities'])}`;
-  }
+
   const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!freeze']={xSplit:2,ySplit:1};
-  ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:rows.length-1,c:headers.length-1}})};
-  ws['!cols']=headers.map((h,i)=>({wch:i<2?18:(h.length>30?28:20)}));
-  for(let c=0;c<headers.length;c++){
-    const addr=XLSX.utils.encode_cell({r:0,c});
-    if(ws[addr]) ws[addr].s={font:{bold:true},fill:{fgColor:{rgb:'D9EAF7'}},alignment:{wrapText:true,vertical:'center'}};
-  }
-  for(let r=1;r<rows.length;r++){
-    const dateAddr=XLSX.utils.encode_cell({r,c:1});
-    if(ws[dateAddr]) ws[dateAddr].t='s';
-    for(let c=2;c<headers.length;c++){
-      const cell=ws[XLSX.utils.encode_cell({r,c})];
-      if(cell && typeof cell.v==='number') cell.z='#,##0.00;[Red]-#,##0.00';
-    }
-    const ratioCols=['Current ratio (x)','Debt-equity ratio (x)'];
-    for(const label of ratioCols){ const c=col[label]-1; const cell=ws[XLSX.utils.encode_cell({r,c})]; if(cell) cell.z='0.00'; }
-  }
-  XLSX.utils.book_append_sheet(wb,ws,'Financials by Year');
-  const noteRows=[
-    ['Data source and methodology notes'],[''],
-    ['Source: financial tables extracted from the selected PDF. This workbook restructures the statements into one row per financial year for analysis.'],
-    ['Period End Date assumes the standard 31 March Indian fiscal year-end from the FY label.'],
-    ['Current Assets, Current Liabilities, Total Debt, Total Equity, Current Ratio, Debt-equity Ratio and Net Working Capital are Excel formulas derived from the underlying extracted figures.']
+
+  /* 1. Executive Summary */
+  const sumRows=[['FINANCIAL ANALYSIS — EXECUTIVE SUMMARY'],[''],['Metric',...yearCandidates]];
+  const metricDefs=[
+    ['Revenue from operations','Revenue from operations'],['Total income','Total income'],['Profit before tax','Profit before tax'],['Profit after tax','Profit after tax'],
+    ['Current Assets','__calcCA'],['Current Liabilities','__calcCL'],['Net Working Capital','__nwc'],['Total Debt','__debt'],['Total Equity','__equity'],['Current Ratio (x)','__cr'],['Debt-equity Ratio (x)','__de'],['Operating Cash Flow','Net cash from operating activities']
   ];
-  const notes=XLSX.utils.aoa_to_sheet(noteRows); notes['!cols']=[{wch:120}];
-  if(notes.A1) notes.A1.s={font:{bold:true}};
-  XLSX.utils.book_append_sheet(wb,notes,'Notes');
+  function sourceVal(fy,head){ const i=yearCandidates.indexOf(fy); return sourceRows[i+1][headers.indexOf(head)]; }
+  function ca(fy){ return ['Inventories','Trade receivables','Cash and cash equivalents','Other current assets'].map(h=>Number(sourceVal(fy,h)||0)).reduce((a,b)=>a+b,0); }
+  function cl(fy){ return ['Current borrowings','Trade payables','Other current liabilities'].map(h=>Number(sourceVal(fy,h)||0)).reduce((a,b)=>a+b,0); }
+  function debt(fy){ return Number(sourceVal(fy,'Non-current borrowings')||0)+Number(sourceVal(fy,'Current borrowings')||0); }
+  function equity(fy){ return Number(sourceVal(fy,'Share capital')||0)+Number(sourceVal(fy,'Reserves and surplus')||0); }
+  for(const [label,key] of metricDefs){
+    const row=[label];
+    for(const fy of yearCandidates){
+      let v=key;
+      if(key==='__calcCA')v=ca(fy); else if(key==='__calcCL')v=cl(fy); else if(key==='__nwc')v=ca(fy)-cl(fy); else if(key==='__debt')v=debt(fy); else if(key==='__equity')v=equity(fy); else if(key==='__cr')v=cl(fy)?ca(fy)/cl(fy):''; else if(key==='__de')v=equity(fy)?debt(fy)/equity(fy):''; else v=sourceVal(fy,key);
+      row.push(v===''||v===null?'N/A':v);
+    }
+    sumRows.push(row);
+  }
+  sumRows.push([''],['Interpretation / checks'],['• Figures shown as extracted from the PDF where available; calculated metrics are derived only from available heads.'],['• N/A means the source did not provide sufficient data for that calculation.'],['• Review unusual movements, exceptional items and cash-flow trends before using the analysis for appraisal.']);
+  const sumWs=faFormulaSheet(wb,'Executive Summary',sumRows,[34,...yearCandidates.map(()=>22)]); faNumFmt(sumWs,sumRows,3);
+
+  /* 2. Year-wise source model */
+  const sourceWs=faFormulaSheet(wb,'Financials by Year',sourceRows,[18,18,...headers.slice(2).map(h=>Math.min(30,Math.max(18,h.length+2)))]); faNumFmt(sourceWs,sourceRows,1);
+  sourceWs['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:sourceRows.length-1,c:headers.length-1}})};
+
+  /* 3. P&L analysis */
+  const pnlHeads=['Revenue from operations','Other income','Total income','Cost of materials consumed','Purchases of stock-in-trade','Changes in inventories','Employee benefits expense','Finance costs','Depreciation and amortisation','Other expenses','Total expenses','Profit before tax','Tax expense','Profit after tax'];
+  const pnlRows=[['P&L ANALYSIS'],['Head',...yearCandidates],['Change (latest vs prior)','']];
+  for(const h of pnlHeads){ const row=[h]; for(const fy of yearCandidates) row.push(sourceVal(fy,h)||'N/A'); pnlRows.push(row); }
+  if(yearCandidates.length>=2){
+    pnlRows[2]=['Latest year change vs previous year'];
+    for(let i=0;i<yearCandidates.length;i++) pnlRows[2].push(i===yearCandidates.length-1?'':(Number(sourceVal(yearCandidates[i], 'Revenue from operations')||0)-Number(sourceVal(yearCandidates[i+1], 'Revenue from operations')||0)));
+  }
+  const pnlWs=faFormulaSheet(wb,'P&L Analysis',pnlRows,[34,...yearCandidates.map(()=>22)]); faNumFmt(pnlWs,pnlRows,3);
+  const marginRows=[['P&L MARGINS / GROWTH'],['Metric',...yearCandidates]];
+  for(const [name,num,den] of [['Revenue growth %','Revenue from operations','__prev'],['PBT margin %','Profit before tax','Total income'],['PAT margin %','Profit after tax','Total income'],['Finance cost / revenue %','Finance costs','Revenue from operations'],['Employee cost / revenue %','Employee benefits expense','Revenue from operations']]){
+    const row=[name];
+    for(let i=0;i<yearCandidates.length;i++){
+      const fy=yearCandidates[i], n=Number(sourceVal(fy,num)||0); let v='';
+      if(name==='Revenue growth %'){ if(i<yearCandidates.length-1){const p=Number(sourceVal(yearCandidates[i+1],num)||0); v=p?((n-p)/p)*100:'';} }
+      else {const d=Number(sourceVal(fy,den)||0); v=d?(n/d)*100:'';}
+      row.push(v);
+    }
+    marginRows.push(row);
+  }
+  const marginWs=faFormulaSheet(wb,'Margins & Growth',marginRows,[34,...yearCandidates.map(()=>22)]); faNumFmt(marginWs,marginRows,2);
+
+  /* 4. Balance sheet analysis */
+  const bsHeads=['Share capital','Reserves and surplus','Non-current borrowings','Current borrowings','Trade payables','Other current liabilities','Property, plant and equipment','Non-current investments','Inventories','Trade receivables','Cash and cash equivalents','Other current assets','Total assets'];
+  const bsRows=[['BALANCE SHEET ANALYSIS'],['Head',...yearCandidates]];
+  for(const h of bsHeads){ const row=[h]; for(const fy of yearCandidates) row.push(sourceVal(fy,h)||'N/A'); bsRows.push(row); }
+  for(const [h,fn] of [['Current Assets',ca],['Current Liabilities',cl],['Total Debt',debt],['Total Equity',equity]]){ const row=[h]; for(const fy of yearCandidates) row.push(fn(fy)); bsRows.push(row); }
+  bsRows.push(['Net Working Capital',...yearCandidates.map(fy=>ca(fy)-cl(fy))]);
+  const bsWs=faFormulaSheet(wb,'Balance Sheet',bsRows,[34,...yearCandidates.map(()=>22)]); faNumFmt(bsWs,bsRows,2);
+
+  /* 5. Ratios */
+  const ratioRows=[['RATIO ANALYSIS'],['Ratio',...yearCandidates],['Formula / meaning','']];
+  const ratios=[
+    ['Current Ratio (x)',fy=>cl(fy)?ca(fy)/cl(fy):'', 'Current Assets ÷ Current Liabilities'],
+    ['Debt-equity Ratio (x)',fy=>equity(fy)?debt(fy)/equity(fy):'', 'Total Debt ÷ Total Equity'],
+    ['NWC / Total Assets %',fy=>Number(sourceVal(fy,'Total assets')||0)?((ca(fy)-cl(fy))/Number(sourceVal(fy,'Total assets')))*100:'', 'Net Working Capital ÷ Total Assets'],
+    ['Debt / Total Assets %',fy=>Number(sourceVal(fy,'Total assets')||0)?(debt(fy)/Number(sourceVal(fy,'Total assets')))*100:'', 'Total Debt ÷ Total Assets'],
+    ['PAT Margin %',fy=>Number(sourceVal(fy,'Total income')||0)?(Number(sourceVal(fy,'Profit after tax')||0)/Number(sourceVal(fy,'Total income')))*100:'', 'PAT ÷ Total Income']
+  ];
+  for(const [name,fn,meaning] of ratios){ const row=[name]; for(const fy of yearCandidates) row.push(fn(fy)); ratioRows.push(row); ratioRows.push([meaning,...yearCandidates.map(()=> '')]); }
+  const ratioWs=faFormulaSheet(wb,'Ratios',ratioRows,[36,...yearCandidates.map(()=>22)]); faNumFmt(ratioWs,ratioRows,2);
+
+  /* 6. Cash flow */
+  const cfHeads=['Net cash from operating activities','Net cash used in investing activities','Net cash used in financing activities','Net increase in cash','Closing cash and cash equivalents'];
+  const cfRows=[['CASH FLOW ANALYSIS'],['Head',...yearCandidates]];
+  for(const h of cfHeads){ const row=[h]; for(const fy of yearCandidates) row.push(sourceVal(fy,h)||'N/A'); cfRows.push(row); }
+  const cfWs=faFormulaSheet(wb,'Cash Flow',cfRows,[40,...yearCandidates.map(()=>22)]); faNumFmt(cfWs,cfRows,2);
+
+  /* 7. Source tables exactly as extracted */
+  const sourceDataRows=[['SOURCE DATA — PDF TABLES'],['Sheet / table','Row data']];
+  for(const sh of sheets||[]){
+    for(const r of sh.rows||[]) sourceDataRows.push([sh.name,(r||[]).join(' | ')]);
+  }
+  const rawWs=faFormulaSheet(wb,'Source Data',sourceDataRows,[34,150]);
+
+  /* 8. Notes */
+  const notesRows=[
+    ['NOTES / METHODOLOGY'],[''],
+    ['Source','Selected PDF; tables are extracted in the browser.'],
+    ['Source figures','Displayed as extracted where a matching financial head is available.'],
+    ['Calculated figures','Current Assets, Current Liabilities, Total Debt, Total Equity, Current Ratio, Debt-equity, NWC and analysis percentages are calculated from available source heads.'],
+    ['Missing data','The workbook uses N/A rather than inventing a figure when a required source head is absent.'],
+    ['Period end','31 March is assigned only when the source column is explicitly labelled as an FY year.'],
+    ['Caution','This is an analytical aid. Verify the extracted figures against the original PDF before credit appraisal, sanction, tax filing or any financial decision.']
+  ];
+  faFormulaSheet(wb,'Notes',notesRows,[28,120]);
   return wb;
 }
 $('btnPdfFinancialAnalysis')?.addEventListener('click', async()=>{
-  // Dedicated handler: do not rely on the generic file-gate for this tool.
-  // If a PDF is already selected in the Studio upload card, load it and run.
-  // Otherwise open the single shared Studio upload card and resume automatically.
-  const selected = window.__docuForgeStudioFile || null;
-  const isPdf = f => !!f && (f.type === 'application/pdf' || /\.pdf$/i.test(f.name||''));
+  const selected=window.__docuForgeStudioFile||null;
+  const isPdf=f=>!!f&&(f.type==='application/pdf'||/\.pdf$/i.test(f.name||''));
   if(!workingBytes){
-    if(selected && isPdf(selected)){
-      try{
-        await loadFiles([selected]);
-      }catch(e){ toast(e?.message || 'Could not open the selected PDF.', true); return; }
-      if(!workingBytes){ toast('Could not open the selected PDF.', true); return; }
-    }else{
-      pendingToolId='btnPdfFinancialAnalysis';
-      requestFileForTool('btnPdfFinancialAnalysis');
-      return;
-    }
+    if(selected&&isPdf(selected)){
+      try{await loadFiles([selected]);}catch(e){toast(e?.message||'Could not open the selected PDF.',true);return;}
+      if(!workingBytes){toast('Could not open the selected PDF.',true);return;}
+    }else{pendingToolId='btnPdfFinancialAnalysis';requestFileForTool('btnPdfFinancialAnalysis');return;}
   }
-  setStatus('Building year-wise Financial Analysis Excel…'); showProgress(20);
+  setStatus('Building Financial Analysis Excel…');showProgress(20);
   try{
-    // Final source check for Safari/iPhone: if the selected PDF exists but the
-    // editor byte buffer was lost between Studio navigation and the tool tap,
-    // reload it directly before extracting tables.
-    if(!(workingBytes instanceof Uint8Array) || !workingBytes.byteLength){
-      const f=window.__docuForgeStudioFile;
-      if(f && (f.type==='application/pdf' || /\.pdf$/i.test(f.name||''))) await loadFiles([f]);
-    }
-    if(!(workingBytes instanceof Uint8Array) || !workingBytes.byteLength) throw new Error('The selected PDF is not loaded. Please choose the PDF again.');
+    if(!(workingBytes instanceof Uint8Array)||!workingBytes.byteLength){const f=window.__docuForgeStudioFile;if(f&&isPdf(f))await loadFiles([f]);}
+    if(!(workingBytes instanceof Uint8Array)||!workingBytes.byteLength)throw new Error('The selected PDF is not loaded. Please choose the PDF again.');
     await loadLib('xlsx');
     const wb=await buildFinancialAnalysisWorkbook();
     const out=XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true,bookSST:false});
     const base=($('outName').value||'document').replace(/\.[^.]+$/,'');
     conversionOutput(new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),base+'_Financial_Analysis.xlsx','PDF → Financial Analysis Excel');
-    setStatus(`Created year-wise Financial Analysis workbook with ${yearCandidatesCount(wb)} financial year row(s).`);
+    setStatus('Financial Analysis workbook created: Executive Summary, P&L, Balance Sheet, Ratios, Cash Flow, Source Data and Notes.');
     logConversion('PDF → Financial Analysis Excel',base+'_Financial_Analysis');
-  }catch(e){ console.error(e); toast('Financial Analysis Excel failed: '+(e?.message||'unknown error'),true); }
-  finally{ showProgress(null); }
-});;
-function yearCandidatesCount(wb){
-  const ws=wb.Sheets['Financials by Year'];
-  if(!ws?.['!ref']) return 0;
-  const r=XLSX.utils.decode_range(ws['!ref']); return Math.max(0,r.e.r);
-}
-
+  }catch(e){console.error(e);toast('Financial Analysis Excel failed: '+(e?.message||'unknown error'),true);}
+  finally{showProgress(null);}
+});
 $('btnPdfToExcel').addEventListener('click', async () => {
   setStatus('Detecting PDF tables and building Excel workbook…'); showProgress(20);
   try{
