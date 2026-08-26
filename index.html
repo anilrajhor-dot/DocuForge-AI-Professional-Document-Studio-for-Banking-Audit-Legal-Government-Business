@@ -746,7 +746,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.100</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.101</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -4984,7 +4984,7 @@ $('btnPdfToCsv').addEventListener('click', async () => {
 
 
 /* ---------- PDF → Financial Analysis Excel (year-wise / credit-analysis) ----------
-   Version 100: creates a practical year-wise financial-analysis workbook while
+   Version 101: creates a practical year-wise financial-analysis workbook while
    keeping extracted/source figures separate from calculated analysis. No figure
    is invented when the source PDF does not contain the required head. */
 function financialAnalysisYearEnd(fy){
@@ -5200,10 +5200,14 @@ async function buildFinancialAnalysisWorkbookOrdinary(){
 function faColLetter(n){let s=''; n++; while(n){let r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);} return s;}
 function faSetFormula(ws,r,c,formula,numFmt){
   const cell=XLSX.utils.encode_cell({r,c});
-  ws[cell]={t:'n',f:formula};
+  ws[cell]={t:'n',v:0,f:String(formula).replace(/^=/,'')};
   if(numFmt) ws[cell].z=numFmt;
 }
 function faFormulaDrivenWorkbook(wb){
+  // Version 101: formula references must point to real Financials by Year cells.
+  // Missing source heads are represented by numeric 0 inside formulas (not the text "N/A"),
+  // preventing formulas such as SUM("N/A",...) and keeping Excel recalculation valid.
+
   const fin=wb.Sheets['Financials by Year'];
   if(!fin) return wb;
   const range=XLSX.utils.decode_range(fin['!ref']||'A1');
@@ -5215,7 +5219,7 @@ function faFormulaDrivenWorkbook(wb){
   for(let r=1;r<=range.e.r;r++){const v=fin[XLSX.utils.encode_cell({r,c:0})]?.v;if(v)rowByHead[String(v).trim()]=r;}
   const ref=(head,yearIdx)=>{
     const r=rowByHead[head], c=yearCols[yearIdx]?.col;
-    return (r!=null&&c!=null)?`'Financials by Year'!${faColLetter(c)}${r+1}`:'"N/A"';
+    return (r!=null&&c!=null)?`'Financials by Year'!${faColLetter(c)}${r+1}`:'0';
   };
   const sum=wb.Sheets['Executive Summary'];
   if(sum){
@@ -5232,7 +5236,7 @@ function faFormulaDrivenWorkbook(wb){
       const debt=`SUM(${ref('Non-current borrowings',i)},${ref('Current borrowings',i)})`;
       const eq=`SUM(${ref('Share capital',i)},${ref('Reserves and surplus',i)})`;
       const set=(label,formula,fmt)=>{if(labels[label]!=null)faSetFormula(sum,labels[label],c,formula,fmt);};
-      set('Current Assets',ca,'#,##0.00;[Red]-#,##0.00'); set('Current Liabilities',cl,'#,##0.00;[Red]-#,##0.00'); set('Net Working Capital',`=${ca}-${cl}`.replace(/^=/,''),'#,##0.00;[Red]-#,##0.00'); set('Total Debt',debt,'#,##0.00;[Red]-#,##0.00'); set('Total Equity',eq,'#,##0.00;[Red]-#,##0.00'); set('Current Ratio (x)',`IFERROR((${ca})/(${cl}),"")`,'0.00'); set('Debt-equity Ratio (x)',`IFERROR((${debt})/(${eq}),"")`,'0.00');
+      set('Current Assets',ca,'#,##0.00;[Red]-#,##0.00'); set('Current Liabilities',cl,'#,##0.00;[Red]-#,##0.00'); set('Net Working Capital',`(${ca})-(${cl})`,'#,##0.00;[Red]-#,##0.00'); set('Total Debt',debt,'#,##0.00;[Red]-#,##0.00'); set('Total Equity',eq,'#,##0.00;[Red]-#,##0.00'); set('Current Ratio (x)',`IFERROR((${ca})/(${cl}),"")`,'0.00'); set('Debt-equity Ratio (x)',`IFERROR((${debt})/(${eq}),"")`,'0.00');
     });
   }
   function applySourceFormulas(sheetName, headColumn=0){
