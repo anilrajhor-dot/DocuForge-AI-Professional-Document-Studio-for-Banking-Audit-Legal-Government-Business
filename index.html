@@ -731,7 +731,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '2026.08.26.92';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.26.93';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -742,7 +742,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.92</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.93</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -2338,38 +2338,63 @@ function pageTitleFromLines(lines, pageIndex){
   if(/key\s+ratios/i.test(joined)) return 'Key Ratios';
   return 'Page ' + (pageIndex+1);
 }
+function pdfNumericToken(str){
+  const s=String(str||'').trim().replace(/[₹$€£,]/g,'').replace(/−/g,'-');
+  return /^\(?-?\d+(?:\.\d+)?%?\)?$/.test(s);
+}
+function inferNumericColumnStarts(lines, headerIndex, expectedCount){
+  const xs=[];
+  for(let i=headerIndex+1;i<lines.length;i++){
+    for(const it of lines[i].items){
+      if(pdfNumericToken(it.str)) xs.push(it.x);
+    }
+  }
+  xs.sort((a,b)=>a-b);
+  const clusters=[];
+  for(const x of xs){
+    let c=clusters.find(c=>Math.abs(c.mean-x)<=28);
+    if(!c){ c={xs:[x],mean:x}; clusters.push(c); }
+    else { c.xs.push(x); c.mean=c.xs.reduce((a,b)=>a+b,0)/c.xs.length; }
+  }
+  const starts=clusters.filter(c=>c.xs.length>=2).map(c=>({x:c.mean,n:c.xs.length}));
+  starts.sort((a,b)=>a.x-b.x);
+  if(starts.length>=expectedCount) return starts.slice(-expectedCount).map(c=>c.x);
+  // Fall back to all clusters if the table is short.
+  return starts.map(c=>c.x);
+}
 function inferPdfTableColumns(lines){
   const header=lines.find(l=>/\bParticulars\b/i.test(lineToText(l)) || /^\s*KPI\b/i.test(lineToText(l)));
   if(!header) return null;
   const text=lineToText(header);
   const isRatio=/^\s*KPI\b/i.test(text);
-  const anchors=[];
   const toks=header.items;
   if(isRatio){
-    anchors.push(toks.find(it=>/^KPI$/i.test(it.str))?.x ?? 136);
-    const y1=toks.find(it=>it.str==='2025-26');
-    const y2=toks.find(it=>it.str==='2024-25');
-    const unit=toks.find(it=>/^Unit$/i.test(it.str));
-    anchors.push(y1 ? y1.x-14 : 406);
-    anchors.push(y2 ? y2.x-14 : 516);
-    anchors.push(unit ? unit.x : 626);
-  }else{
-    anchors.push(toks.find(it=>/^Particulars$/i.test(it.str))?.x ?? 122);
-    const y1=toks.find(it=>it.str==='2025-26');
-    const y2=toks.find(it=>it.str==='2024-25');
-    anchors.push(y1 ? y1.x-14 : 512);
-    anchors.push(y2 ? y2.x-14 : 622);
+    const anchors=[
+      toks.find(it=>/^KPI$/i.test(it.str))?.x ?? 136,
+      toks.find(it=>it.str==='2025-26')?.x ?? 407,
+      toks.find(it=>it.str==='2024-25')?.x ?? 517,
+      toks.find(it=>/^Unit$/i.test(it.str))?.x ?? 627
+    ];
+    return {anchors, headerIndex:lines.indexOf(header), isRatio};
   }
-  return {anchors, headerIndex:lines.indexOf(header), isRatio};
+  const particular=toks.find(it=>/^Particulars$/i.test(it.str))?.x ?? 122;
+  const numeric=inferNumericColumnStarts(lines, lines.indexOf(header), 2);
+  const y1=numeric[0] ?? (toks.find(it=>it.str==='2025-26')?.x ?? 512);
+  const y2=numeric[1] ?? (toks.find(it=>it.str==='2024-25')?.x ?? 622);
+  return {anchors:[particular,y1,y2], headerIndex:lines.indexOf(header), isRatio};
 }
 function itemsToAnchoredCells(items, anchors){
   const cells=Array.from({length:anchors.length},()=>[]);
   for(const it of items){
     let idx=0;
     if(anchors.length===3){
-      if(it.x>= (anchors[1]+anchors[2])/2) idx=2;
-      else if(it.x>= (anchors[0]+anchors[1])/2) idx=1;
-      else idx=0;
+      // Three-column financial tables: Particulars | FY 2025-26 | FY 2024-25.
+      // The old logic used the midpoint between the *last two* anchors as
+      // the first boundary, which incorrectly put both year values into the
+      // FY 2024-25 cell. Use the normal adjacent-anchor boundaries instead.
+      const m01=(anchors[0]+anchors[1])/2;
+      const m12=(anchors[1]+anchors[2])/2;
+      idx = it.x < m01 ? 0 : (it.x < m12 ? 1 : 2);
     }else{
       const mids=anchors.slice(0,-1).map((a,i)=>(a+anchors[i+1])/2);
       idx=it.x<mids[0]?0:it.x<mids[1]?1:it.x<mids[2]?2:3;
