@@ -746,7 +746,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.99</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.100</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -903,8 +903,9 @@ window.DFStorage = (function(){
       <strong>Two-way conversion:</strong> PDF → Word/Excel/CSV/Text/HTML/JSON/XML and more, and <strong>Word, Excel, PowerPoint, HTML, CSV, TXT and Markdown → PDF</strong>.
     </div>
 <div class="tool-group">
-<button class="tool-btn primary-tool" id="btnPdfFinancialAnalysis">📊 PDF → Financial Analysis Excel (Year-wise)</button>
-<p class="hint" style="margin:4px 14px 10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);">Creates a year-wise financial model: one row per financial year, with financial heads as columns, period-end date, calculated Current Assets/Liabilities, Total Debt/Equity, Current Ratio, Debt-equity and Net Working Capital.</p>
+<button class="tool-btn primary-tool" id="btnPdfFinancialAnalysisOrdinary">📊 Financial Analysis Excel — Ordinary</button>
+<button class="tool-btn primary-tool" id="btnPdfFinancialAnalysisFormula">🧮 Financial Analysis Excel — Formula Driven</button>
+<p class="hint" style="margin:4px 14px 10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);"><strong>Ordinary:</strong> ready-to-use values. <strong>Formula Driven:</strong> calculations remain linked by Excel formulas so changes to source figures update the analysis.</p>
 <button class="tool-btn" id="btnPdfToWord"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M8 13h8M8 17h8"></path></svg> PDF → Word (.docx)</button>
 <button class="tool-btn" id="btnPdfToExcel"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16"></path></svg> PDF → Excel (.xlsx)</button>
 <button class="tool-btn" id="btnPdfToCsv"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16M15 4v16"></path></svg> PDF → CSV</button>
@@ -4983,7 +4984,7 @@ $('btnPdfToCsv').addEventListener('click', async () => {
 
 
 /* ---------- PDF → Financial Analysis Excel (year-wise / credit-analysis) ----------
-   Version 99: creates a practical year-wise financial-analysis workbook while
+   Version 100: creates a practical year-wise financial-analysis workbook while
    keeping extracted/source figures separate from calculated analysis. No figure
    is invented when the source PDF does not contain the required head. */
 function financialAnalysisYearEnd(fy){
@@ -5047,7 +5048,7 @@ function faNumFmt(ws,rows,fromRow=1){
     if(cell && typeof cell.v==='number') cell.z='#,##0.00;[Red]-#,##0.00';
   }
 }
-async function buildFinancialAnalysisWorkbook(){
+async function buildFinancialAnalysisWorkbookOrdinary(){
   const {sheets,hasText}=await collectPdfWorkbookTables();
   if(!hasText) throw new Error('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.');
   const map=financialAnalysisTableMap(sheets);
@@ -5196,1076 +5197,88 @@ async function buildFinancialAnalysisWorkbook(){
   faFormulaSheet(wb,'Notes',notesRows,[28,120]);
   return wb;
 }
-$('btnPdfFinancialAnalysis')?.addEventListener('click', async()=>{
+function faColLetter(n){let s=''; n++; while(n){let r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);} return s;}
+function faSetFormula(ws,r,c,formula,numFmt){
+  const cell=XLSX.utils.encode_cell({r,c});
+  ws[cell]={t:'n',f:formula};
+  if(numFmt) ws[cell].z=numFmt;
+}
+function faFormulaDrivenWorkbook(wb){
+  const fin=wb.Sheets['Financials by Year'];
+  if(!fin) return wb;
+  const range=XLSX.utils.decode_range(fin['!ref']||'A1');
+  const header={};
+  for(let c=0;c<=range.e.c;c++){const v=fin[XLSX.utils.encode_cell({r:0,c})]?.v;if(v)header[String(v).trim()]=c;}
+  const yearCols=[];
+  for(let c=2;c<=range.e.c;c++){const v=fin[XLSX.utils.encode_cell({r:0,c})]?.v;if(v)yearCols.push({year:String(v),col:c});}
+  const rowByHead={};
+  for(let r=1;r<=range.e.r;r++){const v=fin[XLSX.utils.encode_cell({r,c:0})]?.v;if(v)rowByHead[String(v).trim()]=r;}
+  const ref=(head,yearIdx)=>{
+    const r=rowByHead[head], c=yearCols[yearIdx]?.col;
+    return (r!=null&&c!=null)?`'Financials by Year'!${faColLetter(c)}${r+1}`:'"N/A"';
+  };
+  const sum=wb.Sheets['Executive Summary'];
+  if(sum){
+    // Executive Summary: formulas reference the Financials by Year source sheet.
+    const labels={};
+    const sr=XLSX.utils.decode_range(sum['!ref']||'A1');
+    for(let r=0;r<=sr.e.r;r++){const v=sum[XLSX.utils.encode_cell({r,c:0})]?.v;if(v)labels[String(v).trim()]=r;}
+    const defs={
+      'Revenue from operations':'Revenue from operations','Total income':'Total income','Profit before tax':'Profit before tax','Profit after tax':'Profit after tax','Operating Cash Flow':'Net cash from operating activities'
+    };
+    yearCols.forEach((y,i)=>{const c=i+1; for(const [label,head] of Object.entries(defs)){if(labels[label]!=null)faSetFormula(sum,labels[label],c,ref(head,i),'#,##0.00;[Red]-#,##0.00');}
+      const ca=`SUM(${ref('Inventories',i)},${ref('Trade receivables',i)},${ref('Cash and cash equivalents',i)},${ref('Other current assets',i)})`;
+      const cl=`SUM(${ref('Current borrowings',i)},${ref('Trade payables',i)},${ref('Other current liabilities',i)})`;
+      const debt=`SUM(${ref('Non-current borrowings',i)},${ref('Current borrowings',i)})`;
+      const eq=`SUM(${ref('Share capital',i)},${ref('Reserves and surplus',i)})`;
+      const set=(label,formula,fmt)=>{if(labels[label]!=null)faSetFormula(sum,labels[label],c,formula,fmt);};
+      set('Current Assets',ca,'#,##0.00;[Red]-#,##0.00'); set('Current Liabilities',cl,'#,##0.00;[Red]-#,##0.00'); set('Net Working Capital',`=${ca}-${cl}`.replace(/^=/,''),'#,##0.00;[Red]-#,##0.00'); set('Total Debt',debt,'#,##0.00;[Red]-#,##0.00'); set('Total Equity',eq,'#,##0.00;[Red]-#,##0.00'); set('Current Ratio (x)',`IFERROR((${ca})/(${cl}),"")`,'0.00'); set('Debt-equity Ratio (x)',`IFERROR((${debt})/(${eq}),"")`,'0.00');
+    });
+  }
+  function applySourceFormulas(sheetName, headColumn=0){
+    const ws=wb.Sheets[sheetName]; if(!ws)return;
+    const rr=XLSX.utils.decode_range(ws['!ref']||'A1');
+    let headRow=-1; const first=ws['A1']?.v;
+    for(let r=0;r<=rr.e.r;r++){if(String(ws[XLSX.utils.encode_cell({r,c:0})]?.v||'').trim()==='Head'){headRow=r;break;}}
+    if(headRow<0)return;
+    for(let r=headRow+1;r<=rr.e.r;r++){
+      const h=String(ws[XLSX.utils.encode_cell({r,c:0})]?.v||'').trim(); if(!h||/^Latest year change/.test(h))continue;
+      const sourceHead=h;
+      yearCols.forEach((y,i)=>{const c=i+1;if(rowByHead[sourceHead]!=null)faSetFormula(ws,r,c,ref(sourceHead,i),'#,##0.00;[Red]-#,##0.00');});
+    }
+  }
+  applySourceFormulas('P&L Analysis'); applySourceFormulas('Balance Sheet'); applySourceFormulas('Cash Flow');
+  const mg=wb.Sheets['Margins & Growth'];
+  if(mg){const rr=XLSX.utils.decode_range(mg['!ref']||'A1');for(let r=2;r<=rr.e.r;r++){const name=String(mg[XLSX.utils.encode_cell({r,c:0})]?.v||'');for(let i=0;i<yearCols.length;i++){const c=i+1;let f='';if(name==='Revenue growth %'){if(i<yearCols.length-1)f=`IFERROR((${ref('Revenue from operations',i)}/${ref('Revenue from operations',i+1)}-1)*100,"")`;}else if(name==='PBT margin %')f=`IFERROR(${ref('Profit before tax',i)}/${ref('Total income',i)}*100,"")`;else if(name==='PAT margin %')f=`IFERROR(${ref('Profit after tax',i)}/${ref('Total income',i)}*100,"")`;else if(name==='Finance cost / revenue %')f=`IFERROR(${ref('Finance costs',i)}/${ref('Revenue from operations',i)}*100,"")`;else if(name==='Employee cost / revenue %')f=`IFERROR(${ref('Employee benefits expense',i)}/${ref('Revenue from operations',i)}*100,"")`;if(f)faSetFormula(mg,r,c,f,'0.00');}}}
+  const bs=wb.Sheets['Balance Sheet'];
+  if(bs){const rr=XLSX.utils.decode_range(bs['!ref']||'A1');const row={};for(let r=0;r<=rr.e.r;r++){const v=bs[XLSX.utils.encode_cell({r,c:0})]?.v;if(v)row[String(v).trim()]=r;}yearCols.forEach((y,i)=>{const c=i+1;const ca=`SUM(${ref('Inventories',i)},${ref('Trade receivables',i)},${ref('Cash and cash equivalents',i)},${ref('Other current assets',i)})`;const cl=`SUM(${ref('Current borrowings',i)},${ref('Trade payables',i)},${ref('Other current liabilities',i)})`;const debt=`SUM(${ref('Non-current borrowings',i)},${ref('Current borrowings',i)})`;const eq=`SUM(${ref('Share capital',i)},${ref('Reserves and surplus',i)})`;for(const [h,f] of [['Current Assets',ca],['Current Liabilities',cl],['Total Debt',debt],['Total Equity',eq],['Net Working Capital',`(${ca})-(${cl})`]])if(row[h]!=null)faSetFormula(bs,row[h],c,f,'#,##0.00;[Red]-#,##0.00');});}
+  const rat=wb.Sheets['Ratios'];
+  if(rat){const rr=XLSX.utils.decode_range(rat['!ref']||'A1');for(let r=0;r<=rr.e.r;r++){const name=String(rat[XLSX.utils.encode_cell({r,c:0})]?.v||'').trim();for(let i=0;i<yearCols.length;i++){const c=i+1;let f='';const ca=`SUM(${ref('Inventories',i)},${ref('Trade receivables',i)},${ref('Cash and cash equivalents',i)},${ref('Other current assets',i)})`;const cl=`SUM(${ref('Current borrowings',i)},${ref('Trade payables',i)},${ref('Other current liabilities',i)})`;const debt=`SUM(${ref('Non-current borrowings',i)},${ref('Current borrowings',i)})`;const eq=`SUM(${ref('Share capital',i)},${ref('Reserves and surplus',i)})`;if(name==='Current Ratio (x)')f=`IFERROR((${ca})/(${cl}),"")`;else if(name==='Debt-equity Ratio (x)')f=`IFERROR((${debt})/(${eq}),"")`;else if(name==='NWC / Total Assets %')f=`IFERROR(((${ca})-(${cl}))/${ref('Total assets',i)}*100,"")`;else if(name==='Debt / Total Assets %')f=`IFERROR((${debt})/${ref('Total assets',i)}*100,"")`;else if(name==='PAT Margin %')f=`IFERROR(${ref('Profit after tax',i)}/${ref('Total income',i)}*100,"")`;if(f)faSetFormula(rat,r,c,f,name.includes('%')?'0.00':'0.00');}}}
+  const cf=wb.Sheets['Cash Flow']; if(cf)applySourceFormulas('Cash Flow');
+  if(wb.Workbook)wb.Workbook.CalcPr={calcMode:'auto',fullCalcOnLoad:true,forceFullCalc:true};
+  return wb;
+}
+async function buildFinancialAnalysisWorkbookFormula(){const wb=await buildFinancialAnalysisWorkbookOrdinary();return faFormulaDrivenWorkbook(wb);}
+async function runFinancialAnalysis(mode){
   const selected=window.__docuForgeStudioFile||null;
   const isPdf=f=>!!f&&(f.type==='application/pdf'||/\.pdf$/i.test(f.name||''));
   if(!workingBytes){
-    if(selected&&isPdf(selected)){
-      try{await loadFiles([selected]);}catch(e){toast(e?.message||'Could not open the selected PDF.',true);return;}
-      if(!workingBytes){toast('Could not open the selected PDF.',true);return;}
-    }else{pendingToolId='btnPdfFinancialAnalysis';requestFileForTool('btnPdfFinancialAnalysis');return;}
+    if(selected&&isPdf(selected)){try{await loadFiles([selected]);}catch(e){toast(e?.message||'Could not open the selected PDF.',true);return;}if(!workingBytes){toast('Could not open the selected PDF.',true);return;}}
+    else{pendingToolId=mode==='formula'?'btnPdfFinancialAnalysisFormula':'btnPdfFinancialAnalysisOrdinary';requestFileForTool(pendingToolId);return;}
   }
-  setStatus('Building Financial Analysis Excel…');showProgress(20);
+  setStatus(mode==='formula'?'Building Formula-Driven Financial Analysis Excel…':'Building Ordinary Financial Analysis Excel…');showProgress(20);
   try{
     if(!(workingBytes instanceof Uint8Array)||!workingBytes.byteLength){const f=window.__docuForgeStudioFile;if(f&&isPdf(f))await loadFiles([f]);}
     if(!(workingBytes instanceof Uint8Array)||!workingBytes.byteLength)throw new Error('The selected PDF is not loaded. Please choose the PDF again.');
     await loadLib('xlsx');
-    const wb=await buildFinancialAnalysisWorkbook();
-    const out=XLSX.write(wb,{bookType:'xlsx',type:'array',cellStyles:true,bookSST:false});
-    const base=($('outName').value||'document').replace(/\.[^.]+$/,'');
-    conversionOutput(new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),base+'_Financial_Analysis.xlsx','PDF → Financial Analysis Excel');
-    setStatus('Financial Analysis workbook created: Executive Summary, P&L, Balance Sheet, Ratios, Cash Flow, Source Data and Notes.');
-    logConversion('PDF → Financial Analysis Excel',base+'_Financial_Analysis');
-  }catch(e){console.error(e);toast('Financial Analysis Excel failed: '+(e?.message||'unknown error'),true);}
-  finally{showProgress(null);}
-});
-$('btnPdfToExcel').addEventListener('click', async () => {
-  setStatus('Detecting PDF tables and building Excel workbook…'); showProgress(20);
-  try{
-    const { sheets, hasText } = await collectPdfWorkbookTables();
-    if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-    await loadLib('xlsx');
-    const wb = XLSX.utils.book_new();
-    const used=new Set();
-    sheets.forEach((table,i)=>{
-      let name=(table.name||('Sheet '+(i+1))).replace(/[\\\/\?\*\[\]:]/g,'').slice(0,31)||('Sheet '+(i+1));
-      const base=name; let n=2; while(used.has(name)){ name=(base.slice(0,28)+' '+n++).slice(0,31); } used.add(name);
-      const ws=XLSX.utils.aoa_to_sheet(table.rows);
-      const maxCols=Math.max(...table.rows.map(r=>r.length),1);
-      ws['!cols']=Array.from({length:maxCols},(_,c)=>({wch:c===0?46:16}));
-      if(table.rows.length){
-        const ref=XLSX.utils.encode_range({s:{r:0,c:0},e:{r:table.rows.length-1,c:maxCols-1}});
-        ws['!autofilter']={ref};
-        for(let c=0;c<maxCols;c++){
-          const addr=XLSX.utils.encode_cell({r:0,c});
-          if(ws[addr]) ws[addr].s={font:{bold:true}};
-        }
-      }
-      XLSX.utils.book_append_sheet(wb,ws,name);
-    });
-    if(!wb.SheetNames.length){ toast('No tables could be detected in this PDF.', true); return; }
-    const out = XLSX.write(wb, { bookType:'xlsx', type:'array', cellStyles:true });
-    conversionOutput(new Blob([out], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), ($('outName').value || 'document') + '.xlsx', 'PDF → Excel');
-    setStatus(`Exported Excel workbook with ${wb.SheetNames.length} table sheet(s).`); logConversion('PDF → Excel', $('outName').value);
-  } catch(e){ console.error(e); toast('PDF → Excel failed: ' + (e?.message || 'unknown error'), true); }
-  finally { showProgress(null); }
-});
-
-$('btnPdfToWord').addEventListener('click', async () => {
-  setStatus('Building Word document…'); showProgress(20);
-  try{
-    const pages = await getPdfPagesTextItems();
-    const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
-    if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-    const pagesLines = pages.map(p => groupIntoLines(p.items).map(lineToText));
-    const bytes = await buildDocxFromPages(pagesLines);
-    conversionOutput(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), ($('outName').value || 'document') + '.docx', 'PDF → Word');
-    setStatus('Exported Word document.'); logConversion('PDF → Word', $('outName').value);
-  } finally { showProgress(null); }
-});
-
-$('btnPdfToHtml').addEventListener('click', async () => {
-  setStatus('Building HTML…'); showProgress(20);
-  try{
-    const html = await buildPdfHtml();
-    conversionOutput(new Blob([html], { type:'text/html' }), ($('outName').value || 'document') + '.html', 'PDF → HTML');
-    setStatus('Exported HTML.');
-  } finally { showProgress(null); }
-});
-
-$('btnPdfToJson').addEventListener('click', async () => {
-  setStatus('Building JSON…'); showProgress(20);
-  try{
-    const json = await buildPdfJson();
-    conversionOutput(new Blob([json], { type:'application/json' }), ($('outName').value || 'document') + '.json', 'PDF → JSON');
-    setStatus('Exported JSON.');
-  } finally { showProgress(null); }
-});
-
-$('btnPdfToXml').addEventListener('click', async () => {
-  setStatus('Building XML…'); showProgress(20);
-  try{
-    const xml = await buildPdfXml();
-    conversionOutput(new Blob([xml], { type:'application/xml' }), ($('outName').value || 'document') + '.xml', 'PDF → XML');
-    setStatus('Exported XML.');
-  } finally { showProgress(null); }
-});
-
-$('btnPdfToSvg').addEventListener('click', async () => {
-  setStatus('Rendering pages as SVG…'); showProgress(20);
-  try{
-    const blob = await convertPdfToSvgZip();
-    conversionOutput(blob, ($('outName').value || 'document') + '_svg.zip', 'PDF → SVG');
-    setStatus('Exported SVG pages.');
-  } finally { showProgress(null); }
-});
-
-$('btnPdfToRtf').addEventListener('click', async () => {
-  setStatus('Building RTF…'); showProgress(20);
-  try{
-    const pages = await getPdfPagesTextItems();
-    const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
-    if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-    const rtf = await buildPdfRtf();
-    conversionOutput(new Blob([rtf], { type:'application/rtf' }), ($('outName').value || 'document') + '.rtf', 'PDF → RTF');
-    setStatus('Exported RTF.');
-  } finally { showProgress(null); }
-});
-
-$('btnPdfToOdt').addEventListener('click', async () => {
-  setStatus('Building ODT…'); showProgress(20);
-  try{
-    const pages = await getPdfPagesTextItems();
-    const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
-    if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-    const bytes = await buildPdfOdt();
-    conversionOutput(new Blob([bytes], { type:'application/vnd.oasis.opendocument.text' }), ($('outName').value || 'document') + '.odt', 'PDF → ODT');
-    setStatus('Exported ODT.');
-  } finally { showProgress(null); }
-});
-
-$('btnPdfToOds').addEventListener('click', async () => {
-  setStatus('Building ODS…'); showProgress(20);
-  try{
-    const { hasText } = await collectPdfRows();
-    if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-    const bytes = await buildPdfOds();
-    conversionOutput(new Blob([bytes], { type:'application/vnd.oasis.opendocument.spreadsheet' }), ($('outName').value || 'document') + '.ods', 'PDF → ODS');
-    setStatus('Exported ODS.');
-  } finally { showProgress(null); }
-});
-
-$('btnPdfToOdp').addEventListener('click', async () => {
-  setStatus('Building ODP…'); showProgress(20);
-  try{
-    const pages = await getPdfPagesTextItems();
-    const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
-    if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-    const bytes = await buildPdfOdp();
-    conversionOutput(new Blob([bytes], { type:'application/vnd.oasis.opendocument.presentation' }), ($('outName').value || 'document') + '.odp', 'PDF → ODP');
-    setStatus('Exported ODP.');
-  } finally { showProgress(null); }
-});
-
-$('btnPdfToEpub').addEventListener('click', async () => {
-  setStatus('Building EPUB…'); showProgress(20);
-  try{
-    const pages = await getPdfPagesTextItems();
-    const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
-    if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-    const bytes = await buildPdfEpub();
-    conversionOutput(new Blob([bytes], { type:'application/epub+zip' }), ($('outName').value || 'document') + '.epub', 'PDF → EPUB');
-    setStatus('Exported EPUB.');
-  } finally { showProgress(null); }
-});
-
-$('btnPdfToImages').addEventListener('click', () => {
-  openModal('PDF → Images', `
-    <div class="field row">
-      <div><label>Format</label><select id="imgFmt"><option value="png">PNG</option><option value="jpg">JPG</option></select></div>
-      <div><label>JPG quality</label><input type="number" id="imgQuality" min="0.3" max="1" step="0.1" value="0.85"></div>
-    </div>
-    <p class="hint">Renders each page at high resolution and downloads them all as a .zip.</p>
-  `, async () => {
-    const format = document.getElementById('imgFmt').value;
-    const quality = parseFloat(document.getElementById('imgQuality').value) || 0.85;
-    setStatus('Rendering pages as images…'); showProgress(20);
-    try{
-      const blob = await convertPdfToImagesZip(format, quality);
-      conversionOutput(blob, ($('outName').value || 'document') + '_images.zip', 'PDF → Images');
-      setStatus('Exported images.');
-    } finally { showProgress(null); }
-  });
-});
-
-$('btnCrop').addEventListener('click', () => {
-  openModal('Crop pages', `
-    <p class="hint" style="margin:0;">Trims the visible area from each edge, in points (72pt = 1 inch). This hides content rather than deleting it, so it's reversible with Undo.</p>
-    <div class="field row">
-      <div><label>Top</label><input type="number" id="cropTop" min="0" value="0"></div>
-      <div><label>Bottom</label><input type="number" id="cropBottom" min="0" value="0"></div>
-    </div>
-    <div class="field row">
-      <div><label>Left</label><input type="number" id="cropLeft" min="0" value="0"></div>
-      <div><label>Right</label><input type="number" id="cropRight" min="0" value="0"></div>
-    </div>
-  `, async () => {
-    const idx = selectedIndices();
-    const doc = await PDFDocument.load(workingBytes);
-    const target = idx.length ? idx : doc.getPageIndices();
-    const margins = {
-      top: parseFloat(document.getElementById('cropTop').value) || 0,
-      bottom: parseFloat(document.getElementById('cropBottom').value) || 0,
-      left: parseFloat(document.getElementById('cropLeft').value) || 0,
-      right: parseFloat(document.getElementById('cropRight').value) || 0,
-    };
-    await cropPages(target, margins);
-  });
-});
-
-$('btnDupPages').addEventListener('click', async () => {
-  setStatus('Scanning for duplicate pages…'); showProgress(20);
-  try{
-    const pairs = await detectDuplicatePages();
-    if(!pairs.length){ toast('No duplicate pages found (or this PDF has no extractable text).', true); return; }
-    const rows = pairs.map((p,i) => `<div class="field" style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="dup_${i}" checked style="width:auto;"><label style="margin:0;font-weight:400;" for="dup_${i}">Page ${p.a+1} \u2248 Page ${p.b+1} (${Math.round(p.sim*100)}% similar) \u2014 delete page ${p.b+1}</label></div>`).join('');
-    openModal('Duplicate pages found', rows + `<p class="hint">Checked pages will be deleted. Uncheck any pair you want to keep as-is.</p>`, async () => {
-      const toDelete = [];
-      pairs.forEach((p,i) => { if(document.getElementById('dup_'+i)?.checked) toDelete.push(p.b); });
-      if(toDelete.length) await deletePages(toDelete);
-    });
-  } finally { showProgress(null); }
-});
-
-$('btnPptxToPdf').addEventListener('click', () => {
-  openModal('PowerPoint → PDF', `
-    <div class="field"><label>PowerPoint file (.pptx)</label><input type="file" id="pptxFile" accept=".pptx"></div>
-    <p class="hint">Reads each slide's title and body text and lays it out one slide per PDF page, using the deck's own aspect ratio.</p>
-  `, async () => {
-    const file = document.getElementById('pptxFile').files[0];
-    if(!file){ toast('Choose a .pptx file first.', true); return; }
-    setStatus('Converting PowerPoint file…'); showProgress(20);
-    try{
-      const result = await convertPptxFileToPdf(file);
-      const name = file.name.replace(/\.[^.]+$/, '') + '.pdf';
-      downloadBlob(new Blob([result.bytes], { type:'application/pdf' }), name);
-      setStatus(`Created ${name} from ${result.count} slide(s).`);
-      logConversion('PowerPoint → PDF', file.name);
-    } catch(e){ console.error(e); toast('Could not convert that PowerPoint file: ' + (e && e.message ? e.message : 'unknown error') + '.', true); }
-    finally { showProgress(null); }
-  });
-});
-
-
-$('btnPptxToMarkdown').addEventListener('click', () => {
-  const suppliedFile = window.__docuForgeStudioFile || null;
-  if(suppliedFile){
-    window.__docuForgeStudioFile = null;
-    convertPptxToMarkdownFile(suppliedFile);
-    return;
-  }
-  openModal('PowerPoint → Markdown', `
-    <div class="field">
-      <label>PowerPoint file (.pptx)</label>
-      <input type="file" id="pptxMarkdownFile" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation">
-    </div>
-    <p class="hint">
-      Extracts slide titles and text/bullets into a clean Markdown document.
-      Slide design, images, animations and formatting are not copied.
-    </p>
-  `, async () => {
-    const file = document.getElementById('pptxMarkdownFile')?.files?.[0];
-    if(!file){ toast('Choose a .pptx file first.', true); return; }
-    await convertPptxToMarkdownFile(file);
-  });
-});
-
-async function convertPptxToMarkdownFile(file){
-    if(!file){ toast('Choose a .pptx file first.', true); return; }
-    setStatus('Converting PowerPoint to Markdown…');
-    showProgress(20);
-    try{
-      const slides = await extractPptxSlidesData(file);
-      if(!slides.length){ toast('No slides found in the PowerPoint file.', true); return; }
-
-      const lines = [];
-      const escMd = text => String(text || '')
-        .replace(/\\/g, '\\\\')
-        .replace(/([`*_{}\[\]()+#\-.!|>])/g, '\\$1');
-
-      slides.forEach((slide, i) => {
-        if(i > 0) lines.push('');
-        lines.push(`## Slide ${i + 1}: ${escMd(slide.title || 'Untitled slide')}`);
-        lines.push('');
-        const bullets = Array.isArray(slide.bullets) ? slide.bullets : [];
-        if(bullets.length){
-          bullets.forEach(b => {
-            const t = String(b || '').trim();
-            if(t) lines.push(`- ${escMd(t)}`);
-          });
-        } else {
-          lines.push('_No body text extracted._');
-        }
-      });
-
-      const markdown = `# ${escMd(file.name.replace(/\.[^.]+$/, '') || 'PowerPoint presentation')}
-
-> Converted from PowerPoint (.pptx) to Markdown by DocuForge AI.
-
-${lines.join('\n')}
-`;
-
-      const base = file.name.replace(/\.[^.]+$/, '') || 'presentation';
-      const filename = `${base}.md`;
-      conversionOutput(
-        new Blob([markdown], {type:'text/markdown;charset=utf-8'}),
-        filename,
-        'PowerPoint → Markdown'
-      );
-      setStatus(`Created ${filename} from ${slides.length} slide(s).`);
-      logConversion('PowerPoint → Markdown', file.name);
-    } catch(e){
-      console.error(e);
-      toast('Could not convert that PowerPoint file: ' + (e && e.message ? e.message : 'unknown error') + '.', true);
-    } finally {
-      showProgress(null);
-    }
+    const wb=mode==='formula'?await buildFinancialAnalysisWorkbookFormula():await buildFinancialAnalysisWorkbookOrdinary();
+    const base=((selected&&selected.name)||'financial_analysis').replace(/\.pdf$/i,'')+(mode==='formula'?'_Financial_Analysis_Formula_Driven':'_Financial_Analysis_Ordinary');
+    XLSX.writeFile(wb,base+'.xlsx',{bookType:'xlsx',compression:true});
+    setStatus(mode==='formula'?'Formula-Driven Financial Analysis Excel created.':'Ordinary Financial Analysis Excel created.');showProgress(100);setTimeout(()=>showProgress(null),500);logConversion(mode==='formula'?'Financial Analysis Excel — Formula Driven':'Financial Analysis Excel — Ordinary',base);
+  }catch(e){console.error(e);toast(e?.message||'Financial Analysis export failed.',true);showProgress(null);}
 }
-
-
-$('btnPptxMerge').addEventListener('click', () => {
-  openModal('Merge PowerPoint files', `
-    <div class="field"><label>PPTX files (merged in the order selected)</label><input type="file" id="pptxMergeFiles" accept=".pptx" multiple></div>
-    <p class="hint">Structural merge: combines each deck's slide text (title + bullets) in order. Original slide design, images, and layouts aren't preserved — same honest limit as PDF ⇄ PowerPoint conversion.</p>
-  `, async () => {
-    const files = Array.from(document.getElementById('pptxMergeFiles').files || []);
-    if(files.length < 2){ toast('Choose at least two .pptx files.', true); return; }
-    setStatus('Merging PowerPoint files…'); showProgress(20);
-    try{
-      let allSlides = [];
-      for(const f of files) allSlides = allSlides.concat(await extractPptxSlidesData(f));
-      const bytes = await buildPptxFromSlides(allSlides);
-      downloadBlob(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' }), 'merged.pptx');
-      setStatus(`Merged ${files.length} files into one deck (${allSlides.length} slides).`);
-      logConversion('Merged PowerPoint files', 'merged.pptx');
-    } catch(e){ console.error(e); toast('Could not merge those files: ' + (e && e.message ? e.message : 'unknown error'), true); }
-    finally { showProgress(null); }
-  });
-});
-
-$('btnPptxSplit').addEventListener('click', () => {
-  openModal('Split PowerPoint', `
-    <div class="field"><label>PPTX file</label><input type="file" id="pptxSplitFile" accept=".pptx"></div>
-    <div class="radio-row">
-      <label><input type="radio" name="pptxSplitMode" value="every" checked> Every N slides</label>
-      <label><input type="radio" name="pptxSplitMode" value="ranges"> Custom ranges</label>
-    </div>
-    <div class="field" id="pptxEveryField"><label>Slides per file (N)</label><input type="number" id="pptxEveryN" min="1" value="1"></div>
-    <div class="field" id="pptxRangesField" style="display:none;"><label>Ranges (e.g. 1-3, 4-4, 5-8)</label><input type="text" id="pptxRangesInput" placeholder="1-3, 4-4, 5-8"></div>
-    <p class="hint">Structural split — rebuilds each part from slide text. Downloads a .zip with one .pptx per part.</p>
-  `, async () => {
-    const file = document.getElementById('pptxSplitFile').files[0];
-    if(!file){ toast('Choose a .pptx file first.', true); return; }
-    setStatus('Splitting PowerPoint file…'); showProgress(20);
-    try{
-      const slides = await extractPptxSlidesData(file);
-      const mode = document.querySelector('input[name=pptxSplitMode]:checked').value;
-      let chunks = [];
-      if(mode === 'every'){
-        const n = parseInt(document.getElementById('pptxEveryN').value) || 1;
-        for(let s = 0; s < slides.length; s += n) chunks.push(slides.slice(s, s + n));
-      } else {
-        const raw = document.getElementById('pptxRangesInput').value;
-        const ranges = raw.split(',').map(s => s.trim()).filter(Boolean).map(s => {
-          const [a, b] = s.split('-').map(x => parseInt(x.trim()));
-          return [a, isNaN(b) ? a : b];
-        });
-        chunks = ranges.map(([a, b]) => slides.slice(Math.max(0, a - 1), b)).filter(c => c.length);
-      }
-      if(!chunks.length){ toast('No valid ranges produced any slides.', true); return; }
-      const zip = new JSZip();
-      for(let i = 0; i < chunks.length; i++) zip.file(`part${i+1}.pptx`, await buildPptxFromSlides(chunks[i]));
-      downloadBlob(await zip.generateAsync({ type:'blob' }), (file.name.replace(/\.[^.]+$/, '') || 'presentation') + '_split.zip');
-      setStatus(`Split into ${chunks.length} files.`);
-      logConversion('Split PowerPoint file', file.name);
-    } catch(e){ console.error(e); toast('Could not split that file: ' + (e && e.message ? e.message : 'unknown error'), true); }
-    finally { showProgress(null); }
-  });
-  setTimeout(() => {
-    document.querySelectorAll('input[name=pptxSplitMode]').forEach(r => r.addEventListener('change', (e) => {
-      document.getElementById('pptxEveryField').style.display = e.target.value === 'every' ? 'block' : 'none';
-      document.getElementById('pptxRangesField').style.display = e.target.value === 'ranges' ? 'block' : 'none';
-    }));
-  }, 0);
-});
-
-$('btnPptxReorder').addEventListener('click', () => {
-  openModal('Reorder slides', `
-    <div class="field"><label>PPTX file</label><input type="file" id="pptxReorderFile" accept=".pptx"></div>
-    <div id="pptxReorderList" style="display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto;"></div>
-    <p class="hint" id="pptxReorderHint" style="display:none;margin:0;">Drag to reorder, then confirm. Structural rebuild — titles and bullets carry over, original design doesn't.</p>
-  `, async () => {
-    const items = Array.from(document.querySelectorAll('#pptxReorderList .reorder-item'));
-    const slides = window.__pptxReorderSlides;
-    if(!items.length || !slides){ toast('Choose a file first.', true); return; }
-    const order = items.map(el => parseInt(el.dataset.idx));
-    const newSlides = order.map(i => slides[i]);
-    setStatus('Rebuilding presentation…'); showProgress(20);
-    try{
-      const bytes = await buildPptxFromSlides(newSlides);
-      downloadBlob(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' }), 'reordered.pptx');
-      setStatus('Slides reordered.');
-      logConversion('Reordered PowerPoint slides', 'reordered.pptx');
-    } catch(e){ console.error(e); toast('Could not rebuild the presentation.', true); }
-    finally { showProgress(null); }
-  });
-  setTimeout(() => {
-    document.getElementById('pptxReorderFile').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if(!file) return;
-      try{
-        const slides = await extractPptxSlidesData(file);
-        window.__pptxReorderSlides = slides;
-        const list = document.getElementById('pptxReorderList');
-        list.innerHTML = slides.map((s, i) => `<div class="reorder-item" data-idx="${i}" style="padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--surface);cursor:grab;font-size:12.5px;">${i+1}. ${escapeXml(s.title)}</div>`).join('');
-        Sortable.create(list, { animation:150 });
-        document.getElementById('pptxReorderHint').style.display = 'block';
-      } catch(err){ console.error(err); toast('Could not read that file: ' + (err && err.message ? err.message : 'unknown error'), true); }
-    });
-  }, 0);
-});
-
-function pptxSlideEditorBlock(slide){
-  const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-  const div = document.createElement('div');
-  div.className = 'pptx-edit-slide';
-  div.style.cssText = 'border:1px solid var(--line);border-radius:4px;padding:10px;background:var(--surface);cursor:grab;';
-  div.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-      <span class="mono" style="font-size:11px;color:var(--ink-soft);">⠿ Drag to reorder</span>
-      <button class="pptx-del-slide" type="button" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:12px;">Delete</button>
-    </div>
-    <input type="text" class="pptx-slide-title" value="${esc(slide.title)}" placeholder="Slide title" style="width:100%;margin-bottom:6px;font-weight:600;padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);">
-    <textarea class="pptx-slide-bullets" placeholder="One bullet per line" style="width:100%;min-height:70px;padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);font-size:12.5px;">${esc((slide.bullets || []).join('\n'))}</textarea>
-  `;
-  div.querySelector('.pptx-del-slide').addEventListener('click', () => div.remove());
-  return div;
-}
-$('btnPptxEdit').addEventListener('click', () => {
-  openModal('Edit PowerPoint', `
-    <div class="field"><label>PPTX file (optional — leave blank to start a new deck)</label><input type="file" id="pptxEditFile" accept=".pptx"></div>
-    <div id="pptxEditSlides" style="display:flex;flex-direction:column;gap:10px;max-height:380px;overflow-y:auto;"></div>
-    <button class="btn ghost" id="pptxAddSlide" type="button" style="align-self:flex-start;">+ Add slide</button>
-    <p class="hint">Edit each slide's title and bullets (one per line), add or delete slides, or drag to reorder. Structural rebuild — same honest limit as other PowerPoint tools here: original design isn't preserved.</p>
-  `, async () => {
-    const container = document.getElementById('pptxEditSlides');
-    if(!container || !container.children.length){ toast('Add at least one slide first.', true); return; }
-    const slides = Array.from(container.children).map(div => ({
-      title: div.querySelector('.pptx-slide-title').value || 'Untitled slide',
-      bullets: div.querySelector('.pptx-slide-bullets').value.split('\n').map(s => s.trim()).filter(Boolean),
-    }));
-    setStatus('Rebuilding presentation…'); showProgress(20);
-    try{
-      const bytes = await buildPptxFromSlides(slides);
-      shareGeneratedFile(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' }), 'edited.pptx', 'Edited PowerPoint');
-      setStatus('Presentation saved.');
-      logConversion('Edited PowerPoint', 'edited.pptx');
-    } catch(e){ console.error(e); toast('Could not rebuild the presentation.', true); }
-    finally { showProgress(null); }
-  });
-  setTimeout(() => {
-    const container = document.getElementById('pptxEditSlides');
-    Sortable.create(container, { animation:150 });
-    document.getElementById('pptxEditFile').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if(!file) return;
-      try{
-        const slides = await extractPptxSlidesData(file);
-        container.innerHTML = '';
-        slides.forEach(s => container.appendChild(pptxSlideEditorBlock(s)));
-      } catch(err){ console.error(err); toast('Could not read that file: ' + (err && err.message ? err.message : 'unknown error'), true); }
-    });
-    document.getElementById('pptxAddSlide').addEventListener('click', () => {
-      container.appendChild(pptxSlideEditorBlock({ title: 'New slide', bullets: [] }));
-    });
-  }, 0);
-});
-
-$('btnFileToPdf').addEventListener('click', () => {
-  openModal('Convert file to PDF', `
-    <div class="field"><label>File</label><input type="file" id="c2pFile" accept=".docx,.pptx,.xlsx,.xls,.csv,.txt,.md,.html,.htm"></div>
-    <p class="hint">Word and text files are laid out as wrapped paragraphs. PowerPoint files become one page per slide (title + bullets). HTML keeps headings and bullet lists, dropping styling/layout. Spreadsheets and CSVs become a table with the first row as a header; long values are truncated to fit the column width. Markdown is treated as plain text — headings aren't styled.</p>
-  `, async () => {
-    const file = document.getElementById('c2pFile').files[0];
-    if(!file){ toast('Choose a file first.', true); return; }
-    await convertFileToPdf(file);
-  });
-});
-$('btnPptxFileToPdf')?.addEventListener('click', () => $('btnFileToPdf')?.click());
-
-
-$('btnTranslateText').addEventListener('click', () => {
-  openModal('Translate text / upload', `
-    <div class="field">
-      <label>Text to translate</label>
-      <textarea id="trInput" style="min-height:150px;" placeholder="Type or paste text here, or use one of the upload options below…"></textarea>
-    </div>
-    <div class="field">
-      <label>Upload source</label>
-      <div class="row" style="gap:10px;flex-wrap:wrap;">
-        <button class="btn ghost" type="button" id="trPickFile">📁 Choose from Files</button>
-        <button class="btn ghost" type="button" id="trPickPhoto">🖼️ Choose from Photos / Gallery</button>
-      </div>
-      <input type="file" id="trUploadFile" accept=".pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown" style="display:none;">
-      <input type="file" id="trUploadPhoto" accept="image/*" style="display:none;">
-      <p class="hint" style="margin-top:7px;">On iPhone/iPad, <strong>Files</strong> opens the document picker and <strong>Photos / Gallery</strong> opens the photo picker. A photo is OCR'd in your browser before translation. Hindi is supported; if Source is Auto-detect, Devanagari text is automatically treated as Hindi.</p>
-      <div id="trUploadStatus" class="hint" style="display:none;"></div>
-    </div>
-    <div class="field row">
-      <div><label>Source language</label><select id="trSource">${langOptions(true)}</select></div>
-      <div><label>Target language</label><select id="trTarget">${langOptions(false)}</select></div>
-    </div>
-    <p class="hint" style="margin-top:-4px;">For an English photo → Hindi, keep Source as Auto-detect and select <strong>Hindi</strong> as Target. For a Hindi photo → English, select <strong>Hindi</strong> as Source.</p>
-    <div class="field"><label>Email (optional — raises the free daily translation limit)</label><input type="text" id="trEmail" placeholder="you@example.com"></div>
-    <p class="hint">You can type/paste text, upload a PDF/DOCX/TXT/MD from Files, or upload a photo from Photos/Gallery. Only the extracted text is sent to the translation service.</p>
-  `, async () => {
-    const text = document.getElementById('trInput').value.trim();
-    if(!text){ toast('Enter text or upload a file/photo first.', true); return; }
-    const source = document.getElementById('trSource').value;
-    const target = document.getElementById('trTarget').value;
-    const email = document.getElementById('trEmail').value.trim();
-    setStatus('Translating…'); showProgress(10);
-    try{
-      const translated = await translateFullText(text, source, target, email, (d,t) => showProgress(Math.round((d/t)*100)));
-      showTranslationResult(text, translated, langName(source), langName(target), 'translation');
-      setStatus('Translation complete.');
-    } catch(e){ console.error(e); toast('Translation failed — the free service may be rate-limited. Try again shortly, or add your email above to raise the limit.', true); }
-    finally { showProgress(null); }
-  });
-
-  setTimeout(() => {
-    const pickFile = document.getElementById('trPickFile');
-    const pickPhoto = document.getElementById('trPickPhoto');
-    const fileInput = document.getElementById('trUploadFile');
-    const photoInput = document.getElementById('trUploadPhoto');
-    const textArea = document.getElementById('trInput');
-    const status = document.getElementById('trUploadStatus');
-    if(!pickFile || !pickPhoto || !fileInput || !photoInput || !textArea) return;
-
-    pickFile.addEventListener('click', () => fileInput.click());
-    pickPhoto.addEventListener('click', () => photoInput.click());
-
-    fileInput.addEventListener('change', async () => {
-      const file = fileInput.files && fileInput.files[0];
-      if(!file) return;
-      try{
-        status.style.display = 'block'; status.textContent = 'Reading ' + file.name + '…';
-        const text = await extractTextFromAnyFile(file);
-        textArea.value = text || '';
-        status.textContent = text ? 'Loaded: ' + file.name : 'No text found in that file.';
-        if(!text) toast('No text found in that file.', true);
-      } catch(e){ status.textContent = 'Could not read file.'; toast(e.message || 'Could not read that file.', true); }
-    });
-
-    photoInput.addEventListener('change', async () => {
-      const image = photoInput.files && photoInput.files[0];
-      if(!image) return;
-      try{
-        status.style.display = 'block'; status.textContent = 'Reading photo with OCR…';
-        const source = document.getElementById('trSource').value;
-        const ocrLang = source === 'auto'
-          ? 'eng+hin'
-          : ocrCodeForTranslationLanguage(source);
-        const result = await Tesseract.recognize(image, ocrLang, {
-          logger: m => {
-            if(m && typeof m.progress === 'number') status.textContent = 'OCR: ' + Math.round(m.progress*100) + '%';
-          }
-        });
-        const text = result?.data?.text || '';
-        textArea.value = text;
-        status.textContent = text ? 'OCR complete: ' + image.name + ' — now tap Apply to translate.' : 'No readable text found in the photo.';
-        if(!text) toast('No readable text found. Try a clearer, well-lit photo.', true);
-      } catch(e){ status.textContent = 'Could not read photo.'; toast(e.message || 'Photo OCR failed.', true); }
-    });
-  }, 0);
-});
-
-async function extractTextFromAnyFile(file){
-  const ext = (file.name.split('.').pop() || '').toLowerCase();
-  if(ext === 'pdf'){
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const pdf = await dfGetPdfJs(bytes).promise;
-    const parts = [];
-    for(let i = 1; i <= pdf.numPages; i++){
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const items = content.items.filter(it => typeof it.str === 'string')
-        .map(it => ({ str: it.str, x: it.transform[4], y: it.transform[5], width: it.width || 0 }));
-      parts.push(`--- Page ${i} ---\n` + groupIntoLines(items).map(lineToText).join('\n'));
-    }
-    const joined = parts.join('\n\n');
-    if(!joined.replace(/---.*?---/g, '').trim()) throw new Error('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.');
-    return joined;
-  } else if(ext === 'docx'){
-    await loadLib('mammoth');
-    const buf = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({ arrayBuffer: buf });
-    return result.value;
-  } else if(['txt','md'].includes(ext)){
-    return await file.text();
-  }
-  throw new Error('Unsupported file type — use PDF, DOCX, TXT, or MD.');
-}
-$('btnTranslateDoc').addEventListener('click', () => {
-  openModal('Translate a document / image', `
-    <div class="field">
-      <label>Choose a document from Files</label>
-      <input type="file" id="trDocFile" accept=".pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown">
-      <p class="hint" style="margin-top:5px;">On iPhone/iPad, tap the picker and choose <strong>Files</strong> or a supported document from the available locations.</p>
-    </div>
-    <div class="field">
-      <label>Or choose a photo/image from Gallery</label>
-      <input type="file" id="trDocImage" accept="image/*">
-      <p class="hint" style="margin-top:5px;">On iPhone/iPad this opens the photo picker so you can select an image from <strong>Photos</strong>. It can also offer camera/photo options depending on iOS.</p>
-    </div>
-    <div class="field row">
-      <div><label>Source language</label><select id="trDocSource">${langOptions(true)}</select></div>
-      <div><label>Target language</label><select id="trDocTarget">${langOptions(false)}</select></div>
-    </div>
-    <div class="field"><label>Email (optional — raises the free daily translation limit)</label><input type="text" id="trDocEmail" placeholder="you@example.com"></div>
-    <p class="hint">Documents are read locally. For an image/photo, DocuForge first runs OCR in your browser, then sends only the extracted text to the translation service. For a scanned PDF, run OCR Studio first.</p>
-  `, async () => {
-    const file = document.getElementById('trDocFile').files[0];
-    const image = document.getElementById('trDocImage').files[0];
-    if(!file && !image){ toast('Choose a document from Files or an image from Gallery first.', true); return; }
-    if(file && image){ toast('Please choose either a document or an image, not both.', true); return; }
-    const source = document.getElementById('trDocSource').value;
-    const target = document.getElementById('trDocTarget').value;
-    const email = document.getElementById('trDocEmail').value.trim();
-    setStatus(image ? 'Reading image with OCR…' : 'Reading document…'); showProgress(10);
-    try{
-      let text = '';
-      let baseName = 'translation';
-      if(image){
-        // Use the selected source language for OCR where possible; auto-detect
-        // falls back to English+Hindi, which is useful for common Indian documents.
-        const ocrLang = source === 'auto'
-          ? 'eng+hin'
-          : ocrCodeForTranslationLanguage(source);
-        const result = await Tesseract.recognize(image, ocrLang, {
-          logger: m => {
-            if(m && typeof m.progress === 'number') showProgress(Math.max(10, Math.min(65, Math.round(m.progress * 55))));
-          }
-        });
-        text = result?.data?.text || '';
-        baseName = image.name.replace(/\.[^.]+$/, '') + '_translated';
-      } else {
-        text = await extractTextFromAnyFile(file);
-        baseName = file.name.replace(/\.[^.]+$/, '') + '_translated';
-      }
-      if(!text.trim()){ toast('No text found. For a photo, make sure the text is clear and well lit.', true); return; }
-      setStatus('Translating…');
-      const translated = await translateFullText(text, source, target, email, (d,t) => showProgress(65 + Math.round((d/t)*35)));
-      showTranslationResult(text, translated, langName(source), langName(target), baseName);
-      setStatus('Translation complete.');
-    } catch(e){ console.error(e); toast(e.message || 'Translation failed.', true); }
-    finally { showProgress(null); }
-  });
-});
-
-$('btnTranslateAI').addEventListener('click', () => {
-  const savedKey = DFStorage.getItem('pdfworkbench-ai-key') || '';
-  const savedProvider = DFStorage.getItem('pdfworkbench-ai-provider') || 'anthropic';
-  openModal('Translate via AI', `
-    <p class="hint" style="margin:0;">Uses an AI model instead of the free MyMemory service — generally much better with grammar, idioms, and longer or formal text. Needs your own API key; Google Gemini's free tier (aistudio.google.com) works well here at no cost.</p>
-    <div class="field row">
-      <div><label>Provider</label><select id="trAiProvider"><option value="anthropic" ${savedProvider==='anthropic'?'selected':''}>Anthropic (Claude)</option><option value="gemini" ${savedProvider==='gemini'?'selected':''}>Google Gemini (free tier available)</option><option value="openai" ${savedProvider==='openai'?'selected':''}>OpenAI</option></select></div>
-      <div><label>API key</label><input type="password" id="trAiKey" value="${savedKey}" placeholder="sk-..."></div>
-    </div>
-    <div class="field"><label>Target language</label><select id="trAiTarget">${langOptions(false)}</select></div>
-    <div class="field"><label>Source text</label>
-      <select id="trAiSource">
-        <option value="pdf" ${workingBytes ? '' : 'disabled'}>This PDF's text</option>
-        <option value="paste">Paste text</option>
-      </select>
-    </div>
-    <div class="field" id="trAiPasteField" style="display:none;"><label>Text</label><textarea id="trAiPasteText" style="min-height:120px;"></textarea></div>
-  `, async () => {
-    const provider = document.getElementById('trAiProvider').value;
-    const apiKey = document.getElementById('trAiKey').value.trim();
-    const target = document.getElementById('trAiTarget').value;
-    const source = document.getElementById('trAiSource').value;
-    if(!apiKey){ toast('Enter your API key.', true); return; }
-    DFStorage.setItem('pdfworkbench-ai-key', apiKey);
-    DFStorage.setItem('pdfworkbench-ai-provider', provider);
-    let text = '';
-    if(source === 'pdf'){
-      const pages = await getPdfPagesTextItems();
-      text = pages.map(p => groupIntoLines(p.items).map(lineToText).join('\n')).join('\n\n');
-      if(!text.trim()){ toast('No extractable text — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-    } else {
-      text = document.getElementById('trAiPasteText').value.trim();
-      if(!text){ toast('Paste some text first.', true); return; }
-    }
-    if(text.length > 12000) text = text.slice(0, 12000);
-    setStatus('Translating via AI…'); showProgress(20);
-    try{
-      const targetName = langName(target);
-      const prompt = `Translate the following text into ${targetName}. Output ONLY the translation \u2014 no preamble, no notes, no explanation \u2014 and preserve paragraph breaks as closely as possible:\n\n${text}`;
-      const translated = await callAI(provider, apiKey, '', prompt, 4000);
-      showTranslationResult(text, translated, 'Original', targetName, 'ai_translation');
-      setStatus('Translation complete.');
-    } catch(e){ console.error(e); toast('AI translation failed: ' + e.message, true); }
-    finally { showProgress(null); }
-  });
-  setTimeout(() => {
-    document.getElementById('trAiSource').addEventListener('change', e => {
-      document.getElementById('trAiPasteField').style.display = e.target.value === 'paste' ? 'block' : 'none';
-    });
-  }, 0);
-});
-
-$('btnTranslatePdf').addEventListener('click', () => {
-  openModal('Translate this PDF', `
-    <div class="field row">
-      <div><label>Source language</label><select id="trpSource">${langOptions(true)}</select></div>
-      <div><label>Target language</label><select id="trpTarget">${langOptions(false)}</select></div>
-    </div>
-    <div class="field"><label>Pages</label><select id="trpScope"><option value="all">All pages</option><option value="selected">Selected pages only</option></select></div>
-    <div class="field"><label>Email (optional — raises the free daily translation limit)</label><input type="text" id="trpEmail" placeholder="you@example.com"></div>
-    <p class="hint">Extracts this PDF's text layer and sends it to the free MyMemory translation service. Scanned PDFs have no text layer — run OCR first, then translate.</p>
-  `, async () => {
-    const source = document.getElementById('trpSource').value;
-    const target = document.getElementById('trpTarget').value;
-    const scope = document.getElementById('trpScope').value;
-    const email = document.getElementById('trpEmail').value.trim();
-    const pages = await getPdfPagesTextItems();
-    const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
-    if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-    const chosenPages = scope === 'selected' ? pages.filter(p => selected.has(p.pageIndex)) : pages;
-    if(!chosenPages.length){ toast('No pages selected.', true); return; }
-    const text = chosenPages.map(p => `--- Page ${p.pageIndex+1} ---\n` + groupIntoLines(p.items).map(lineToText).join('\n')).join('\n\n');
-    setStatus('Translating PDF text…'); showProgress(10);
-    try{
-      const translated = await translateFullText(text, source, target, email, (d,t) => showProgress(Math.round((d/t)*100)));
-      showTranslationResult(text, translated, langName(source), langName(target), ($('outName').value || 'document') + '_translated');
-      setStatus('Translation complete.');
-    } catch(e){ console.error(e); toast('Translation failed — the free service may be rate-limited. Try again shortly, or add your email above to raise the limit.', true); }
-    finally { showProgress(null); }
-  });
-});
-
-$('btnPdfToPptx').addEventListener('click', async () => {
-  setStatus('Building PowerPoint file…'); showProgress(20);
-  try{
-    const pages = await getPdfPagesTextItems();
-    const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
-    if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-    const slides = pages.map(p => {
-      const lines = groupIntoLines(p.items).map(lineToText).filter(l => l.trim().length);
-      return { title: lines[0] || `Page ${p.pageIndex+1}`, bullets: lines.slice(1) };
-    });
-    const bytes = await buildPptxFromSlides(slides);
-    conversionOutput(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' }), ($('outName').value || 'document') + '.pptx', 'PDF → PowerPoint');
-    setStatus('Exported PowerPoint file.'); logConversion('PDF → PowerPoint', $('outName').value);
-  } catch(e){ console.error(e); toast('Could not build the PowerPoint file.', true); }
-  finally { showProgress(null); }
-});
-
-$('btnHeaderFooter').addEventListener('click', () => {
-  openModal('Add header / footer', `
-    <p class="hint" style="margin:0;">Use <span class="mono">{page}</span> and <span class="mono">{total}</span> as placeholders. Leave any field blank to skip it.</p>
-    <div class="field"><label>Header — left</label><input type="text" id="hfHL"></div>
-    <div class="field row"><div><label>Header — center</label><input type="text" id="hfHC"></div><div><label>Header — right</label><input type="text" id="hfHR"></div></div>
-    <div class="field"><label>Footer — left</label><input type="text" id="hfFL" value="{page} of {total}"></div>
-    <div class="field row"><div><label>Footer — center</label><input type="text" id="hfFC"></div><div><label>Footer — right</label><input type="text" id="hfFR"></div></div>
-    <div class="field"><label>Font size</label><input type="number" id="hfSize" min="6" max="24" value="9"></div>
-  `, async () => {
-    await addHeaderFooter({
-      headerL: document.getElementById('hfHL').value, headerC: document.getElementById('hfHC').value, headerR: document.getElementById('hfHR').value,
-      footerL: document.getElementById('hfFL').value, footerC: document.getElementById('hfFC').value, footerR: document.getElementById('hfFR').value,
-      size: parseInt(document.getElementById('hfSize').value) || 9,
-    });
-  });
-});
-
-$('btnBates').addEventListener('click', () => {
-  openModal('Bates numbering', `
-    <p class="hint" style="margin:0;">Standard legal/audit convention: a fixed prefix plus a sequential number on every page, e.g. <span class="mono">ABC-00000001</span>.</p>
-    <div class="field"><label>Prefix</label><input type="text" id="batesPrefix" placeholder="e.g. ABC-"></div>
-    <div class="field row">
-      <div><label>Starting number</label><input type="number" id="batesStart" min="0" value="1"></div>
-      <div><label>Digits (zero-padded)</label><input type="number" id="batesDigits" min="1" max="12" value="8"></div>
-    </div>
-    <div class="field row">
-      <div><label>Position</label><select id="batesPos"><option value="right">Bottom right</option><option value="center">Bottom center</option><option value="left">Bottom left</option></select></div>
-      <div><label>Font size</label><input type="number" id="batesSize" min="6" max="18" value="9"></div>
-    </div>
-  `, async () => {
-    const prefix = document.getElementById('batesPrefix').value || '';
-    const startNum = parseInt(document.getElementById('batesStart').value) || 1;
-    const digits = parseInt(document.getElementById('batesDigits').value) || 8;
-    const position = document.getElementById('batesPos').value;
-    const size = parseInt(document.getElementById('batesSize').value) || 9;
-    await addBatesNumbering({ prefix, startNum, digits, position, size });
-  });
-});
-
-$('btnRemoveBlank').addEventListener('click', async () => {
-  setStatus('Scanning for blank pages…'); showProgress(20);
-  try{
-    const blankIndices = await detectBlankPages();
-    if(!blankIndices.length){ toast('No blank pages found.', true); return; }
-    const rows = blankIndices.map((idx, i) => `<div class="field" style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="blank_${i}" checked style="width:auto;"><label style="margin:0;font-weight:400;" for="blank_${i}">Page ${idx + 1}</label></div>`).join('');
-    openModal('Blank pages found', rows + `<p class="hint">Checked pages will be deleted. Detection is pixel-based (mostly-white pages), so a page that's blank except for a faint header/footer might still be flagged — review before confirming.</p>`, async () => {
-      const toDelete = [];
-      blankIndices.forEach((idx, i) => { if(document.getElementById('blank_' + i)?.checked) toDelete.push(idx); });
-      if(toDelete.length) await deletePages(toDelete);
-    });
-  } catch(e){ console.error(e); toast('Could not scan for blank pages.', true); }
-  finally { showProgress(null); }
-});
-
-$('btnFillForm').addEventListener('click', async () => {
-  const fields = await getFormFieldsInfo();
-  if(!fields.length){ toast('This PDF has no fillable form fields.', true); return; }
-  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-  let body = '';
-  fields.forEach((f, i) => {
-    const id = 'ff_' + i;
-    if(f.type === 'PDFCheckBox'){
-      body += `<div class="field" style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="${id}" ${f.value==='true'?'checked':''} style="width:auto;"><label style="margin:0;font-weight:400;" for="${id}">${esc(f.name)}</label></div>`;
-    } else if((f.type === 'PDFDropdown' || f.type === 'PDFRadioGroup') && f.options.length){
-      body += `<div class="field"><label>${esc(f.name)}</label><select id="${id}">${f.options.map(o=>`<option value="${esc(o)}" ${o===f.value?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`;
-    } else {
-      body += `<div class="field"><label>${esc(f.name)}</label><input type="text" id="${id}" value="${esc(f.value)}"></div>`;
-    }
-  });
-  openModal('Fill form fields', body + `<p class="hint">Use "Flatten form" afterward to lock these values in as permanent, non-editable page content.</p>`, async () => {
-    const values = {};
-    fields.forEach((f, i) => {
-      const el = document.getElementById('ff_' + i);
-      if(!el) return;
-      values[f.name] = f.type === 'PDFCheckBox' ? String(el.checked) : el.value;
-    });
-    await fillForm(values);
-  });
-});
-
-$('btnFlattenForm').addEventListener('click', () => {
-  if(confirm('Flatten the form? Field values become permanent page content and the fields can no longer be edited.')) flattenForm();
-});
-
-$('btnSign').addEventListener('click', () => {
-  openModal('Sign PDF', `
-    <div class="field"><label>Draw your signature</label>
-      <canvas id="sigCanvas" width="380" height="140" style="border:1px solid var(--line);border-radius:4px;background:#fff;touch-action:none;width:100%;max-width:380px;display:block;"></canvas>
-      <button class="btn ghost" type="button" id="sigClear" style="margin-top:6px;">Clear</button>
-    </div>
-    <div class="field row">
-      <div><label>Page number</label><input type="number" id="sigPage" min="1" value="1"></div>
-      <div><label>Position</label><select id="sigPos"><option value="br">Bottom right</option><option value="bl">Bottom left</option><option value="tr">Top right</option><option value="tl">Top left</option><option value="center">Center</option></select></div>
-    </div>
-    <div class="field"><label>Width (points)</label><input type="number" id="sigWidth" min="60" max="400" value="160"></div>
-    <p class="hint">This stamps your drawn signature onto the page as an image — a visual mark, not a cryptographic digital signature.</p>
-  `, async () => {
-    const canvas = document.getElementById('sigCanvas');
-    const pageIndex = Math.max(0, (parseInt(document.getElementById('sigPage').value) || 1) - 1);
-    const position = document.getElementById('sigPos').value;
-    const widthPt = parseInt(document.getElementById('sigWidth').value) || 160;
-    await signPdf({ dataUrl: canvas.toDataURL('image/png'), pageIndex, position, widthPt });
-  });
-  setTimeout(() => {
-    const canvas = document.getElementById('sigCanvas');
-    const clear = setupSignaturePad(canvas);
-    document.getElementById('sigClear').addEventListener('click', clear);
-  }, 0);
-});
-
-$('btnEncrypt').addEventListener('click', () => {
-  openModal('Set password (beta)', `
-    <p class="hint" style="margin:0;">Uses a community fork of the core PDF library — real encryption, but less proven than the rest of this app. Open the resulting file with your password before relying on it. <strong>Not recommended for confidential or legally sensitive documents until more thoroughly validated.</strong></p>
-    <div class="field"><label>Password to open the file</label><input type="password" id="encUserPw" placeholder="Required"></div>
-    <div class="field"><label>Owner password (optional — controls the permissions below; if left blank, the password above is used for both)</label><input type="password" id="encOwnerPw"></div>
-    <div class="field"><label>Permissions once opened</label>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:13px;">
-        <label style="display:flex;align-items:center;gap:5px;font-weight:400;margin:0;"><input type="checkbox" id="encAllowPrint" checked style="width:auto;"> Printing</label>
-        <label style="display:flex;align-items:center;gap:5px;font-weight:400;margin:0;"><input type="checkbox" id="encAllowCopy" checked style="width:auto;"> Copying text/images</label>
-        <label style="display:flex;align-items:center;gap:5px;font-weight:400;margin:0;"><input type="checkbox" id="encAllowModify" style="width:auto;"> Modifying</label>
-        <label style="display:flex;align-items:center;gap:5px;font-weight:400;margin:0;"><input type="checkbox" id="encAllowAnnotate" checked style="width:auto;"> Annotating/comments</label>
-        <label style="display:flex;align-items:center;gap:5px;font-weight:400;margin:0;"><input type="checkbox" id="encAllowForms" checked style="width:auto;"> Filling forms</label>
-      </div>
-    </div>
-  `, async () => {
-    const userPassword = document.getElementById('encUserPw').value;
-    if(!userPassword){ toast('Enter a password.', true); return; }
-    const ownerPassword = document.getElementById('encOwnerPw').value;
-    setStatus('Encrypting PDF…'); showProgress(20);
-    try{
-      const bytes = await encryptPdfBytes(workingBytes, {
-        userPassword, ownerPassword,
-        allowPrinting: document.getElementById('encAllowPrint').checked,
-        allowCopying: document.getElementById('encAllowCopy').checked,
-        allowModifying: document.getElementById('encAllowModify').checked,
-        allowAnnotating: document.getElementById('encAllowAnnotate').checked,
-        allowFillingForms: document.getElementById('encAllowForms').checked,
-      });
-      downloadBlob(new Blob([bytes], { type:'application/pdf' }), ($('outName').value || 'document') + '_protected.pdf');
-      setStatus('Password-protected PDF created — verify it opens correctly before relying on it.');
-    } catch(e){ console.error(e); toast('Could not encrypt this PDF: ' + e.message, true); }
-    finally { showProgress(null); }
-  });
-});
-
-$('btnOpenEncrypted').addEventListener('click', () => {
-  openModal('Open password-protected PDF', `
-    <p class="hint" style="margin:0;">Beta: uses the same community fork as "Set password" — less battle-tested than the rest of this app. Decrypts the file and loads it as a normal working copy; it won't stay password-protected here unless you re-apply "Set password" before exporting.</p>
-    <div class="field"><label>Password-protected PDF</label><input type="file" id="pwPdfFile" accept="application/pdf"></div>
-    <div class="field"><label>Password</label><input type="password" id="pwPdfPassword"></div>
-  `, async () => {
-    const file = document.getElementById('pwPdfFile').files[0];
-    const password = document.getElementById('pwPdfPassword').value;
-    if(!file){ toast('Choose a file.', true); return; }
-    if(!password){ toast('Enter the password.', true); return; }
-    setStatus('Decrypting PDF…'); showProgress(20);
-    try{
-      const buf = new Uint8Array(await file.arrayBuffer());
-      const decryptedBytes = await decryptPdfBytes(buf, password);
-      $('outName').value = file.name.replace(/\.pdf$/i, '') || 'document';
-      currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
-      setToolsEnabled(true);
-      await commit(decryptedBytes, `Opened and decrypted "${file.name}".`);
-      setStudio('pdf');
-    } catch(e){
-      console.error(e);
-      toast('Could not open that PDF — check the password is correct: ' + (e && e.message ? e.message : 'unknown error'), true);
-    } finally { showProgress(null); }
-  });
-});
-
-$('btnRedact').addEventListener('click', () => {
-  openModal('Redact page', `
-    <div class="field row">
-      <div><label>Page number</label><input type="number" id="redactPageNum" min="1" value="1"></div>
-      <div style="display:flex;align-items:flex-end;"><button class="btn ghost" id="redactLoadPage" type="button">Load page</button></div>
-    </div>
-    <div class="dig-canvas-wrap" style="margin-top:4px;"><canvas id="redactCanvas"></canvas></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn ghost" id="redactUndo" type="button">Undo last box</button>
-      <button class="btn ghost" id="redactClear" type="button">Clear boxes</button>
-    </div>
-    <p class="hint">Draw one or more boxes over the areas to black out, then confirm. This is real redaction: the page is flattened to an image, so the covered content is permanently removed, not just hidden underneath — that page will no longer have selectable/searchable text.</p>
-  `, async () => {
-    const boxes = window.__redactBoxes || [];
-    const pageIndex = window.__redactPageIndex;
-    const scale = window.__redactScale;
-    if(pageIndex === undefined || !boxes.length){ toast('Load a page and draw at least one box first.', true); return; }
-    setStatus('Redacting page…'); showProgress(20);
-    try{
-      await redactPage(pageIndex, boxes, scale);
-    } catch(e){ console.error(e); toast('Could not redact that page: ' + e.message, true); }
-    finally { showProgress(null); }
-  });
-  setTimeout(() => {
-    let canvas, ctx, baseImage, drawing = false, startX = 0, startY = 0, boxes = [];
-    const scale = 1.5;
-    window.__redactScale = scale;
-    function redraw(){
-      ctx.putImageData(baseImage, 0, 0);
-      ctx.fillStyle = 'rgba(0,0,0,0.85)';
-      boxes.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
-    }
-    function toCanvasCoords(e){
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-      return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
-    }
-    document.getElementById('redactLoadPage').addEventListener('click', async () => {
-      const pageNum = parseInt(document.getElementById('redactPageNum').value) || 1;
-      try{
-        const pdf = await dfGetPdfJs(workingBytes).promise;
-        if(pageNum < 1 || pageNum > pdf.numPages){ toast('Page number out of range.', true); return; }
-        const page = await pdf.getPage(pageNum);
-        const viewport = page.getViewport({ scale });
-        canvas = document.getElementById('redactCanvas');
-        canvas.width = viewport.width; canvas.height = viewport.height;
-        ctx = canvas.getContext('2d');
-        await page.render({ canvasContext: ctx, viewport }).promise;
-        baseImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        boxes = []; window.__redactBoxes = boxes; window.__redactPageIndex = pageNum - 1;
-        canvas.addEventListener('pointerdown', e => {
-          const p = toCanvasCoords(e);
-          startX = p.x; startY = p.y; drawing = true;
-          canvas.setPointerCapture(e.pointerId);
-        });
-        canvas.addEventListener('pointermove', e => {
-          if(!drawing) return;
-          const p = toCanvasCoords(e);
-          redraw();
-          ctx.fillStyle = 'rgba(0,0,0,0.5)';
-          ctx.fillRect(Math.min(startX,p.x), Math.min(startY,p.y), Math.abs(p.x-startX), Math.abs(p.y-startY));
-        });
-        canvas.addEventListener('pointerup', e => {
-          if(!drawing) return;
-          drawing = false;
-          const p = toCanvasCoords(e);
-          const box = { x: Math.min(startX,p.x), y: Math.min(startY,p.y), width: Math.abs(p.x-startX), height: Math.abs(p.y-startY) };
-          if(box.width > 4 && box.height > 4) boxes.push(box);
-          redraw();
-        });
-      } catch(e){ console.error(e); toast('Could not load that page.', true); }
-    });
-    document.getElementById('redactUndo').addEventListener('click', () => { if(ctx){ boxes.pop(); redraw(); } });
-    document.getElementById('redactClear').addEventListener('click', () => { if(ctx){ boxes = []; window.__redactBoxes = boxes; redraw(); } });
-  }, 0);
-});
-
-$('btnImagesToPdf').addEventListener('click', () => {
-  const f=window.__docuForgeStudioFile;
-  if(!f || !String(f.type||'').startsWith('image/')){
-    toast('Choose one or more images with the Upload File button above first.', true);
-    return;
-  }
-  const files = window.__docuForgeStudioFiles?.length ? window.__docuForgeStudioFiles : [f];
-  openModal('Combine images into PDF', `
-    <p class="hint">${files.length} image${files.length===1?'':'s'} selected.</p>
-    <p class="hint">Each image becomes one page, sized to match the image so nothing is cropped or stretched.</p>
-  `, async () => {
-    try{
-      const bytes = await buildImagesPdf(files);
-      downloadBlob(new Blob([bytes], { type:'application/pdf' }), (files.length === 1 ? files[0].name.replace(/\.[^.]+$/, '') : 'images') + '.pdf');
-      setStatus('Created PDF from images.');
-    } catch(e){ console.error(e); toast('Could not build a PDF from those images.', true); }
-  });
-});
-
-$('btnBatch').addEventListener('click', () => {
-  $('modalTitle').textContent = 'Batch process files';
-  $('modalConfirm').style.display = 'none';
-  $('modalCancel').textContent = 'Close';
-  $('modalBody').innerHTML = `
-    <div class="field"><label>PDF files</label><input type="file" id="batchFiles" accept="application/pdf" multiple></div>
-    <div class="field"><label>Operation</label>
-      <select id="batchOp">
-        <option value="compress">Compress</option>
-        <option value="ocr">Make searchable (OCR)</option>
-        <option value="word">Convert to Word (.docx)</option>
-        <option value="text">Convert to Text (.txt)</option>
-        <option value="watermark">Add watermark</option>
-        <option value="merge">Merge into one PDF</option>
-      </select>
-    </div>
-    <div class="field" id="batchLangField" style="display:none;"><label>OCR language</label>
-      ${ocrLangOptions('batchLang')}
-    </div>
-    <div class="field" id="batchWmField" style="display:none;"><label>Watermark text</label><input type="text" id="batchWmText" value="CONFIDENTIAL"></div>
-    <p class="hint" id="batchMergeHint" style="display:none;">Files are merged in the order they're listed above, into a single PDF.</p>
-    <p class="hint">Each file is processed independently (except Merge); results download together as one .zip. Large batches take a while since everything runs right here in your browser.</p>
-    <button class="btn primary" id="batchStart" type="button" style="align-self:flex-start;">Start batch</button>
-  `;
-  $('genericModal').classList.add('show');
-  document.getElementById('batchOp').addEventListener('change', e => {
-    document.getElementById('batchLangField').style.display = e.target.value === 'ocr' ? 'block' : 'none';
-    document.getElementById('batchWmField').style.display = e.target.value === 'watermark' ? 'block' : 'none';
-    document.getElementById('batchMergeHint').style.display = e.target.value === 'merge' ? 'block' : 'none';
-  });
-  document.getElementById('batchStart').addEventListener('click', runBatch);
-});
-
-$('btnAnalyze').addEventListener('click', async () => {
-  setStatus('Analyzing document…'); showProgress(20);
-  try{
-    const pages = await getPdfPagesTextItems();
-    const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
-    if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-    const text = pages.map(p => groupIntoLines(p.items).map(lineToText).join('\n')).join('\n');
-    const docType = detectDocumentType(text);
-    const fields = extractFields(text);
-    showAnalysisResult(docType, fields, ($('outName').value || 'document'));
-    setStatus('Analysis complete.');
-  } finally { showProgress(null); }
-});
-
+$('btnPdfFinancialAnalysisOrdinary')?.addEventListener('click',()=>runFinancialAnalysis('ordinary'));
+$('btnPdfFinancialAnalysisFormula')?.addEventListener('click',()=>runFinancialAnalysis('formula'));
 /* ---------- Generate a website ----------
    Uses the same bring-your-own-key AI infrastructure as AI Tools/Chat.
    The prompt asks for a single, complete HTML file with inline CSS —
