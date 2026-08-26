@@ -746,7 +746,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.101</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.102</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -4984,7 +4984,7 @@ $('btnPdfToCsv').addEventListener('click', async () => {
 
 
 /* ---------- PDF → Financial Analysis Excel (year-wise / credit-analysis) ----------
-   Version 101: creates a practical year-wise financial-analysis workbook while
+   Version 102: creates a practical year-wise financial-analysis workbook while
    keeping extracted/source figures separate from calculated analysis. No figure
    is invented when the source PDF does not contain the required head. */
 function financialAnalysisYearEnd(fy){
@@ -5204,62 +5204,158 @@ function faSetFormula(ws,r,c,formula,numFmt){
   if(numFmt) ws[cell].z=numFmt;
 }
 function faFormulaDrivenWorkbook(wb){
-  // Version 101: formula references must point to real Financials by Year cells.
-  // Missing source heads are represented by numeric 0 inside formulas (not the text "N/A"),
-  // preventing formulas such as SUM("N/A",...) and keeping Excel recalculation valid.
-
+  /* Version 102: genuine formula-linked workbook.
+     Financials by Year has one row per year and one column per financial head.
+     Every analysis formula therefore references the correct source COLUMN and YEAR ROW. */
   const fin=wb.Sheets['Financials by Year'];
   if(!fin) return wb;
   const range=XLSX.utils.decode_range(fin['!ref']||'A1');
-  const header={};
-  for(let c=0;c<=range.e.c;c++){const v=fin[XLSX.utils.encode_cell({r:0,c})]?.v;if(v)header[String(v).trim()]=c;}
-  const yearCols=[];
-  for(let c=2;c<=range.e.c;c++){const v=fin[XLSX.utils.encode_cell({r:0,c})]?.v;if(v)yearCols.push({year:String(v),col:c});}
+  const headerToCol={};
+  for(let c=0;c<=range.e.c;c++){
+    const v=fin[XLSX.utils.encode_cell({r:0,c})]?.v;
+    if(v!==undefined && v!==null && String(v).trim()) headerToCol[String(v).trim()]=c;
+  }
+  const yearRows=[];
+  for(let r=1;r<=range.e.r;r++){
+    const fy=String(fin[XLSX.utils.encode_cell({r,c:0})]?.v||'').trim();
+    if(/^FY\s*\d{4}\s*[-–]\s*\d{2,4}$/i.test(fy)) yearRows.push({year:fy,row:r});
+  }
   const rowByHead={};
-  for(let r=1;r<=range.e.r;r++){const v=fin[XLSX.utils.encode_cell({r,c:0})]?.v;if(v)rowByHead[String(v).trim()]=r;}
+  for(const [h,c] of Object.entries(headerToCol)) rowByHead[h]=c;
   const ref=(head,yearIdx)=>{
-    const r=rowByHead[head], c=yearCols[yearIdx]?.col;
-    return (r!=null&&c!=null)?`'Financials by Year'!${faColLetter(c)}${r+1}`:'0';
+    const c=rowByHead[head], r=yearRows[yearIdx]?.row;
+    return (c!=null && r!=null) ? `'Financials by Year'!${faColLetter(c)}${r+1}` : '0';
   };
+  const fmtNum='#,##0.00;[Red]-#,##0.00';
+  const fmtRatio='0.00';
+  const fmtPct='0.00';
+
+  function sheetRowsByLabel(ws){
+    const out={}; if(!ws) return out;
+    const rr=XLSX.utils.decode_range(ws['!ref']||'A1');
+    for(let r=0;r<=rr.e.r;r++){
+      const v=ws[XLSX.utils.encode_cell({r,c:0})]?.v;
+      if(v!==undefined && v!==null && String(v).trim()) out[String(v).trim()]=r;
+    }
+    return out;
+  }
+  function set(ws,row,col,formula,fmt){ if(ws && row!=null) faSetFormula(ws,row,col,formula,fmt); }
+
+  // Executive Summary
   const sum=wb.Sheets['Executive Summary'];
   if(sum){
-    // Executive Summary: formulas reference the Financials by Year source sheet.
-    const labels={};
-    const sr=XLSX.utils.decode_range(sum['!ref']||'A1');
-    for(let r=0;r<=sr.e.r;r++){const v=sum[XLSX.utils.encode_cell({r,c:0})]?.v;if(v)labels[String(v).trim()]=r;}
-    const defs={
-      'Revenue from operations':'Revenue from operations','Total income':'Total income','Profit before tax':'Profit before tax','Profit after tax':'Profit after tax','Operating Cash Flow':'Net cash from operating activities'
-    };
-    yearCols.forEach((y,i)=>{const c=i+1; for(const [label,head] of Object.entries(defs)){if(labels[label]!=null)faSetFormula(sum,labels[label],c,ref(head,i),'#,##0.00;[Red]-#,##0.00');}
+    const labels=sheetRowsByLabel(sum);
+    yearRows.forEach((y,i)=>{
+      const c=i+1;
       const ca=`SUM(${ref('Inventories',i)},${ref('Trade receivables',i)},${ref('Cash and cash equivalents',i)},${ref('Other current assets',i)})`;
       const cl=`SUM(${ref('Current borrowings',i)},${ref('Trade payables',i)},${ref('Other current liabilities',i)})`;
       const debt=`SUM(${ref('Non-current borrowings',i)},${ref('Current borrowings',i)})`;
       const eq=`SUM(${ref('Share capital',i)},${ref('Reserves and surplus',i)})`;
-      const set=(label,formula,fmt)=>{if(labels[label]!=null)faSetFormula(sum,labels[label],c,formula,fmt);};
-      set('Current Assets',ca,'#,##0.00;[Red]-#,##0.00'); set('Current Liabilities',cl,'#,##0.00;[Red]-#,##0.00'); set('Net Working Capital',`(${ca})-(${cl})`,'#,##0.00;[Red]-#,##0.00'); set('Total Debt',debt,'#,##0.00;[Red]-#,##0.00'); set('Total Equity',eq,'#,##0.00;[Red]-#,##0.00'); set('Current Ratio (x)',`IFERROR((${ca})/(${cl}),"")`,'0.00'); set('Debt-equity Ratio (x)',`IFERROR((${debt})/(${eq}),"")`,'0.00');
+      const defs={
+        'Revenue from operations':ref('Revenue from operations',i),
+        'Total income':ref('Total income',i),
+        'Profit before tax':ref('Profit before tax',i),
+        'Profit after tax':ref('Profit after tax',i),
+        'Current Assets':ca,
+        'Current Liabilities':cl,
+        'Net Working Capital':`(${ca})-(${cl})`,
+        'Total Debt':debt,
+        'Total Equity':eq,
+        'Current Ratio (x)':`IFERROR((${ca})/(${cl}),"")`,
+        'Debt-equity Ratio (x)':`IFERROR((${debt})/(${eq}),"")`,
+        'Operating Cash Flow':ref('Net cash from operating activities',i)
+      };
+      for(const [label,f] of Object.entries(defs)) set(sum,labels[label],c,f,(label.includes('(x)')?fmtRatio:fmtNum));
     });
   }
-  function applySourceFormulas(sheetName, headColumn=0){
-    const ws=wb.Sheets[sheetName]; if(!ws)return;
-    const rr=XLSX.utils.decode_range(ws['!ref']||'A1');
-    let headRow=-1; const first=ws['A1']?.v;
-    for(let r=0;r<=rr.e.r;r++){if(String(ws[XLSX.utils.encode_cell({r,c:0})]?.v||'').trim()==='Head'){headRow=r;break;}}
-    if(headRow<0)return;
-    for(let r=headRow+1;r<=rr.e.r;r++){
-      const h=String(ws[XLSX.utils.encode_cell({r,c:0})]?.v||'').trim(); if(!h||/^Latest year change/.test(h))continue;
-      const sourceHead=h;
-      yearCols.forEach((y,i)=>{const c=i+1;if(rowByHead[sourceHead]!=null)faSetFormula(ws,r,c,ref(sourceHead,i),'#,##0.00;[Red]-#,##0.00');});
+
+  // Direct source-linked analysis sheets.
+  function applySourceFormulas(sheetName){
+    const ws=wb.Sheets[sheetName]; if(!ws) return;
+    const labels=sheetRowsByLabel(ws);
+    for(const [label,r] of Object.entries(labels)){
+      if(label==='Head' || label==='Latest year change vs previous year' || label==='Change (latest vs prior)') continue;
+      if(rowByHead[label]==null) continue;
+      yearRows.forEach((y,i)=>set(ws,r,i+1,ref(label,i),fmtNum));
     }
   }
-  applySourceFormulas('P&L Analysis'); applySourceFormulas('Balance Sheet'); applySourceFormulas('Cash Flow');
+  applySourceFormulas('P&L Analysis');
+  applySourceFormulas('Balance Sheet');
+  applySourceFormulas('Cash Flow');
+
+  // P&L change row: latest year minus previous year.
+  const pnl=wb.Sheets['P&L Analysis'];
+  if(pnl && yearRows.length>=2){
+    const labels=sheetRowsByLabel(pnl);
+    const r=labels['Latest year change vs previous year'];
+    if(r!=null){
+      for(let rr=0;rr<=XLSX.utils.decode_range(pnl['!ref']||'A1').e.r;rr++){
+        const h=String(pnl[XLSX.utils.encode_cell({r:rr,c:0})]?.v||'').trim();
+        if(!h || h==='Latest year change vs previous year') continue;
+        if(rowByHead[h]!=null) set(pnl,r,1,`=${ref(h,0)}-${ref(h,1)}`,fmtNum);
+      }
+    }
+  }
+
+  // Margins & growth.
   const mg=wb.Sheets['Margins & Growth'];
-  if(mg){const rr=XLSX.utils.decode_range(mg['!ref']||'A1');for(let r=2;r<=rr.e.r;r++){const name=String(mg[XLSX.utils.encode_cell({r,c:0})]?.v||'');for(let i=0;i<yearCols.length;i++){const c=i+1;let f='';if(name==='Revenue growth %'){if(i<yearCols.length-1)f=`IFERROR((${ref('Revenue from operations',i)}/${ref('Revenue from operations',i+1)}-1)*100,"")`;}else if(name==='PBT margin %')f=`IFERROR(${ref('Profit before tax',i)}/${ref('Total income',i)}*100,"")`;else if(name==='PAT margin %')f=`IFERROR(${ref('Profit after tax',i)}/${ref('Total income',i)}*100,"")`;else if(name==='Finance cost / revenue %')f=`IFERROR(${ref('Finance costs',i)}/${ref('Revenue from operations',i)}*100,"")`;else if(name==='Employee cost / revenue %')f=`IFERROR(${ref('Employee benefits expense',i)}/${ref('Revenue from operations',i)}*100,"")`;if(f)faSetFormula(mg,r,c,f,'0.00');}}}
+  if(mg){
+    const rr=XLSX.utils.decode_range(mg['!ref']||'A1');
+    for(let r=0;r<=rr.e.r;r++){
+      const name=String(mg[XLSX.utils.encode_cell({r,c:0})]?.v||'').trim();
+      for(let i=0;i<yearRows.length;i++){
+        const c=i+1; let f='';
+        if(name==='Revenue growth %'){
+          f=i<yearRows.length-1 ? `IFERROR((${ref('Revenue from operations',i)}/${ref('Revenue from operations',i+1)}-1)*100,"")` : '""';
+        } else if(name==='PBT margin %') f=`IFERROR(${ref('Profit before tax',i)}/${ref('Total income',i)}*100,"")`;
+        else if(name==='PAT margin %') f=`IFERROR(${ref('Profit after tax',i)}/${ref('Total income',i)}*100,"")`;
+        else if(name==='Finance cost / revenue %') f=`IFERROR(${ref('Finance costs',i)}/${ref('Revenue from operations',i)}*100,"")`;
+        else if(name==='Employee cost / revenue %') f=`IFERROR(${ref('Employee benefits expense',i)}/${ref('Revenue from operations',i)}*100,"")`;
+        if(f) set(mg,r,c,f,fmtPct);
+      }
+    }
+  }
+
+  // Balance-sheet calculated rows.
   const bs=wb.Sheets['Balance Sheet'];
-  if(bs){const rr=XLSX.utils.decode_range(bs['!ref']||'A1');const row={};for(let r=0;r<=rr.e.r;r++){const v=bs[XLSX.utils.encode_cell({r,c:0})]?.v;if(v)row[String(v).trim()]=r;}yearCols.forEach((y,i)=>{const c=i+1;const ca=`SUM(${ref('Inventories',i)},${ref('Trade receivables',i)},${ref('Cash and cash equivalents',i)},${ref('Other current assets',i)})`;const cl=`SUM(${ref('Current borrowings',i)},${ref('Trade payables',i)},${ref('Other current liabilities',i)})`;const debt=`SUM(${ref('Non-current borrowings',i)},${ref('Current borrowings',i)})`;const eq=`SUM(${ref('Share capital',i)},${ref('Reserves and surplus',i)})`;for(const [h,f] of [['Current Assets',ca],['Current Liabilities',cl],['Total Debt',debt],['Total Equity',eq],['Net Working Capital',`(${ca})-(${cl})`]])if(row[h]!=null)faSetFormula(bs,row[h],c,f,'#,##0.00;[Red]-#,##0.00');});}
+  if(bs){
+    const labels=sheetRowsByLabel(bs);
+    yearRows.forEach((y,i)=>{
+      const c=i+1;
+      const ca=`SUM(${ref('Inventories',i)},${ref('Trade receivables',i)},${ref('Cash and cash equivalents',i)},${ref('Other current assets',i)})`;
+      const cl=`SUM(${ref('Current borrowings',i)},${ref('Trade payables',i)},${ref('Other current liabilities',i)})`;
+      const debt=`SUM(${ref('Non-current borrowings',i)},${ref('Current borrowings',i)})`;
+      const eq=`SUM(${ref('Share capital',i)},${ref('Reserves and surplus',i)})`;
+      set(bs,labels['Current Assets'],c,ca,fmtNum);
+      set(bs,labels['Current Liabilities'],c,cl,fmtNum);
+      set(bs,labels['Total Debt'],c,debt,fmtNum);
+      set(bs,labels['Total Equity'],c,eq,fmtNum);
+      set(bs,labels['Net Working Capital'],c,`(${ca})-(${cl})`,fmtNum);
+    });
+  }
+
+  // Ratios.
   const rat=wb.Sheets['Ratios'];
-  if(rat){const rr=XLSX.utils.decode_range(rat['!ref']||'A1');for(let r=0;r<=rr.e.r;r++){const name=String(rat[XLSX.utils.encode_cell({r,c:0})]?.v||'').trim();for(let i=0;i<yearCols.length;i++){const c=i+1;let f='';const ca=`SUM(${ref('Inventories',i)},${ref('Trade receivables',i)},${ref('Cash and cash equivalents',i)},${ref('Other current assets',i)})`;const cl=`SUM(${ref('Current borrowings',i)},${ref('Trade payables',i)},${ref('Other current liabilities',i)})`;const debt=`SUM(${ref('Non-current borrowings',i)},${ref('Current borrowings',i)})`;const eq=`SUM(${ref('Share capital',i)},${ref('Reserves and surplus',i)})`;if(name==='Current Ratio (x)')f=`IFERROR((${ca})/(${cl}),"")`;else if(name==='Debt-equity Ratio (x)')f=`IFERROR((${debt})/(${eq}),"")`;else if(name==='NWC / Total Assets %')f=`IFERROR(((${ca})-(${cl}))/${ref('Total assets',i)}*100,"")`;else if(name==='Debt / Total Assets %')f=`IFERROR((${debt})/${ref('Total assets',i)}*100,"")`;else if(name==='PAT Margin %')f=`IFERROR(${ref('Profit after tax',i)}/${ref('Total income',i)}*100,"")`;if(f)faSetFormula(rat,r,c,f,name.includes('%')?'0.00':'0.00');}}}
-  const cf=wb.Sheets['Cash Flow']; if(cf)applySourceFormulas('Cash Flow');
-  if(wb.Workbook)wb.Workbook.CalcPr={calcMode:'auto',fullCalcOnLoad:true,forceFullCalc:true};
+  if(rat){
+    const labels=sheetRowsByLabel(rat);
+    yearRows.forEach((y,i)=>{
+      const c=i+1;
+      const ca=`SUM(${ref('Inventories',i)},${ref('Trade receivables',i)},${ref('Cash and cash equivalents',i)},${ref('Other current assets',i)})`;
+      const cl=`SUM(${ref('Current borrowings',i)},${ref('Trade payables',i)},${ref('Other current liabilities',i)})`;
+      const debt=`SUM(${ref('Non-current borrowings',i)},${ref('Current borrowings',i)})`;
+      const eq=`SUM(${ref('Share capital',i)},${ref('Reserves and surplus',i)})`;
+      const defs={
+        'Current Ratio (x)':`IFERROR((${ca})/(${cl}),"")`,
+        'Debt-equity Ratio (x)':`IFERROR((${debt})/(${eq}),"")`,
+        'NWC / Total Assets %':`IFERROR(((${ca})-(${cl}))/${ref('Total assets',i)}*100,"")`,
+        'Debt / Total Assets %':`IFERROR((${debt})/${ref('Total assets',i)}*100,"")`,
+        'PAT Margin %':`IFERROR(${ref('Profit after tax',i)}/${ref('Total income',i)}*100,"")`
+      };
+      for(const [label,f] of Object.entries(defs)) set(rat,labels[label],c,f,label.includes('%')?fmtPct:fmtRatio);
+    });
+  }
+
+  if(wb.Workbook) wb.Workbook.CalcPr={calcMode:'auto',fullCalcOnLoad:true,forceFullCalc:true};
   return wb;
 }
 async function buildFinancialAnalysisWorkbookFormula(){const wb=await buildFinancialAnalysisWorkbookOrdinary();return faFormulaDrivenWorkbook(wb);}
