@@ -731,7 +731,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '2026.08.24.89';</script>
+<script>const DOCUFORGE_BUILD = '2026.08.26.92';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -742,7 +742,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.24.91</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.92</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -2318,7 +2318,104 @@ function toCsvValue(v){
   const s = String(v ?? '');
   return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 }
+function normaliseCellNumber(v){
+  const s=String(v??'').trim().replace(/[,₹$€£]/g,'').replace(/−/g,'-');
+  if(!s) return v;
+  if(/^\(?-?\d+(?:\.\d+)?%?\)?$/.test(s)){
+    const neg=s.startsWith('(')&&s.endsWith(')');
+    const core=s.replace(/[()]/g,'').replace(/%$/,'');
+    const n=Number(core);
+    if(Number.isFinite(n)) return s.endsWith('%') ? n/100 : (neg ? -Math.abs(n) : n);
+  }
+  return v;
+}
+function pageTitleFromLines(lines, pageIndex){
+  const all=lines.map(lineToText).map(x=>x.trim()).filter(Boolean);
+  const joined=all.slice(0,4).join(' ');
+  if(/profit.*loss/i.test(joined)) return 'Profit & Loss';
+  if(/balance\s+sheet/i.test(joined)) return 'Balance Sheet';
+  if(/cash\s+flow/i.test(joined)) return 'Cash Flow';
+  if(/key\s+ratios/i.test(joined)) return 'Key Ratios';
+  return 'Page ' + (pageIndex+1);
+}
+function inferPdfTableColumns(lines){
+  const header=lines.find(l=>/\bParticulars\b/i.test(lineToText(l)) || /^\s*KPI\b/i.test(lineToText(l)));
+  if(!header) return null;
+  const text=lineToText(header);
+  const isRatio=/^\s*KPI\b/i.test(text);
+  const anchors=[];
+  const toks=header.items;
+  if(isRatio){
+    anchors.push(toks.find(it=>/^KPI$/i.test(it.str))?.x ?? 136);
+    const y1=toks.find(it=>it.str==='2025-26');
+    const y2=toks.find(it=>it.str==='2024-25');
+    const unit=toks.find(it=>/^Unit$/i.test(it.str));
+    anchors.push(y1 ? y1.x-14 : 406);
+    anchors.push(y2 ? y2.x-14 : 516);
+    anchors.push(unit ? unit.x : 626);
+  }else{
+    anchors.push(toks.find(it=>/^Particulars$/i.test(it.str))?.x ?? 122);
+    const y1=toks.find(it=>it.str==='2025-26');
+    const y2=toks.find(it=>it.str==='2024-25');
+    anchors.push(y1 ? y1.x-14 : 512);
+    anchors.push(y2 ? y2.x-14 : 622);
+  }
+  return {anchors, headerIndex:lines.indexOf(header), isRatio};
+}
+function itemsToAnchoredCells(items, anchors){
+  const cells=Array.from({length:anchors.length},()=>[]);
+  for(const it of items){
+    let idx=0;
+    if(anchors.length===3){
+      if(it.x>= (anchors[1]+anchors[2])/2) idx=2;
+      else if(it.x>= (anchors[0]+anchors[1])/2) idx=1;
+      else idx=0;
+    }else{
+      const mids=anchors.slice(0,-1).map((a,i)=>(a+anchors[i+1])/2);
+      idx=it.x<mids[0]?0:it.x<mids[1]?1:it.x<mids[2]?2:3;
+    }
+    cells[idx].push(it);
+  }
+  return cells.map((arr,idx)=>{
+    if(!arr.length) return '';
+    arr.sort((a,b)=>a.x-b.x);
+    let out=''; let end=null;
+    for(const it of arr){
+      if(end!==null && it.x-end>1.5) out+=' ';
+      out+=it.str; end=it.x+it.width;
+    }
+    const clean=out.trim();
+    return idx>0 ? normaliseCellNumber(clean) : clean;
+  });
+}
+async function collectPdfWorkbookTables(){
+  const pages=await getPdfPagesTextItems();
+  const sheets=[]; let hasText=false;
+  pages.forEach((p,pi)=>{
+    const lines=groupIntoLines(p.items);
+    if(lines.some(l=>l.items.some(it=>String(it.str||'').trim()))) hasText=true;
+    const inferred=inferPdfTableColumns(lines);
+    if(!inferred){
+      const rows=lines.map(l=>l.items.map(it=>it.str).join(' ').trim()).filter(Boolean).map(x=>[x]);
+      if(rows.length) sheets.push({name:pageTitleFromLines(lines,pi),rows});
+      return;
+    }
+    const rows=[];
+    // Preserve the real table header, then only table rows below it.
+    const headerCells=itemsToAnchoredCells(lines[inferred.headerIndex].items,inferred.anchors);
+    rows.push(headerCells);
+    for(let i=inferred.headerIndex+1;i<lines.length;i++){
+      const line=lines[i];
+      if(!line.items.length) continue;
+      const cells=itemsToAnchoredCells(line.items,inferred.anchors);
+      if(cells.some(c=>String(c??'').trim()!=='')) rows.push(cells);
+    }
+    sheets.push({name:pageTitleFromLines(lines,pi),rows});
+  });
+  return {sheets,hasText};
+}
 async function collectPdfRows(){
+  // CSV remains a simple text extraction; Excel uses the table-aware routine below.
   const pages = await getPdfPagesTextItems();
   const rows = []; let hasText = false;
   pages.forEach(p => {
@@ -4842,18 +4939,35 @@ $('btnPdfToCsv').addEventListener('click', async () => {
 });
 
 $('btnPdfToExcel').addEventListener('click', async () => {
-  setStatus('Building Excel file…'); showProgress(20);
+  setStatus('Detecting PDF tables and building Excel workbook…'); showProgress(20);
   try{
-    const { rows, hasText } = await collectPdfRows();
+    const { sheets, hasText } = await collectPdfWorkbookTables();
     if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
     await loadLib('xlsx');
-    const ws = XLSX.utils.aoa_to_sheet(rows);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    const out = XLSX.write(wb, { bookType:'xlsx', type:'array' });
-    conversionOutput(new Blob([out], { type:'application/octet-stream' }), ($('outName').value || 'document') + '.xlsx', 'PDF → Excel');
-    setStatus('Exported Excel file.'); logConversion('PDF → Excel', $('outName').value);
-  } finally { showProgress(null); }
+    const used=new Set();
+    sheets.forEach((table,i)=>{
+      let name=(table.name||('Sheet '+(i+1))).replace(/[\\\/\?\*\[\]:]/g,'').slice(0,31)||('Sheet '+(i+1));
+      const base=name; let n=2; while(used.has(name)){ name=(base.slice(0,28)+' '+n++).slice(0,31); } used.add(name);
+      const ws=XLSX.utils.aoa_to_sheet(table.rows);
+      const maxCols=Math.max(...table.rows.map(r=>r.length),1);
+      ws['!cols']=Array.from({length:maxCols},(_,c)=>({wch:c===0?46:16}));
+      if(table.rows.length){
+        const ref=XLSX.utils.encode_range({s:{r:0,c:0},e:{r:table.rows.length-1,c:maxCols-1}});
+        ws['!autofilter']={ref};
+        for(let c=0;c<maxCols;c++){
+          const addr=XLSX.utils.encode_cell({r:0,c});
+          if(ws[addr]) ws[addr].s={font:{bold:true}};
+        }
+      }
+      XLSX.utils.book_append_sheet(wb,ws,name);
+    });
+    if(!wb.SheetNames.length){ toast('No tables could be detected in this PDF.', true); return; }
+    const out = XLSX.write(wb, { bookType:'xlsx', type:'array', cellStyles:true });
+    conversionOutput(new Blob([out], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), ($('outName').value || 'document') + '.xlsx', 'PDF → Excel');
+    setStatus(`Exported Excel workbook with ${wb.SheetNames.length} table sheet(s).`); logConversion('PDF → Excel', $('outName').value);
+  } catch(e){ console.error(e); toast('PDF → Excel failed: ' + (e?.message || 'unknown error'), true); }
+  finally { showProgress(null); }
 });
 
 $('btnPdfToWord').addEventListener('click', async () => {
