@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.6: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.7: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -732,7 +732,7 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 
 
 <style id="df1105-responsive-fix">
-/* DocuForge 27.110.6 — responsive PDF Studio only.
+/* DocuForge 27.110.7 — responsive PDF Studio only.
    Deliberately does NOT alter financial calculations/report logic. */
 html, body{
   width:100%;
@@ -842,7 +842,7 @@ main{
 
 
 <style id="df1106-pdf-studio-fix">
-/* 27.110.6: PDF Studio interaction fixes only. Financial calculations and
+/* 27.110.7: PDF Studio interaction fixes only. Financial calculations and
    PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
 @media(max-width:720px){
   #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
@@ -851,6 +851,14 @@ main{
   #df1106CropGrid input{width:100%;min-height:44px;font-size:17px;padding:8px;}
 }
 </style>
+
+<style id="df1107-view-share">
+.df-view-share-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.df-view-share-actions .btn{min-height:52px}
+@media(max-width:520px){.df-view-share-actions{grid-template-columns:1fr}}
+.df-preview-note{font-size:12px;opacity:.75;margin-top:10px}
+</style>
+
 </head>
 <body>
 <script>
@@ -873,7 +881,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.6';</script>
+<script>const DOCUFORGE_BUILD = '27.110.7';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -884,7 +892,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.6</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.7</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -2836,6 +2844,34 @@ function showCompareResult(diff, nameA, nameB){
       body{font-family:Arial,sans-serif;margin:24px;color:#222}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #ccc;padding:7px;vertical-align:top;white-space:pre-wrap;overflow-wrap:anywhere}th{background:#eee}.changed td{background:#fff8d9}.cmp-added{background:#bff0c5}.cmp-removed{background:#f5bcbc;text-decoration:line-through}.cmp-added,.cmp-removed{border-radius:3px;padding:1px 2px}</style></head><body><h2>Document Comparison</h2><p><b>${esc(nameA)}</b> vs <b>${esc(nameB)}</b></p><table><thead><tr><th style="width:40px">#</th><th>${esc(nameA)}</th><th>${esc(nameB)}</th></tr></thead><tbody>${body}</tbody></table>
 
 
+
+<script id="df1107-view-share-js">
+/* DocuForge 27.110.7
+   View-before-share UX only. Conversion engines and financial calculations
+   are intentionally untouched. */
+(function(){
+  window.__dfViewFile = function(blob, filename){
+    try{
+      const url=URL.createObjectURL(blob);
+      const w=window.open(url,'_blank','noopener,noreferrer');
+      if(!w){
+        const a=document.createElement('a');
+        a.href=url;a.target='_blank';a.rel='noopener';
+        a.download='';
+        document.body.appendChild(a);a.click();a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),60000);
+      }else{
+        setTimeout(()=>URL.revokeObjectURL(url),60000);
+      }
+      return true;
+    }catch(e){
+      if(window.toast) window.toast('Could not open the file for viewing.',true);
+      return false;
+    }
+  };
+})();
+</script>
+
 </body></html>`;
       downloadBlob(new Blob([html],{type:'text/html'}),'document-comparison.html');
     });
@@ -2858,12 +2894,16 @@ function showConversionShare(label){
   openModal('Conversion complete', `
     <div style="padding:4px 0 10px;"><strong>${label || 'File'} ready.</strong></div>
     <div class="hint" style="margin-bottom:14px;">File: <strong>${safe}</strong></div>
-    <button class="btn primary" id="convShare" type="button" style="width:100%;min-height:52px;">📤 Share via Email / WhatsApp</button>
-    <p class="hint" style="margin-top:12px;">On iPhone/iPad, this opens the system Share Sheet so you can choose WhatsApp, Mail or another app and share the converted file directly. The file is not opened or downloaded automatically.</p>
+    <div class="df-view-share-actions">
+      <button class="btn" id="convView" type="button">👁️ View File</button>
+      <button class="btn primary" id="convShare" type="button">📤 Share</button>
+    </div>
+    <p class="df-preview-note">Please view/check the converted file first. When satisfied, use Share to send it.</p>
   `, async () => {});
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
   setTimeout(() => {
+    $('convView')?.addEventListener('click', () => window.__dfViewFile(item.blob, item.filename));
     $('convShare')?.addEventListener('click', async () => {
       try{
         const file = new File([item.blob], item.filename, { type: item.blob.type || 'application/octet-stream' });
@@ -2875,8 +2915,6 @@ function showConversionShare(label){
           });
           return;
         }
-        // Desktop/older browsers without file-share support: fall back to a
-        // normal download so the user can attach the file manually.
         downloadBlob(item.blob, item.filename);
         toast('File sharing is not supported by this browser. The converted file was downloaded; attach it in Email or WhatsApp.', false);
       }catch(e){
@@ -3357,12 +3395,16 @@ function shareGeneratedFile(blob, filename, label='File'){
   openModal('PowerPoint ready', `
     <div style="padding:4px 0 10px;"><strong>${label} ready.</strong></div>
     <div class="hint" style="margin-bottom:14px;">File: <strong>${safe}</strong></div>
-    <button class="btn primary" id="pptShareFile" type="button" style="width:100%;min-height:52px;">📤 Share via Email / WhatsApp</button>
-    <p class="hint" style="margin-top:12px;">On iPhone/iPad, Share opens the system Share Sheet so you can choose WhatsApp, Mail, AirDrop, Files or another app. The PowerPoint file is not opened or downloaded automatically.</p>
+    <div class="df-view-share-actions">
+      <button class="btn" id="pptViewFile" type="button">👁️ View File</button>
+      <button class="btn primary" id="pptShareFile" type="button">📤 Share</button>
+    </div>
+    <p class="df-preview-note">View the PowerPoint file first, then share it when you are satisfied.</p>
   `, async () => {});
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
   setTimeout(() => {
+    $('pptViewFile')?.addEventListener('click', () => window.__dfViewFile(item.blob, item.filename));
     $('pptShareFile')?.addEventListener('click', async () => {
       try{
         const file = new File([item.blob], item.filename, {
@@ -4850,17 +4892,20 @@ function showPdfResult(title, blob, filename, message){
   openModal(title || 'Result ready', `
     <div style="padding:4px 0 10px;"><strong>${message || 'Your result is ready.'}</strong></div>
     <div class="hint" style="margin-bottom:14px;">File: <strong>${safe}</strong></div>
-    <button class="btn primary" id="pdfResultShare" type="button" style="width:100%;min-height:52px;">
-      📤 Share via Email / WhatsApp
-    </button>
-    <p class="hint" style="margin-top:12px;">
-      On iPhone/iPad, Share opens the system Share Sheet so you can choose WhatsApp, Mail, AirDrop, Files or another app.
-      ${isZip ? 'The split PDF files are shared together as one ZIP file.' : 'The PDF is shared as an attachment.'}
-    </p>
+    <div class="df-view-share-actions">
+      <button class="btn" id="pdfResultView" type="button">👁️ View File</button>
+      <button class="btn primary" id="pdfResultShare" type="button">📤 Share</button>
+    </div>
+    <p class="df-preview-note">View the generated file first. After checking it, use Share to send it through WhatsApp, Mail, AirDrop or another available app.</p>
+    <p class="hint" style="margin-top:8px;">${isZip ? 'ZIP files can be shared directly but may not have a browser preview.' : 'PDF files open in the device/browser PDF viewer.'}</p>
   `, async () => {});
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
   setTimeout(() => {
+    $('pdfResultView')?.addEventListener('click', () => {
+      if(isZip){ toast('ZIP files do not have a built-in browser preview. You can share the ZIP directly.', false); return; }
+      window.__dfViewFile(blob, filename);
+    });
     $('pdfResultShare')?.addEventListener('click', async () => {
       try{
         const mime = isZip ? 'application/zip' : 'application/pdf';
@@ -6571,7 +6616,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.6 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.7 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
