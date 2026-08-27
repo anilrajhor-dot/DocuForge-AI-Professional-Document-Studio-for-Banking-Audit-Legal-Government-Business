@@ -735,7 +735,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '2026.08.26.97';</script>
+<script>const DOCUFORGE_BUILD = '27.111';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -746,7 +746,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.27.110</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1113,7 +1113,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.27.110 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.110 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -5157,7 +5157,7 @@ async function buildFinancialAnalysisWorkbookOrdinary(){
   }
   const pnlWs=faFormulaSheet(wb,'P&L Analysis',pnlRows,[34,...yearCandidates.map(()=>22)]); faNumFmt(pnlWs,pnlRows,3);
   const marginRows=[['P&L MARGINS / GROWTH'],['Metric',...yearCandidates]];
-  for(const [name,num,den] of [['Revenue growth %','Revenue from operations','__prev'],['PBT margin %','Profit before tax','Total income'],['PAT margin %','Profit after tax','Total income'],['Finance cost / revenue %','Finance costs','Revenue from operations'],['Employee cost / revenue %','Employee benefits expense','Revenue from operations']]){
+  for(const [name,num,den] of [['Revenue growth %','Revenue from operations','__prev'],['PBT margin %','Profit before tax','Total income'],['PAT margin %','Profit after tax','Revenue from operations'],['Finance cost / revenue %','Finance costs','Revenue from operations'],['Employee cost / revenue %','Employee benefits expense','Revenue from operations']]){
     const row=[name];
     for(let i=0;i<yearCandidates.length;i++){
       const fy=yearCandidates[i], n=Number(sourceVal(fy,num)||0); let v='';
@@ -5367,7 +5367,7 @@ function faFormulaDrivenWorkbook(wb){
         'Debt-equity Ratio (x)':`IFERROR((${debt})/(${eq}),"")`,
         'NWC / Total Assets %':`IFERROR(((${ca})-(${cl}))/${ref('Total assets',i)}*100,"")`,
         'Debt / Total Assets %':`IFERROR((${debt})/${ref('Total assets',i)}*100,"")`,
-        'PAT Margin %':`IFERROR(${ref('Profit after tax',i)}/${ref('Total income',i)}*100,"")`
+        'PAT Margin %':`IFERROR(${ref('Profit after tax',i)}/${ref('Revenue from operations',i)}*100,"")`
       };
       for(const [label,f] of Object.entries(defs)) set(rat,labels[label],c,f,label.includes('%')?fmtPct:fmtRatio);
     });
@@ -6386,20 +6386,36 @@ function financialFmt(v,unit){
 async function showFinancialDashboard(fin, filename){
   const d=financialDashboardData(fin);
   const esc=s=>escapeXml(String(s??''));
+  const latest=d.latest, previous=d.previous;
+  const delta=(key)=>{
+    const a=financialMetric(fin,latest,key), b=financialMetric(fin,previous,key);
+    return (a!==null&&b!==null&&b!==0)?(a/b-1)*100:null;
+  };
+  const trendClass=v=>v===null?'':(v>0?'▲':v<0?'▼':'→');
   const cards=d.kpis.map(k=>`<div style="padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);"><div class="hint" style="margin:0 0 5px;">${esc(k[0])}</div><div style="font-size:20px;font-weight:800;">${esc(financialFmt(k[1],k[2]))}</div></div>`).join('');
+  const insights=[];
+  const revGrowth=delta('Revenue'), patGrowth=delta('PAT');
+  if(revGrowth!==null) insights.push(`Revenue ${trendClass(revGrowth)} ${Math.abs(revGrowth).toFixed(2)}% versus the previous year.`);
+  if(patGrowth!==null) insights.push(`PAT ${trendClass(patGrowth)} ${Math.abs(patGrowth).toFixed(2)}% versus the previous year.`);
+  const cr=financialMetric(fin,latest,'Current Ratio'); if(cr!==null) insights.push(`Current ratio is ${cr.toFixed(2)}x.`);
+  const de=financialMetric(fin,latest,'Debt-Equity'); if(de!==null) insights.push(`Debt-equity is ${de.toFixed(2)}x.`);
+  const cfo=financialMetric(fin,latest,'CFO'); if(cfo!==null) insights.push(`Operating cash flow is ${financialFmt(cfo,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · amounts and ratios are kept in separate charts</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.111</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
+    <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;margin-bottom:14px;">${cards}</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
       <div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);"><strong>Revenue & PAT — ₹ lakh</strong><div style="height:240px"><canvas id="finRevenuePat"></canvas></div></div>
       <div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);"><strong>Margins — %</strong><div style="height:240px"><canvas id="finMargins"></canvas></div></div>
-      <div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);"><strong>Liquidity & Leverage</strong><div style="height:240px"><canvas id="finRatios"></canvas></div></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);"><strong>Liquidity & Leverage — x</strong><div style="height:240px"><canvas id="finRatios"></canvas></div></div>
       <div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);"><strong>Cash Flow — ₹ lakh</strong><div style="height:240px"><canvas id="finCashFlow"></canvas></div></div>
     </div>
-    <p class="hint" style="margin-bottom:0;">Source values are read from the workbook's <strong>Financials by Year</strong> sheet. Calculated indicators use the workbook's available financial heads. Prior-year growth is shown only when a comparison year is available.</p>
+    <div style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:12px;line-height:1.5;">
+      <strong>Calculation rules</strong><br>Amounts are shown in ₹ lakh; margins in %; liquidity/leverage in x. PAT margin = PAT ÷ Revenue from Operations. Growth is calculated only where a comparison year exists. No missing figures are invented.
+    </div>
   `,async()=>{});
   $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
   setTimeout(async()=>{
@@ -6415,6 +6431,7 @@ async function showFinancialDashboard(fin, filename){
     }catch(e){console.error(e);toast('Could not render the financial dashboard.',true)}
   },0);
 }
+
 function showChartResult(labels,data,type,title){
   openModal('Chart',`<div style="height:360px;background:#fff;border-radius:8px;padding:8px;"><canvas id="genericChartCanvas"></canvas></div>`,async()=>{});
   $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
