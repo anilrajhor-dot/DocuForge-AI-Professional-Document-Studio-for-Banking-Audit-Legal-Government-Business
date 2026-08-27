@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.19: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.20: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -208,6 +208,8 @@ body.dark .dropzone .stamp{color:var(--pine);}
   border-top:1px solid var(--line); font-family:var(--font-mono); font-size:11px; color:var(--ink-soft);
 }
 .page-card .ctrls{display:flex; gap:2px;}
+.page-card .drag-handle{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;cursor:grab;touch-action:none;user-select:none;font-size:18px;color:var(--ink-soft);border:0;background:transparent;}
+.page-card .drag-handle:active{cursor:grabbing;}
 .page-card .ctrls button{
   width:22px; height:22px; border:none; background:transparent; color:var(--ink-soft); cursor:pointer;
   border-radius:3px; display:flex; align-items:center; justify-content:center;
@@ -726,7 +728,7 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 
 
 <style id="df1106-pdf-studio-fix">
-/* 27.110.19: PDF Studio interaction fixes only. Financial calculations and
+/* 27.110.20: PDF Studio interaction fixes only. Financial calculations and
    PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
 @media(max-width:720px){
   #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
@@ -758,7 +760,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.19';</script>
+<script>const DOCUFORGE_BUILD = '27.110.20';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -769,7 +771,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.19</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.20</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1876,6 +1878,14 @@ async function renderThumbnails(){
     bar.innerHTML = `<span>#${i}</span>`;
     const ctrls = document.createElement('div');
     ctrls.className = 'ctrls';
+    const dragHandle = document.createElement('button');
+    dragHandle.type = 'button';
+    dragHandle.className = 'drag-handle';
+    dragHandle.textContent = '☷';
+    dragHandle.title = 'Drag to reorder page';
+    dragHandle.setAttribute('aria-label', 'Drag to reorder page');
+    dragHandle.addEventListener('click', e => e.stopPropagation());
+    ctrls.appendChild(dragHandle);
     ctrls.appendChild(iconBtn('rotL', '↺', () => rotatePages([i-1], -90)));
     ctrls.appendChild(iconBtn('rotR', '↻', () => rotatePages([i-1], 90)));
     ctrls.appendChild(iconBtn('dup', '⧉', () => duplicatePages([i-1])));
@@ -1903,6 +1913,10 @@ function initSortable(){
   if(sortableInstance) sortableInstance.destroy();
   sortableInstance = Sortable.create(grid, {
     animation:150,
+    handle: '.drag-handle',
+    delayOnTouchOnly: true,
+    delay: 180,
+    touchStartThreshold: 6,
     onEnd: async () => {
       const newOrder = Array.from(grid.children).map(c => parseInt(c.dataset.index));
       await reorderPages(newOrder);
@@ -6631,7 +6645,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.19 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.20 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7851,7 +7865,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 \n\n
 <script id="df1111-pdf-tools-js">
-/* DocuForge 27.110.19 — PDF Studio reliability layer.
+/* DocuForge 27.110.20 — PDF Studio reliability layer.
    PDF/Excel conversion and financial calculation modules are untouched. */
 (function(){
   const $=id=>document.getElementById(id);
@@ -8024,7 +8038,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 
 <style id="df1114-preview-css">
-/* 27.110.19 — PDF Studio inspection preview */
+/* 27.110.20 — PDF Studio inspection preview */
 #df1114Preview{
   position:fixed;inset:0;z-index:2147483000;
   background:rgba(8,14,17,.82);
@@ -8230,7 +8244,7 @@ function df1115MetadataResult(){
 
 
 <script id="df1116-image-tools-reliability">
-/* DocuForge AI 27.110.19 — reliable Image/Table/QR/PDF↔Image tools.
+/* DocuForge AI 27.110.20 — reliable Image/Table/QR/PDF↔Image tools.
    Does not modify PDF→Simple Excel or PDF→Financial Excel calculations. */
 (function(){
   const $=id=>document.getElementById(id);
