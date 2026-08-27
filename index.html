@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.16: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.17: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -726,7 +726,7 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 
 
 <style id="df1106-pdf-studio-fix">
-/* 27.110.16: PDF Studio interaction fixes only. Financial calculations and
+/* 27.110.17: PDF Studio interaction fixes only. Financial calculations and
    PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
 @media(max-width:720px){
   #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
@@ -758,7 +758,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.16';</script>
+<script>const DOCUFORGE_BUILD = '27.110.17';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -769,7 +769,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.16</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.17</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -6501,7 +6501,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.16 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.17 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7720,7 +7720,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 \n\n
 <script id="df1111-pdf-tools-js">
-/* DocuForge 27.110.16 — PDF Studio reliability layer.
+/* DocuForge 27.110.17 — PDF Studio reliability layer.
    PDF/Excel conversion and financial calculation modules are untouched. */
 (function(){
   const $=id=>document.getElementById(id);
@@ -7893,7 +7893,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 
 <style id="df1114-preview-css">
-/* 27.110.16 — PDF Studio inspection preview */
+/* 27.110.17 — PDF Studio inspection preview */
 #df1114Preview{
   position:fixed;inset:0;z-index:2147483000;
   background:rgba(8,14,17,.82);
@@ -8099,7 +8099,7 @@ function df1115MetadataResult(){
 
 
 <script id="df1116-image-tools-reliability">
-/* DocuForge AI 27.110.16 — reliable Image/Table/QR/PDF↔Image tools.
+/* DocuForge AI 27.110.17 — reliable Image/Table/QR/PDF↔Image tools.
    Does not modify PDF→Simple Excel or PDF→Financial Excel calculations. */
 (function(){
   const $=id=>document.getElementById(id);
@@ -8169,16 +8169,54 @@ function df1115MetadataResult(){
     }catch(e){console.error(e);say(e?.message||'Could not combine the images into PDF.',true);}
   }
 
+  async function df1117ShowImageGallery(images,name){
+    const urls=images.map(x=>URL.createObjectURL(x.blob));
+    let idx=0;
+    openModal('PDF → Images — preview',`
+      <div style="text-align:center">
+        <div style="font-weight:800;margin-bottom:8px">Page <span id="df1117Pg">1</span> of ${images.length}</div>
+        <div style="background:#eef0ec;border:1px solid var(--line);border-radius:10px;padding:10px;overflow:auto;max-height:68vh">
+          <img id="df1117Img" src="${urls[0]}" style="display:block;max-width:100%;height:auto;margin:auto;background:#fff;box-shadow:0 2px 10px #0002">
+        </div>
+        <div style="display:flex;justify-content:center;gap:8px;margin-top:10px">
+          <button class="btn ghost" id="df1117Prev">‹ Previous</button>
+          <button class="btn ghost" id="df1117Next">Next ›</button>
+        </div>
+        <p class="hint">Inspect every page here. The ZIP contains the same PNG images.</p>
+      </div>`,async()=>{});
+    $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
+    const cleanup=()=>urls.forEach(u=>URL.revokeObjectURL(u));
+    setTimeout(()=>{
+      const img=$('df1117Img'),pg=$('df1117Pg');
+      const update=()=>{img.src=urls[idx];pg.textContent=String(idx+1);};
+      $('df1117Prev')?.addEventListener('click',()=>{idx=(idx-1+urls.length)%urls.length;update();});
+      $('df1117Next')?.addEventListener('click',()=>{idx=(idx+1)%urls.length;update();});
+      $('modalCancel')?.addEventListener('click',cleanup,{once:true});
+    },0);
+  }
+
   async function doPdfToImages(file){
     try{
       const bytes=new Uint8Array(await file.arrayBuffer());
-      const zip=await convertPdfToImagesZip('png',0.92);
+      const pdf=await dfGetPdfJs(bytes).promise;
+      const images=[];
+      for(let i=1;i<=pdf.numPages;i++){
+        const page=await pdf.getPage(i);
+        const viewport=page.getViewport({scale:2.2});
+        const c=document.createElement('canvas'); c.width=Math.ceil(viewport.width); c.height=Math.ceil(viewport.height);
+        await page.render({canvasContext:c.getContext('2d'),viewport}).promise;
+        const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+        images.push({page:i,blob});
+      }
+      const zip=new JSZip();
+      for(const x of images) zip.file(`page_${String(x.page).padStart(3,'0')}.png`,await x.blob.arrayBuffer());
+      const zipBlob=await zip.generateAsync({type:'blob'});
       const name=file.name.replace(/\.pdf$/i,'')+'_images.zip';
       resultModal('PDF converted to images',
-        `All pages have been rendered as high-resolution PNG images and placed in <strong>${esc(name)}</strong>.`,
-        null,
-        ()=>shareBlob(zip,name,'application/zip'),
-        ()=>downloadBlob(zip,name));
+        `<strong>${images.length}</strong> page image${images.length===1?'':'s'} created. <strong>View images before sharing.</strong>`,
+        ()=>df1117ShowImageGallery(images,name),
+        ()=>shareBlob(zipBlob,name,'application/zip'),
+        ()=>downloadBlob(zipBlob,name));
       say('PDF converted to images. Download or share the ZIP.',false);
     }catch(e){console.error(e);say(e?.message||'Could not convert the PDF to images.',true);}
   }
@@ -8212,7 +8250,7 @@ function df1115MetadataResult(){
         for(const c of tries){const r=await bd.detect(c);if(r?.length)return r[0].rawValue;}
       }catch(_){}
     }
-    await loadLib('jsqr');
+    if(typeof jsQR !== 'function') return null;
     for(const c of tries){
       const ctx=c.getContext('2d',{willReadFrequently:true});
       const data=ctx.getImageData(0,0,c.width,c.height);
@@ -8231,7 +8269,7 @@ function df1115MetadataResult(){
         const value=await qrDetect(file);
         if(value) showTextResult('QR code contents',value,'qr_result.txt',true);
         else say('No QR code found. Use a clear, well-lit image with the complete QR square visible.',true);
-      }catch(e){console.error(e);say(e?.message||'Could not read the QR code.',true);}
+      }catch(e){console.error(e);say('QR reader could not run offline on this browser. The app no longer tries to connect to the internet. A bundled QR decoding engine is required for offline iPhone support.',true);}
     });
   }
 
