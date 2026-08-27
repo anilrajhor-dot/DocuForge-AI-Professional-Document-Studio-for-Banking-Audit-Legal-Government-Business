@@ -746,7 +746,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 2026.08.26.104</div>
+  <div style="font-size:13px;font-weight:700;">Version 2026.08.27.110</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1113,7 +1113,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 2026.08.21.82 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 2026.08.27.110 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -6288,6 +6288,144 @@ $('exportAllZipTile').addEventListener('click', async () => {
 });
 
 /* ---------- Excel / CSV → Chart ---------- */
+/* Financial-aware spreadsheet engine.  Generic charting remains available,
+   but recognised financial-analysis workbooks are routed to a dedicated
+   dashboard so currency amounts, percentages and ratios are never mixed. */
+function chartNum(v){
+  if(v === null || v === undefined || v === '') return null;
+  if(typeof v === 'number') return Number.isFinite(v) ? v : null;
+  const s=String(v).replace(/,/g,'').replace(/₹/g,'').replace(/%/g,'').trim();
+  const n=parseFloat(s);
+  return Number.isFinite(n) ? n : null;
+}
+function analyzeColumn(rows, idx){
+  const vals=rows.slice(1).map(r=>r && r[idx] !== undefined ? r[idx] : '').filter(v=>String(v).trim()!=='');
+  const nums=vals.map(chartNum).filter(v=>v!==null);
+  const pctNumeric=vals.length ? nums.length/vals.length*100 : 0;
+  const pctNonzero=nums.length ? nums.filter(v=>v!==0).length/nums.length*100 : 0;
+  const isSequential=nums.length>=3 && nums.every((v,i)=>i===0 || v===nums[i-1]+1);
+  return {pctNumeric,pctNonzero,isSequential,samples:vals.slice(0,3).map(v=>String(v))};
+}
+function financialRowsFromWorkbook(wb){
+  const sn=wb.SheetNames.find(n=>String(n).toLowerCase().replace(/\s+/g,' ')==='financials by year');
+  if(!sn) return null;
+  const ws=wb.Sheets[sn];
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''});
+  if(rows.length<3) return null;
+  const headers=rows[0].map(v=>String(v??'').trim());
+  const fyIdx=headers.findIndex(h=>/^fiscal year$/i.test(h));
+  const revIdx=headers.findIndex(h=>/^revenue from operations$/i.test(h));
+  const patIdx=headers.findIndex(h=>/^profit after tax$/i.test(h));
+  const pbtIdx=headers.findIndex(h=>/^profit before tax$/i.test(h));
+  const assetsIdx=headers.findIndex(h=>/^total assets$/i.test(h));
+  if(fyIdx<0 || revIdx<0 || patIdx<0 || pbtIdx<0 || assetsIdx<0) return null;
+  const data=rows.slice(1).filter(r=>r && r[fyIdx] !== '');
+  if(!data.length) return null;
+  return {headers,rows:data,fyIdx,revIdx,patIdx,pbtIdx,assetsIdx,
+    otherIncomeIdx:headers.findIndex(h=>/^other income$/i.test(h)),
+    totalIncomeIdx:headers.findIndex(h=>/^total income$/i.test(h)),
+    currentBorrowIdx:headers.findIndex(h=>/^current borrowings$/i.test(h)),
+    nonCurrentBorrowIdx:headers.findIndex(h=>/^non-current borrowings$/i.test(h)),
+    payablesIdx:headers.findIndex(h=>/^trade payables$/i.test(h)),
+    otherCLIdx:headers.findIndex(h=>/^other current liabilities$/i.test(h)),
+    inventoriesIdx:headers.findIndex(h=>/^inventories$/i.test(h)),
+    receivablesIdx:headers.findIndex(h=>/^trade receivables$/i.test(h)),
+    cashIdx:headers.findIndex(h=>/^cash and cash equivalents$/i.test(h)),
+    otherCAIdx:headers.findIndex(h=>/^other current assets$/i.test(h)),
+    equityIdx:headers.findIndex(h=>/^reserves and surplus$/i.test(h)),
+    shareIdx:headers.findIndex(h=>/^share capital$/i.test(h)),
+    cfoIdx:headers.findIndex(h=>/^net cash from operating activities$/i.test(h)),
+    cfiIdx:headers.findIndex(h=>/^net cash used in investing activities$/i.test(h)),
+    cffIdx:headers.findIndex(h=>/^net cash used in financing activities$/i.test(h)),
+    cashIncIdx:headers.findIndex(h=>/^net increase in cash$/i.test(h)),
+    closingCashIdx:headers.findIndex(h=>/^closing cash and cash equivalents$/i.test(h))};
+}
+function fyVal(fin,row,idx){ return idx>=0 ? chartNum(row[idx]) : null; }
+function financialMetric(fin,row,key){
+  const v=k=>fyVal(fin,row,fin[k+'Idx']);
+  switch(key){
+    case 'Revenue': return v('rev');
+    case 'PAT': return v('pat');
+    case 'PBT': return v('pbt');
+    case 'Total Income': return v('totalIncome');
+    case 'Current Assets': return ['inventories','receivables','cash','otherCA'].reduce((a,k)=>a+(v(k)||0),0);
+    case 'Current Liabilities': return ['currentBorrow','payables','otherCL'].reduce((a,k)=>a+(v(k)||0),0);
+    case 'Debt': return ['currentBorrow','nonCurrentBorrow'].reduce((a,k)=>a+(v(k)||0),0);
+    case 'Equity': return ['share','equity'].reduce((a,k)=>a+(v(k)||0),0);
+    case 'NWC': return financialMetric(fin,row,'Current Assets')-financialMetric(fin,row,'Current Liabilities');
+    case 'Current Ratio': { const cl=financialMetric(fin,row,'Current Liabilities'); return cl ? financialMetric(fin,row,'Current Assets')/cl : null; }
+    case 'Debt-Equity': { const e=financialMetric(fin,row,'Equity'); return e ? financialMetric(fin,row,'Debt')/e : null; }
+    case 'PAT Margin': { const r=v('rev'); return r ? v('pat')/r*100 : null; }
+    case 'PBT Margin': { const r=v('totalIncome'); return r ? v('pbt')/r*100 : null; }
+    case 'CFO': return v('cfo');
+    case 'CFI': return v('cfi');
+    case 'CFF': return v('cff');
+    case 'Net Cash Change': return v('cashInc');
+    default: return null;
+  }
+}
+function financialDashboardData(fin){
+  const labels=fin.rows.map(r=>String(r[fin.fyIdx]??''));
+  const latest=fin.rows[0], previous=fin.rows[1];
+  const revenue=financialMetric(fin,latest,'Revenue'), prevRevenue=financialMetric(fin,previous,'Revenue');
+  const pat=financialMetric(fin,latest,'PAT'), prevPAT=financialMetric(fin,previous,'PAT');
+  return {labels,latest,previous, kpis:[
+    ['Revenue',revenue,'₹ lakh'],['Revenue Growth',prevRevenue ? (revenue/prevRevenue-1)*100:null,'%'],
+    ['PBT',financialMetric(fin,latest,'PBT'),'₹ lakh'],['PAT',pat,'₹ lakh'],
+    ['PAT Growth',prevPAT ? (pat/prevPAT-1)*100:null,'%'],['PAT Margin',financialMetric(fin,latest,'PAT Margin'),'%'],
+    ['Current Ratio',financialMetric(fin,latest,'Current Ratio'),'x'],['Debt-Equity',financialMetric(fin,latest,'Debt-Equity'),'x'],
+    ['NWC',financialMetric(fin,latest,'NWC'),'₹ lakh']
+  ]};
+}
+function financialFmt(v,unit){
+  if(v===null || v===undefined || !Number.isFinite(v)) return '—';
+  if(unit==='₹ lakh') return new Intl.NumberFormat('en-IN',{maximumFractionDigits:2}).format(v)+' ₹ lakh';
+  if(unit==='%') return v.toFixed(2)+'%';
+  return v.toFixed(2)+'x';
+}
+async function showFinancialDashboard(fin, filename){
+  const d=financialDashboardData(fin);
+  const esc=s=>escapeXml(String(s??''));
+  const cards=d.kpis.map(k=>`<div style="padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);"><div class="hint" style="margin:0 0 5px;">${esc(k[0])}</div><div style="font-size:20px;font-weight:800;">${esc(financialFmt(k[1],k[2]))}</div></div>`).join('');
+  openModal('Financial Analysis Dashboard',`
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · amounts and ratios are kept in separate charts</div></div>
+      <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;margin-bottom:14px;">${cards}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
+      <div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);"><strong>Revenue & PAT — ₹ lakh</strong><div style="height:240px"><canvas id="finRevenuePat"></canvas></div></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);"><strong>Margins — %</strong><div style="height:240px"><canvas id="finMargins"></canvas></div></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);"><strong>Liquidity & Leverage</strong><div style="height:240px"><canvas id="finRatios"></canvas></div></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);"><strong>Cash Flow — ₹ lakh</strong><div style="height:240px"><canvas id="finCashFlow"></canvas></div></div>
+    </div>
+    <p class="hint" style="margin-bottom:0;">Source values are read from the workbook's <strong>Financials by Year</strong> sheet. Calculated indicators use the workbook's available financial heads. Prior-year growth is shown only when a comparison year is available.</p>
+  `,async()=>{});
+  $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
+  setTimeout(async()=>{
+    try{
+      await loadLib('chartjs');
+      if(Chart.registerables){try{Chart.register(...Chart.registerables)}catch(e){}}
+      const labels=d.labels;
+      const chart=(id,type,datasets,opts={})=>{const el=document.getElementById(id); if(!el)return; const old=Chart.getChart?.(el); if(old)old.destroy(); new Chart(el.getContext('2d'),{type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true}},...opts}});};
+      chart('finRevenuePat','bar',[{label:'Revenue',data:fin.rows.map(r=>financialMetric(fin,r,'Revenue'))},{label:'PAT',data:fin.rows.map(r=>financialMetric(fin,r,'PAT'))}],{scales:{y:{beginAtZero:true,title:{display:true,text:'₹ lakh'}}}});
+      chart('finMargins','bar',[{label:'PBT Margin',data:fin.rows.map(r=>financialMetric(fin,r,'PBT Margin'))},{label:'PAT Margin',data:fin.rows.map(r=>financialMetric(fin,r,'PAT Margin'))}],{scales:{y:{title:{display:true,text:'%'}}}});
+      chart('finRatios','bar',[{label:'Current Ratio',data:fin.rows.map(r=>financialMetric(fin,r,'Current Ratio'))},{label:'Debt-Equity',data:fin.rows.map(r=>financialMetric(fin,r,'Debt-Equity'))}],{scales:{y:{beginAtZero:true,title:{display:true,text:'x'}}}});
+      chart('finCashFlow','bar',[{label:'Operating',data:fin.rows.map(r=>financialMetric(fin,r,'CFO'))},{label:'Investing',data:fin.rows.map(r=>financialMetric(fin,r,'CFI'))},{label:'Financing',data:fin.rows.map(r=>financialMetric(fin,r,'CFF'))}],{scales:{y:{title:{display:true,text:'₹ lakh'}}}});
+    }catch(e){console.error(e);toast('Could not render the financial dashboard.',true)}
+  },0);
+}
+function showChartResult(labels,data,type,title){
+  openModal('Chart',`<div style="height:360px;background:#fff;border-radius:8px;padding:8px;"><canvas id="genericChartCanvas"></canvas></div>`,async()=>{});
+  $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
+  setTimeout(async()=>{try{await loadLib('chartjs');const el=document.getElementById('genericChartCanvas');const old=Chart.getChart?.(el);if(old)old.destroy();const t=type==='hbar'?'bar':type==='area'?'line':type;new Chart(el.getContext('2d'),{type:t,data:{labels,datasets:[{label:title,data,fill:type==='area',tension:.2}]},options:{indexAxis:type==='hbar'?'y':'x',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true}}}})}catch(e){console.error(e);toast('Could not render the chart.',true)}},0);
+}
+function detectFinancialWorkbook(wb){
+  const names=wb.SheetNames.map(n=>String(n).toLowerCase());
+  const hasFinancialSheet=names.some(n=>n.replace(/\s+/g,' ')==='financials by year');
+  const hasFinancialCompanions=['executive summary','p&l analysis','margins & growth','balance sheet','ratios','cash flow'].filter(n=>names.includes(n)).length>=3;
+  return hasFinancialSheet && hasFinancialCompanions;
+}
 function dataUrlToBlob(dataUrl){
   const [meta, b64] = dataUrl.split(',');
   const mime = meta.match(/:(.*?);/)[1];
@@ -6309,7 +6447,7 @@ $('btnExcelChart').addEventListener('click', () => {
   openModal('Excel / CSV → Chart', `
     <div class="field"><label>Spreadsheet file</label><input type="file" id="chartFile" accept=".xlsx,.xls,.csv"></div>
     <div id="chartColumnsArea"></div>
-    <p class="hint">Uses the first sheet. Columns marked 🔢 look numeric and useful; ⚠️ marks a row-number-style column — a poor choice for either axis. Sample values are shown so you can tell columns apart before picking.</p>
+    <p class="hint">The app automatically detects supported financial-analysis workbooks and opens a financial dashboard. Other spreadsheets use the generic chart builder. Columns marked 🔢 look numeric; ⚠️ marks a likely row-number/ID column.</p>
   `, async () => {
     const rows = window.__chartRows;
     if(!rows){ toast('Choose a spreadsheet file first.', true); return; }
@@ -6353,6 +6491,10 @@ $('btnExcelChart').addEventListener('click', () => {
         await loadLib('xlsx');
         const buf = await file.arrayBuffer();
         const wb = XLSX.read(buf, { type:'array' });
+        if(detectFinancialWorkbook(wb)){
+          const fin=financialRowsFromWorkbook(wb);
+          if(fin){ await showFinancialDashboard(fin,file.name); return; }
+        }
         const ws = wb.Sheets[wb.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:'' });
         if(!rows.length){ toast('Could not read any data from that file.', true); return; }
