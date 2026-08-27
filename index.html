@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.5: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.6: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -732,7 +732,7 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 
 
 <style id="df1105-responsive-fix">
-/* DocuForge 27.110.5 — responsive PDF Studio only.
+/* DocuForge 27.110.6 — responsive PDF Studio only.
    Deliberately does NOT alter financial calculations/report logic. */
 html, body{
   width:100%;
@@ -840,6 +840,17 @@ main{
 }
 </style>
 
+
+<style id="df1106-pdf-studio-fix">
+/* 27.110.6: PDF Studio interaction fixes only. Financial calculations and
+   PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
+@media(max-width:720px){
+  #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
+  #genericModal .modal-body{overflow:auto;}
+  #df1106CropGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  #df1106CropGrid input{width:100%;min-height:44px;font-size:17px;padding:8px;}
+}
+</style>
 </head>
 <body>
 <script>
@@ -862,7 +873,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.5';</script>
+<script>const DOCUFORGE_BUILD = '27.110.6';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -873,7 +884,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.5</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.6</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -2823,161 +2834,7 @@ function showCompareResult(diff, nameA, nameB){
       }).join('');
       const html=`<!doctype html><html><head><meta charset="utf-8"><title>Comparison</title><style>
       body{font-family:Arial,sans-serif;margin:24px;color:#222}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #ccc;padding:7px;vertical-align:top;white-space:pre-wrap;overflow-wrap:anywhere}th{background:#eee}.changed td{background:#fff8d9}.cmp-added{background:#bff0c5}.cmp-removed{background:#f5bcbc;text-decoration:line-through}.cmp-added,.cmp-removed{border-radius:3px;padding:1px 2px}</style></head><body><h2>Document Comparison</h2><p><b>${esc(nameA)}</b> vs <b>${esc(nameB)}</b></p><table><thead><tr><th style="width:40px">#</th><th>${esc(nameA)}</th><th>${esc(nameB)}</th></tr></thead><tbody>${body}</tbody></table>
-<script id="df1104-pdf-fix-js">
-/* DocuForge 27.110.5 — PDF Studio reliability fix
-   Fixes Insert PDF at page, Crop pages and Remove blank pages.
-   All three use explicit UI + existing workingBytes/commit pipeline. */
-(function(){
-  const $id = id => document.getElementById(id);
-  const toast = (m,b) => window.toast ? window.toast(m,b) : alert(m);
-  const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const indices = () => Array.from(window.selected||[]).sort((a,b)=>a-b);
-  const allIndices = async () => {
-    const doc=await PDFDocument.load(window.workingBytes);
-    return Array.from({length:doc.getPageCount()},(_,i)=>i);
-  };
 
-  async function insertRobust(file,pos){
-    if(typeof window.insertPdfAt==='function'){ await window.insertPdfAt(file,pos); return; }
-    throw new Error('PDF insertion engine is unavailable.');
-  }
-
-  function openInsert(){
-    if(!window.workingBytes){ toast('Open a PDF first.',true); return; }
-    let pages=1;
-    PDFDocument.load(window.workingBytes).then(d=>pages=d.getPageCount()).catch(()=>{});
-    window.openModal('Insert PDF at page…',`
-      <div id="df1104InsertBox">
-        <div class="field"><label>PDF or image to insert</label>
-          <input type="file" id="df1104InsFile" accept="application/pdf,.pdf,image/*"></div>
-        <div class="field"><label>Insert before page number</label>
-          <input type="number" id="df1104InsPos" min="1" value="1" inputmode="numeric">
-          <p class="hint">Enter 1 to insert before page 1. Enter one greater than the current last page to append.</p>
-        </div>
-      </div>`,async()=>{
-        const f=$id('df1104InsFile')?.files?.[0];
-        const p=parseInt($id('df1104InsPos')?.value,10);
-        if(!f){toast('Choose a PDF or image to insert.',true);return;}
-        if(!Number.isFinite(p)||p<1||p>pages+1){toast('Enter a page number from 1 to '+(pages+1)+'.',true);return;}
-        await insertRobust(f,p-1);
-      });
-  }
-
-  function openCrop(){
-    if(!window.workingBytes){toast('Open a PDF first.',true);return;}
-    const sel=indices();
-    if(!sel.length){toast('Select at least one page to crop.',true);return;}
-    window.openModal('Crop selected pages',`
-      <div id="df1104CropBox">
-        <p class="hint">Enter margins in PDF points (72 points = 1 inch). The crop is non-destructive and can be undone.</p>
-        <div class="row">
-          <div class="field"><label>Left</label><input type="number" id="df1104L" min="0" value="0"></div>
-          <div class="field"><label>Right</label><input type="number" id="df1104R" min="0" value="0"></div>
-          <div class="field"><label>Top</label><input type="number" id="df1104T" min="0" value="36"></div>
-          <div class="field"><label>Bottom</label><input type="number" id="df1104B" min="0" value="36"></div>
-        </div>
-        <p class="hint"><strong>${sel.length}</strong> selected page${sel.length===1?'':'s'}.</p>
-      </div>`,async()=>{
-        const margins={
-          left:Math.max(0,parseFloat($id('df1104L')?.value)||0),
-          right:Math.max(0,parseFloat($id('df1104R')?.value)||0),
-          top:Math.max(0,parseFloat($id('df1104T')?.value)||0),
-          bottom:Math.max(0,parseFloat($id('df1104B')?.value)||0)
-        };
-        const doc=await PDFDocument.load(window.workingBytes);
-        for(const i of sel){
-          const page=doc.getPage(i), {width,height}=page.getSize();
-          const x=Math.min(margins.left,width-10), y=Math.min(margins.bottom,height-10);
-          const w=Math.max(10,width-margins.left-margins.right);
-          const h=Math.max(10,height-margins.top-margins.bottom);
-          page.setCropBox(x,y,w,h);
-        }
-        const bytes=await doc.save();
-        await window.commit(bytes,`Cropped ${sel.length} page(s).`);
-      });
-  }
-
-  async function pageInkRatio(pdfPage){
-    const viewport=pdfPage.getViewport({scale:.35});
-    const canvas=document.createElement('canvas');
-    canvas.width=Math.max(1,Math.ceil(viewport.width));
-    canvas.height=Math.max(1,Math.ceil(viewport.height));
-    const ctx=canvas.getContext('2d',{willReadFrequently:true});
-    await pdfPage.render({canvasContext:ctx,viewport}).promise;
-    const data=ctx.getImageData(0,0,canvas.width,canvas.height).data;
-    let ink=0, total=0;
-    // Sample every 2nd pixel for speed; count non-white/non-transparent pixels.
-    for(let i=0;i<data.length;i+=8){
-      const a=data[i+3];
-      if(a<10) continue;
-      total++;
-      const r=data[i],g=data[i+1],b=data[i+2];
-      if(Math.min(r,g,b)<245) ink++;
-    }
-    return total?ink/total:0;
-  }
-
-  async function detectBlankPages(){
-    if(!window.workingBytes){toast('Open a PDF first.',true);return;}
-    const pdf=await (window.dfGetPdfJs ? window.dfGetPdfJs(window.workingBytes).promise : null);
-    if(!pdf) throw new Error('PDF preview engine is unavailable.');
-    const found=[];
-    for(let i=1;i<=pdf.numPages;i++){
-      const ratio=await pageInkRatio(await pdf.getPage(i));
-      if(ratio<0.0012) found.push({page:i,ratio});
-      if(window.showProgress) window.showProgress(Math.round(i/pdf.numPages*90));
-    }
-    if(window.showProgress) window.showProgress(null);
-    if(!found.length){toast('No blank pages were detected.',false);return;}
-    const pageText=found.map(x=>`Page ${x.page}`).join(', ');
-    window.openModal('Blank pages detected',`
-      <div id="df1104BlankBox">
-        <p><strong>${found.length}</strong> page${found.length===1?'':'s'} appear blank: ${esc(pageText)}.</p>
-        <p class="hint">Detection checks rendered page pixels, so it also works for scanned PDFs. Very light content may be classified as blank.</p>
-        <div class="row">
-          <button type="button" class="btn" id="df1104BlankCancel">Cancel</button>
-          <button type="button" class="btn primary" id="df1104BlankDelete">Remove detected pages</button>
-        </div>
-      </div>`,async()=>{});
-    // The modal confirm is hidden; use explicit action button.
-    setTimeout(()=>{
-      const b=$id('df1104BlankDelete');
-      if(b)b.onclick=async()=>{
-        try{
-          const doc=await PDFDocument.load(window.workingBytes);
-          if(doc.getPageCount()-found.length<1){toast('Cannot remove all pages.',true);return;}
-          [...found].sort((a,b)=>b.page-a.page).forEach(x=>doc.removePage(x.page-1));
-          const bytes=await doc.save();
-          if(window.closeModal) window.closeModal();
-          await window.commit(bytes,`Removed ${found.length} blank page(s).`);
-        }catch(e){toast(e?.message||'Could not remove blank pages.',true);}
-      };
-      const c=$id('df1104BlankCancel');
-      if(c)c.onclick=()=>window.closeModal&&window.closeModal();
-    },20);
-  }
-
-  function install(){
-    // Capture phase deliberately supersedes older handlers in this build.
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnInsert');
-      if(b){e.preventDefault();e.stopImmediatePropagation();openInsert();}
-    },true);
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnCrop');
-      if(b){e.preventDefault();e.stopImmediatePropagation();openCrop();}
-    },true);
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnRemoveBlank');
-      if(b){
-        e.preventDefault();e.stopImmediatePropagation();
-        detectBlankPages().catch(err=>{if(window.showProgress)window.showProgress(null);toast(err?.message||'Could not check for blank pages.',true);});
-      }
-    },true);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
-})();
-</script>
 
 </body></html>`;
       downloadBlob(new Blob([html],{type:'text/html'}),'document-comparison.html');
@@ -6714,7 +6571,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.5 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.6 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7931,5 +7788,103 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 })();
 </script>
 
-</body>
+\n<script id="df1106-pdf-studio-fix-js">
+(function(){
+  const $=id=>document.getElementById(id);
+  function msg(t,b){ if(typeof toast==='function') toast(t,b); else alert(t); }
+  function selected(){ return typeof selectedIndices==='function' ? selectedIndices() : Array.from(window.selected||[]).sort((a,b)=>a-b); }
+
+  async function pageCount(){
+    const d=await PDFDocument.load(workingBytes); return d.getPageCount();
+  }
+
+  function insertTool(){
+    if(!workingBytes){msg('Open a PDF first.',true);return;}
+    const input=document.createElement('input');
+    input.type='file'; input.accept='application/pdf,.pdf,image/*'; input.hidden=true;
+    document.body.appendChild(input);
+    input.onchange=async()=>{
+      const file=input.files&&input.files[0]; input.remove();
+      if(!file)return;
+      try{
+        const pages=await pageCount();
+        let chosen=1;
+        openModal('Insert PDF at page…',`
+          <div class="field"><label>Selected file</label><div style="padding:10px;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere;"><strong>${String(file.name).replace(/[&<>]/g,'')}</strong></div></div>
+          <div class="field"><label>Insert before page number</label><input id="df1106InsertPage" type="number" min="1" max="${pages+1}" value="1" inputmode="numeric"></div>
+          <p class="hint">Current document: ${pages} page${pages===1?'':'s'}. Enter ${pages+1} to append at the end. Existing pages are not replaced.</p>
+        `,async()=>{
+          const el=$('df1106InsertPage');
+          const pos=parseInt(el&&el.value,10);
+          if(!Number.isFinite(pos)||pos<1||pos>pages+1){msg('Enter a page number from 1 to '+(pages+1)+'.',true);return;}
+          await insertPdfAt(file,pos-1);
+        });
+      }catch(e){msg(e?.message||'Could not prepare insertion.',true);}
+    };
+    input.click();
+  }
+
+  function cropTool(){
+    if(!workingBytes){msg('Open a PDF first.',true);return;}
+    const idx=selected();
+    if(!idx.length){msg('Select at least one page to crop.',true);return;}
+    openModal('Crop selected pages',`
+      <p class="hint">Crop is non-destructive: it changes the visible CropBox, so the original page content is not deleted.</p>
+      <div id="df1106CropGrid">
+        <div class="field"><label>Left (pt)</label><input id="df1106L" type="number" min="0" value="0"></div>
+        <div class="field"><label>Right (pt)</label><input id="df1106R" type="number" min="0" value="0"></div>
+        <div class="field"><label>Top (pt)</label><input id="df1106T" type="number" min="0" value="0"></div>
+        <div class="field"><label>Bottom (pt)</label><input id="df1106B" type="number" min="0" value="0"></div>
+      </div>
+      <p class="hint">${idx.length} selected page${idx.length===1?'':'s'}. 72 pt = 1 inch.</p>
+    `,async()=>{
+      const m={left:Math.max(0,parseFloat($('df1106L')?.value)||0),right:Math.max(0,parseFloat($('df1106R')?.value)||0),top:Math.max(0,parseFloat($('df1106T')?.value)||0),bottom:Math.max(0,parseFloat($('df1106B')?.value)||0)};
+      await cropPages(idx,m);
+    });
+    // openModal closes before its callback, so preserve the entered values by
+    // replacing the handler with one that reads the fields before close.
+    const btn=$('modalConfirm');
+    btn.onclick=async()=>{
+      const m={left:Math.max(0,parseFloat($('df1106L')?.value)||0),right:Math.max(0,parseFloat($('df1106R')?.value)||0),top:Math.max(0,parseFloat($('df1106T')?.value)||0),bottom:Math.max(0,parseFloat($('df1106B')?.value)||0)};
+      closeModal(); await cropPages(idx,m);
+    };
+  }
+
+  async function blankTool(){
+    if(!workingBytes){msg('Open a PDF first.',true);return;}
+    try{
+      setStatus('Checking pages for blank content…');
+      showProgress(15);
+      const blanks=await detectBlankPages(0.995);
+      showProgress(null);
+      if(!blanks.length){msg('No blank pages detected.',false);setStatus('No blank pages detected.');return;}
+      const labels=blanks.map(i=>i+1).join(', ');
+      openModal('Blank pages detected',`
+        <p><strong>${blanks.length}</strong> blank-looking page${blanks.length===1?'':'s'} detected.</p>
+        <p>Pages: <strong>${labels}</strong></p>
+        <p class="hint">Detection is based on rendered page pixels, so scanned blank pages are included. Review the page numbers before removing them.</p>
+      `,async()=>{});
+      $('modalConfirm').textContent='Remove detected pages';
+      $('modalConfirm').onclick=async()=>{
+        closeModal();
+        if((await pageCount())-blanks.length<1){msg('At least one page must remain.',true);return;}
+        await deletePages(blanks);
+      };
+    }catch(e){showProgress(null);console.error(e);msg(e?.message||'Could not check for blank pages.',true);}
+  }
+
+  function install(){
+    document.addEventListener('click',e=>{
+      const b=e.target.closest('#btnInsert'); if(b){e.preventDefault();e.stopImmediatePropagation();insertTool();}
+    },true);
+    document.addEventListener('click',e=>{
+      const b=e.target.closest('#btnCrop'); if(b){e.preventDefault();e.stopImmediatePropagation();cropTool();}
+    },true);
+    document.addEventListener('click',e=>{
+      const b=e.target.closest('#btnRemoveBlank'); if(b){e.preventDefault();e.stopImmediatePropagation();blankTool();}
+    },true);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true}); else install();
+})();
+</script>\n</body>
 </html>
