@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.9: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.10: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -732,7 +732,7 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 
 
 <style id="df1105-responsive-fix">
-/* DocuForge 27.110.9 — responsive PDF Studio only.
+/* DocuForge 27.110.10 — responsive PDF Studio only.
    Deliberately does NOT alter financial calculations/report logic. */
 html, body{
   width:100%;
@@ -842,7 +842,7 @@ main{
 
 
 <style id="df1106-pdf-studio-fix">
-/* 27.110.9: PDF Studio interaction fixes only. Financial calculations and
+/* 27.110.10: PDF Studio interaction fixes only. Financial calculations and
    PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
 @media(max-width:720px){
   #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
@@ -895,7 +895,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.9';</script>
+<script>const DOCUFORGE_BUILD = '27.110.10';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -906,7 +906,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.9</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.10</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -2859,168 +2859,12 @@ function showCompareResult(diff, nameA, nameB){
 
 
 
-<script id="df1107-view-share-js">
-/* DocuForge 27.110.9
-   View-before-share UX only. Conversion engines and financial calculations
-   are intentionally untouched. */
-(function(){
-  window.__dfViewFile = function(blob, filename){
-    try{
-      const url=URL.createObjectURL(blob);
-      const w=window.open(url,'_blank','noopener,noreferrer');
-      if(!w){
-        const a=document.createElement('a');
-        a.href=url;a.target='_blank';a.rel='noopener';
-        a.download='';
-        document.body.appendChild(a);a.click();a.remove();
-        setTimeout(()=>URL.revokeObjectURL(url),60000);
-      }else{
-        setTimeout(()=>URL.revokeObjectURL(url),60000);
-      }
-      return true;
-    }catch(e){
-      if(window.toast) window.toast('Could not open the file for viewing.',true);
-      return false;
-    }
-  };
-})();
-</script>
 
 
-<script id="df1108-header-footer-bates-js">
-/* DocuForge 27.110.9
-   Header/Footer + Bates enhancement.
-   Does NOT alter PDF-to-Excel or financial conversion/calculation modules. */
-(function(){
-  const $=id=>document.getElementById(id);
-  const toast=(m,b)=>window.toast?window.toast(m,b):alert(m);
 
-  function pageTemplateText(text,page,total,title,filename){
-    return String(text||'')
-      .replace(/\{page\}/gi,String(page))
-      .replace(/\{total\}/gi,String(total))
-      .replace(/\{date\}/gi,new Date().toLocaleDateString('en-GB'))
-      .replace(/\{title\}/gi,title||'')
-      .replace(/\{filename\}/gi,filename||'');
-  }
 
-  async function loadDoc(){
-    if(!window.workingBytes) throw new Error('Open a PDF first.');
-    return PDFDocument.load(window.workingBytes);
-  }
 
-  async function addHeaderFooter(kind){
-    const doc=await loadDoc(), total=doc.getPageCount();
-    const meta=doc.getTitle ? (doc.getTitle()||'') : '';
-    const fname=(window.currentFileName||window.currentFilename||'document.pdf');
-    const title=meta;
-    const defaults=kind==='header'
-      ? {left:'',center:'',right:'',top:24,bottom:0,size:9}
-      : {left:'',center:'',right:'',top:0,bottom:22,size:9};
-    window.openModal(kind==='header'?'Add Header':'Add Footer',`
-      <div class="df1108-form">
-        <div class="df1108-grid">
-          <div class="df1108-field"><label>Left</label><input id="df1108Left" placeholder="{filename}"></div>
-          <div class="df1108-field"><label>Centre</label><input id="df1108Center" placeholder="Confidential"></div>
-          <div class="df1108-field"><label>Right</label><input id="df1108Right" placeholder="Page {page} of {total}"></div>
-        </div>
-        <div class="df1108-grid">
-          <div class="df1108-field"><label>${kind==='header'?'Distance from top':'Distance from bottom'} (pt)</label>
-            <input type="number" id="df1108Offset" min="0" value="${kind==='header'?defaults.top:defaults.bottom}"></div>
-          <div class="df1108-field"><label>Left / right margin (pt)</label><input type="number" id="df1108Margin" min="0" value="36"></div>
-          <div class="df1108-field"><label>Font size (pt)</label><input type="number" id="df1108Size" min="5" max="30" value="${defaults.size}"></div>
-        </div>
-        <label class="df1108-check"><input type="checkbox" id="df1108Line"> Add separator line</label>
-        <div class="df1108-hint">Placeholders: {page}, {total}, {date}, {title}, {filename}. Preview the result before sharing.</div>
-        <div class="df1108-preview"><strong>Safe placement:</strong> the text is kept inside the page boundary and a conservative margin is used to reduce overlap with existing content.</div>
-      </div>`,async()=>{
-        const left=$('df1108Left').value, center=$('df1108Center').value, right=$('df1108Right').value;
-        if(!left&&!center&&!right){toast('Enter at least one header/footer item.',true);return;}
-        const offset=Math.max(0,Number($('df1108Offset').value)||0);
-        const margin=Math.max(0,Number($('df1108Margin').value)||0);
-        const size=Math.max(5,Math.min(30,Number($('df1108Size').value)||9));
-        const line=$('df1108Line').checked;
-        const font=await doc.embedFont(StandardFonts.Helvetica);
-        for(let i=0;i<total;i++){
-          const p=doc.getPage(i), {width,height}=p.getSize();
-          const y=kind==='header'?height-offset-size:offset;
-          const items=[
-            [left,margin,'left'],[center,width/2,'center'],[right,width-margin,'right']
-          ];
-          for(const [raw,x,align] of items){
-            const txt=pageTemplateText(raw,i+1,total,title,fname);
-            if(!txt)continue;
-            let tx=x;
-            if(align==='center')tx=x-font.widthOfTextAtSize(txt,size)/2;
-            if(align==='right')tx=x-font.widthOfTextAtSize(txt,size);
-            tx=Math.max(4,Math.min(width-font.widthOfTextAtSize(txt,size)-4,tx));
-            const yy=Math.max(4,Math.min(height-size-2,y));
-            p.drawText(txt,{x:tx,y:yy,size,font});
-          }
-          if(line){
-            const ly=kind==='header'?Math.max(3,y-4):Math.min(height-3,offset+size+5);
-            p.drawLine({start:{x:margin,y:ly},end:{x:width-margin,y:ly},thickness:.5});
-          }
-        }
-        await window.commit(await doc.save(),`${kind==='header'?'Header':'Footer'} added.`);
-      });
-  }
-
-  async function addBates(){
-    const doc=await loadDoc(), total=doc.getPageCount();
-    window.openModal('Add Bates Numbering',`
-      <div class="df1108-form">
-        <div class="df1108-grid">
-          <div class="df1108-field"><label>Prefix</label><input id="df1108Prefix" value="CBI-"></div>
-          <div class="df1108-field"><label>Starting number</label><input id="df1108Start" type="number" value="1" min="0"></div>
-          <div class="df1108-field"><label>Digits</label><input id="df1108Digits" type="number" value="6" min="1" max="12"></div>
-        </div>
-        <div class="df1108-grid">
-          <div class="df1108-field"><label>Position</label>
-            <select id="df1108Pos"><option>Bottom Centre</option><option>Bottom Left</option><option>Bottom Right</option><option>Top Centre</option><option>Top Left</option><option>Top Right</option></select></div>
-          <div class="df1108-field"><label>Edge margin (pt)</label><input id="df1108BMargin" type="number" value="28" min="4"></div>
-          <div class="df1108-field"><label>Font size (pt)</label><input id="df1108BSize" type="number" value="8" min="5" max="24"></div>
-        </div>
-        <div class="df1108-hint">Example: CBI-000001, CBI-000002 … Bates numbers are added as a separate text layer and do not change page content.</div>
-      </div>`,async()=>{
-        const prefix=$('df1108Prefix').value||'', start=Math.max(0,parseInt($('df1108Start').value,10)||0);
-        const digits=Math.max(1,Math.min(12,parseInt($('df1108Digits').value,10)||6));
-        const pos=$('df1108Pos').value, margin=Math.max(4,Number($('df1108BMargin').value)||28);
-        const size=Math.max(5,Math.min(24,Number($('df1108BSize').value)||8));
-        const font=await doc.embedFont(StandardFonts.Helvetica);
-        for(let i=0;i<total;i++){
-          const p=doc.getPage(i),{width,height}=p.getSize();
-          const txt=prefix+String(start+i).padStart(digits,'0');
-          const tw=font.widthOfTextAtSize(txt,size);
-          const top=/Top/.test(pos), right=/Right/.test(pos), center=/Centre/.test(pos);
-          const x=center?(width-tw)/2:(right?width-margin-tw:margin);
-          const y=top?height-margin-size:margin;
-          p.drawText(txt,{x:Math.max(2,x),y:Math.max(2,y),size,font});
-        }
-        await window.commit(await doc.save(),'Bates numbering added.');
-      });
-  }
-
-  function bind(){
-    // Support both current IDs and common button labels without touching conversion code.
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnHeader,#btnAddHeader,[data-tool="header"]');
-      if(b){e.preventDefault();e.stopImmediatePropagation();addHeaderFooter('header').catch(x=>toast(x.message||'Header failed.',true));}
-    },true);
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnFooter,#btnAddFooter,[data-tool="footer"]');
-      if(b){e.preventDefault();e.stopImmediatePropagation();addHeaderFooter('footer').catch(x=>toast(x.message||'Footer failed.',true));}
-    },true);
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnBates,#btnBatesNumber,[data-tool="bates"]');
-      if(b){e.preventDefault();e.stopImmediatePropagation();addBates().catch(x=>toast(x.message||'Bates numbering failed.',true));}
-    },true);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
-})();
-</script>
-
-<\/body><\/html>`;
+</body></html>`;
       downloadBlob(new Blob([html],{type:'text/html'}),'document-comparison.html');
     });
   },0);
@@ -3351,7 +3195,7 @@ function buildBilingualHtml(original, translated, sourceLabel, targetLabel){
 </style>
 
 
-<\/body><\/html>`;
+</body></html>`;
 }
 function showTranslationResult(original, translated, sourceLabel, targetLabel, baseName){
   const ta = 'style="width:100%;min-height:260px;font-size:12.5px;padding:8px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);"';
@@ -4305,7 +4149,7 @@ body.dashboard-active #noPdfBanner{display:none !important;}
 
 </style>
 </head><body><h1>${title}</h1>${body}
-<\/body><\/html>`;
+</body></html>`;
 }
 async function buildPdfJson(){
   const pages = await getPdfPagesTextItems();
@@ -4598,7 +4442,7 @@ body.dashboard-active #studioUploadScreen{
 </head>
 <body>${bodyHtml}
 
-<\/body><\/html>`);
+</body></html>`);
   });
   return await zip.generateAsync({ type:'uint8array' });
 }
@@ -6764,7 +6608,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.9 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.10 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7981,7 +7825,165 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 })();
 </script>
 
-\n<script id="df1106-pdf-studio-fix-js">
+\n\n<script id="df1107-view-share-js">
+/* DocuForge 27.110.10
+   View-before-share UX only. Conversion engines and financial calculations
+   are intentionally untouched. */
+(function(){
+  window.__dfViewFile = function(blob, filename){
+    try{
+      const url=URL.createObjectURL(blob);
+      const w=window.open(url,'_blank','noopener,noreferrer');
+      if(!w){
+        const a=document.createElement('a');
+        a.href=url;a.target='_blank';a.rel='noopener';
+        a.download='';
+        document.body.appendChild(a);a.click();a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),60000);
+      }else{
+        setTimeout(()=>URL.revokeObjectURL(url),60000);
+      }
+      return true;
+    }catch(e){
+      if(window.toast) window.toast('Could not open the file for viewing.',true);
+      return false;
+    }
+  };
+})();
+</script>
+<script id="df1108-header-footer-bates-js">
+/* DocuForge 27.110.10
+   Header/Footer + Bates enhancement.
+   Does NOT alter PDF-to-Excel or financial conversion/calculation modules. */
+(function(){
+  const $=id=>document.getElementById(id);
+  const toast=(m,b)=>window.toast?window.toast(m,b):alert(m);
+
+  function pageTemplateText(text,page,total,title,filename){
+    return String(text||'')
+      .replace(/\{page\}/gi,String(page))
+      .replace(/\{total\}/gi,String(total))
+      .replace(/\{date\}/gi,new Date().toLocaleDateString('en-GB'))
+      .replace(/\{title\}/gi,title||'')
+      .replace(/\{filename\}/gi,filename||'');
+  }
+
+  async function loadDoc(){
+    if(!window.workingBytes) throw new Error('Open a PDF first.');
+    return PDFDocument.load(window.workingBytes);
+  }
+
+  async function addHeaderFooter(kind){
+    const doc=await loadDoc(), total=doc.getPageCount();
+    const meta=doc.getTitle ? (doc.getTitle()||'') : '';
+    const fname=(window.currentFileName||window.currentFilename||'document.pdf');
+    const title=meta;
+    const defaults=kind==='header'
+      ? {left:'',center:'',right:'',top:24,bottom:0,size:9}
+      : {left:'',center:'',right:'',top:0,bottom:22,size:9};
+    window.openModal(kind==='header'?'Add Header':'Add Footer',`
+      <div class="df1108-form">
+        <div class="df1108-grid">
+          <div class="df1108-field"><label>Left</label><input id="df1108Left" placeholder="{filename}"></div>
+          <div class="df1108-field"><label>Centre</label><input id="df1108Center" placeholder="Confidential"></div>
+          <div class="df1108-field"><label>Right</label><input id="df1108Right" placeholder="Page {page} of {total}"></div>
+        </div>
+        <div class="df1108-grid">
+          <div class="df1108-field"><label>${kind==='header'?'Distance from top':'Distance from bottom'} (pt)</label>
+            <input type="number" id="df1108Offset" min="0" value="${kind==='header'?defaults.top:defaults.bottom}"></div>
+          <div class="df1108-field"><label>Left / right margin (pt)</label><input type="number" id="df1108Margin" min="0" value="36"></div>
+          <div class="df1108-field"><label>Font size (pt)</label><input type="number" id="df1108Size" min="5" max="30" value="${defaults.size}"></div>
+        </div>
+        <label class="df1108-check"><input type="checkbox" id="df1108Line"> Add separator line</label>
+        <div class="df1108-hint">Placeholders: {page}, {total}, {date}, {title}, {filename}. Preview the result before sharing.</div>
+        <div class="df1108-preview"><strong>Safe placement:</strong> the text is kept inside the page boundary and a conservative margin is used to reduce overlap with existing content.</div>
+      </div>`,async()=>{
+        const left=$('df1108Left').value, center=$('df1108Center').value, right=$('df1108Right').value;
+        if(!left&&!center&&!right){toast('Enter at least one header/footer item.',true);return;}
+        const offset=Math.max(0,Number($('df1108Offset').value)||0);
+        const margin=Math.max(0,Number($('df1108Margin').value)||0);
+        const size=Math.max(5,Math.min(30,Number($('df1108Size').value)||9));
+        const line=$('df1108Line').checked;
+        const font=await doc.embedFont(StandardFonts.Helvetica);
+        for(let i=0;i<total;i++){
+          const p=doc.getPage(i), {width,height}=p.getSize();
+          const y=kind==='header'?height-offset-size:offset;
+          const items=[
+            [left,margin,'left'],[center,width/2,'center'],[right,width-margin,'right']
+          ];
+          for(const [raw,x,align] of items){
+            const txt=pageTemplateText(raw,i+1,total,title,fname);
+            if(!txt)continue;
+            let tx=x;
+            if(align==='center')tx=x-font.widthOfTextAtSize(txt,size)/2;
+            if(align==='right')tx=x-font.widthOfTextAtSize(txt,size);
+            tx=Math.max(4,Math.min(width-font.widthOfTextAtSize(txt,size)-4,tx));
+            const yy=Math.max(4,Math.min(height-size-2,y));
+            p.drawText(txt,{x:tx,y:yy,size,font});
+          }
+          if(line){
+            const ly=kind==='header'?Math.max(3,y-4):Math.min(height-3,offset+size+5);
+            p.drawLine({start:{x:margin,y:ly},end:{x:width-margin,y:ly},thickness:.5});
+          }
+        }
+        await window.commit(await doc.save(),`${kind==='header'?'Header':'Footer'} added.`);
+      });
+  }
+
+  async function addBates(){
+    const doc=await loadDoc(), total=doc.getPageCount();
+    window.openModal('Add Bates Numbering',`
+      <div class="df1108-form">
+        <div class="df1108-grid">
+          <div class="df1108-field"><label>Prefix</label><input id="df1108Prefix" value="CBI-"></div>
+          <div class="df1108-field"><label>Starting number</label><input id="df1108Start" type="number" value="1" min="0"></div>
+          <div class="df1108-field"><label>Digits</label><input id="df1108Digits" type="number" value="6" min="1" max="12"></div>
+        </div>
+        <div class="df1108-grid">
+          <div class="df1108-field"><label>Position</label>
+            <select id="df1108Pos"><option>Bottom Centre</option><option>Bottom Left</option><option>Bottom Right</option><option>Top Centre</option><option>Top Left</option><option>Top Right</option></select></div>
+          <div class="df1108-field"><label>Edge margin (pt)</label><input id="df1108BMargin" type="number" value="28" min="4"></div>
+          <div class="df1108-field"><label>Font size (pt)</label><input id="df1108BSize" type="number" value="8" min="5" max="24"></div>
+        </div>
+        <div class="df1108-hint">Example: CBI-000001, CBI-000002 … Bates numbers are added as a separate text layer and do not change page content.</div>
+      </div>`,async()=>{
+        const prefix=$('df1108Prefix').value||'', start=Math.max(0,parseInt($('df1108Start').value,10)||0);
+        const digits=Math.max(1,Math.min(12,parseInt($('df1108Digits').value,10)||6));
+        const pos=$('df1108Pos').value, margin=Math.max(4,Number($('df1108BMargin').value)||28);
+        const size=Math.max(5,Math.min(24,Number($('df1108BSize').value)||8));
+        const font=await doc.embedFont(StandardFonts.Helvetica);
+        for(let i=0;i<total;i++){
+          const p=doc.getPage(i),{width,height}=p.getSize();
+          const txt=prefix+String(start+i).padStart(digits,'0');
+          const tw=font.widthOfTextAtSize(txt,size);
+          const top=/Top/.test(pos), right=/Right/.test(pos), center=/Centre/.test(pos);
+          const x=center?(width-tw)/2:(right?width-margin-tw:margin);
+          const y=top?height-margin-size:margin;
+          p.drawText(txt,{x:Math.max(2,x),y:Math.max(2,y),size,font});
+        }
+        await window.commit(await doc.save(),'Bates numbering added.');
+      });
+  }
+
+  function bind(){
+    // Support both current IDs and common button labels without touching conversion code.
+    document.addEventListener('click',e=>{
+      const b=e.target.closest('#btnHeader,#btnAddHeader,[data-tool="header"]');
+      if(b){e.preventDefault();e.stopImmediatePropagation();addHeaderFooter('header').catch(x=>toast(x.message||'Header failed.',true));}
+    },true);
+    document.addEventListener('click',e=>{
+      const b=e.target.closest('#btnFooter,#btnAddFooter,[data-tool="footer"]');
+      if(b){e.preventDefault();e.stopImmediatePropagation();addHeaderFooter('footer').catch(x=>toast(x.message||'Footer failed.',true));}
+    },true);
+    document.addEventListener('click',e=>{
+      const b=e.target.closest('#btnBates,#btnBatesNumber,[data-tool="bates"]');
+      if(b){e.preventDefault();e.stopImmediatePropagation();addBates().catch(x=>toast(x.message||'Bates numbering failed.',true));}
+    },true);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
+})();
+</script>
+<script id="df1106-pdf-studio-fix-js">
 (function(){
   const $=id=>document.getElementById(id);
   function msg(t,b){ if(typeof toast==='function') toast(t,b); else alert(t); }
@@ -8079,12 +8081,6 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true}); else install();
 })();
-</script>\n
-<script id="df1109-script-rendering-fix">
-/* DocuForge 27.110.9 — parser safety fix.
-   Prevents generated HTML template strings from accidentally terminating
-   the parent script. No conversion or financial calculation changes. */
 </script>
-
 </body>
 </html>
