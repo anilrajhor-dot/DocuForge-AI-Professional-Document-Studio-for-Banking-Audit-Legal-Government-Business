@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.14: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.15: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -726,7 +726,7 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 
 
 <style id="df1106-pdf-studio-fix">
-/* 27.110.14: PDF Studio interaction fixes only. Financial calculations and
+/* 27.110.15: PDF Studio interaction fixes only. Financial calculations and
    PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
 @media(max-width:720px){
   #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
@@ -758,7 +758,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.14';</script>
+<script>const DOCUFORGE_BUILD = '27.110.15';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -769,7 +769,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.14</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.15</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -6477,7 +6477,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.14 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.15 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7696,7 +7696,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 \n\n
 <script id="df1111-pdf-tools-js">
-/* DocuForge 27.110.14 — PDF Studio reliability layer.
+/* DocuForge 27.110.15 — PDF Studio reliability layer.
    PDF/Excel conversion and financial calculation modules are untouched. */
 (function(){
   const $=id=>document.getElementById(id);
@@ -7754,6 +7754,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
           if(sep==='both'||sep==='footer'){const y=Math.min(height-3,bottom+size+5);p.drawLine({start:{x:margin,y},end:{x:width-margin,y},thickness:.5})}
         }
         await commit(await d.save(),'Header/footer added to all pages.');
+        df1115OperationResult('Header / Footer applied','Header/footer text was added to all pages. Use View updated PDF to inspect it.',0);
       });
   }
 
@@ -7769,10 +7770,10 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
         </div>
         <div class="df1111-grid">
           <div class="df1111-field"><label>Position</label><select id="df1111BPos"><option value="bottom-center">Bottom Centre</option><option value="bottom-left">Bottom Left</option><option value="bottom-right">Bottom Right</option><option value="top-center">Top Centre</option><option value="top-left">Top Left</option><option value="top-right">Top Right</option></select></div>
-          <div class="df1111-field"><label>Edge margin (pt)</label><input id="df1111BM" type="number" min="4" value="30"></div>
-          <div class="df1111-field"><label>Font size (pt)</label><input id="df1111BSz" type="number" min="5" max="24" value="8"></div>
+          <div class="df1111-field"><label>Edge margin (pt)</label><input id="df1111BM" type="number" min="4" value="42"></div>
+          <div class="df1111-field"><label>Font size (pt)</label><input id="df1111BSz" type="number" min="5" max="24" value="9"></div>
         </div>
-        <div class="df1111-help">Example: CBI-000001, CBI-000002 … sequentially across all ${n} pages.</div>
+        <div class="df1111-help">Example: CBI-000001, CBI-000002 … sequentially across all ${n} pages. The number is kept safely inside the page boundary for clear inspection.</div>
       </div>`,async()=>{
         const pre=$('df1111BP').value||'', start=Math.max(0,parseInt($('df1111BS').value,10)||0);
         const digits=Math.max(1,Math.min(12,parseInt($('df1111BD').value,10)||6)), pos=$('df1111BPos').value;
@@ -7785,6 +7786,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
           p.drawText(text,{x:Math.max(2,x),y:Math.max(2,y),size,font});
         }
         await commit(await d.save(),'Bates numbering added to all pages.');
+        df1115OperationResult('Bates numbering applied',`Bates numbering was added sequentially to all ${n} pages. Use View updated PDF to confirm the Bates number is visible.`,0);
       });
   }
 
@@ -7840,6 +7842,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
           x.setTitle($('df1111MT').value||'');x.setAuthor($('df1111MA').value||'');x.setSubject($('df1111MS').value||'');
           x.setKeywords(($('df1111MK').value||'').split(',').map(v=>v.trim()).filter(Boolean));
           await commit(await x.save(),'Metadata updated.');
+          df1115MetadataResult();
         });
     }catch(e){console.error(e);say(e?.message||'Could not read PDF metadata.',true)}
   }
@@ -7866,7 +7869,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 
 <style id="df1114-preview-css">
-/* 27.110.14 — PDF Studio inspection preview */
+/* 27.110.15 — PDF Studio inspection preview */
 #df1114Preview{
   position:fixed;inset:0;z-index:2147483000;
   background:rgba(8,14,17,.82);
@@ -7934,6 +7937,17 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 </style>
 
 
+<script id="df1115-result-helper">
+function df1115OperationResult(title,message,previewPage=0){
+ const safe=String(message||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ openModal(title,`<div style="padding:4px 0"><div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px"><div style="font-weight:800;font-size:16px;margin-bottom:7px">✓ Operation completed</div><div style="line-height:1.5">${safe}</div></div><p class="hint" style="margin:12px 0 4px"><strong>Check the result before sharing.</strong> Open the updated PDF page below to verify the visible change.</p><button type="button" class="btn primary" id="df1115ViewUpdated">👁 View updated PDF</button></div>`,async()=>{});
+ $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
+ setTimeout(()=>{const b=$('df1115ViewUpdated');if(b)b.onclick=()=>{$('genericModal').classList.remove('show');if(window.df1114OpenPreview)window.df1114OpenPreview(previewPage);else toast('Open a page thumbnail to preview the updated PDF.',false)}},0);
+}
+function df1115MetadataResult(){
+ if(!workingBytes)return;(async()=>{try{const d=await PDFDocument.load(workingBytes);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));openModal('Metadata updated — verify',`<div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px"><div style="font-weight:800;margin-bottom:8px">✓ Metadata has been written into the PDF.</div><div><strong>Title:</strong> ${esc(d.getTitle()||'—')}</div><div><strong>Author:</strong> ${esc(d.getAuthor()||'—')}</div><div><strong>Subject:</strong> ${esc(d.getSubject()||'—')}</div><div><strong>Keywords:</strong> ${esc(d.getKeywords()||'—')}</div><div><strong>Producer:</strong> ${esc(d.getProducer()||'—')}</div></div><p class="hint" style="margin-top:12px">Metadata is stored in PDF properties; it normally <strong>does not appear as text on the PDF page</strong>. Use Metadata Inspector to verify it.</p>`,async()=>{});$('modalConfirm').style.display='none';$('modalCancel').textContent='Close';}catch(e){console.error(e)}})();
+}
+</script>
 <script id="df1114-preview-js">
 (function(){
   const $=id=>document.getElementById(id);
@@ -8032,6 +8046,8 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
       m.querySelector('.df1114-foot').textContent='Could not open this PDF page.';
     }
   }
+
+  window.df1114OpenPreview = openPreview;
 
   function bind(){
     document.addEventListener('click',function(e){
