@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.15: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.16: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -726,7 +726,7 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 
 
 <style id="df1106-pdf-studio-fix">
-/* 27.110.15: PDF Studio interaction fixes only. Financial calculations and
+/* 27.110.16: PDF Studio interaction fixes only. Financial calculations and
    PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
 @media(max-width:720px){
   #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
@@ -758,7 +758,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.15';</script>
+<script>const DOCUFORGE_BUILD = '27.110.16';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -769,7 +769,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.15</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.16</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -4369,12 +4369,36 @@ async function buildHtmlPdf(blocks){
 /* ---------- Extract table from an image (OCR + position clustering) ---------- */
 async function extractTableFromImage(file, lang){
   await loadLib('tesseract');
-  const { data } = await Tesseract.recognize(file, lang, {});
-  const items = (data.words || []).map(w => ({
-    str: w.text, x: w.bbox.x0, y: -((w.bbox.y0 + w.bbox.y1) / 2), width: w.bbox.x1 - w.bbox.x0,
+  const img = await loadImageFromBytes(new Uint8Array(await file.arrayBuffer()), file.type || 'image/png');
+  const maxSide = 3200;
+  const scale = Math.min(2.5, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.max(1, Math.round(img.naturalWidth * scale));
+  const h = Math.max(1, Math.round(img.naturalHeight * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width=w; canvas.height=h;
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(img,0,0,w,h);
+  // Mild contrast/grayscale preprocessing helps tables and scanned statements.
+  const px=ctx.getImageData(0,0,w,h);
+  for(let i=0;i<px.data.length;i+=4){
+    const g=Math.round(.299*px.data[i]+.587*px.data[i+1]+.114*px.data[i+2]);
+    px.data[i]=px.data[i+1]=px.data[i+2]=g;
+  }
+  ctx.putImageData(px,0,0);
+  const {data} = await Tesseract.recognize(canvas, lang, {
+    preserve_interword_spaces: '1',
+    tessedit_pageseg_mode: '6'
+  });
+  const items=(data.words||[]).filter(w=>String(w.text||'').trim()).map(w=>({
+    str:w.text.trim(),
+    x:w.bbox.x0, y:-((w.bbox.y0+w.bbox.y1)/2),
+    width:w.bbox.x1-w.bbox.x0
   }));
-  const lines = groupIntoLines(items, 6);
-  return lines.map(l => lineToCells(l.items, 20));
+  if(!items.length) throw new Error('No text was recognised. Use a clearer image or run OCR first.');
+  const lines=groupIntoLines(items, Math.max(8,Math.round(6*scale)));
+  const rows=lines.map(l=>lineToCells(l.items,Math.max(18,Math.round(20*scale))))
+    .filter(r=>r.some(c=>String(c).trim()));
+  return rows;
 }
 function showTableResult(rows, baseName){
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
@@ -6477,7 +6501,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.15 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.16 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7696,7 +7720,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 \n\n
 <script id="df1111-pdf-tools-js">
-/* DocuForge 27.110.15 — PDF Studio reliability layer.
+/* DocuForge 27.110.16 — PDF Studio reliability layer.
    PDF/Excel conversion and financial calculation modules are untouched. */
 (function(){
   const $=id=>document.getElementById(id);
@@ -7869,7 +7893,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 
 <style id="df1114-preview-css">
-/* 27.110.15 — PDF Studio inspection preview */
+/* 27.110.16 — PDF Studio inspection preview */
 #df1114Preview{
   position:fixed;inset:0;z-index:2147483000;
   background:rgba(8,14,17,.82);
@@ -8072,3 +8096,163 @@ function df1115MetadataResult(){
 
 </body>
 </html>
+
+
+<script id="df1116-image-tools-reliability">
+/* DocuForge AI 27.110.16 — reliable Image/Table/QR/PDF↔Image tools.
+   Does not modify PDF→Simple Excel or PDF→Financial Excel calculations. */
+(function(){
+  const $=id=>document.getElementById(id);
+  const say=(m,b)=>typeof toast==='function'?toast(m,b):alert(m);
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function pick(accept,multiple,cb){
+    const i=document.createElement('input');
+    i.type='file'; i.accept=accept; i.multiple=!!multiple; i.hidden=true;
+    document.body.appendChild(i);
+    i.addEventListener('change',async()=>{
+      const fs=Array.from(i.files||[]); i.remove();
+      if(fs.length) await cb(fs);
+    },{once:true});
+    i.click();
+  }
+  function resultModal(title,html,onView,onShare,onDownload){
+    openModal(title,`
+      <div style="line-height:1.5">${html}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+        ${onView?'<button class="btn primary" id="df1116View">👁 View</button>':''}
+        ${onShare?'<button class="btn primary" id="df1116Share">📤 Share</button>':''}
+        ${onDownload?'<button class="btn ghost" id="df1116Download">⬇ Download</button>':''}
+      </div>
+    `,async()=>{});
+    $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
+    setTimeout(()=>{
+      if(onView)$('df1116View')?.addEventListener('click',onView);
+      if(onShare)$('df1116Share')?.addEventListener('click',onShare);
+      if(onDownload)$('df1116Download')?.addEventListener('click',onDownload);
+    },0);
+  }
+  async function shareBlob(blob,name,mime){
+    const f=new File([blob],name,{type:mime});
+    try{
+      if(navigator.share && (!navigator.canShare || navigator.canShare({files:[f]}))){
+        await navigator.share({files:[f],title:name,text:name});
+      }else{
+        downloadBlob(blob,name);
+        say('Direct sharing is not supported here. The file was downloaded for sharing.',false);
+      }
+    }catch(e){if(e?.name!=='AbortError')say('Could not share the file.',true);}
+  }
+
+  async function imageToCanvas(file){
+    const img=await loadImageFromBytes(new Uint8Array(await file.arrayBuffer()),file.type||'image/png');
+    const max=3600, sc=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+    const c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(img.naturalWidth*sc));
+    c.height=Math.max(1,Math.round(img.naturalHeight*sc));
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    return c;
+  }
+
+  async function doImagesToPdf(files){
+    if(!files.length){say('Choose at least one image.',true);return;}
+    try{
+      const bytes=await buildImagesPdf(files);
+      const blob=new Blob([bytes],{type:'application/pdf'});
+      const name='combined_images.pdf';
+      resultModal('Images combined into PDF',
+        `<strong>${files.length}</strong> image${files.length===1?'':'s'} were converted to a PDF. View it before sharing.`,
+        ()=>{ window.__dfViewFile ? window.__dfViewFile(blob,name) : previewInApp(null,bytes,name); },
+        ()=>shareBlob(blob,name,'application/pdf'),
+        ()=>downloadBlob(blob,name));
+      say('Images combined successfully. View the PDF before sharing.',false);
+    }catch(e){console.error(e);say(e?.message||'Could not combine the images into PDF.',true);}
+  }
+
+  async function doPdfToImages(file){
+    try{
+      const bytes=new Uint8Array(await file.arrayBuffer());
+      const zip=await convertPdfToImagesZip('png',0.92);
+      const name=file.name.replace(/\.pdf$/i,'')+'_images.zip';
+      resultModal('PDF converted to images',
+        `All pages have been rendered as high-resolution PNG images and placed in <strong>${esc(name)}</strong>.`,
+        null,
+        ()=>shareBlob(zip,name,'application/zip'),
+        ()=>downloadBlob(zip,name));
+      say('PDF converted to images. Download or share the ZIP.',false);
+    }catch(e){console.error(e);say(e?.message||'Could not convert the PDF to images.',true);}
+  }
+
+  async function doImageTable(file){
+    openModal('Extract table from image',`
+      <p class="hint">Selected: <strong>${esc(file.name)}</strong></p>
+      <div class="field"><label>Language</label>${ocrLangOptions('df1116Lang')}</div>
+      <p class="hint">The image is enlarged and preprocessed before OCR. The extracted rows and columns can be saved as CSV or Excel.</p>
+    `,async()=>{
+      try{
+        const rows=await extractTableFromImage(file,$('df1116Lang').value);
+        if(!rows.length){say('No table could be detected.',true);return;}
+        showTableResult(rows,file.name.replace(/\.[^.]+$/,''));
+      }catch(e){console.error(e);say(e?.message||'Could not extract the table.',true);}
+    });
+  }
+
+  async function qrDetect(file){
+    const canvas=await imageToCanvas(file);
+    const tries=[canvas];
+    // A second pass at 1.5× often helps when the QR is small in a screenshot.
+    if(canvas.width<2800 && canvas.height<2800){
+      const c2=document.createElement('canvas');
+      c2.width=Math.round(canvas.width*1.5);c2.height=Math.round(canvas.height*1.5);
+      c2.getContext('2d').drawImage(canvas,0,0,c2.width,c2.height);tries.push(c2);
+    }
+    if('BarcodeDetector' in window){
+      try{
+        const bd=new BarcodeDetector({formats:['qr_code']});
+        for(const c of tries){const r=await bd.detect(c);if(r?.length)return r[0].rawValue;}
+      }catch(_){}
+    }
+    await loadLib('jsqr');
+    for(const c of tries){
+      const ctx=c.getContext('2d',{willReadFrequently:true});
+      const data=ctx.getImageData(0,0,c.width,c.height);
+      const r=jsQR(data.data,data.width,data.height,{inversionAttempts:'attemptBoth'});
+      if(r?.data)return r.data;
+    }
+    return null;
+  }
+
+  async function doQr(file){
+    openModal('Read QR code',`
+      <p class="hint">Selected: <strong>${esc(file.name)}</strong></p>
+      <p class="hint">DocuForge will try the device QR detector first, then jsQR with an enlarged image and inverted-contrast detection.</p>
+    `,async()=>{
+      try{
+        const value=await qrDetect(file);
+        if(value) showTextResult('QR code contents',value,'qr_result.txt',true);
+        else say('No QR code found. Use a clear, well-lit image with the complete QR square visible.',true);
+      }catch(e){console.error(e);say(e?.message||'Could not read the QR code.',true);}
+    });
+  }
+
+  function install(){
+    const map={
+      btnImagesToPdf: async()=>pick('image/*',true,doImagesToPdf),
+      btnPdfToImages: async()=>pick('.pdf,application/pdf',false,async fs=>{
+        const f=fs[0]; if(f) await doPdfToImages(f);
+      }),
+      btnImageTable: async()=>pick('image/*',false,async fs=>{if(fs[0])await doImageTable(fs[0]);}),
+      btnQrReader: async()=>pick('image/*',false,async fs=>{if(fs[0])await doQr(fs[0]);})
+    };
+    Object.entries(map).forEach(([id,fn])=>{
+      document.addEventListener('click',async e=>{
+        const b=e.target.closest('#'+id);if(!b)return;
+        if(b.dataset.df1116Ready==='1'){delete b.dataset.df1116Ready;return;}
+        e.preventDefault();e.stopImmediatePropagation();
+        await fn();
+      },true);
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+})();
+</script>
