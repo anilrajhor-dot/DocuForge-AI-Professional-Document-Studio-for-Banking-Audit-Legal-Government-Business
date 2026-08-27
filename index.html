@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.17: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.18: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -726,7 +726,7 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 
 
 <style id="df1106-pdf-studio-fix">
-/* 27.110.17: PDF Studio interaction fixes only. Financial calculations and
+/* 27.110.18: PDF Studio interaction fixes only. Financial calculations and
    PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
 @media(max-width:720px){
   #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
@@ -758,7 +758,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.17';</script>
+<script>const DOCUFORGE_BUILD = '27.110.18';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -769,7 +769,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.17</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.18</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -2045,18 +2045,28 @@ async function splitPdf({mode, everyN, ranges}){
 }
 
 /* ---------- Watermark ---------- */
-async function addWatermark({text, opacity, size}){
+async function addWatermark({text, opacity, size, color, xRatio, yRatio, angle}){
   await withDoc(async (doc) => {
     const font = await doc.embedFont(StandardFonts.HelveticaBold);
+    const hex = String(color || '#8c8c8c').replace('#','');
+    const rr = parseInt(hex.slice(0,2),16)/255;
+    const gg = parseInt(hex.slice(2,4),16)/255;
+    const bb = parseInt(hex.slice(4,6),16)/255;
     doc.getPages().forEach(page => {
       const { width, height } = page.getSize();
       const textWidth = font.widthOfTextAtSize(text, size);
+      const cx = Math.max(0, Math.min(1, Number(xRatio ?? .5))) * width;
+      const cy = Math.max(0, Math.min(1, Number(yRatio ?? .5))) * height;
       page.drawText(text, {
-        x: width/2 - textWidth/2, y: height/2, size, font,
-        color: rgb(0.55,0.55,0.55), opacity, rotate: degrees(45),
+        x: cx - textWidth/2,
+        y: cy - size/2,
+        size, font,
+        color: rgb(rr,gg,bb),
+        opacity: Math.max(.05, Math.min(1, Number(opacity ?? .25))),
+        rotate: degrees(Number(angle ?? 45)),
       });
     });
-  }, 'Watermark added to all pages.');
+  }, 'Watermark added to all pages. Preview the updated PDF before sharing.');
 }
 
 /* ---------- Page numbers ---------- */
@@ -4914,17 +4924,135 @@ $('btnPdfCompare').addEventListener('click', () => {
 
 $('btnWatermark').addEventListener('click', () => {
   openModal('Add watermark', `
-    <div class="field"><label>Watermark text</label><input type="text" id="wmText" value="CONFIDENTIAL"></div>
-    <div class="field row">
-      <div><label>Opacity (0.1–1)</label><input type="number" id="wmOpacity" min="0.1" max="1" step="0.1" value="0.25"></div>
-      <div><label>Font size</label><input type="number" id="wmSize" min="10" max="200" value="60"></div>
+    <style>
+      #df1118WmPreview{position:relative;background:#e9e9e4;border:1px solid var(--line);border-radius:10px;padding:10px;overflow:hidden;touch-action:none}
+      #df1118WmCanvas{display:block;max-width:100%;height:auto;margin:auto;background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.22)}
+      #df1118WmStage{position:relative;margin:auto;max-width:100%;width:max-content}
+      #df1118WmDrag{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(45deg);
+        transform-origin:center;white-space:nowrap;cursor:grab;user-select:none;touch-action:none;
+        font-family:Arial,sans-serif;font-weight:800;padding:3px 6px;border:1px dashed rgba(0,0,0,.25)}
+      #df1118WmDrag:active{cursor:grabbing}
+      #df1118WmHint{font-size:12px;color:var(--ink-soft);margin:6px 0 10px;text-align:center}
+      #df1118WmControls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+      #df1118WmControls .field{margin:0}
+      @media(max-width:650px){
+        #df1118WmControls{grid-template-columns:1fr 1fr}
+        #df1118WmControls input,#df1118WmControls select{min-height:42px}
+      }
+    </style>
+    <div class="field">
+      <label>Common watermark</label>
+      <select id="df1118WmPreset">
+        <option value="CONFIDENTIAL">CONFIDENTIAL</option>
+        <option value="DRAFT">DRAFT</option>
+        <option value="SAMPLE">SAMPLE</option>
+        <option value="COPY">COPY</option>
+        <option value="FOR REVIEW">FOR REVIEW</option>
+        <option value="APPROVED">APPROVED</option>
+        <option value="RECEIVED">RECEIVED</option>
+        <option value="PAID">PAID</option>
+        <option value="INTERNAL USE ONLY">INTERNAL USE ONLY</option>
+        <option value="CUSTOM">Custom…</option>
+      </select>
     </div>
+    <div class="field">
+      <label>Watermark text</label>
+      <input type="text" id="df1118WmText" value="CONFIDENTIAL" maxlength="80">
+    </div>
+    <div id="df1118WmControls">
+      <div class="field"><label>Colour</label><input type="color" id="df1118WmColor" value="#8c8c8c"></div>
+      <div class="field"><label>Opacity</label><input type="number" id="df1118WmOpacity" min="0.05" max="1" step="0.05" value="0.25"></div>
+      <div class="field"><label>Font size</label><input type="number" id="df1118WmSize" min="10" max="180" value="60"></div>
+      <div class="field"><label>Rotation</label><input type="number" id="df1118WmAngle" min="-180" max="180" step="5" value="45"></div>
+    </div>
+    <p id="df1118WmHint">Drag the watermark on the page to place it exactly where you want.</p>
+    <div id="df1118WmPreview"><div id="df1118WmStage"><canvas id="df1118WmCanvas"></canvas><div id="df1118WmDrag">CONFIDENTIAL</div></div></div>
+    <input type="hidden" id="df1118WmX" value=".5"><input type="hidden" id="df1118WmY" value=".5">
   `, async () => {
-    const text = document.getElementById('wmText').value || 'CONFIDENTIAL';
-    const opacity = parseFloat(document.getElementById('wmOpacity').value) || 0.25;
-    const size = parseInt(document.getElementById('wmSize').value) || 60;
-    await addWatermark({ text, opacity, size });
+    const text = document.getElementById('df1118WmText').value.trim() || 'CONFIDENTIAL';
+    const opacity = Math.max(.05, Math.min(1, parseFloat(document.getElementById('df1118WmOpacity').value) || .25));
+    const size = Math.max(10, Math.min(180, parseInt(document.getElementById('df1118WmSize').value) || 60));
+    const color = document.getElementById('df1118WmColor').value || '#8c8c8c';
+    const angle = Math.max(-180, Math.min(180, parseInt(document.getElementById('df1118WmAngle').value) || 45));
+    const xRatio = parseFloat(document.getElementById('df1118WmX').value) || .5;
+    const yRatio = parseFloat(document.getElementById('df1118WmY').value) || .5;
+    await addWatermark({text, opacity, size, color, xRatio, yRatio, angle});
   });
+
+  setTimeout(async () => {
+    const preset = document.getElementById('df1118WmPreset');
+    const text = document.getElementById('df1118WmText');
+    const color = document.getElementById('df1118WmColor');
+    const opacity = document.getElementById('df1118WmOpacity');
+    const size = document.getElementById('df1118WmSize');
+    const angle = document.getElementById('df1118WmAngle');
+    const drag = document.getElementById('df1118WmDrag');
+    const canvas = document.getElementById('df1118WmCanvas');
+    const stage = document.getElementById('df1118WmStage');
+    if(!preset || !text || !canvas || !stage || !window.workingBytes && typeof workingBytes==='undefined') return;
+
+    preset.addEventListener('change',()=>{
+      if(preset.value !== 'CUSTOM') text.value=preset.value;
+      update();
+    });
+    [text,color,opacity,size,angle].forEach(el=>el.addEventListener('input',update));
+
+    let pdf=null,page=null;
+    try{
+      let bytes;
+      try{ bytes=workingBytes; }catch(_){ bytes=window.__docuForgeWorkingBytes; }
+      if(!bytes) throw new Error('No PDF');
+      pdf=await dfGetPdfJs(bytes).promise;
+      page=await pdf.getPage(1);
+      await drawPreview();
+    }catch(e){
+      document.getElementById('df1118WmHint').textContent='Open a PDF first to use the visual watermark placement preview.';
+      return;
+    }
+
+    function update(){
+      drag.textContent=text.value||'CONFIDENTIAL';
+      drag.style.color=color.value||'#8c8c8c';
+      drag.style.opacity=opacity.value||.25;
+      drag.style.fontSize=Math.max(12,Math.min(100,Number(size.value)||60))+'px';
+      drag.style.transform=`translate(-50%,-50%) rotate(${Number(angle.value)||45}deg)`;
+    }
+    async function drawPreview(){
+      const natural=page.getViewport({scale:1});
+      const maxW=Math.min(720, Math.max(260, (document.getElementById('df1118WmPreview').clientWidth||720)-20));
+      const maxH=Math.min(window.innerHeight*.60, 760);
+      const scale=Math.min(maxW/natural.width,maxH/natural.height);
+      const dpr=Math.min(2,window.devicePixelRatio||1);
+      const cssV=page.getViewport({scale});
+      const rv=page.getViewport({scale:scale*dpr});
+      canvas.width=Math.ceil(rv.width);canvas.height=Math.ceil(rv.height);
+      canvas.style.width=Math.ceil(cssV.width)+'px';canvas.style.height=Math.ceil(cssV.height)+'px';
+      stage.style.width=Math.ceil(cssV.width)+'px';stage.style.height=Math.ceil(cssV.height)+'px';
+      await page.render({canvasContext:canvas.getContext('2d'),viewport:rv}).promise;
+      const xr=parseFloat(document.getElementById('df1118WmX').value)||.5;
+      const yr=parseFloat(document.getElementById('df1118WmY').value)||.5;
+      drag.style.left=(xr*100)+'%'; drag.style.top=(yr*100)+'%';
+      update();
+    }
+
+    let dragging=false;
+    drag.addEventListener('pointerdown',e=>{
+      dragging=true; drag.setPointerCapture?.(e.pointerId); e.preventDefault();
+    });
+    drag.addEventListener('pointermove',e=>{
+      if(!dragging)return;
+      const r=stage.getBoundingClientRect();
+      const x=Math.max(0,Math.min(r.width,e.clientX-r.left));
+      const y=Math.max(0,Math.min(r.height,e.clientY-r.top));
+      const xr=x/r.width, yr=y/r.height;
+      drag.style.left=(xr*100)+'%'; drag.style.top=(yr*100)+'%';
+      document.getElementById('df1118WmX').value=xr.toFixed(4);
+      document.getElementById('df1118WmY').value=yr.toFixed(4);
+    });
+    drag.addEventListener('pointerup',()=>dragging=false);
+    drag.addEventListener('pointercancel',()=>dragging=false);
+    update();
+  }, 60);
 });
 
 $('btnPageNum').addEventListener('click', () => {
@@ -6501,7 +6629,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.17 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.18 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7008,6 +7136,7 @@ const HELP_FAQ = [
   { q: ['gst invoice','gst invoice generator','invoice'], a: 'GST Invoice Studio → enter your business, invoice, buyer and line-item details → review the live totals → Preview or Generate PDF. Saved buyers, products and invoices stay in the browser.' },
   { q: ['merge','combine pdf'], a: 'PDF Studio → Add pages → "Open / Merge PDFs". Pick one file to start, or several at once to merge them in the order chosen.' },
   { q: ['split'], a: 'PDF Studio → Extract & split → "Split into files…" — by page ranges or every N pages, downloads as a .zip.' },
+  { q: ['watermark'], a: 'PDF Studio → Enhance → Add watermark. Choose a common watermark or enter your own text, select colour, opacity, font size and rotation, then drag the watermark on the page preview to place it. Always view the updated PDF before sharing.' },
   { q: ['compress','reduce size','file size','smaller'], a: 'PDF Studio → Enhance → "Compress" — recompresses embedded JPEGs. Works best on scanned/photo-heavy PDFs; text-only PDFs won\u2019t shrink much.' },
   { q: ['ocr','scan','searchable'], a: 'OCR Studio → "Make this PDF searchable…" — adds a real, invisible text layer so scans become searchable and copyable.' },
   { q: ['translate'], a: 'Translation Studio → "Translate text…" (paste), "Translate a document…" (upload PDF/DOCX/TXT/MD directly), or "Translate this open PDF" (whatever\u2019s loaded in the editor). Covers 38 languages. Sends the text you choose (never the file) to a translation service.' },
@@ -7720,7 +7849,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 \n\n
 <script id="df1111-pdf-tools-js">
-/* DocuForge 27.110.17 — PDF Studio reliability layer.
+/* DocuForge 27.110.18 — PDF Studio reliability layer.
    PDF/Excel conversion and financial calculation modules are untouched. */
 (function(){
   const $=id=>document.getElementById(id);
@@ -7893,7 +8022,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 
 <style id="df1114-preview-css">
-/* 27.110.17 — PDF Studio inspection preview */
+/* 27.110.18 — PDF Studio inspection preview */
 #df1114Preview{
   position:fixed;inset:0;z-index:2147483000;
   background:rgba(8,14,17,.82);
@@ -8099,7 +8228,7 @@ function df1115MetadataResult(){
 
 
 <script id="df1116-image-tools-reliability">
-/* DocuForge AI 27.110.17 — reliable Image/Table/QR/PDF↔Image tools.
+/* DocuForge AI 27.110.18 — reliable Image/Table/QR/PDF↔Image tools.
    Does not modify PDF→Simple Excel or PDF→Financial Excel calculations. */
 (function(){
   const $=id=>document.getElementById(id);
