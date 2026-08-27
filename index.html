@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.12: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.13: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -726,7 +726,7 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 
 
 <style id="df1106-pdf-studio-fix">
-/* 27.110.12: PDF Studio interaction fixes only. Financial calculations and
+/* 27.110.13: PDF Studio interaction fixes only. Financial calculations and
    PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
 @media(max-width:720px){
   #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
@@ -758,7 +758,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.12';</script>
+<script>const DOCUFORGE_BUILD = '27.110.13';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -769,7 +769,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.12</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.13</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -6477,7 +6477,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.12 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.13 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7696,7 +7696,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 \n\n
 <script id="df1111-pdf-tools-js">
-/* DocuForge 27.110.12 — PDF Studio reliability layer.
+/* DocuForge 27.110.13 — PDF Studio reliability layer.
    PDF/Excel conversion and financial calculation modules are untouched. */
 (function(){
   const $=id=>document.getElementById(id);
@@ -7854,6 +7854,193 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
       },true);
     }
   }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
+})();
+</script>
+
+
+<style id="df1113-fullpage-preview-css">
+/* 27.110.13 — Full-page, high-resolution PDF preview */
+#df1113Preview{
+  position:fixed;inset:0;z-index:100000;background:rgba(10,15,20,.72);
+  display:flex;flex-direction:column;align-items:stretch;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+#df1113Preview .df1113-head{
+  flex:0 0 auto;background:var(--surface,#fff);border-bottom:1px solid var(--line,#ddd);
+  min-height:58px;display:flex;align-items:center;gap:8px;padding:8px 12px;
+}
+#df1113Preview .df1113-title{font-weight:800;font-size:16px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#df1113Preview .df1113-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#df1113Preview .df1113-tools button{
+  min-height:40px;padding:7px 11px;border:1px solid var(--line,#ccc);border-radius:8px;
+  background:var(--bg,#fff);color:var(--ink,#17201e);font-weight:700;font-size:13px;
+}
+#df1113Preview .df1113-tools button.primary{background:var(--pine-solid,#0b4037);color:#fff;border-color:var(--pine-solid,#0b4037)}
+#df1113Preview .df1113-tools button:disabled{opacity:.45}
+#df1113Preview .df1113-stage{
+  flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;
+  display:flex;align-items:flex-start;justify-content:center;padding:14px;
+}
+#df1113Preview .df1113-page{
+  flex:0 0 auto;background:#fff;box-shadow:0 3px 18px rgba(0,0,0,.38);
+}
+#df1113Preview .df1113-page canvas{display:block;background:#fff}
+#df1113Preview .df1113-foot{
+  flex:0 0 auto;background:var(--surface,#fff);border-top:1px solid var(--line,#ddd);
+  padding:7px 12px;font-size:12px;color:var(--ink-soft,#56605d);text-align:center;
+}
+@media(max-width:700px){
+  #df1113Preview .df1113-head{align-items:flex-start}
+  #df1113Preview .df1113-title{padding-top:9px}
+  #df1113Preview .df1113-tools{justify-content:flex-end}
+  #df1113Preview .df1113-tools button{min-width:40px;padding:7px 9px}
+  #df1113Preview .df1113-stage{padding:10px}
+}
+</style>
+
+
+<script id="df1113-fullpage-preview-js">
+/* DocuForge AI 27.110.13
+   Full-page PDF preview for PDF Studio page thumbnails.
+   This is a preview-only layer; it does not change PDF editing or
+   PDF→Simple Excel / Financial Excel conversion logic. */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function getBytes(){
+    try{
+      if(typeof workingBytes!=='undefined' && workingBytes) return workingBytes;
+    }catch(_){}
+    try{
+      if(window.__docuForgeWorkingBytes) return window.__docuForgeWorkingBytes;
+    }catch(_){}
+    return null;
+  }
+
+  let state={index:0,scale:1,pdf:null,page:null,baseFit:1,rendering:false};
+
+  function close(){
+    const m=$('df1113Preview');
+    if(m)m.remove();
+    state={index:0,scale:1,pdf:null,page:null,baseFit:1,rendering:false};
+  }
+
+  function makeButton(label,fn,cls){
+    const b=document.createElement('button');
+    b.type='button';b.textContent=label;
+    if(cls)b.className=cls;
+    b.addEventListener('click',fn);
+    return b;
+  }
+
+  async function render(){
+    const m=$('df1113Preview'), stage=m?.querySelector('.df1113-stage'), holder=m?.querySelector('.df1113-page');
+    if(!m||!stage||!holder||!state.page)return;
+    state.rendering=true;
+    try{
+      const page=state.page;
+      const natural=page.getViewport({scale:1});
+      const availW=Math.max(260,stage.clientWidth-20);
+      const availH=Math.max(260,stage.clientHeight-20);
+      const fit=Math.min(availW/natural.width,availH/natural.height);
+      state.baseFit=Math.max(.5,Math.min(2.5,fit));
+      const effective=Math.max(.5,Math.min(5,state.baseFit*state.scale));
+      const cssViewport=page.getViewport({scale:effective});
+      const dpr=Math.min(2.5,window.devicePixelRatio||1);
+      const renderViewport=page.getViewport({scale:effective*dpr});
+      const canvas=holder.querySelector('canvas');
+      canvas.width=Math.ceil(renderViewport.width);
+      canvas.height=Math.ceil(renderViewport.height);
+      canvas.style.width=Math.ceil(cssViewport.width)+'px';
+      canvas.style.height=Math.ceil(cssViewport.height)+'px';
+      holder.style.width=Math.ceil(cssViewport.width)+'px';
+      holder.style.height=Math.ceil(cssViewport.height)+'px';
+      const ctx=canvas.getContext('2d',{alpha:false});
+      ctx.setTransform(1,0,0,1,0,0);
+      await page.render({canvasContext:ctx,viewport:renderViewport}).promise;
+      const z=m.querySelector('.df1113-zoom-label');
+      if(z)z.textContent=Math.round(state.scale*100)+'%';
+      const p=m.querySelector('.df1113-page-label');
+      if(p)p.textContent='Page '+(state.index+1)+' of '+state.pdf.numPages;
+    }catch(e){
+      console.error(e);
+      const msg=m?.querySelector('.df1113-foot');
+      if(msg)msg.textContent='Preview could not be rendered.';
+    }finally{state.rendering=false}
+  }
+
+  async function open(index){
+    const bytes=getBytes();
+    if(!bytes){
+      if(typeof toast==='function')toast('Open a PDF first.',true);
+      return;
+    }
+    const old=$('df1113Preview');if(old)old.remove();
+    const m=document.createElement('div');m.id='df1113Preview';
+    m.innerHTML=`
+      <div class="df1113-head">
+        <div class="df1113-title">Page preview</div>
+        <div class="df1113-tools">
+          <button type="button" class="df1113-fit">Fit page</button>
+          <button type="button" class="df1113-width">Fit width</button>
+          <button type="button" class="df1113-minus" aria-label="Zoom out">−</button>
+          <button type="button" class="df1113-zoom-label">100%</button>
+          <button type="button" class="df1113-plus" aria-label="Zoom in">+</button>
+          <button type="button" class="primary df1113-close" aria-label="Close">✕</button>
+        </div>
+      </div>
+      <div class="df1113-stage"><div class="df1113-page"><canvas></canvas></div></div>
+      <div class="df1113-foot"><span class="df1113-page-label">Loading…</span> · Scroll to inspect the page at higher zoom</div>`;
+    document.body.appendChild(m);
+
+    m.querySelector('.df1113-close').onclick=close;
+    m.addEventListener('click',e=>{if(e.target===m)close()});
+    m.querySelector('.df1113-fit').onclick=async()=>{state.scale=1;await render()};
+    m.querySelector('.df1113-width').onclick=async()=>{
+      if(!state.page)return;
+      const stage=m.querySelector('.df1113-stage'), natural=state.page.getViewport({scale:1});
+      const fitW=Math.max(.5,Math.min(5,(stage.clientWidth-20)/natural.width));
+      state.scale=fitW/state.baseFit;await render();
+    };
+    m.querySelector('.df1113-minus').onclick=async()=>{state.scale=Math.max(.5,state.scale-.25);await render()};
+    m.querySelector('.df1113-plus').onclick=async()=>{state.scale=Math.min(5,state.scale+.25);await render()};
+    document.addEventListener('keydown',function esc(e){if(e.key==='Escape'){close();document.removeEventListener('keydown',esc)}},{once:true});
+
+    try{
+      state.index=index;
+      state.pdf=await dfGetPdfJs(bytes).promise;
+      state.page=await state.pdf.getPage(index+1);
+      state.scale=1;
+      await new Promise(r=>requestAnimationFrame(r));
+      await render();
+    }catch(e){
+      console.error(e);
+      m.querySelector('.df1113-foot').textContent='Could not open this page preview.';
+    }
+  }
+
+  /* Capture thumbnail clicks before the legacy openZoom handler.
+     Checkbox and page-control clicks are deliberately ignored. */
+  function bind(){
+    document.addEventListener('click',function(e){
+      const canvas=e.target.closest('.page-card canvas');
+      if(!canvas)return;
+      if(e.target.closest('input,button,.ctrls'))return;
+      const card=canvas.closest('.page-card');
+      const idx=parseInt(card?.dataset?.index,10);
+      if(!Number.isFinite(idx))return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      open(idx);
+    },true);
+
+    window.addEventListener('resize',()=>{
+      const m=$('df1113Preview');
+      if(m&&state.page&&!state.rendering)render();
+    });
+  }
+
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
 })();
 </script>
