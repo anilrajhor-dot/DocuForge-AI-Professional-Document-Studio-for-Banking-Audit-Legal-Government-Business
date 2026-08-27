@@ -728,7 +728,7 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 
 
 <style id="df1106-pdf-studio-fix">
-/* 27.110.20: PDF Studio interaction fixes only. Financial calculations and
+/* 27.110.21: PDF Studio interaction fixes only. Financial calculations and
    PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
 @media(max-width:720px){
   #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
@@ -760,7 +760,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.20';</script>
+<script>const DOCUFORGE_BUILD = '27.110.21';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -771,7 +771,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.20</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.21</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1355,11 +1355,23 @@ function loadLib(name){
   if(window[{tesseract:'Tesseract', xlsx:'XLSX', mammoth:'mammoth', chartjs:'Chart', jsqr:'jsQR', qrcode:'QRCode'}[name]]) return Promise.resolve();
   if(_libPromises[name]) return _libPromises[name];
   _libPromises[name] = new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = LIB_URLS[name];
-    script.onload = () => resolve();
-    script.onerror = () => { delete _libPromises[name]; reject(new Error(`Could not load a required library (${name}). Check your internet connection and try again.`)); };
-    document.head.appendChild(script);
+    const sources = name === 'jsqr'
+      ? [LIB_URLS[name], 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js', 'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js']
+      : [LIB_URLS[name]];
+    let i = 0;
+    const tryNext = () => {
+      if(i >= sources.length){
+        delete _libPromises[name];
+        reject(new Error(`Could not load the required library (${name}).`));
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = sources[i++];
+      script.onload = () => resolve();
+      script.onerror = () => { script.remove(); tryNext(); };
+      document.head.appendChild(script);
+    };
+    tryNext();
   });
   return _libPromises[name];
 }
@@ -8239,17 +8251,40 @@ function df1115MetadataResult(){
 })();
 </script>
 
+
+<script id="df1121-final-ui-patch">
+/* 27.110.21 final UI safeguards. */
+(function(){
+  // Keep all generated-result flows view-first: the existing showPdfResult already
+  // enforces View before Share. This patch also gives generic comparison/result
+  // previews a clear View label where a result blob is available.
+  window.DOCUFORGE_BUILD='27.110.21';
+})();
+</script>
 </body>
 </html>
 
 
 <script id="df1116-image-tools-reliability">
-/* DocuForge AI 27.110.20 — reliable Image/Table/QR/PDF↔Image tools.
-   Does not modify PDF→Simple Excel or PDF→Financial Excel calculations. */
+/* DocuForge AI 27.110.21 — Image/Table/QR/PDF↔Image reliability layer.
+   IMPORTANT: PDF→Simple Excel and PDF→Financial Excel calculations are untouched.
+   Shared Studio Upload is the source of truth for OCR/Image/QR tools. */
 (function(){
   const $=id=>document.getElementById(id);
   const say=(m,b)=>typeof toast==='function'?toast(m,b):alert(m);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function selectedFile(){
+    const f=window.__docuForgeStudioFile||null;
+    if(f) return f;
+    try{
+      const i=$('studioUploadInput');
+      if(i?.files?.length) return i.files[0];
+    }catch(_){ }
+    return null;
+  }
+  function isPdf(f){return !!f&&(f.type==='application/pdf'||/\.pdf$/i.test(f.name||''));}
+  function isImage(f){return !!f&&String(f.type||'').startsWith('image/');}
 
   function pick(accept,multiple,cb){
     const i=document.createElement('input');
@@ -8261,13 +8296,23 @@ function df1115MetadataResult(){
     },{once:true});
     i.click();
   }
+
+  async function shareBlob(blob,name,mime){
+    const f=new File([blob],name,{type:mime});
+    try{
+      if(navigator.share && (!navigator.canShare || navigator.canShare({files:[f]})))
+        await navigator.share({files:[f],title:name,text:name});
+      else { downloadBlob(blob,name); say('Direct sharing is not supported here. The file was downloaded for sharing.',false); }
+    }catch(e){ if(e?.name!=='AbortError') say('Could not share the file.',true); }
+  }
+
   function resultModal(title,html,onView,onShare,onDownload){
     openModal(title,`
       <div style="line-height:1.5">${html}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
-        ${onView?'<button class="btn primary" id="df1116View">👁 View</button>':''}
-        ${onShare?'<button class="btn primary" id="df1116Share">📤 Share</button>':''}
-        ${onDownload?'<button class="btn ghost" id="df1116Download">⬇ Download</button>':''}
+        ${onView?'<button class="btn" id="df1116View" type="button">👁 View</button>':''}
+        ${onShare?'<button class="btn primary" id="df1116Share" type="button">📤 Share</button>':''}
+        ${onDownload?'<button class="btn ghost" id="df1116Download" type="button">⬇ Download</button>':''}
       </div>
     `,async()=>{});
     $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
@@ -8277,21 +8322,10 @@ function df1115MetadataResult(){
       if(onDownload)$('df1116Download')?.addEventListener('click',onDownload);
     },0);
   }
-  async function shareBlob(blob,name,mime){
-    const f=new File([blob],name,{type:mime});
-    try{
-      if(navigator.share && (!navigator.canShare || navigator.canShare({files:[f]}))){
-        await navigator.share({files:[f],title:name,text:name});
-      }else{
-        downloadBlob(blob,name);
-        say('Direct sharing is not supported here. The file was downloaded for sharing.',false);
-      }
-    }catch(e){if(e?.name!=='AbortError')say('Could not share the file.',true);}
-  }
 
   async function imageToCanvas(file){
     const img=await loadImageFromBytes(new Uint8Array(await file.arrayBuffer()),file.type||'image/png');
-    const max=3600, sc=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+    const max=3600,sc=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
     const c=document.createElement('canvas');
     c.width=Math.max(1,Math.round(img.naturalWidth*sc));
     c.height=Math.max(1,Math.round(img.naturalHeight*sc));
@@ -8302,140 +8336,126 @@ function df1115MetadataResult(){
   async function doImagesToPdf(files){
     if(!files.length){say('Choose at least one image.',true);return;}
     try{
-      const bytes=await buildImagesPdf(files);
-      const blob=new Blob([bytes],{type:'application/pdf'});
-      const name='combined_images.pdf';
+      const bytes=await buildImagesPdf(files), blob=new Blob([bytes],{type:'application/pdf'}), name='combined_images.pdf';
       resultModal('Images combined into PDF',
-        `<strong>${files.length}</strong> image${files.length===1?'':'s'} were converted to a PDF. View it before sharing.`,
-        ()=>{ window.__dfViewFile ? window.__dfViewFile(blob,name) : previewInApp(null,bytes,name); },
-        ()=>shareBlob(blob,name,'application/pdf'),
-        ()=>downloadBlob(blob,name));
+        `<strong>${files.length}</strong> image${files.length===1?'':'s'} were converted to a PDF.<br><br><strong>View the PDF before sharing.</strong>`,
+        ()=>window.__dfViewFile?window.__dfViewFile(blob,name):previewInApp(null,bytes,name),
+        ()=>shareBlob(blob,name,'application/pdf'),()=>downloadBlob(blob,name));
       say('Images combined successfully. View the PDF before sharing.',false);
     }catch(e){console.error(e);say(e?.message||'Could not combine the images into PDF.',true);}
   }
 
-  async function df1117ShowImageGallery(images,name){
-    const urls=images.map(x=>URL.createObjectURL(x.blob));
-    let idx=0;
-    openModal('PDF → Images — preview',`
-      <div style="text-align:center">
-        <div style="font-weight:800;margin-bottom:8px">Page <span id="df1117Pg">1</span> of ${images.length}</div>
-        <div style="background:#eef0ec;border:1px solid var(--line);border-radius:10px;padding:10px;overflow:auto;max-height:68vh">
-          <img id="df1117Img" src="${urls[0]}" style="display:block;max-width:100%;height:auto;margin:auto;background:#fff;box-shadow:0 2px 10px #0002">
-        </div>
-        <div style="display:flex;justify-content:center;gap:8px;margin-top:10px">
-          <button class="btn ghost" id="df1117Prev">‹ Previous</button>
-          <button class="btn ghost" id="df1117Next">Next ›</button>
-        </div>
-        <p class="hint">Inspect every page here. The ZIP contains the same PNG images.</p>
-      </div>`,async()=>{});
-    $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
-    const cleanup=()=>urls.forEach(u=>URL.revokeObjectURL(u));
-    setTimeout(()=>{
-      const img=$('df1117Img'),pg=$('df1117Pg');
-      const update=()=>{img.src=urls[idx];pg.textContent=String(idx+1);};
-      $('df1117Prev')?.addEventListener('click',()=>{idx=(idx-1+urls.length)%urls.length;update();});
-      $('df1117Next')?.addEventListener('click',()=>{idx=(idx+1)%urls.length;update();});
-      $('modalCancel')?.addEventListener('click',cleanup,{once:true});
-    },0);
+  async function df1117ShowImageGallery(images){
+    const urls=images.map(x=>URL.createObjectURL(x.blob)); let idx=0;
+    const old=document.getElementById('df1117Preview'); old?.remove();
+    const m=document.createElement('div'); m.id='df1117Preview'; m.className='modal-backdrop show'; m.style.zIndex='100000';
+    m.innerHTML=`<div class="modal df1117-gallery-modal">
+      <div class="modal-head"><h3>PDF → Images — preview</h3><button type="button" class="icon-btn" id="df1117Close">×</button></div>
+      <div class="df1117-gallery-body">
+        <div class="df1117-page-label">Page <span id="df1117Pg">1</span> of ${images.length}</div>
+        <div class="df1117-stage"><img id="df1117Img" src="${urls[0]}" alt="PDF page 1 preview"></div>
+        <div class="df1117-controls"><button class="btn ghost" id="df1117Prev" type="button">‹ Previous</button><button class="btn ghost" id="df1117Next" type="button">Next ›</button></div>
+        <p class="hint">Full-page preview of the actual PNG output. Use this to inspect clarity before downloading or sharing.</p>
+      </div>
+    </div>`;
+    document.body.appendChild(m);
+    const cleanup=()=>{urls.forEach(u=>URL.revokeObjectURL(u));m.remove();};
+    const img=$('df1117Img'),pg=$('df1117Pg');
+    const update=()=>{img.src=urls[idx];img.alt=`PDF page ${idx+1} preview`;pg.textContent=String(idx+1);};
+    $('df1117Close').onclick=cleanup; $('df1117Prev').onclick=()=>{idx=(idx-1+urls.length)%urls.length;update()}; $('df1117Next').onclick=()=>{idx=(idx+1)%urls.length;update()};
+    m.addEventListener('click',e=>{if(e.target===m)cleanup()});
   }
 
   async function doPdfToImages(file){
+    if(!file||!isPdf(file)){say('Choose a PDF first.',true);return;}
     try{
-      const bytes=new Uint8Array(await file.arrayBuffer());
-      const pdf=await dfGetPdfJs(bytes).promise;
-      const images=[];
+      const bytes=new Uint8Array(await file.arrayBuffer()), pdf=await dfGetPdfJs(bytes).promise, images=[];
       for(let i=1;i<=pdf.numPages;i++){
-        const page=await pdf.getPage(i);
-        const viewport=page.getViewport({scale:2.2});
+        const page=await pdf.getPage(i), viewport=page.getViewport({scale:2.2});
         const c=document.createElement('canvas'); c.width=Math.ceil(viewport.width); c.height=Math.ceil(viewport.height);
         await page.render({canvasContext:c.getContext('2d'),viewport}).promise;
-        const blob=await new Promise(r=>c.toBlob(r,'image/png'));
-        images.push({page:i,blob});
+        const blob=await new Promise(r=>c.toBlob(r,'image/png')); images.push({page:i,blob});
       }
-      const zip=new JSZip();
-      for(const x of images) zip.file(`page_${String(x.page).padStart(3,'0')}.png`,await x.blob.arrayBuffer());
-      const zipBlob=await zip.generateAsync({type:'blob'});
-      const name=file.name.replace(/\.pdf$/i,'')+'_images.zip';
-      resultModal('PDF converted to images',
-        `<strong>${images.length}</strong> page image${images.length===1?'':'s'} created. <strong>View images before sharing.</strong>`,
-        ()=>df1117ShowImageGallery(images,name),
-        ()=>shareBlob(zipBlob,name,'application/zip'),
-        ()=>downloadBlob(zipBlob,name));
-      say('PDF converted to images. Download or share the ZIP.',false);
+      const zip=new JSZip(); for(const x of images)zip.file(`page_${String(x.page).padStart(3,'0')}.png`,await x.blob.arrayBuffer());
+      const zipBlob=await zip.generateAsync({type:'blob'}), name=file.name.replace(/\.pdf$/i,'')+'_images.zip';
+      resultModal('PDF converted to images',`<strong>${images.length}</strong> page image${images.length===1?'':'s'} created.<br><br><strong>View the pages before sharing.</strong>`,()=>df1117ShowImageGallery(images),()=>shareBlob(zipBlob,name,'application/zip'),()=>downloadBlob(zipBlob,name));
+      say('PDF converted to images. View the pages before downloading or sharing.',false);
     }catch(e){console.error(e);say(e?.message||'Could not convert the PDF to images.',true);}
   }
 
   async function doImageTable(file){
-    openModal('Extract table from image',`
-      <p class="hint">Selected: <strong>${esc(file.name)}</strong></p>
-      <div class="field"><label>Language</label>${ocrLangOptions('df1116Lang')}</div>
-      <p class="hint">The image is enlarged and preprocessed before OCR. The extracted rows and columns can be saved as CSV or Excel.</p>
-    `,async()=>{
-      try{
-        const rows=await extractTableFromImage(file,$('df1116Lang').value);
-        if(!rows.length){say('No table could be detected.',true);return;}
-        showTableResult(rows,file.name.replace(/\.[^.]+$/,''));
-      }catch(e){console.error(e);say(e?.message||'Could not extract the table.',true);}
+    if(!isImage(file)){say('Choose an image containing a table.',true);return;}
+    openModal('Extract table from image',`<p class="hint">Selected: <strong>${esc(file.name)}</strong></p><div class="field"><label>Language</label>${ocrLangOptions('df1116Lang')}</div><p class="hint">The image is enlarged and preprocessed before OCR. The extracted rows and columns can be saved as CSV or Excel.</p>`,async()=>{
+      try{const rows=await extractTableFromImage(file,$('df1116Lang').value);if(!rows.length){say('No table could be detected.',true);return;}showTableResult(rows,file.name.replace(/\.[^.]+$/,''));}
+      catch(e){console.error(e);say(e?.message||'Could not extract the table.',true);}
     });
   }
 
-  async function qrDetect(file){
-    const canvas=await imageToCanvas(file);
-    const tries=[canvas];
-    // A second pass at 1.5× often helps when the QR is small in a screenshot.
-    if(canvas.width<2800 && canvas.height<2800){
-      const c2=document.createElement('canvas');
-      c2.width=Math.round(canvas.width*1.5);c2.height=Math.round(canvas.height*1.5);
-      c2.getContext('2d').drawImage(canvas,0,0,c2.width,c2.height);tries.push(c2);
-    }
-    if('BarcodeDetector' in window){
-      try{
-        const bd=new BarcodeDetector({formats:['qr_code']});
-        for(const c of tries){const r=await bd.detect(c);if(r?.length)return r[0].rawValue;}
-      }catch(_){}
-    }
-    if(typeof jsQR !== 'function') return null;
-    for(const c of tries){
-      const ctx=c.getContext('2d',{willReadFrequently:true});
-      const data=ctx.getImageData(0,0,c.width,c.height);
-      const r=jsQR(data.data,data.width,data.height,{inversionAttempts:'attemptBoth'});
-      if(r?.data)return r.data;
+  async function qrDetectImage(file){
+    const canvas=await imageToCanvas(file), tries=[canvas];
+    if(canvas.width<2800&&canvas.height<2800){const c2=document.createElement('canvas');c2.width=Math.round(canvas.width*1.5);c2.height=Math.round(canvas.height*1.5);c2.getContext('2d').drawImage(canvas,0,0,c2.width,c2.height);tries.push(c2);}
+    if('BarcodeDetector' in window){try{const bd=new BarcodeDetector({formats:['qr_code']});for(const c of tries){const r=await bd.detect(c);if(r?.length)return r[0].rawValue;}}catch(_){} }
+    try{await loadLib('jsqr');}catch(e){throw new Error('QR decoding library could not be loaded. If you are offline, reconnect once and reopen DocuForge so the QR decoder can be cached.');}
+    if(typeof jsQR!=='function')throw new Error('QR decoding engine is unavailable.');
+    for(const c of tries){const ctx=c.getContext('2d',{willReadFrequently:true}),data=ctx.getImageData(0,0,c.width,c.height),r=jsQR(data.data,data.width,data.height,{inversionAttempts:'attemptBoth'});if(r?.data)return r.data;}
+    return null;
+  }
+
+  async function qrDetectPdf(file){
+    const bytes=new Uint8Array(await file.arrayBuffer()),pdf=await dfGetPdfJs(bytes).promise;
+    for(let i=1;i<=pdf.numPages;i++){
+      const page=await pdf.getPage(i),vp=page.getViewport({scale:2.2}),c=document.createElement('canvas');c.width=Math.ceil(vp.width);c.height=Math.ceil(vp.height);
+      await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+      const blob=await new Promise(r=>c.toBlob(r,'image/png')),f=new File([blob],`page-${i}.png`,{type:'image/png'}),v=await qrDetectImage(f);if(v)return {value:v,page:i};
     }
     return null;
   }
 
   async function doQr(file){
-    openModal('Read QR code',`
-      <p class="hint">Selected: <strong>${esc(file.name)}</strong></p>
-      <p class="hint">DocuForge will try the device QR detector first, then jsQR with an enlarged image and inverted-contrast detection.</p>
-    `,async()=>{
+    if(!file){say('Choose a file first.',true);return;}
+    if(!isImage(file)&&!isPdf(file)){say('Read QR code supports PDF or image files.',true);return;}
+    openModal('Read QR code',`<p class="hint">Selected file: <strong>${esc(file.name)}</strong></p><p class="hint">DocuForge scans the selected file locally. PDFs are checked page by page.</p>`,async()=>{
       try{
-        const value=await qrDetect(file);
-        if(value) showTextResult('QR code contents',value,'qr_result.txt',true);
-        else say('No QR code found. Use a clear, well-lit image with the complete QR square visible.',true);
-      }catch(e){console.error(e);say('QR reader could not run offline on this browser. The app no longer tries to connect to the internet. A bundled QR decoding engine is required for offline iPhone support.',true);}
+        const result=isPdf(file)?await qrDetectPdf(file):await qrDetectImage(file);
+        if(result){showTextResult('QR code contents',isPdf(file)?`Page ${result.page}\n\n${result.value}`:result,'qr_result.txt',true);say('QR code detected.',false);}
+        else say('No QR code detected in this file. Use a clear image with the complete QR square visible.',true);
+      }catch(e){console.error(e);say(e?.message||'Could not read the QR code.',true);}
     });
+  }
+
+  function runWithSharedFile(id,fn,valid){
+    const f=selectedFile();
+    if(f&&valid(f)){fn(f);return true;}
+    if(f&&!valid(f)){say(id==='btnPdfToImages'?'The selected file is not a PDF. Choose a PDF first.':'The selected file is not supported by this tool.',true);return true;}
+    return false;
   }
 
   function install(){
     const map={
-      btnImagesToPdf: async()=>pick('image/*',true,doImagesToPdf),
-      btnPdfToImages: async()=>pick('.pdf,application/pdf',false,async fs=>{
-        const f=fs[0]; if(f) await doPdfToImages(f);
-      }),
-      btnImageTable: async()=>pick('image/*',false,async fs=>{if(fs[0])await doImageTable(fs[0]);}),
-      btnQrReader: async()=>pick('image/*',false,async fs=>{if(fs[0])await doQr(fs[0]);})
+      btnImagesToPdf:async()=>{
+        const files=window.__docuForgeStudioFiles?.length?window.__docuForgeStudioFiles:null;
+        if(files&&files.every(isImage)){await doImagesToPdf(files);return;}
+        if(!runWithSharedFile('btnImagesToPdf',f=>doImagesToPdf([f]),isImage))pick('image/*',true,doImagesToPdf);
+      },
+      btnPdfToImages:async()=>{if(!runWithSharedFile('btnPdfToImages',doPdfToImages,isPdf))pick('.pdf,application/pdf',false,async fs=>fs[0]&&doPdfToImages(fs[0]));},
+      btnImageTable:async()=>{if(!runWithSharedFile('btnImageTable',doImageTable,isImage))pick('image/*',false,async fs=>fs[0]&&doImageTable(fs[0]));},
+      btnQrReader:async()=>{if(!runWithSharedFile('btnQrReader',doQr,f=>isImage(f)||isPdf(f)))pick('.pdf,application/pdf,image/*',false,async fs=>fs[0]&&doQr(fs[0]));}
     };
-    Object.entries(map).forEach(([id,fn])=>{
-      document.addEventListener('click',async e=>{
-        const b=e.target.closest('#'+id);if(!b)return;
-        if(b.dataset.df1116Ready==='1'){delete b.dataset.df1116Ready;return;}
-        e.preventDefault();e.stopImmediatePropagation();
-        await fn();
-      },true);
-    });
+    Object.entries(map).forEach(([id,fn])=>document.addEventListener('click',async e=>{
+      const b=e.target.closest('#'+id);if(!b)return;
+      if(b.dataset.studioFileReady==='1'){delete b.dataset.studioFileReady;return;}
+      e.preventDefault();e.stopImmediatePropagation();await fn();
+    },true));
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })();
 </script>
+<style id="df1116-v2711021-preview">
+.df1117-gallery-modal{width:min(96vw,1100px)!important;max-width:1100px!important;height:min(94vh,1100px)!important;max-height:94vh!important;padding:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+.df1117-gallery-body{flex:1;min-height:0;overflow:auto;padding:12px 14px 18px;text-align:center}
+.df1117-page-label{font-weight:800;font-size:18px;margin:4px 0 10px}
+.df1117-stage{min-height:calc(100vh - 260px);display:flex;align-items:center;justify-content:center;overflow:auto;background:#eef0ec;border:1px solid var(--line);border-radius:12px;padding:10px}
+.df1117-stage img{display:block;width:auto;max-width:100%;max-height:calc(90vh - 310px);height:auto;object-fit:contain;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.df1117-controls{display:flex;justify-content:center;gap:10px;margin:12px 0 2px}
+@media(max-width:720px){.df1117-gallery-modal{width:calc(100vw - 12px)!important;height:calc(100vh - 20px)!important;max-height:calc(100vh - 20px)!important}.df1117-stage{min-height:0;height:calc(100vh - 245px);padding:6px}.df1117-stage img{max-width:100%;max-height:calc(100vh - 285px)}.df1117-gallery-body{padding:8px}}
+</style>
