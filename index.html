@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.4: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.5: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -730,6 +730,116 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 #df1104CropBox .row,#df1104BlankBox .row,#df1104InsertBox .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 </style>
 
+
+<style id="df1105-responsive-fix">
+/* DocuForge 27.110.5 — responsive PDF Studio only.
+   Deliberately does NOT alter financial calculations/report logic. */
+html, body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+*,*::before,*::after{box-sizing:border-box;}
+.layout{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+main{
+  min-width:0;
+  max-width:100%;
+  overflow-x:hidden;
+}
+.studio-tabs{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+.ribbon{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+}
+.ribbon-panel.active{
+  flex:0 0 auto;
+  width:max-content;
+  max-width:none;
+  min-width:100%;
+}
+.ribbon .tool-group,
+.ribbon-quick{
+  flex:0 0 auto;
+}
+#studioUploadScreen{
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+}
+#studioUploadScreen > div{
+  max-width:100%;
+  box-sizing:border-box;
+}
+@media(max-width:720px){
+  header{
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+    padding-left:12px;
+    padding-right:12px;
+  }
+  #docuForgeTopBrand{
+    max-width:100%;
+    overflow:hidden;
+  }
+  #backToMainMenu{
+    max-width:calc(100% - 20px);
+  }
+  .ribbon{
+    padding:6px 4px;
+  }
+  .ribbon-panel.active{
+    min-width:max-content;
+  }
+  .ribbon .tool-group,
+  .ribbon-quick{
+    padding-left:7px;
+    padding-right:7px;
+  }
+  .ribbon .tool-btn,
+  .ribbon-quick .tool-btn{
+    width:62px;
+    min-width:62px;
+  }
+  #studioUploadScreen{
+    margin-left:0 !important;
+    margin-right:0 !important;
+  }
+}
+</style>
+
+
+<style id="df1105-upload-wrap">
+@media(max-width:560px){
+  #studioUploadScreen > div{
+    padding:14px !important;
+  }
+  #studioUploadChoose,#studioUploadView{
+    max-width:100%;
+    margin-bottom:6px;
+  }
+  #studioUploadName{
+    display:block;
+    margin:4px 0 0 !important;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+  }
+}
+</style>
+
 </head>
 <body>
 <script>
@@ -752,7 +862,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.4';</script>
+<script>const DOCUFORGE_BUILD = '27.110.5';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -763,7 +873,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.4</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.5</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -2714,7 +2824,7 @@ function showCompareResult(diff, nameA, nameB){
       const html=`<!doctype html><html><head><meta charset="utf-8"><title>Comparison</title><style>
       body{font-family:Arial,sans-serif;margin:24px;color:#222}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #ccc;padding:7px;vertical-align:top;white-space:pre-wrap;overflow-wrap:anywhere}th{background:#eee}.changed td{background:#fff8d9}.cmp-added{background:#bff0c5}.cmp-removed{background:#f5bcbc;text-decoration:line-through}.cmp-added,.cmp-removed{border-radius:3px;padding:1px 2px}</style></head><body><h2>Document Comparison</h2><p><b>${esc(nameA)}</b> vs <b>${esc(nameB)}</b></p><table><thead><tr><th style="width:40px">#</th><th>${esc(nameA)}</th><th>${esc(nameB)}</th></tr></thead><tbody>${body}</tbody></table>
 <script id="df1104-pdf-fix-js">
-/* DocuForge 27.110.4 — PDF Studio reliability fix
+/* DocuForge 27.110.5 — PDF Studio reliability fix
    Fixes Insert PDF at page, Crop pages and Remove blank pages.
    All three use explicit UI + existing workingBytes/commit pipeline. */
 (function(){
@@ -6604,7 +6714,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.4 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.5 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
