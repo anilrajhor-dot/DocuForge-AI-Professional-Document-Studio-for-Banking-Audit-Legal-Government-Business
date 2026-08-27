@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.10: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.11: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -725,124 +725,8 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 </style>
 
 
-<style id="df1104-pdf-fix">
-#df1104CropBox input,#df1104BlankBox input,#df1104InsertBox input{font-size:17px;min-height:44px;padding:8px 10px;box-sizing:border-box}
-#df1104CropBox .row,#df1104BlankBox .row,#df1104InsertBox .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-</style>
-
-
-<style id="df1105-responsive-fix">
-/* DocuForge 27.110.10 — responsive PDF Studio only.
-   Deliberately does NOT alter financial calculations/report logic. */
-html, body{
-  width:100%;
-  max-width:100%;
-  overflow-x:hidden;
-}
-*,*::before,*::after{box-sizing:border-box;}
-.layout{
-  width:100%;
-  max-width:100%;
-  min-width:0;
-}
-main{
-  min-width:0;
-  max-width:100%;
-  overflow-x:hidden;
-}
-.studio-tabs{
-  width:100%;
-  max-width:100%;
-  min-width:0;
-}
-.ribbon{
-  width:100%;
-  max-width:100%;
-  min-width:0;
-  overflow-x:auto;
-  overflow-y:hidden;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:thin;
-}
-.ribbon-panel.active{
-  flex:0 0 auto;
-  width:max-content;
-  max-width:none;
-  min-width:100%;
-}
-.ribbon .tool-group,
-.ribbon-quick{
-  flex:0 0 auto;
-}
-#studioUploadScreen{
-  width:100%;
-  max-width:100%;
-  box-sizing:border-box;
-}
-#studioUploadScreen > div{
-  max-width:100%;
-  box-sizing:border-box;
-}
-@media(max-width:720px){
-  header{
-    width:100%;
-    max-width:100%;
-    box-sizing:border-box;
-    padding-left:12px;
-    padding-right:12px;
-  }
-  #docuForgeTopBrand{
-    max-width:100%;
-    overflow:hidden;
-  }
-  #backToMainMenu{
-    max-width:calc(100% - 20px);
-  }
-  .ribbon{
-    padding:6px 4px;
-  }
-  .ribbon-panel.active{
-    min-width:max-content;
-  }
-  .ribbon .tool-group,
-  .ribbon-quick{
-    padding-left:7px;
-    padding-right:7px;
-  }
-  .ribbon .tool-btn,
-  .ribbon-quick .tool-btn{
-    width:62px;
-    min-width:62px;
-  }
-  #studioUploadScreen{
-    margin-left:0 !important;
-    margin-right:0 !important;
-  }
-}
-</style>
-
-
-<style id="df1105-upload-wrap">
-@media(max-width:560px){
-  #studioUploadScreen > div{
-    padding:14px !important;
-  }
-  #studioUploadChoose,#studioUploadView{
-    max-width:100%;
-    margin-bottom:6px;
-  }
-  #studioUploadName{
-    display:block;
-    margin:4px 0 0 !important;
-    overflow-wrap:anywhere;
-    word-break:break-word;
-  }
-}
-</style>
-
-
 <style id="df1106-pdf-studio-fix">
-/* 27.110.10: PDF Studio interaction fixes only. Financial calculations and
+/* 27.110.11: PDF Studio interaction fixes only. Financial calculations and
    PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
 @media(max-width:720px){
   #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
@@ -850,27 +734,6 @@ main{
   #df1106CropGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   #df1106CropGrid input{width:100%;min-height:44px;font-size:17px;padding:8px;}
 }
-</style>
-
-<style id="df1107-view-share">
-.df-view-share-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.df-view-share-actions .btn{min-height:52px}
-@media(max-width:520px){.df-view-share-actions{grid-template-columns:1fr}}
-.df-preview-note{font-size:12px;opacity:.75;margin-top:10px}
-</style>
-
-
-<style id="df1108-header-footer-bates-css">
-.df1108-form{display:grid;gap:12px}
-.df1108-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.df1108-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.df1108-field label{display:block;font-size:12px;font-weight:600;margin-bottom:5px}
-.df1108-field input,.df1108-field select{width:100%;min-height:42px;padding:8px;border:1px solid #ccd2db;border-radius:8px;font:inherit}
-.df1108-check{display:flex;align-items:center;gap:8px;font-size:13px}
-.df1108-check input{width:18px;height:18px}
-.df1108-hint{font-size:12px;opacity:.72}
-.df1108-preview{padding:12px;border:1px dashed #b8bec8;border-radius:10px;background:#fafbfc}
-@media(max-width:680px){.df1108-grid,.df1108-grid2{grid-template-columns:1fr}}
 </style>
 
 </head>
@@ -895,7 +758,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.10';</script>
+<script>const DOCUFORGE_BUILD = '27.110.11';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -906,7 +769,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.10</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.11</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -4439,6 +4302,12 @@ body.dashboard-active #studioUploadScreen{
 }
 </style>
 
+
+<style id="df1111-pdf-tools-css">
+.df1111-form{display:grid;gap:12px}.df1111-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.df1111-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.df1111-field label{display:block;font-size:12px;font-weight:700;margin-bottom:5px}.df1111-field input,.df1111-field select{width:100%;min-height:44px;padding:8px;border:1px solid #cbd2db;border-radius:8px;font:inherit}.df1111-help{font-size:12px;opacity:.72;line-height:1.45}.df1111-stat{padding:10px;border:1px solid var(--line,#ddd);border-radius:8px;background:var(--surface-2,#fafafa)}
+@media(max-width:680px){.df1111-grid,.df1111-grid2{grid-template-columns:1fr}}
+</style>
+
 </head>
 <body>${bodyHtml}
 
@@ -6608,7 +6477,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.10 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.11 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7825,262 +7694,169 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 })();
 </script>
 
-\n\n<script id="df1107-view-share-js">
-/* DocuForge 27.110.10
-   View-before-share UX only. Conversion engines and financial calculations
-   are intentionally untouched. */
-(function(){
-  window.__dfViewFile = function(blob, filename){
-    try{
-      const url=URL.createObjectURL(blob);
-      const w=window.open(url,'_blank','noopener,noreferrer');
-      if(!w){
-        const a=document.createElement('a');
-        a.href=url;a.target='_blank';a.rel='noopener';
-        a.download='';
-        document.body.appendChild(a);a.click();a.remove();
-        setTimeout(()=>URL.revokeObjectURL(url),60000);
-      }else{
-        setTimeout(()=>URL.revokeObjectURL(url),60000);
-      }
-      return true;
-    }catch(e){
-      if(window.toast) window.toast('Could not open the file for viewing.',true);
-      return false;
-    }
-  };
-})();
-</script>
-<script id="df1108-header-footer-bates-js">
-/* DocuForge 27.110.10
-   Header/Footer + Bates enhancement.
-   Does NOT alter PDF-to-Excel or financial conversion/calculation modules. */
+\n\n
+<script id="df1111-pdf-tools-js">
+/* DocuForge 27.110.11 — PDF Studio reliability layer.
+   PDF/Excel conversion and financial calculation modules are untouched. */
 (function(){
   const $=id=>document.getElementById(id);
-  const toast=(m,b)=>window.toast?window.toast(m,b):alert(m);
+  const say=(m,b)=>typeof toast==='function'?toast(m,b):alert(m);
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const need=()=>{if(!window.workingBytes){say('Open a PDF first.',true);return false}return true};
+  const sub=(s,p,t,title,file)=>String(s||'').replace(/\{page\}/gi,p).replace(/\{total\}/gi,t).replace(/\{date\}/gi,new Date().toLocaleDateString('en-GB')).replace(/\{title\}/gi,title||'').replace(/\{filename\}/gi,file||'');
 
-  function pageTemplateText(text,page,total,title,filename){
-    return String(text||'')
-      .replace(/\{page\}/gi,String(page))
-      .replace(/\{total\}/gi,String(total))
-      .replace(/\{date\}/gi,new Date().toLocaleDateString('en-GB'))
-      .replace(/\{title\}/gi,title||'')
-      .replace(/\{filename\}/gi,filename||'');
-  }
-
-  async function loadDoc(){
-    if(!window.workingBytes) throw new Error('Open a PDF first.');
-    return PDFDocument.load(window.workingBytes);
-  }
-
-  async function addHeaderFooter(kind){
-    const doc=await loadDoc(), total=doc.getPageCount();
-    const meta=doc.getTitle ? (doc.getTitle()||'') : '';
-    const fname=(window.currentFileName||window.currentFilename||'document.pdf');
-    const title=meta;
-    const defaults=kind==='header'
-      ? {left:'',center:'',right:'',top:24,bottom:0,size:9}
-      : {left:'',center:'',right:'',top:0,bottom:22,size:9};
-    window.openModal(kind==='header'?'Add Header':'Add Footer',`
-      <div class="df1108-form">
-        <div class="df1108-grid">
-          <div class="df1108-field"><label>Left</label><input id="df1108Left" placeholder="{filename}"></div>
-          <div class="df1108-field"><label>Centre</label><input id="df1108Center" placeholder="Confidential"></div>
-          <div class="df1108-field"><label>Right</label><input id="df1108Right" placeholder="Page {page} of {total}"></div>
+  async function headerFooter(){
+    if(!need())return;
+    const d=await PDFDocument.load(workingBytes), n=d.getPageCount();
+    const title=d.getTitle?.()||'', file=window.currentFileName||window.currentFilename||'document.pdf';
+    openModal('Add Header / Footer',`
+      <div class="df1111-form">
+        <div class="df1111-grid2">
+          <div class="df1111-field"><label>Header — Left</label><input id="df1111HL" placeholder="{filename}"></div>
+          <div class="df1111-field"><label>Header — Centre</label><input id="df1111HC" placeholder="Confidential"></div>
         </div>
-        <div class="df1108-grid">
-          <div class="df1108-field"><label>${kind==='header'?'Distance from top':'Distance from bottom'} (pt)</label>
-            <input type="number" id="df1108Offset" min="0" value="${kind==='header'?defaults.top:defaults.bottom}"></div>
-          <div class="df1108-field"><label>Left / right margin (pt)</label><input type="number" id="df1108Margin" min="0" value="36"></div>
-          <div class="df1108-field"><label>Font size (pt)</label><input type="number" id="df1108Size" min="5" max="30" value="${defaults.size}"></div>
+        <div class="df1111-grid2">
+          <div class="df1111-field"><label>Header — Right</label><input id="df1111HR" placeholder="Page {page} of {total}"></div>
+          <div class="df1111-field"><label>Header distance from top (pt)</label><input id="df1111HT" type="number" min="0" value="28"></div>
         </div>
-        <label class="df1108-check"><input type="checkbox" id="df1108Line"> Add separator line</label>
-        <div class="df1108-hint">Placeholders: {page}, {total}, {date}, {title}, {filename}. Preview the result before sharing.</div>
-        <div class="df1108-preview"><strong>Safe placement:</strong> the text is kept inside the page boundary and a conservative margin is used to reduce overlap with existing content.</div>
+        <div class="df1111-grid2">
+          <div class="df1111-field"><label>Footer — Left</label><input id="df1111FL" placeholder="Internal Use Only"></div>
+          <div class="df1111-field"><label>Footer — Centre</label><input id="df1111FC" placeholder="Page {page} of {total}"></div>
+        </div>
+        <div class="df1111-grid2">
+          <div class="df1111-field"><label>Footer — Right</label><input id="df1111FR" placeholder="{date}"></div>
+          <div class="df1111-field"><label>Footer distance from bottom (pt)</label><input id="df1111FB" type="number" min="0" value="28"></div>
+        </div>
+        <div class="df1111-grid">
+          <div class="df1111-field"><label>Side margin (pt)</label><input id="df1111M" type="number" min="4" value="36"></div>
+          <div class="df1111-field"><label>Font size (pt)</label><input id="df1111S" type="number" min="5" max="24" value="9"></div>
+          <div class="df1111-field"><label>Separator</label><select id="df1111Line"><option value="none">None</option><option value="both">Header & Footer</option><option value="header">Header only</option><option value="footer">Footer only</option></select></div>
+        </div>
+        <div class="df1111-help">Placeholders: {page}, {total}, {date}, {title}, {filename}. Placement stays inside the page boundary.</div>
       </div>`,async()=>{
-        const left=$('df1108Left').value, center=$('df1108Center').value, right=$('df1108Right').value;
-        if(!left&&!center&&!right){toast('Enter at least one header/footer item.',true);return;}
-        const offset=Math.max(0,Number($('df1108Offset').value)||0);
-        const margin=Math.max(0,Number($('df1108Margin').value)||0);
-        const size=Math.max(5,Math.min(30,Number($('df1108Size').value)||9));
-        const line=$('df1108Line').checked;
-        const font=await doc.embedFont(StandardFonts.Helvetica);
-        for(let i=0;i<total;i++){
-          const p=doc.getPage(i), {width,height}=p.getSize();
-          const y=kind==='header'?height-offset-size:offset;
-          const items=[
-            [left,margin,'left'],[center,width/2,'center'],[right,width-margin,'right']
-          ];
-          for(const [raw,x,align] of items){
-            const txt=pageTemplateText(raw,i+1,total,title,fname);
-            if(!txt)continue;
-            let tx=x;
-            if(align==='center')tx=x-font.widthOfTextAtSize(txt,size)/2;
-            if(align==='right')tx=x-font.widthOfTextAtSize(txt,size);
-            tx=Math.max(4,Math.min(width-font.widthOfTextAtSize(txt,size)-4,tx));
-            const yy=Math.max(4,Math.min(height-size-2,y));
-            p.drawText(txt,{x:tx,y:yy,size,font});
-          }
-          if(line){
-            const ly=kind==='header'?Math.max(3,y-4):Math.min(height-3,offset+size+5);
-            p.drawLine({start:{x:margin,y:ly},end:{x:width-margin,y:ly},thickness:.5});
-          }
+        const f=['HL','HC','HR','FL','FC','FR'].map(x=>$('df1111'+x).value);
+        if(!f.some(Boolean)){say('Enter at least one header or footer item.',true);return}
+        const top=Math.max(0,+$('df1111HT').value||28), bottom=Math.max(0,+$('df1111FB').value||28);
+        const margin=Math.max(4,+$('df1111M').value||36), size=Math.max(5,Math.min(24,+$('df1111S').value||9));
+        const sep=$('df1111Line').value, font=await d.embedFont(StandardFonts.Helvetica);
+        for(let i=0;i<n;i++){
+          const p=d.getPage(i),{width,height}=p.getSize();
+          const put=(raw,y,a)=>{
+            const text=sub(raw,i+1,n,title,file);if(!text)return;
+            const tw=font.widthOfTextAtSize(text,size);
+            let x=a==='left'?margin:a==='right'?width-margin-tw:(width-tw)/2;
+            x=Math.max(2,Math.min(width-tw-2,x));
+            p.drawText(text,{x,y:Math.max(2,Math.min(height-size-2,y)),size,font});
+          };
+          put(f[0],height-top-size,'left');put(f[1],height-top-size,'center');put(f[2],height-top-size,'right');
+          put(f[3],bottom,'left');put(f[4],bottom,'center');put(f[5],bottom,'right');
+          if(sep==='both'||sep==='header'){const y=Math.max(3,height-top-size-5);p.drawLine({start:{x:margin,y},end:{x:width-margin,y},thickness:.5})}
+          if(sep==='both'||sep==='footer'){const y=Math.min(height-3,bottom+size+5);p.drawLine({start:{x:margin,y},end:{x:width-margin,y},thickness:.5})}
         }
-        await window.commit(await doc.save(),`${kind==='header'?'Header':'Footer'} added.`);
+        await commit(await d.save(),'Header/footer added to all pages.');
       });
   }
 
-  async function addBates(){
-    const doc=await loadDoc(), total=doc.getPageCount();
-    window.openModal('Add Bates Numbering',`
-      <div class="df1108-form">
-        <div class="df1108-grid">
-          <div class="df1108-field"><label>Prefix</label><input id="df1108Prefix" value="CBI-"></div>
-          <div class="df1108-field"><label>Starting number</label><input id="df1108Start" type="number" value="1" min="0"></div>
-          <div class="df1108-field"><label>Digits</label><input id="df1108Digits" type="number" value="6" min="1" max="12"></div>
+  async function bates(){
+    if(!need())return;
+    const d=await PDFDocument.load(workingBytes), n=d.getPageCount();
+    openModal('Bates Numbering',`
+      <div class="df1111-form">
+        <div class="df1111-grid">
+          <div class="df1111-field"><label>Prefix</label><input id="df1111BP" value="CBI-"></div>
+          <div class="df1111-field"><label>Starting number</label><input id="df1111BS" type="number" min="0" value="1"></div>
+          <div class="df1111-field"><label>Digits</label><input id="df1111BD" type="number" min="1" max="12" value="6"></div>
         </div>
-        <div class="df1108-grid">
-          <div class="df1108-field"><label>Position</label>
-            <select id="df1108Pos"><option>Bottom Centre</option><option>Bottom Left</option><option>Bottom Right</option><option>Top Centre</option><option>Top Left</option><option>Top Right</option></select></div>
-          <div class="df1108-field"><label>Edge margin (pt)</label><input id="df1108BMargin" type="number" value="28" min="4"></div>
-          <div class="df1108-field"><label>Font size (pt)</label><input id="df1108BSize" type="number" value="8" min="5" max="24"></div>
+        <div class="df1111-grid">
+          <div class="df1111-field"><label>Position</label><select id="df1111BPos"><option value="bottom-center">Bottom Centre</option><option value="bottom-left">Bottom Left</option><option value="bottom-right">Bottom Right</option><option value="top-center">Top Centre</option><option value="top-left">Top Left</option><option value="top-right">Top Right</option></select></div>
+          <div class="df1111-field"><label>Edge margin (pt)</label><input id="df1111BM" type="number" min="4" value="30"></div>
+          <div class="df1111-field"><label>Font size (pt)</label><input id="df1111BSz" type="number" min="5" max="24" value="8"></div>
         </div>
-        <div class="df1108-hint">Example: CBI-000001, CBI-000002 … Bates numbers are added as a separate text layer and do not change page content.</div>
+        <div class="df1111-help">Example: CBI-000001, CBI-000002 … sequentially across all ${n} pages.</div>
       </div>`,async()=>{
-        const prefix=$('df1108Prefix').value||'', start=Math.max(0,parseInt($('df1108Start').value,10)||0);
-        const digits=Math.max(1,Math.min(12,parseInt($('df1108Digits').value,10)||6));
-        const pos=$('df1108Pos').value, margin=Math.max(4,Number($('df1108BMargin').value)||28);
-        const size=Math.max(5,Math.min(24,Number($('df1108BSize').value)||8));
-        const font=await doc.embedFont(StandardFonts.Helvetica);
-        for(let i=0;i<total;i++){
-          const p=doc.getPage(i),{width,height}=p.getSize();
-          const txt=prefix+String(start+i).padStart(digits,'0');
-          const tw=font.widthOfTextAtSize(txt,size);
-          const top=/Top/.test(pos), right=/Right/.test(pos), center=/Centre/.test(pos);
-          const x=center?(width-tw)/2:(right?width-margin-tw:margin);
-          const y=top?height-margin-size:margin;
-          p.drawText(txt,{x:Math.max(2,x),y:Math.max(2,y),size,font});
+        const pre=$('df1111BP').value||'', start=Math.max(0,parseInt($('df1111BS').value,10)||0);
+        const digits=Math.max(1,Math.min(12,parseInt($('df1111BD').value,10)||6)), pos=$('df1111BPos').value;
+        const margin=Math.max(4,+$('df1111BM').value||30), size=Math.max(5,Math.min(24,+$('df1111BSz').value||8));
+        const font=await d.embedFont(StandardFonts.Helvetica);
+        for(let i=0;i<n;i++){
+          const p=d.getPage(i),{width,height}=p.getSize(),text=pre+String(start+i).padStart(digits,'0'),tw=font.widthOfTextAtSize(text,size);
+          const top=pos.startsWith('top'),right=pos.endsWith('right'),center=pos.endsWith('center');
+          const x=center?(width-tw)/2:(right?width-margin-tw:margin), y=top?height-margin-size:margin;
+          p.drawText(text,{x:Math.max(2,x),y:Math.max(2,y),size,font});
         }
-        await window.commit(await doc.save(),'Bates numbering added.');
+        await commit(await d.save(),'Bates numbering added to all pages.');
       });
+  }
+
+  async function compress(){
+    if(!need())return;
+    openModal('Compress PDF',`
+      <div class="df1111-form"><div class="df1111-grid2">
+        <div class="df1111-field"><label>JPEG quality</label><input id="df1111CQ" type="number" min=".3" max=".95" step=".05" value=".65"></div>
+        <div class="df1111-field"><label>Maximum image dimension (px)</label><input id="df1111CD" type="number" min="400" max="4000" step="100" value="1600"></div>
+      </div><div class="df1111-help">Recompresses embedded JPEG scans/photos. Text/vector content is preserved.</div></div>`,async()=>{
+        const q=Math.max(.3,Math.min(.95,+$('df1111CQ').value||.65)), md=Math.max(400,Math.min(4000,parseInt($('df1111CD').value,10)||1600));
+        const before=workingBytes.byteLength;
+        try{
+          const d=await PDFDocument.load(workingBytes),ctx=d.context,PN=PDFLib.PDFName.of.bind(PDFLib.PDFName);
+          let changed=0,images=0;
+          for(const [ref,obj] of ctx.enumerateIndirectObjects()){
+            if(!(obj instanceof PDFLib.PDFStream))continue;
+            const dict=obj.dict,sub=dict.get(PN('Subtype')),fil=dict.get(PN('Filter'));
+            if(!sub||sub.toString()!=='/Image'||!fil||fil.toString()!=='/DCTDecode')continue;
+            images++;
+            try{
+              const raw=obj.getContents();if(!raw||raw.length<6000)continue;
+              const r=await recompressJpegBytes(raw,q,md);
+              if(r.bytes.byteLength<raw.length){
+                dict.set(PN('Width'),PDFLib.PDFNumber.of(r.width));dict.set(PN('Height'),PDFLib.PDFNumber.of(r.height));
+                dict.set(PN('Filter'),PN('DCTDecode'));dict.set(PN('ColorSpace'),PN('DeviceRGB'));dict.set(PN('BitsPerComponent'),PDFLib.PDFNumber.of(8));
+                dict.delete(PN('DecodeParms'));dict.delete(PN('Decode'));dict.delete(PN('SMask'));
+                ctx.assign(ref,PDFLib.PDFRawStream.of(dict,r.bytes));changed++;
+              }
+            }catch(_){}
+          }
+          const out=await d.save({useObjectStreams:true}),after=out.byteLength,pct=before?Math.round(Math.max(0,before-after)/before*100):0;
+          await commit(out,changed?`Compressed PDF: ${fmtBytes(before)} → ${fmtBytes(after)} (${pct}% smaller).`:`Compression completed. ${images} JPEG image${images===1?'':'s'} checked; no further JPEG reduction was possible.`);
+        }catch(e){console.error(e);say(e?.message||'Could not compress this PDF.',true)}
+      });
+  }
+
+  async function metadata(){
+    if(!need())return;
+    try{
+      const d=await PDFDocument.load(workingBytes), fd=x=>{try{return x?new Date(x).toLocaleString():'—'}catch{return'—'}};
+      const m={title:d.getTitle()||'',author:d.getAuthor()||'',subject:d.getSubject()||'',keywords:d.getKeywords()||'',creator:d.getCreator()||'—',producer:d.getProducer()||'—',created:fd(d.getCreationDate?.()),modified:fd(d.getModificationDate?.()),pages:d.getPageCount(),size:fmtBytes(workingBytes.byteLength)};
+      openModal('Metadata Inspector',`
+        <div class="df1111-grid2"><div class="df1111-stat"><strong>Pages</strong><br>${m.pages}</div><div class="df1111-stat"><strong>File size</strong><br>${esc(m.size)}</div>
+        <div class="df1111-stat"><strong>Created</strong><br>${esc(m.created)}</div><div class="df1111-stat"><strong>Modified</strong><br>${esc(m.modified)}</div>
+        <div class="df1111-stat"><strong>Creator</strong><br>${esc(m.creator)}</div><div class="df1111-stat"><strong>Producer</strong><br>${esc(m.producer)}</div></div>
+        <div class="df1111-field"><label>Title</label><input id="df1111MT" value="${esc(m.title)}"></div>
+        <div class="df1111-field"><label>Author</label><input id="df1111MA" value="${esc(m.author)}"></div>
+        <div class="df1111-field"><label>Subject</label><input id="df1111MS" value="${esc(m.subject)}"></div>
+        <div class="df1111-field"><label>Keywords (comma separated)</label><input id="df1111MK" value="${esc(m.keywords)}"></div>
+        <div class="df1111-help">Changes are written into the PDF. Page content is not altered.</div>`,async()=>{
+          const x=await PDFDocument.load(workingBytes);
+          x.setTitle($('df1111MT').value||'');x.setAuthor($('df1111MA').value||'');x.setSubject($('df1111MS').value||'');
+          x.setKeywords(($('df1111MK').value||'').split(',').map(v=>v.trim()).filter(Boolean));
+          await commit(await x.save(),'Metadata updated.');
+        });
+    }catch(e){console.error(e);say(e?.message||'Could not read PDF metadata.',true)}
   }
 
   function bind(){
-    // Support both current IDs and common button labels without touching conversion code.
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnHeader,#btnAddHeader,[data-tool="header"]');
-      if(b){e.preventDefault();e.stopImmediatePropagation();addHeaderFooter('header').catch(x=>toast(x.message||'Header failed.',true));}
-    },true);
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnFooter,#btnAddFooter,[data-tool="footer"]');
-      if(b){e.preventDefault();e.stopImmediatePropagation();addHeaderFooter('footer').catch(x=>toast(x.message||'Footer failed.',true));}
-    },true);
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnBates,#btnBatesNumber,[data-tool="bates"]');
-      if(b){e.preventDefault();e.stopImmediatePropagation();addBates().catch(x=>toast(x.message||'Bates numbering failed.',true));}
-    },true);
+    const defs=[['btnHeaderFooter',headerFooter],['btnBates',bates],['btnCompress',compress],['btnMetadata',metadata]];
+    for(const [id,fn] of defs){
+      document.addEventListener('click',e=>{
+        const b=e.target.closest('#'+id);if(!b||!workingBytes)return;
+        e.preventDefault();e.stopImmediatePropagation();
+        fn().catch(x=>say(x?.message||'The PDF operation could not be completed.',true));
+      },true);
+    }
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
 })();
 </script>
-<script id="df1106-pdf-studio-fix-js">
-(function(){
-  const $=id=>document.getElementById(id);
-  function msg(t,b){ if(typeof toast==='function') toast(t,b); else alert(t); }
-  function selected(){ return typeof selectedIndices==='function' ? selectedIndices() : Array.from(window.selected||[]).sort((a,b)=>a-b); }
 
-  async function pageCount(){
-    const d=await PDFDocument.load(workingBytes); return d.getPageCount();
-  }
-
-  function insertTool(){
-    if(!workingBytes){msg('Open a PDF first.',true);return;}
-    const input=document.createElement('input');
-    input.type='file'; input.accept='application/pdf,.pdf,image/*'; input.hidden=true;
-    document.body.appendChild(input);
-    input.onchange=async()=>{
-      const file=input.files&&input.files[0]; input.remove();
-      if(!file)return;
-      try{
-        const pages=await pageCount();
-        let chosen=1;
-        openModal('Insert PDF at page…',`
-          <div class="field"><label>Selected file</label><div style="padding:10px;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere;"><strong>${String(file.name).replace(/[&<>]/g,'')}</strong></div></div>
-          <div class="field"><label>Insert before page number</label><input id="df1106InsertPage" type="number" min="1" max="${pages+1}" value="1" inputmode="numeric"></div>
-          <p class="hint">Current document: ${pages} page${pages===1?'':'s'}. Enter ${pages+1} to append at the end. Existing pages are not replaced.</p>
-        `,async()=>{
-          const el=$('df1106InsertPage');
-          const pos=parseInt(el&&el.value,10);
-          if(!Number.isFinite(pos)||pos<1||pos>pages+1){msg('Enter a page number from 1 to '+(pages+1)+'.',true);return;}
-          await insertPdfAt(file,pos-1);
-        });
-      }catch(e){msg(e?.message||'Could not prepare insertion.',true);}
-    };
-    input.click();
-  }
-
-  function cropTool(){
-    if(!workingBytes){msg('Open a PDF first.',true);return;}
-    const idx=selected();
-    if(!idx.length){msg('Select at least one page to crop.',true);return;}
-    openModal('Crop selected pages',`
-      <p class="hint">Crop is non-destructive: it changes the visible CropBox, so the original page content is not deleted.</p>
-      <div id="df1106CropGrid">
-        <div class="field"><label>Left (pt)</label><input id="df1106L" type="number" min="0" value="0"></div>
-        <div class="field"><label>Right (pt)</label><input id="df1106R" type="number" min="0" value="0"></div>
-        <div class="field"><label>Top (pt)</label><input id="df1106T" type="number" min="0" value="0"></div>
-        <div class="field"><label>Bottom (pt)</label><input id="df1106B" type="number" min="0" value="0"></div>
-      </div>
-      <p class="hint">${idx.length} selected page${idx.length===1?'':'s'}. 72 pt = 1 inch.</p>
-    `,async()=>{
-      const m={left:Math.max(0,parseFloat($('df1106L')?.value)||0),right:Math.max(0,parseFloat($('df1106R')?.value)||0),top:Math.max(0,parseFloat($('df1106T')?.value)||0),bottom:Math.max(0,parseFloat($('df1106B')?.value)||0)};
-      await cropPages(idx,m);
-    });
-    // openModal closes before its callback, so preserve the entered values by
-    // replacing the handler with one that reads the fields before close.
-    const btn=$('modalConfirm');
-    btn.onclick=async()=>{
-      const m={left:Math.max(0,parseFloat($('df1106L')?.value)||0),right:Math.max(0,parseFloat($('df1106R')?.value)||0),top:Math.max(0,parseFloat($('df1106T')?.value)||0),bottom:Math.max(0,parseFloat($('df1106B')?.value)||0)};
-      closeModal(); await cropPages(idx,m);
-    };
-  }
-
-  async function blankTool(){
-    if(!workingBytes){msg('Open a PDF first.',true);return;}
-    try{
-      setStatus('Checking pages for blank content…');
-      showProgress(15);
-      const blanks=await detectBlankPages(0.995);
-      showProgress(null);
-      if(!blanks.length){msg('No blank pages detected.',false);setStatus('No blank pages detected.');return;}
-      const labels=blanks.map(i=>i+1).join(', ');
-      openModal('Blank pages detected',`
-        <p><strong>${blanks.length}</strong> blank-looking page${blanks.length===1?'':'s'} detected.</p>
-        <p>Pages: <strong>${labels}</strong></p>
-        <p class="hint">Detection is based on rendered page pixels, so scanned blank pages are included. Review the page numbers before removing them.</p>
-      `,async()=>{});
-      $('modalConfirm').textContent='Remove detected pages';
-      $('modalConfirm').onclick=async()=>{
-        closeModal();
-        if((await pageCount())-blanks.length<1){msg('At least one page must remain.',true);return;}
-        await deletePages(blanks);
-      };
-    }catch(e){showProgress(null);console.error(e);msg(e?.message||'Could not check for blank pages.',true);}
-  }
-
-  function install(){
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnInsert'); if(b){e.preventDefault();e.stopImmediatePropagation();insertTool();}
-    },true);
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnCrop'); if(b){e.preventDefault();e.stopImmediatePropagation();cropTool();}
-    },true);
-    document.addEventListener('click',e=>{
-      const b=e.target.closest('#btnRemoveBlank'); if(b){e.preventDefault();e.stopImmediatePropagation();blankTool();}
-    },true);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true}); else install();
-})();
-</script>
 </body>
 </html>
