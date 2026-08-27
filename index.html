@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.20: enhanced financial dashboard -->
+<!-- InstantDash release 27.110.22: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -208,8 +208,6 @@ body.dark .dropzone .stamp{color:var(--pine);}
   border-top:1px solid var(--line); font-family:var(--font-mono); font-size:11px; color:var(--ink-soft);
 }
 .page-card .ctrls{display:flex; gap:2px;}
-.page-card .drag-handle{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;cursor:grab;touch-action:none;user-select:none;font-size:18px;color:var(--ink-soft);border:0;background:transparent;}
-.page-card .drag-handle:active{cursor:grabbing;}
 .page-card .ctrls button{
   width:22px; height:22px; border:none; background:transparent; color:var(--ink-soft); cursor:pointer;
   border-radius:3px; display:flex; align-items:center; justify-content:center;
@@ -728,7 +726,7 @@ body:not(.dashboard-active)[data-studio]:not([data-studio="pdf"]) #noPdfBanner{d
 
 
 <style id="df1106-pdf-studio-fix">
-/* 27.110.21: PDF Studio interaction fixes only. Financial calculations and
+/* 27.110.22: PDF Studio interaction fixes only. Financial calculations and
    PDF→Excel/simple Excel/financial Excel conversion code are untouched. */
 @media(max-width:720px){
   #genericModal .modal{max-width:calc(100vw - 24px);width:calc(100vw - 24px);max-height:88vh;overflow:auto;}
@@ -760,7 +758,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.21';</script>
+<script>const DOCUFORGE_BUILD = '27.110.22';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -771,7 +769,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.21</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.22</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -844,6 +842,7 @@ window.DFStorage = (function(){
       <button class="studio-tab" data-studio="help"><span class="st-icon">❓</span> Help</button>
       <button class="studio-tab" data-studio="settings"><span class="st-icon">⚙️</span> Settings</button>
       <button class="studio-tab" data-studio="reader"><span class="st-icon">📖</span> Reader</button>
+      <button class="studio-tab" data-studio="view"><span class="st-icon">👁️</span> View</button>
       <button class="studio-tab" data-studio="export"><span class="st-icon">📤</span> Export</button>
       <button class="studio-tab" data-studio="about"><span class="st-icon">ℹ️</span> About</button>
 </div>
@@ -1090,6 +1089,29 @@ window.DFStorage = (function(){
         <div id="readerPdfView" class="reader-pdf-view" style="display:none;"></div>
         <div id="readerEpubView" class="reader-epub-view" style="display:none;"></div>
         <div id="readerTocPanel" class="reader-toc-panel" style="display:none;"></div>
+      </div>
+    </div>
+
+    <div id="viewStudio" class="studio-page" style="display:none !important;">
+      <div class="df-view-head">
+        <div><h2 style="margin:0 0 4px;">👁️ View</h2><p class="hint" style="margin:0;">Full-page document preview. Review the file before Download or Share.</p></div>
+        <div class="df-view-actions">
+          <button class="btn ghost" id="dfViewOpen" type="button">📂 Open PDF</button>
+          <button class="btn ghost" id="dfViewCurrent" type="button">👁️ View current PDF</button>
+          <button class="btn ghost" id="dfViewFit" type="button">Fit page</button>
+          <button class="btn ghost" id="dfViewWidth" type="button">Fit width</button>
+          <button class="btn ghost" id="dfViewZoomOut" type="button">−</button>
+          <span id="dfViewZoom" class="mono">100%</span>
+          <button class="btn ghost" id="dfViewZoomIn" type="button">+</button>
+        </div>
+      </div>
+      <div id="dfViewStatus" class="hint" style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin:10px 0;">Choose a PDF or use the current PDF.</div>
+      <div id="dfViewCanvasWrap" style="height:calc(100vh - 300px);min-height:520px;overflow:auto;background:#dfe3df;border:1px solid var(--line);border-radius:12px;padding:18px;text-align:center;-webkit-overflow-scrolling:touch;">
+        <div id="dfViewPages" style="display:inline-flex;flex-direction:column;align-items:center;gap:18px;min-width:100%;"></div>
+      </div>
+      <div class="df-view-bottom" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px;">
+        <button class="btn primary" id="dfViewDownload" type="button" disabled>⬇️ Download PDF</button>
+        <button class="btn primary" id="dfViewShare" type="button" disabled>📤 Share PDF</button>
       </div>
     </div>
 
@@ -1355,23 +1377,11 @@ function loadLib(name){
   if(window[{tesseract:'Tesseract', xlsx:'XLSX', mammoth:'mammoth', chartjs:'Chart', jsqr:'jsQR', qrcode:'QRCode'}[name]]) return Promise.resolve();
   if(_libPromises[name]) return _libPromises[name];
   _libPromises[name] = new Promise((resolve, reject) => {
-    const sources = name === 'jsqr'
-      ? [LIB_URLS[name], 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js', 'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js']
-      : [LIB_URLS[name]];
-    let i = 0;
-    const tryNext = () => {
-      if(i >= sources.length){
-        delete _libPromises[name];
-        reject(new Error(`Could not load the required library (${name}).`));
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = sources[i++];
-      script.onload = () => resolve();
-      script.onerror = () => { script.remove(); tryNext(); };
-      document.head.appendChild(script);
-    };
-    tryNext();
+    const script = document.createElement('script');
+    script.src = LIB_URLS[name];
+    script.onload = () => resolve();
+    script.onerror = () => { delete _libPromises[name]; reject(new Error(`Could not load a required library (${name}). Check your internet connection and try again.`)); };
+    document.head.appendChild(script);
   });
   return _libPromises[name];
 }
@@ -1890,14 +1900,6 @@ async function renderThumbnails(){
     bar.innerHTML = `<span>#${i}</span>`;
     const ctrls = document.createElement('div');
     ctrls.className = 'ctrls';
-    const dragHandle = document.createElement('button');
-    dragHandle.type = 'button';
-    dragHandle.className = 'drag-handle';
-    dragHandle.textContent = '☷';
-    dragHandle.title = 'Drag to reorder page';
-    dragHandle.setAttribute('aria-label', 'Drag to reorder page');
-    dragHandle.addEventListener('click', e => e.stopPropagation());
-    ctrls.appendChild(dragHandle);
     ctrls.appendChild(iconBtn('rotL', '↺', () => rotatePages([i-1], -90)));
     ctrls.appendChild(iconBtn('rotR', '↻', () => rotatePages([i-1], 90)));
     ctrls.appendChild(iconBtn('dup', '⧉', () => duplicatePages([i-1])));
@@ -1925,10 +1927,6 @@ function initSortable(){
   if(sortableInstance) sortableInstance.destroy();
   sortableInstance = Sortable.create(grid, {
     animation:150,
-    handle: '.drag-handle',
-    delayOnTouchOnly: true,
-    delay: 180,
-    touchStartThreshold: 6,
     onEnd: async () => {
       const newOrder = Array.from(grid.children).map(c => parseInt(c.dataset.index));
       await reorderPages(newOrder);
@@ -2693,21 +2691,6 @@ function groupCompareDiff(diff){
   }
   return out;
 }
-function buildComparisonHtml(groups, nameA, nameB){
-  const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const body=groups.map((g,idx)=>{
-    if(g.type==='same') return `<tr><td>${idx+1}</td><td>${esc(g.a)}</td><td>${esc(g.b)}</td></tr>`;
-    const wd=wordDiff(g.a,g.b);
-    return `<tr class="changed"><td>${idx+1}</td><td>${wd.aHtml}</td><td>${wd.bHtml}</td></tr>`;
-  }).join('');
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Document Comparison</title><style>body{font-family:Arial,sans-serif;margin:24px;color:#222;line-height:1.4}h2{margin-bottom:6px}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #ccc;padding:8px;vertical-align:top;white-space:pre-wrap;overflow-wrap:anywhere}th{background:#eee}.changed td{background:#fff8d9}.cmp-added{background:#bff0c5}.cmp-removed{background:#f5bcbc;text-decoration:line-through}.cmp-added,.cmp-removed{border-radius:3px;padding:1px 2px}@media(max-width:700px){body{margin:12px;font-size:13px}th,td{padding:6px}}</style></head><body><h2>Document Comparison</h2><p><b>${esc(nameA)}</b> vs <b>${esc(nameB)}</b></p><table><thead><tr><th style="width:40px">#</th><th>${esc(nameA)}</th><th>${esc(nameB)}</th></tr></thead><tbody>${body}</tbody></table></body></html>`;
-}
-function showComparePreview(groups, nameA, nameB, onBack){
-  const html=buildComparisonHtml(groups,nameA,nameB); const blob=new Blob([html],{type:'text/html'}); const url=URL.createObjectURL(blob);
-  openModal('Comparison preview', `<div class="hint" style="margin-bottom:8px;">Review the complete comparison below. You can download or share it after checking the preview.</div><div style="height:62vh;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;"><iframe id="cmpPreviewFrame" title="Comparison preview" style="width:100%;height:100%;border:0;background:#fff;"></iframe></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn ghost" id="cmpBack" type="button">← Back to comparison</button><button class="btn" id="cmpDownloadPreview" type="button">⬇️ Download</button><button class="btn primary" id="cmpSharePreview" type="button">📤 Share</button></div>`, async()=>{});
-  $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
-  setTimeout(()=>{ const frame=$('cmpPreviewFrame'); if(frame) frame.src=url; $('cmpBack')?.addEventListener('click',()=>{URL.revokeObjectURL(url);onBack?.();}); $('cmpDownloadPreview')?.addEventListener('click',()=>downloadBlob(blob,'document-comparison.html')); $('cmpSharePreview')?.addEventListener('click',async()=>{try{const file=new File([blob],'document-comparison.html',{type:'text/html'});if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){await navigator.share({title:'Document Comparison',text:`Comparison: ${nameA} vs ${nameB}`,files:[file]});}else{downloadBlob(blob,'document-comparison.html');openModal('Share comparison','<p>Direct file sharing is not supported here. The comparison has been downloaded so you can share it from Files.</p>',async()=>{});$('modalConfirm').style.display='none';$('modalCancel').textContent='Close';}}catch(e){if(e?.name!=='AbortError')console.error(e);}}); },0);
-}
 function showCompareResult(diff, nameA, nameB){
   const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const groups=groupCompareDiff(diff);
@@ -2751,8 +2734,7 @@ function showCompareResult(diff, nameA, nameB){
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
       <button class="btn primary" id="cmpPrev" type="button">↑ Previous difference</button>
       <button class="btn primary" id="cmpNext" type="button">↓ Next difference</button>
-      <button class="btn" id="cmpView" type="button">👁️ View comparison</button>
-      <button class="btn ghost" id="cmpDownload" type="button">⬇️ Download comparison</button>
+      <button class="btn ghost" id="cmpDownload" type="button">Download comparison (.html)</button>
     </div>
   `, async()=>{});
   $('modalConfirm').style.display='none';
@@ -2763,9 +2745,126 @@ function showCompareResult(diff, nameA, nameB){
     const jump=(dir)=>{ if(!changes.length)return; pos=(pos+dir+changes.length)%changes.length; changes[pos].scrollIntoView({block:'center'}); };
     document.getElementById('cmpPrev')?.addEventListener('click',()=>jump(-1));
     document.getElementById('cmpNext')?.addEventListener('click',()=>jump(1));
-    document.getElementById('cmpView')?.addEventListener('click',()=>showComparePreview(groups,nameA,nameB,()=>showCompareResult(diff,nameA,nameB)));
     document.getElementById('cmpDownload')?.addEventListener('click',()=>{
-      const html=buildComparisonHtml(groups,nameA,nameB);
+      const body=groups.map((g,idx)=>{
+        if(g.type==='same') return `<tr><td>${idx+1}</td><td>${esc(g.a)}</td><td>${esc(g.b)}</td></tr>`;
+        const wd=wordDiff(g.a,g.b);
+        return `<tr class="changed"><td>${idx+1}</td><td>${wd.aHtml}</td><td>${wd.bHtml}</td></tr>`;
+      }).join('');
+      const html=`<!doctype html><html><head><meta charset="utf-8"><title>Comparison</title><style>
+      body{font-family:Arial,sans-serif;margin:24px;color:#222}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #ccc;padding:7px;vertical-align:top;white-space:pre-wrap;overflow-wrap:anywhere}th{background:#eee}.changed td{background:#fff8d9}.cmp-added{background:#bff0c5}.cmp-removed{background:#f5bcbc;text-decoration:line-through}.cmp-added,.cmp-removed{border-radius:3px;padding:1px 2px}</style></head><body><h2>Document Comparison</h2><p><b>${esc(nameA)}</b> vs <b>${esc(nameB)}</b></p><table><thead><tr><th style="width:40px">#</th><th>${esc(nameA)}</th><th>${esc(nameB)}</th></tr></thead><tbody>${body}</tbody></table>
+
+
+
+
+
+
+
+
+
+<style id="df22-translation-view-fixes">
+/* v27.110.22: responsive Translation submenu + dedicated full-page View tab */
+.ribbon-panel[data-studio-panel="translate"] .tool-group{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.ribbon-panel[data-studio-panel="translate"] .tool-btn{flex:1 1 220px;min-height:68px;white-space:normal;line-height:1.25}
+@media(max-width:720px){
+  .ribbon-panel[data-studio-panel="translate"] .tool-group{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;overflow:visible}
+  .ribbon-panel[data-studio-panel="translate"] .tool-btn{min-width:0;width:100%;font-size:12px;padding:8px 6px}
+  .ribbon-panel[data-studio-panel="translate"] .hint{grid-column:1/-1}
+  #viewStudio{padding:12px 10px!important}
+  .df-view-head{display:block!important}
+  .df-view-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important;margin-top:10px}
+  .df-view-actions button,#dfViewZoom{min-height:42px;display:flex;align-items:center;justify-content:center}
+  #dfViewCanvasWrap{height:calc(100vh - 360px)!important;min-height:460px!important;padding:10px!important}
+}
+.df-view-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:8px}
+.df-view-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.df-view-actions .btn{white-space:nowrap}
+#dfViewPages canvas{display:block;background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.18);margin:0 auto;max-width:none}
+#dfViewPages .df-view-page-label{font:600 12px var(--font-mono,monospace);color:#56635e}
+</style>
+<script id="df22-view-and-translation-fix">
+(function(){
+  const $=id=>document.getElementById(id);
+  let viewBytes=null, viewPdf=null, viewScale=1, viewFit='page';
+  function getBytes(){try{return (typeof workingBytes!=='undefined' && workingBytes)?workingBytes:null}catch(_){return null}}
+  function setViewStatus(t,err){const e=$('dfViewStatus');if(e){e.textContent=t;e.style.borderColor=err?'#b64b3c':''}}
+  function setViewButtons(on){['dfViewDownload','dfViewShare'].forEach(id=>{const e=$(id);if(e)e.disabled=!on})}
+  async function renderView(){
+    const wrap=$('dfViewPages'); if(!wrap||!viewBytes||!window.pdfjsLib)return;
+    wrap.innerHTML='';
+    const task=dfGetPdfJs(viewBytes);
+    viewPdf=await task.promise;
+    const count=viewPdf.numPages;
+    setViewStatus('Viewing '+count+' page'+(count===1?'':'s')+'. Scroll to inspect every page.');
+    for(let n=1;n<=count;n++){
+      const page=await viewPdf.getPage(n);
+      let scale=viewScale;
+      if(viewFit==='width'){
+        const avail=Math.max(280,($('dfViewCanvasWrap').clientWidth||800)-36);
+        const base=page.getViewport({scale:1}); scale=avail/base.width;
+      }else if(viewFit==='page'){
+        const availW=Math.max(280,($('dfViewCanvasWrap').clientWidth||800)-36);
+        const availH=Math.max(420,($('dfViewCanvasWrap').clientHeight||700)-36);
+        const base=page.getViewport({scale:1}); scale=Math.min(availW/base.width,availH/base.height);
+      }
+      scale=Math.max(.35,Math.min(3,scale));
+      const vp=page.getViewport({scale});
+      const c=document.createElement('canvas'); c.width=Math.ceil(vp.width); c.height=Math.ceil(vp.height); c.setAttribute('aria-label','Page '+n);
+      wrap.appendChild(c);
+      const lab=document.createElement('div'); lab.className='df-view-page-label'; lab.textContent='Page '+n+' of '+count; wrap.appendChild(lab);
+      await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+    }
+    $('dfViewZoom').textContent=Math.round((viewFit==='page'||viewFit==='width'?1:viewScale)*100)+'%';
+  }
+  async function loadView(bytes,label){
+    if(!bytes){setViewStatus('No PDF is open. Choose a PDF first.',true);setViewButtons(false);return}
+    viewBytes=bytes; viewFit='page'; viewScale=1; setViewButtons(true);
+    try{await renderView(); if(label)setViewStatus(label)}catch(e){console.error(e);setViewStatus('Could not render this PDF in the View tab.',true)}
+  }
+  function openFile(){
+    const input=document.createElement('input'); input.type='file'; input.accept='.pdf,application/pdf'; input.hidden=true; document.body.appendChild(input);
+    input.onchange=async()=>{const f=input.files&&input.files[0];input.remove();if(!f)return;try{await loadView(new Uint8Array(await f.arrayBuffer()),'Viewing '+f.name+' — review before sharing.')}catch(e){setViewStatus('Could not open the selected PDF.',true)}}; input.click();
+  }
+  function wrapSetStudio(){
+    if(typeof window.setStudio==='function') return;
+  }
+  const originalSetStudio=window.setStudio;
+  window.setStudio=function(name){
+    if(typeof originalSetStudio==='function') originalSetStudio(name);
+    const view=name==='view';
+    if($('viewStudio')) $('viewStudio').classList.toggle('active',view);
+    if(view){
+      ['ribbon','toolbar','pageActionStrip','dropzone','noPdfBanner','grid'].forEach(id=>{if($(id))$(id).style.display='none'});
+      const b=getBytes(); if(b) setTimeout(()=>loadView(b,'Viewing the current PDF — review before sharing.'),30);
+      else setViewStatus('No PDF is open. Choose a PDF first.',true);
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+  };
+  // The app uses a lexical setStudio declaration; patch it too by adding a
+  // delegated View-tab listener that runs after the normal navigation.
+  document.addEventListener('click',e=>{
+    const tab=e.target.closest('.studio-tab[data-studio="view"]'); if(!tab)return;
+    setTimeout(()=>{
+      if($('viewStudio'))$('viewStudio').classList.add('active');
+      ['ribbon','toolbar','pageActionStrip','dropzone','noPdfBanner','grid'].forEach(id=>{if($(id))$(id).style.display='none'});
+      const b=getBytes(); if(b) loadView(b,'Viewing the current PDF — review before sharing.');
+    },20);
+  },true);
+  $('dfViewOpen')?.addEventListener('click',openFile);
+  $('dfViewCurrent')?.addEventListener('click',()=>loadView(getBytes(),'Viewing the current PDF — review before sharing.'));
+  $('dfViewFit')?.addEventListener('click',()=>{viewFit='page';viewScale=1;renderView()});
+  $('dfViewWidth')?.addEventListener('click',()=>{viewFit='width';renderView()});
+  $('dfViewZoomIn')?.addEventListener('click',()=>{viewFit='zoom';viewScale=Math.min(3,viewScale+.1);renderView()});
+  $('dfViewZoomOut')?.addEventListener('click',()=>{viewFit='zoom';viewScale=Math.max(.35,viewScale-.1);renderView()});
+  $('dfViewDownload')?.addEventListener('click',()=>{if(viewBytes)downloadBlob(new Blob([viewBytes],{type:'application/pdf'}),(($('outName')?.value||'document')+'.pdf').replace(/\.pdf\.pdf$/i,'.pdf'))});
+  $('dfViewShare')?.addEventListener('click',async()=>{
+    if(!viewBytes)return; const name=(($('outName')?.value||'document')+'.pdf').replace(/\.pdf\.pdf$/i,'.pdf');
+    try{const f=new File([viewBytes],name,{type:'application/pdf'}); if(navigator.share && (!navigator.canShare||navigator.canShare({files:[f]}))){await navigator.share({files:[f],title:'DocuForge AI PDF',text:name});return} downloadBlob(f,name);setViewStatus('Sharing is not available here; the PDF was downloaded so it can be shared from Files.')}catch(e){if(e.name!=='AbortError')setViewStatus('Could not share the PDF.',true)}
+  });
+})();
+</script>
+
+</body></html>`;
       downloadBlob(new Blob([html],{type:'text/html'}),'document-comparison.html');
     });
   },0);
@@ -6657,7 +6756,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.20 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.22 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7877,7 +7976,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 \n\n
 <script id="df1111-pdf-tools-js">
-/* DocuForge 27.110.20 — PDF Studio reliability layer.
+/* DocuForge 27.110.22 — PDF Studio reliability layer.
    PDF/Excel conversion and financial calculation modules are untouched. */
 (function(){
   const $=id=>document.getElementById(id);
@@ -8050,7 +8149,7 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
 
 
 <style id="df1114-preview-css">
-/* 27.110.20 — PDF Studio inspection preview */
+/* 27.110.22 — PDF Studio inspection preview */
 #df1114Preview{
   position:fixed;inset:0;z-index:2147483000;
   background:rgba(8,14,17,.82);
@@ -8251,40 +8350,17 @@ function df1115MetadataResult(){
 })();
 </script>
 
-
-<script id="df1121-final-ui-patch">
-/* 27.110.21 final UI safeguards. */
-(function(){
-  // Keep all generated-result flows view-first: the existing showPdfResult already
-  // enforces View before Share. This patch also gives generic comparison/result
-  // previews a clear View label where a result blob is available.
-  window.DOCUFORGE_BUILD='27.110.21';
-})();
-</script>
 </body>
 </html>
 
 
 <script id="df1116-image-tools-reliability">
-/* DocuForge AI 27.110.21 — Image/Table/QR/PDF↔Image reliability layer.
-   IMPORTANT: PDF→Simple Excel and PDF→Financial Excel calculations are untouched.
-   Shared Studio Upload is the source of truth for OCR/Image/QR tools. */
+/* DocuForge AI 27.110.22 — reliable Image/Table/QR/PDF↔Image tools.
+   Does not modify PDF→Simple Excel or PDF→Financial Excel calculations. */
 (function(){
   const $=id=>document.getElementById(id);
   const say=(m,b)=>typeof toast==='function'?toast(m,b):alert(m);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-  function selectedFile(){
-    const f=window.__docuForgeStudioFile||null;
-    if(f) return f;
-    try{
-      const i=$('studioUploadInput');
-      if(i?.files?.length) return i.files[0];
-    }catch(_){ }
-    return null;
-  }
-  function isPdf(f){return !!f&&(f.type==='application/pdf'||/\.pdf$/i.test(f.name||''));}
-  function isImage(f){return !!f&&String(f.type||'').startsWith('image/');}
 
   function pick(accept,multiple,cb){
     const i=document.createElement('input');
@@ -8296,23 +8372,13 @@ function df1115MetadataResult(){
     },{once:true});
     i.click();
   }
-
-  async function shareBlob(blob,name,mime){
-    const f=new File([blob],name,{type:mime});
-    try{
-      if(navigator.share && (!navigator.canShare || navigator.canShare({files:[f]})))
-        await navigator.share({files:[f],title:name,text:name});
-      else { downloadBlob(blob,name); say('Direct sharing is not supported here. The file was downloaded for sharing.',false); }
-    }catch(e){ if(e?.name!=='AbortError') say('Could not share the file.',true); }
-  }
-
   function resultModal(title,html,onView,onShare,onDownload){
     openModal(title,`
       <div style="line-height:1.5">${html}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
-        ${onView?'<button class="btn" id="df1116View" type="button">👁 View</button>':''}
-        ${onShare?'<button class="btn primary" id="df1116Share" type="button">📤 Share</button>':''}
-        ${onDownload?'<button class="btn ghost" id="df1116Download" type="button">⬇ Download</button>':''}
+        ${onView?'<button class="btn primary" id="df1116View">👁 View</button>':''}
+        ${onShare?'<button class="btn primary" id="df1116Share">📤 Share</button>':''}
+        ${onDownload?'<button class="btn ghost" id="df1116Download">⬇ Download</button>':''}
       </div>
     `,async()=>{});
     $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
@@ -8322,10 +8388,21 @@ function df1115MetadataResult(){
       if(onDownload)$('df1116Download')?.addEventListener('click',onDownload);
     },0);
   }
+  async function shareBlob(blob,name,mime){
+    const f=new File([blob],name,{type:mime});
+    try{
+      if(navigator.share && (!navigator.canShare || navigator.canShare({files:[f]}))){
+        await navigator.share({files:[f],title:name,text:name});
+      }else{
+        downloadBlob(blob,name);
+        say('Direct sharing is not supported here. The file was downloaded for sharing.',false);
+      }
+    }catch(e){if(e?.name!=='AbortError')say('Could not share the file.',true);}
+  }
 
   async function imageToCanvas(file){
     const img=await loadImageFromBytes(new Uint8Array(await file.arrayBuffer()),file.type||'image/png');
-    const max=3600,sc=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+    const max=3600, sc=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
     const c=document.createElement('canvas');
     c.width=Math.max(1,Math.round(img.naturalWidth*sc));
     c.height=Math.max(1,Math.round(img.naturalHeight*sc));
@@ -8336,126 +8413,140 @@ function df1115MetadataResult(){
   async function doImagesToPdf(files){
     if(!files.length){say('Choose at least one image.',true);return;}
     try{
-      const bytes=await buildImagesPdf(files), blob=new Blob([bytes],{type:'application/pdf'}), name='combined_images.pdf';
+      const bytes=await buildImagesPdf(files);
+      const blob=new Blob([bytes],{type:'application/pdf'});
+      const name='combined_images.pdf';
       resultModal('Images combined into PDF',
-        `<strong>${files.length}</strong> image${files.length===1?'':'s'} were converted to a PDF.<br><br><strong>View the PDF before sharing.</strong>`,
-        ()=>window.__dfViewFile?window.__dfViewFile(blob,name):previewInApp(null,bytes,name),
-        ()=>shareBlob(blob,name,'application/pdf'),()=>downloadBlob(blob,name));
+        `<strong>${files.length}</strong> image${files.length===1?'':'s'} were converted to a PDF. View it before sharing.`,
+        ()=>{ window.__dfViewFile ? window.__dfViewFile(blob,name) : previewInApp(null,bytes,name); },
+        ()=>shareBlob(blob,name,'application/pdf'),
+        ()=>downloadBlob(blob,name));
       say('Images combined successfully. View the PDF before sharing.',false);
     }catch(e){console.error(e);say(e?.message||'Could not combine the images into PDF.',true);}
   }
 
-  async function df1117ShowImageGallery(images){
-    const urls=images.map(x=>URL.createObjectURL(x.blob)); let idx=0;
-    const old=document.getElementById('df1117Preview'); old?.remove();
-    const m=document.createElement('div'); m.id='df1117Preview'; m.className='modal-backdrop show'; m.style.zIndex='100000';
-    m.innerHTML=`<div class="modal df1117-gallery-modal">
-      <div class="modal-head"><h3>PDF → Images — preview</h3><button type="button" class="icon-btn" id="df1117Close">×</button></div>
-      <div class="df1117-gallery-body">
-        <div class="df1117-page-label">Page <span id="df1117Pg">1</span> of ${images.length}</div>
-        <div class="df1117-stage"><img id="df1117Img" src="${urls[0]}" alt="PDF page 1 preview"></div>
-        <div class="df1117-controls"><button class="btn ghost" id="df1117Prev" type="button">‹ Previous</button><button class="btn ghost" id="df1117Next" type="button">Next ›</button></div>
-        <p class="hint">Full-page preview of the actual PNG output. Use this to inspect clarity before downloading or sharing.</p>
-      </div>
-    </div>`;
-    document.body.appendChild(m);
-    const cleanup=()=>{urls.forEach(u=>URL.revokeObjectURL(u));m.remove();};
-    const img=$('df1117Img'),pg=$('df1117Pg');
-    const update=()=>{img.src=urls[idx];img.alt=`PDF page ${idx+1} preview`;pg.textContent=String(idx+1);};
-    $('df1117Close').onclick=cleanup; $('df1117Prev').onclick=()=>{idx=(idx-1+urls.length)%urls.length;update()}; $('df1117Next').onclick=()=>{idx=(idx+1)%urls.length;update()};
-    m.addEventListener('click',e=>{if(e.target===m)cleanup()});
+  async function df1117ShowImageGallery(images,name){
+    const urls=images.map(x=>URL.createObjectURL(x.blob));
+    let idx=0;
+    openModal('PDF → Images — preview',`
+      <div style="text-align:center">
+        <div style="font-weight:800;margin-bottom:8px">Page <span id="df1117Pg">1</span> of ${images.length}</div>
+        <div style="background:#eef0ec;border:1px solid var(--line);border-radius:10px;padding:10px;overflow:auto;max-height:68vh">
+          <img id="df1117Img" src="${urls[0]}" style="display:block;max-width:100%;height:auto;margin:auto;background:#fff;box-shadow:0 2px 10px #0002">
+        </div>
+        <div style="display:flex;justify-content:center;gap:8px;margin-top:10px">
+          <button class="btn ghost" id="df1117Prev">‹ Previous</button>
+          <button class="btn ghost" id="df1117Next">Next ›</button>
+        </div>
+        <p class="hint">Inspect every page here. The ZIP contains the same PNG images.</p>
+      </div>`,async()=>{});
+    $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
+    const cleanup=()=>urls.forEach(u=>URL.revokeObjectURL(u));
+    setTimeout(()=>{
+      const img=$('df1117Img'),pg=$('df1117Pg');
+      const update=()=>{img.src=urls[idx];pg.textContent=String(idx+1);};
+      $('df1117Prev')?.addEventListener('click',()=>{idx=(idx-1+urls.length)%urls.length;update();});
+      $('df1117Next')?.addEventListener('click',()=>{idx=(idx+1)%urls.length;update();});
+      $('modalCancel')?.addEventListener('click',cleanup,{once:true});
+    },0);
   }
 
   async function doPdfToImages(file){
-    if(!file||!isPdf(file)){say('Choose a PDF first.',true);return;}
     try{
-      const bytes=new Uint8Array(await file.arrayBuffer()), pdf=await dfGetPdfJs(bytes).promise, images=[];
+      const bytes=new Uint8Array(await file.arrayBuffer());
+      const pdf=await dfGetPdfJs(bytes).promise;
+      const images=[];
       for(let i=1;i<=pdf.numPages;i++){
-        const page=await pdf.getPage(i), viewport=page.getViewport({scale:2.2});
+        const page=await pdf.getPage(i);
+        const viewport=page.getViewport({scale:2.2});
         const c=document.createElement('canvas'); c.width=Math.ceil(viewport.width); c.height=Math.ceil(viewport.height);
         await page.render({canvasContext:c.getContext('2d'),viewport}).promise;
-        const blob=await new Promise(r=>c.toBlob(r,'image/png')); images.push({page:i,blob});
+        const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+        images.push({page:i,blob});
       }
-      const zip=new JSZip(); for(const x of images)zip.file(`page_${String(x.page).padStart(3,'0')}.png`,await x.blob.arrayBuffer());
-      const zipBlob=await zip.generateAsync({type:'blob'}), name=file.name.replace(/\.pdf$/i,'')+'_images.zip';
-      resultModal('PDF converted to images',`<strong>${images.length}</strong> page image${images.length===1?'':'s'} created.<br><br><strong>View the pages before sharing.</strong>`,()=>df1117ShowImageGallery(images),()=>shareBlob(zipBlob,name,'application/zip'),()=>downloadBlob(zipBlob,name));
-      say('PDF converted to images. View the pages before downloading or sharing.',false);
+      const zip=new JSZip();
+      for(const x of images) zip.file(`page_${String(x.page).padStart(3,'0')}.png`,await x.blob.arrayBuffer());
+      const zipBlob=await zip.generateAsync({type:'blob'});
+      const name=file.name.replace(/\.pdf$/i,'')+'_images.zip';
+      resultModal('PDF converted to images',
+        `<strong>${images.length}</strong> page image${images.length===1?'':'s'} created. <strong>View images before sharing.</strong>`,
+        ()=>df1117ShowImageGallery(images,name),
+        ()=>shareBlob(zipBlob,name,'application/zip'),
+        ()=>downloadBlob(zipBlob,name));
+      say('PDF converted to images. Download or share the ZIP.',false);
     }catch(e){console.error(e);say(e?.message||'Could not convert the PDF to images.',true);}
   }
 
   async function doImageTable(file){
-    if(!isImage(file)){say('Choose an image containing a table.',true);return;}
-    openModal('Extract table from image',`<p class="hint">Selected: <strong>${esc(file.name)}</strong></p><div class="field"><label>Language</label>${ocrLangOptions('df1116Lang')}</div><p class="hint">The image is enlarged and preprocessed before OCR. The extracted rows and columns can be saved as CSV or Excel.</p>`,async()=>{
-      try{const rows=await extractTableFromImage(file,$('df1116Lang').value);if(!rows.length){say('No table could be detected.',true);return;}showTableResult(rows,file.name.replace(/\.[^.]+$/,''));}
-      catch(e){console.error(e);say(e?.message||'Could not extract the table.',true);}
+    openModal('Extract table from image',`
+      <p class="hint">Selected: <strong>${esc(file.name)}</strong></p>
+      <div class="field"><label>Language</label>${ocrLangOptions('df1116Lang')}</div>
+      <p class="hint">The image is enlarged and preprocessed before OCR. The extracted rows and columns can be saved as CSV or Excel.</p>
+    `,async()=>{
+      try{
+        const rows=await extractTableFromImage(file,$('df1116Lang').value);
+        if(!rows.length){say('No table could be detected.',true);return;}
+        showTableResult(rows,file.name.replace(/\.[^.]+$/,''));
+      }catch(e){console.error(e);say(e?.message||'Could not extract the table.',true);}
     });
   }
 
-  async function qrDetectImage(file){
-    const canvas=await imageToCanvas(file), tries=[canvas];
-    if(canvas.width<2800&&canvas.height<2800){const c2=document.createElement('canvas');c2.width=Math.round(canvas.width*1.5);c2.height=Math.round(canvas.height*1.5);c2.getContext('2d').drawImage(canvas,0,0,c2.width,c2.height);tries.push(c2);}
-    if('BarcodeDetector' in window){try{const bd=new BarcodeDetector({formats:['qr_code']});for(const c of tries){const r=await bd.detect(c);if(r?.length)return r[0].rawValue;}}catch(_){} }
-    try{await loadLib('jsqr');}catch(e){throw new Error('QR decoding library could not be loaded. If you are offline, reconnect once and reopen DocuForge so the QR decoder can be cached.');}
-    if(typeof jsQR!=='function')throw new Error('QR decoding engine is unavailable.');
-    for(const c of tries){const ctx=c.getContext('2d',{willReadFrequently:true}),data=ctx.getImageData(0,0,c.width,c.height),r=jsQR(data.data,data.width,data.height,{inversionAttempts:'attemptBoth'});if(r?.data)return r.data;}
-    return null;
-  }
-
-  async function qrDetectPdf(file){
-    const bytes=new Uint8Array(await file.arrayBuffer()),pdf=await dfGetPdfJs(bytes).promise;
-    for(let i=1;i<=pdf.numPages;i++){
-      const page=await pdf.getPage(i),vp=page.getViewport({scale:2.2}),c=document.createElement('canvas');c.width=Math.ceil(vp.width);c.height=Math.ceil(vp.height);
-      await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
-      const blob=await new Promise(r=>c.toBlob(r,'image/png')),f=new File([blob],`page-${i}.png`,{type:'image/png'}),v=await qrDetectImage(f);if(v)return {value:v,page:i};
+  async function qrDetect(file){
+    const canvas=await imageToCanvas(file);
+    const tries=[canvas];
+    // A second pass at 1.5× often helps when the QR is small in a screenshot.
+    if(canvas.width<2800 && canvas.height<2800){
+      const c2=document.createElement('canvas');
+      c2.width=Math.round(canvas.width*1.5);c2.height=Math.round(canvas.height*1.5);
+      c2.getContext('2d').drawImage(canvas,0,0,c2.width,c2.height);tries.push(c2);
+    }
+    if('BarcodeDetector' in window){
+      try{
+        const bd=new BarcodeDetector({formats:['qr_code']});
+        for(const c of tries){const r=await bd.detect(c);if(r?.length)return r[0].rawValue;}
+      }catch(_){}
+    }
+    if(typeof jsQR !== 'function') return null;
+    for(const c of tries){
+      const ctx=c.getContext('2d',{willReadFrequently:true});
+      const data=ctx.getImageData(0,0,c.width,c.height);
+      const r=jsQR(data.data,data.width,data.height,{inversionAttempts:'attemptBoth'});
+      if(r?.data)return r.data;
     }
     return null;
   }
 
   async function doQr(file){
-    if(!file){say('Choose a file first.',true);return;}
-    if(!isImage(file)&&!isPdf(file)){say('Read QR code supports PDF or image files.',true);return;}
-    openModal('Read QR code',`<p class="hint">Selected file: <strong>${esc(file.name)}</strong></p><p class="hint">DocuForge scans the selected file locally. PDFs are checked page by page.</p>`,async()=>{
+    openModal('Read QR code',`
+      <p class="hint">Selected: <strong>${esc(file.name)}</strong></p>
+      <p class="hint">DocuForge will try the device QR detector first, then jsQR with an enlarged image and inverted-contrast detection.</p>
+    `,async()=>{
       try{
-        const result=isPdf(file)?await qrDetectPdf(file):await qrDetectImage(file);
-        if(result){showTextResult('QR code contents',isPdf(file)?`Page ${result.page}\n\n${result.value}`:result,'qr_result.txt',true);say('QR code detected.',false);}
-        else say('No QR code detected in this file. Use a clear image with the complete QR square visible.',true);
-      }catch(e){console.error(e);say(e?.message||'Could not read the QR code.',true);}
+        const value=await qrDetect(file);
+        if(value) showTextResult('QR code contents',value,'qr_result.txt',true);
+        else say('No QR code found. Use a clear, well-lit image with the complete QR square visible.',true);
+      }catch(e){console.error(e);say('QR reader could not run offline on this browser. The app no longer tries to connect to the internet. A bundled QR decoding engine is required for offline iPhone support.',true);}
     });
-  }
-
-  function runWithSharedFile(id,fn,valid){
-    const f=selectedFile();
-    if(f&&valid(f)){fn(f);return true;}
-    if(f&&!valid(f)){say(id==='btnPdfToImages'?'The selected file is not a PDF. Choose a PDF first.':'The selected file is not supported by this tool.',true);return true;}
-    return false;
   }
 
   function install(){
     const map={
-      btnImagesToPdf:async()=>{
-        const files=window.__docuForgeStudioFiles?.length?window.__docuForgeStudioFiles:null;
-        if(files&&files.every(isImage)){await doImagesToPdf(files);return;}
-        if(!runWithSharedFile('btnImagesToPdf',f=>doImagesToPdf([f]),isImage))pick('image/*',true,doImagesToPdf);
-      },
-      btnPdfToImages:async()=>{if(!runWithSharedFile('btnPdfToImages',doPdfToImages,isPdf))pick('.pdf,application/pdf',false,async fs=>fs[0]&&doPdfToImages(fs[0]));},
-      btnImageTable:async()=>{if(!runWithSharedFile('btnImageTable',doImageTable,isImage))pick('image/*',false,async fs=>fs[0]&&doImageTable(fs[0]));},
-      btnQrReader:async()=>{if(!runWithSharedFile('btnQrReader',doQr,f=>isImage(f)||isPdf(f)))pick('.pdf,application/pdf,image/*',false,async fs=>fs[0]&&doQr(fs[0]));}
+      btnImagesToPdf: async()=>pick('image/*',true,doImagesToPdf),
+      btnPdfToImages: async()=>pick('.pdf,application/pdf',false,async fs=>{
+        const f=fs[0]; if(f) await doPdfToImages(f);
+      }),
+      btnImageTable: async()=>pick('image/*',false,async fs=>{if(fs[0])await doImageTable(fs[0]);}),
+      btnQrReader: async()=>pick('image/*',false,async fs=>{if(fs[0])await doQr(fs[0]);})
     };
-    Object.entries(map).forEach(([id,fn])=>document.addEventListener('click',async e=>{
-      const b=e.target.closest('#'+id);if(!b)return;
-      if(b.dataset.studioFileReady==='1'){delete b.dataset.studioFileReady;return;}
-      e.preventDefault();e.stopImmediatePropagation();await fn();
-    },true));
+    Object.entries(map).forEach(([id,fn])=>{
+      document.addEventListener('click',async e=>{
+        const b=e.target.closest('#'+id);if(!b)return;
+        if(b.dataset.df1116Ready==='1'){delete b.dataset.df1116Ready;return;}
+        e.preventDefault();e.stopImmediatePropagation();
+        await fn();
+      },true);
+    });
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })();
 </script>
-<style id="df1116-v2711021-preview">
-.df1117-gallery-modal{width:min(96vw,1100px)!important;max-width:1100px!important;height:min(94vh,1100px)!important;max-height:94vh!important;padding:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
-.df1117-gallery-body{flex:1;min-height:0;overflow:auto;padding:12px 14px 18px;text-align:center}
-.df1117-page-label{font-weight:800;font-size:18px;margin:4px 0 10px}
-.df1117-stage{min-height:calc(100vh - 260px);display:flex;align-items:center;justify-content:center;overflow:auto;background:#eef0ec;border:1px solid var(--line);border-radius:12px;padding:10px}
-.df1117-stage img{display:block;width:auto;max-width:100%;max-height:calc(90vh - 310px);height:auto;object-fit:contain;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.18)}
-.df1117-controls{display:flex;justify-content:center;gap:10px;margin:12px 0 2px}
-@media(max-width:720px){.df1117-gallery-modal{width:calc(100vw - 12px)!important;height:calc(100vh - 20px)!important;max-height:calc(100vh - 20px)!important}.df1117-stage{min-height:0;height:calc(100vh - 245px);padding:6px}.df1117-stage img{max-width:100%;max-height:calc(100vh - 285px)}.df1117-gallery-body{padding:8px}}
-</style>
