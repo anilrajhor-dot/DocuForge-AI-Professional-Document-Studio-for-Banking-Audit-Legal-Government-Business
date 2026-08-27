@@ -735,7 +735,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.111';</script>
+<script>const DOCUFORGE_BUILD = '27.110';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -6307,6 +6307,8 @@ function analyzeColumn(rows, idx){
   return {pctNumeric,pctNonzero,isSequential,samples:vals.slice(0,3).map(v=>String(v))};
 }
 function financialRowsFromWorkbook(wb){
+  // Always read the dedicated source/value sheet. This deliberately avoids
+  // relying on cached results from formula cells in the analysis sheets.
   const sn=wb.SheetNames.find(n=>String(n).toLowerCase().replace(/\s+/g,' ')==='financials by year');
   if(!sn) return null;
   const ws=wb.Sheets[sn];
@@ -6343,6 +6345,7 @@ function financialRowsFromWorkbook(wb){
 function fyVal(fin,row,idx){ return idx>=0 ? chartNum(row[idx]) : null; }
 function financialMetric(fin,row,key){
   const v=k=>fyVal(fin,row,fin[k+'Idx']);
+  const direct=(idx)=>fyVal(fin,row,idx);
   switch(key){
     case 'Revenue': return v('rev');
     case 'PAT': return v('pat');
@@ -6355,8 +6358,8 @@ function financialMetric(fin,row,key){
     case 'NWC': return financialMetric(fin,row,'Current Assets')-financialMetric(fin,row,'Current Liabilities');
     case 'Current Ratio': { const cl=financialMetric(fin,row,'Current Liabilities'); return cl ? financialMetric(fin,row,'Current Assets')/cl : null; }
     case 'Debt-Equity': { const e=financialMetric(fin,row,'Equity'); return e ? financialMetric(fin,row,'Debt')/e : null; }
-    case 'PAT Margin': { const r=v('rev'); return r ? v('pat')/r*100 : null; }
-    case 'PBT Margin': { const r=v('totalIncome'); return r ? v('pbt')/r*100 : null; }
+    case 'PAT Margin': { const r=v('rev'); const p=v('pat'); return r ? p/r*100 : null; }
+    case 'PBT Margin': { const r=v('totalIncome'); const p=v('pbt'); return r ? p/r*100 : null; }
     case 'CFO': return v('cfo');
     case 'CFI': return v('cfi');
     case 'CFF': return v('cff');
@@ -6402,7 +6405,7 @@ async function showFinancialDashboard(fin, filename){
   const cfo=financialMetric(fin,latest,'CFO'); if(cfo!==null) insights.push(`Operating cash flow is ${financialFmt(cfo,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.111</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
