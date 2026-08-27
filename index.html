@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- InstantDash release 27.110.2: enhanced financial dashboard -->
 <meta name="application-ver
 sion" content="2026.08.24.88">
 <meta name="application-title" content="DocuForge AI">
@@ -735,7 +736,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110';</script>
+<script>const DOCUFORGE_BUILD = '27.110.2';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -746,7 +747,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.2</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1113,7 +1114,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.110 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.110.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -6386,6 +6387,28 @@ function financialFmt(v,unit){
   if(unit==='%') return v.toFixed(2)+'%';
   return v.toFixed(2)+'x';
 }
+function financialPctChange(a,b){ return (a!==null&&b!==null&&b!==0)?(a/b-1)*100:null; }
+function financialQualityChecks(fin){
+  const issues=[];
+  if(fin.rows.length<2) issues.push('Only one financial year is available; growth and year-on-year comparisons are limited.');
+  for(const r of fin.rows){
+    const fy=String(r[fin.fyIdx]??'');
+    const rev=financialMetric(fin,r,'Revenue'), pat=financialMetric(fin,r,'PAT'), assets=financialMetric(fin,r,'Total Assets');
+    if(rev!==null && rev<0) issues.push(`${fy}: Revenue from operations is negative.`);
+    if(assets!==null && assets<=0) issues.push(`${fy}: Total assets are zero or negative.`);
+    if(pat!==null && rev!==null && pat>rev) issues.push(`${fy}: PAT exceeds revenue from operations; verify source classification.`);
+  }
+  return issues;
+}
+function financialComparisonRows(fin){
+  const latest=fin.rows[0], previous=fin.rows[1];
+  const specs=[
+    ['Revenue','₹ lakh'],['Total Income','₹ lakh'],['PBT','₹ lakh'],['PAT','₹ lakh'],
+    ['Current Assets','₹ lakh'],['Current Liabilities','₹ lakh'],['NWC','₹ lakh'],['Debt','₹ lakh'],['Equity','₹ lakh'],
+    ['Current Ratio','x'],['Debt-Equity','x'],['PAT Margin','%'],['PBT Margin','%'],['CFO','₹ lakh'],['CFI','₹ lakh'],['CFF','₹ lakh']
+  ];
+  return specs.map(([k,u])=>{const a=financialMetric(fin,latest,k),b=financialMetric(fin,previous,k);return {k,u,a,b,ch:financialPctChange(a,b)};});
+}
 async function showFinancialDashboard(fin, filename){
   const d=financialDashboardData(fin);
   const esc=s=>escapeXml(String(s??''));
@@ -6403,13 +6426,24 @@ async function showFinancialDashboard(fin, filename){
   const cr=financialMetric(fin,latest,'Current Ratio'); if(cr!==null) insights.push(`Current ratio is ${cr.toFixed(2)}x.`);
   const de=financialMetric(fin,latest,'Debt-Equity'); if(de!==null) insights.push(`Debt-equity is ${de.toFixed(2)}x.`);
   const cfo=financialMetric(fin,latest,'CFO'); if(cfo!==null) insights.push(`Operating cash flow is ${financialFmt(cfo,'₹ lakh')}.`);
+  if(cfo!==null && pat!==null && pat!==0) insights.push(`Operating cash flow is ${((cfo/pat)*100).toFixed(1)}% of PAT.`);
+  const nwc=financialMetric(fin,latest,'NWC'), prevNwc=financialMetric(fin,previous,'NWC');
+  if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.2 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;margin-bottom:14px;">${cards}</div>
+    <div style="margin:0 0 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:auto;">
+      <div style="padding:10px 12px;border-bottom:1px solid var(--line);"><strong>Two-year financial comparison</strong><div class="hint" style="margin-top:3px;">Latest year, previous year and change. Change is shown only where both values are comparable.</div></div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:620px;">
+        <thead><tr><th style="text-align:left;padding:8px;border-bottom:1px solid var(--line);">Metric</th><th style="text-align:right;padding:8px;border-bottom:1px solid var(--line);">${esc(d.labels[0]||'Latest')}</th><th style="text-align:right;padding:8px;border-bottom:1px solid var(--line);">${esc(d.labels[1]||'Previous')}</th><th style="text-align:right;padding:8px;border-bottom:1px solid var(--line);">Change</th></tr></thead>
+        <tbody>${financialComparisonRows(fin).map(x=>`<tr><td style="padding:7px;border-bottom:1px solid var(--line);">${esc(x.k)} <span class="hint">(${esc(x.u)})</span></td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line);">${esc(financialFmt(x.a,x.u))}</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line);">${esc(financialFmt(x.b,x.u))}</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line);">${x.ch===null?'—':(x.ch>0?'▲ ':'')+(x.ch<0?'▼ ':'')+Math.abs(x.ch).toFixed(2)+'%'}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+    ${financialQualityChecks(fin).length ? `<div style="margin:0 0 14px;padding:10px 12px;border:1px solid #d6a84f;border-radius:10px;background:var(--surface);"><strong>Data-quality checks</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${financialQualityChecks(fin).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>` : `<div style="margin:0 0 14px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);"><strong>Data-quality check</strong><div style="margin-top:4px;">No basic structural or arithmetic warning was detected by the dashboard.</div></div>`}
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
       <div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);"><strong>Revenue & PAT — ₹ lakh</strong><div style="height:240px"><canvas id="finRevenuePat"></canvas></div></div>
       <div style="border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);"><strong>Margins — %</strong><div style="height:240px"><canvas id="finMargins"></canvas></div></div>
