@@ -195,7 +195,8 @@ body.dark .dropzone .stamp{color:var(--pine);}
 }
 .page-card{
   background:var(--surface); border:1px solid var(--line); border-radius:4px; overflow:hidden;
-  cursor:grab; position:relative; box-shadow:var(--shadow);
+  cursor:default; position:relative; box-shadow:var(--shadow);
+  touch-action:pan-y;
 }
 .page-card.sel{outline:2px solid var(--accent); outline-offset:-1px;}
 .page-card .thumb-wrap{
@@ -769,7 +770,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.23</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.24</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -782,13 +783,12 @@ window.DFStorage = (function(){
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
     <h1>DocuForge AI</h1>
-    <p class="tagline">Create &bull; Convert &bull; Translate &bull; Extract &bull; Protect &mdash; all your documents, one toolkit. Everything runs in your browser; your files are never uploaded anywhere.</p>
+    <p class="tagline">Create &bull; Convert &bull; Extract &bull; Protect &mdash; all your documents, one toolkit. Everything runs in your browser; your files are never uploaded anywhere.</p>
   </div>
   <div style="padding:40px 20px 50px;">
     <div class="feature-grid">
       <div class="feature-card"><span class="fc-icon">📄</span><h3>PDF Tools</h3><p>Merge, split, rotate, crop, reorder, watermark, page numbers, headers/footers, forms, compress.</p></div>
       <div class="feature-card"><span class="fc-icon">🖼</span><h3>OCR &amp; Image Tools</h3><p>Create searchable PDFs using OCR, with a real embedded text layer (where supported — accuracy depends on scan quality and language); extract text from photos, pull tables from images, build PDFs from images.</p></div>
-      <div class="feature-card"><span class="fc-icon">🌍</span><h3>Translation</h3><p>Translate text or whole PDFs across 38 languages, side by side, exportable in four formats.</p></div>
       <div class="feature-card"><span class="fc-icon">🔄</span><h3>Document Conversion</h3><p>Convert PDF content into editable Word, Excel, PowerPoint, CSV, HTML, JSON, and images &mdash; and back again. Structure and text carry over; exact original formatting may not.</p></div>
       <div class="feature-card"><span class="fc-icon">🤖</span><h3>AI Assistant</h3><p>Summarize, rewrite, simplify, chat with a PDF, extract action items and dates &mdash; using your own API key.</p></div>
       <div class="feature-card"><span class="fc-icon">📊</span><h3>Spreadsheet Tools</h3><p>Turn a spreadsheet or CSV straight into a chart, no other software needed.</p></div>
@@ -831,7 +831,6 @@ window.DFStorage = (function(){
       <button class="studio-tab" data-studio="gstinvoice"><span class="st-icon">🧾</span> GST Invoice</button>
       <button class="studio-tab" data-studio="pdf"><span class="st-icon">📄</span> PDF Studio</button>
       <button class="studio-tab" data-studio="ocr"><span class="st-icon">🖼</span> OCR Studio</button>
-      <button class="studio-tab" data-studio="translate"><span class="st-icon">🌍</span> Translation Studio</button>
       <button class="studio-tab" data-studio="convert"><span class="st-icon">🔄</span> Conversion Studio</button>
       <button class="studio-tab" data-studio="powerpoint"><span class="st-icon">📽️</span> PowerPoint Studio</button>
       <button class="studio-tab" data-studio="ai"><span class="st-icon">🤖</span> AI Studio</button>
@@ -913,16 +912,7 @@ window.DFStorage = (function(){
 <button class="tool-btn" id="btnQrGenerate"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="7" width="7" x="3" y="3"></rect><rect height="7" width="7" x="14" y="3"></rect><rect height="7" width="7" x="3" y="14"></rect><rect height="7" width="7" x="14" y="14"></rect></svg> Generate QR code…</button>
 </div>
 </div>
-      <div class="ribbon-panel" data-studio-panel="translate">
-<div class="tool-group">
-<button class="tool-btn" id="btnTranslateText"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 5h9M7 3v2m0 0c0 4-1 7-4 9m4-4c1 2 2.5 3.5 4 4M14 21l4-9 4 9m-6.5-3h5"></path></svg> Translate text…</button>
-<button class="tool-btn" id="btnTranslateDoc"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M9 15l3-3 3 3M12 12v7"></path></svg> Translate a document…</button>
-<button class="tool-btn" id="btnTranslatePdf"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M4 5h9M7 3v2m0 0c0 4-1 7-4 9" transform="translate(1,2) scale(0.55)"></path></svg> Translate this open PDF</button>
-<button class="tool-btn" id="btnTranslateAI"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 5h9M7 3v2m0 0c0 4-1 7-4 9m4-4c1 2 2.5 3.5 4 4M14 21l4-9 4 9m-6.5-3h5"></path><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4L12 3z" transform="translate(3,-2) scale(0.4)"></path></svg> Translate via AI (higher quality)…</button>
-<p class="hint" style="padding:0 14px;margin:6px 0 0;">Translate text, choose a document from Files, or choose a photo from your iPhone/iPad Photos/Gallery. Photo translation uses local OCR first. "Translate this open PDF" works on the PDF currently open in the editor.</p>
-</div>
-</div>
-      <div class="ribbon-panel" data-studio-panel="convert">
+<div class="ribbon-panel" data-studio-panel="convert">
 <div id="conversionDirectionHint" class="hint" style="margin:0 14px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);">
       <strong>Two-way conversion:</strong> PDF → Word/Excel/CSV/Text/HTML/JSON/XML and more, and <strong>Word, Excel, PowerPoint, HTML, CSV, TXT and Markdown → PDF</strong>.
     </div>
@@ -1217,7 +1207,6 @@ function openGstInvoiceApp(){
 
       <button class="dash-tile main-menu-tile" data-studio="pdf"><span class="dt-icon">📄</span><span>PDF Studio</span><small>Merge, split, edit &amp; manage PDFs</small></button>
       <button class="dash-tile main-menu-tile" data-studio="ocr"><span class="dt-icon">🖼️</span><span>OCR &amp; Image Studio</span><small>OCR, extract text &amp; images</small></button>
-      <button class="dash-tile main-menu-tile" data-studio="translate"><span class="dt-icon">🌍</span><span>Translation Studio</span><small>Translate documents &amp; text</small></button>
       <button class="dash-tile main-menu-tile" data-studio="convert"><span class="dt-icon">🔄</span><span>Conversion Studio</span><small>PDF, Word, Excel &amp; other formats</small></button>
       <button class="dash-tile main-menu-tile" data-studio="powerpoint"><span class="dt-icon">📽️</span><span>PowerPoint Studio</span><small>Create and convert presentations</small></button>
       <button class="dash-tile main-menu-tile" data-studio="ai"><span class="dt-icon">🤖</span><span>AI Studio</span><small>Summarise, rewrite &amp; analyse</small></button>
@@ -1925,12 +1914,31 @@ function iconBtn(name, glyph, onClick){
 
 function initSortable(){
   if(sortableInstance) sortableInstance.destroy();
+  if(!grid || !window.Sortable || typeof Sortable.create !== 'function') return;
+
+  // IMPORTANT: normal scrolling, tapping, checkbox selection and page
+  // preview must NEVER reorder pages. Reordering starts only from the
+  // dedicated ☷ handle in the page footer.
   sortableInstance = Sortable.create(grid, {
     animation:150,
-    onEnd: async () => {
+    handle:'.page-drag-handle',
+    draggable:'.page-card',
+    delay:120,
+    delayOnTouchOnly:true,
+    touchStartThreshold:8,
+    fallbackOnBody:true,
+    forceFallback:false,
+    scroll:true,
+    onStart: () => {
+      grid.classList.add('df-page-reordering');
+    },
+    onEnd: async (evt) => {
+      grid.classList.remove('df-page-reordering');
+      if(!evt || evt.oldIndex === evt.newIndex) return;
       const newOrder = Array.from(grid.children).map(c => parseInt(c.dataset.index));
       await reorderPages(newOrder);
-    }
+    },
+    onCancel: () => grid.classList.remove('df-page-reordering')
   });
 }
 
@@ -6339,6 +6347,11 @@ function openExcelDashboard(){
   }
 }
 function setStudio(name){
+  // Translation Studio was intentionally retired in v27.110.24.
+  if(name === 'translate'){
+    name = 'dashboard';
+    if(typeof setStatus === 'function') setStatus('Translation Studio has been removed.');
+  }
   const isDashboard = name === 'dashboard';
   const previousStudio = window.__docuForgeCurrentStudio;
   document.body.dataset.studio = name;
@@ -6421,7 +6434,6 @@ const DASHBOARD_TILE_STUDIOS = {
   btnSplit: 'pdf',
   btnCompress: 'pdf',
   btnOcrPdf: 'ocr',
-  btnTranslateText: 'translate',
   btnPdfToWord: 'convert',
   btnPdfToExcel: 'convert',
   btnImagesToPdf: 'pdf',
@@ -6443,7 +6455,7 @@ function openDashboardCategory(toolId){
 
 function studioLabel(name){
   const labels = {
-    pdf:'PDF', ocr:'OCR', translate:'Translation', convert:'Conversion',
+    pdf:'PDF', ocr:'OCR', convert:'Conversion',
     ai:'AI', batch:'Batch', excel:'Excel'
   };
   return labels[name] || name;
@@ -6656,7 +6668,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.23 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.24 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7351,7 +7363,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
  let pendingToolId='';
  const accept={
   pdf:'.pdf,application/pdf,image/*',ocr:'.pdf,application/pdf,image/*',
-  translate:'.pdf,.docx,.txt,.md,*/*',convert:'.pdf,.docx,.xlsx,.xls,.csv,.pptx,.html,.txt,.md,*/*',
+  convert:'.pdf,.docx,.xlsx,.xls,.csv,.pptx,.html,.txt,.md,*/*',
   powerpoint:'.ppt,.pptx,*/*',excel:'.xlsx,.xls,.csv,*/*',
   reader:'.pdf,.epub,*/*',security:'.pdf,application/pdf,*/*'
  };
@@ -7366,7 +7378,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   // Every file-processing Studio keeps a visible, consistent Upload File card
   // at the top of its submenu. This is only an input provision; it never
   // launches a picker merely because a submenu was opened.
-  const fileStudios=['pdf','ocr','translate','convert','powerpoint','excel','reader','security','batch'];
+  const fileStudios=['pdf','ocr','convert','powerpoint','excel','reader','security','batch'];
   if(!fileStudios.includes(activeStudio)){
    box.style.display='none';return;
   }
@@ -7378,7 +7390,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   if($('studioUploadHint'))$('studioUploadHint').textContent=
    activeStudio==='pdf'?'Choose the PDF for this PDF Studio. It will be loaded automatically.':
    activeStudio==='ocr'?'Choose a PDF or image for OCR and image tools.':
-   activeStudio==='translate'?'Choose a PDF, Word, text, Markdown or image file to translate.':
+   
    activeStudio==='convert'?'Choose the source file for conversion.':
    activeStudio==='powerpoint'?'Choose a PowerPoint file for presentation tools or conversion.':
    activeStudio==='excel'?'Choose an Excel or CSV file.':
@@ -7588,13 +7600,13 @@ $('dashboardAskTile')?.addEventListener('click', () => {
 /* DocuForge AI v2026.08.24.91 — stable universal file bar. */
 (function(){
   const $=id=>document.getElementById(id);
-  const FILE_STUDIOS=new Set(['pdf','ocr','translate','convert','powerpoint','excel','reader','security','batch']);
+  const FILE_STUDIOS=new Set(['pdf','ocr','convert','powerpoint','excel','reader','security','batch']);
   let active=''; let input=null;
   const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   function currentFile(){return window.__docuForgeStudioFile||null;}
   function hasWorking(){try{return !!window.workingBytes;}catch(e){return false;}}
   function fileName(){const f=currentFile();if(f&&f.name)return f.name;return hasWorking()?(($('outName')?.value||'document')+'.pdf'):'No file selected';}
-  function acceptFor(s){return ({pdf:'.pdf,application/pdf,image/*',ocr:'.pdf,application/pdf,image/*',translate:'.pdf,.docx,.txt,.md,.csv,.html,.htm,image/*',convert:'.pdf,.docx,.xlsx,.xls,.csv,.pptx,.ppt,.html,.htm,.txt,.md,.markdown',powerpoint:'.pptx,.ppt',excel:'.xlsx,.xls,.csv',reader:'.pdf,.epub',security:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.txt,.md',batch:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.csv,.txt,.md,.html,.htm'})[s]||'*/*';}
+  function acceptFor(s){return ({pdf:'.pdf,application/pdf,image/*',ocr:'.pdf,application/pdf,image/*',convert:'.pdf,.docx,.xlsx,.xls,.csv,.pptx,.ppt,.html,.htm,.txt,.md,.markdown',powerpoint:'.pptx,.ppt',excel:'.xlsx,.xls,.csv',reader:'.pdf,.epub',security:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.txt,.md',batch:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.csv,.txt,.md,.html,.htm'})[s]||'*/*';}
   function ensureInput(){
     if(input)return input;
     input=document.createElement('input');input.type='file';input.hidden=true;document.body.appendChild(input);
@@ -8552,3 +8564,10 @@ function df1115MetadataResult(){
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })();
 </script>
+
+<style id="df271024-retired-translation">
+/* v27.110.24 — Translation Studio retired. */
+.studio-tab[data-studio="translate"],
+.ribbon-panel[data-studio-panel="translate"],
+.dash-tile[data-studio="translate"]{display:none !important;}
+</style>
