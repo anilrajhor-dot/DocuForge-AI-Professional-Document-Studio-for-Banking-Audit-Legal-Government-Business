@@ -770,7 +770,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.24</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.25</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1550,7 +1550,7 @@ const PDF_REQUIRED_IDS = ['btnInsert','btnDuplicateSel','btnRotateSel','btnRever
    'btnCompress','btnMetadata','btnUndo','btnRedo','btnReset','btnOcrPdf',
    'btnPdfToWord','btnPdfToPptx','btnPdfToExcel','btnPdfToCsv','btnPdfToText','btnPdfToHtml','btnPdfToJson','btnPdfToImages',
    'btnPdfToXml','btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds','btnPdfToOdp','btnPdfToEpub',
-   'btnTranslatePdf','btnAnalyze','btnDupPages','btnChatPdf'];
+   'btnAnalyze','btnDupPages','btnChatPdf'];
 
 function updatePdfUploadAction(){
   const btn = $('btnOpen');
@@ -1563,7 +1563,8 @@ function updatePdfUploadAction(){
   if(group) group.querySelector('h2').textContent = workingBytes ? 'Add pages' : 'Start project';
 }function setToolsEnabled(on){
   PDF_REQUIRED_IDS.forEach(id=>{
-    $(id).title = on ? '' : 'Tap to open a PDF first — this tool needs one loaded.';
+    const el = $(id);
+    if(el) el.title = on ? '' : 'Tap to open a PDF first — this tool needs one loaded.';
   });
   const isDashboard = window.__docuForgeCurrentStudio === 'dashboard';
   $('toolbar').style.display = (on && !isDashboard) ? 'flex' : 'none';
@@ -6347,7 +6348,7 @@ function openExcelDashboard(){
   }
 }
 function setStudio(name){
-  // Translation Studio was intentionally retired in v27.110.24.
+  // Translation Studio was intentionally retired in v27.110.25.
   if(name === 'translate'){
     name = 'dashboard';
     if(typeof setStatus === 'function') setStatus('Translation Studio has been removed.');
@@ -6668,7 +6669,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.24 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.25 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7498,7 +7499,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
  function installToolFileGate(){
   document.addEventListener('click',function(e){
     const btn=e.target.closest('.tool-btn');
-    if(!btn || workingBytes) return;
+    if(!btn || !btn.id || workingBytes) return;
     const SHARED_FILE_TOOL_IDS = new Set([
       'btnOcrImage','btnOcrPdf','btnImageTable','btnImagesToPdf','btnQrReader'
     ]);
@@ -8566,7 +8567,7 @@ function df1115MetadataResult(){
 </script>
 
 <style id="df271024-retired-translation">
-/* v27.110.24 — Translation Studio retired. */
+/* v27.110.25 — Translation Studio retired. */
 .studio-tab[data-studio="translate"],
 .ribbon-panel[data-studio-panel="translate"],
 .dash-tile[data-studio="translate"]{display:none !important;}
