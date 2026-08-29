@@ -759,7 +759,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.26';</script>
+<script>const DOCUFORGE_BUILD = '27.110.27';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -770,7 +770,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.26</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.27</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1150,7 +1150,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.110.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.110.27 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -6698,7 +6698,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.26 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.27 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -8614,3 +8614,244 @@ function df1115MetadataResult(){
 .ribbon-panel[data-studio-panel="translate"],
 .dash-tile[data-studio="translate"]{display:none !important;}
 </style>
+
+
+<script id="df271027-final-reliability-fixes">
+/*
+ DocuForge AI 27.110.27
+ Final reliability pass:
+ 1. PDF -> Word is actually wired and produces a valid .docx.
+ 2. Every conversion result gets View / Download / Share.
+ 3. Word preview is rendered as a PDF preview inside the full-page View tab;
+    the original DOCX remains the file that is shared/downloaded.
+ 4. Page thumbnails do NOT move when the user scrolls/taps. Reordering is
+    possible only from a clearly marked drag handle.
+ 5. Upload-card "View File" opens the app's View tab for PDFs instead of
+    triggering a browser download.
+ 6. Reset hard-clears source-file state and the upload control.
+*/
+(function(){
+  const $=id=>document.getElementById(id);
+  const say=(m,err)=>typeof toast==='function'?toast(m,!!err):alert(m);
+
+  function currentPdfBytes(){
+    try{
+      if(typeof workingBytes!=='undefined' && workingBytes) return workingBytes;
+    }catch(_){}
+    return null;
+  }
+
+  async function ensureCurrentPdf(){
+    const b=currentPdfBytes();
+    if(b) return b;
+    const f=window.__docuForgeStudioFile;
+    if(f && (f.type==='application/pdf' || /\.pdf$/i.test(f.name||''))){
+      await loadFiles([f]);
+      return currentPdfBytes();
+    }
+    return null;
+  }
+
+  async function dfShareBlob(blob,name,mime){
+    const file=new File([blob],name,{type:mime||blob.type||'application/octet-stream'});
+    try{
+      if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+        await navigator.share({files:[file],title:'DocuForge AI — '+name,text:name});
+        return true;
+      }
+      downloadBlob(blob,name);
+      say('Direct file sharing is not supported here. The file was downloaded so you can share it from Files.',false);
+      return false;
+    }catch(e){
+      if(e?.name==='AbortError') return false;
+      say('Could not share the file. Please use Download and share it from Files.',true);
+      return false;
+    }
+  }
+
+  async function showConversionResult(blob,name,label,previewPdfBytes){
+    window.__dfLastConversion={blob,name,label,previewPdfBytes:previewPdfBytes||null};
+    const safe=String(name).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    openModal('Conversion complete',`
+      <div style="padding:4px 0 10px"><strong>${label||'Conversion'} completed.</strong></div>
+      <div class="hint" style="margin-bottom:14px">Output: <strong>${safe}</strong></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn primary" id="df271027ResultView" type="button">👁️ View full page</button>
+        <button class="btn primary" id="df271027ResultDownload" type="button">⬇️ Download</button>
+        <button class="btn primary" id="df271027ResultShare" type="button">📤 Share</button>
+      </div>
+      <p class="hint" style="margin-top:12px">View/check the result first. Share sends the converted file itself, not the preview.</p>
+    `,async()=>{});
+    $('modalConfirm').style.display='none';
+    $('modalCancel').textContent='Close';
+    setTimeout(()=>{
+      $('df271027ResultDownload')?.addEventListener('click',()=>downloadBlob(blob,name));
+      $('df271027ResultShare')?.addEventListener('click',()=>dfShareBlob(blob,name,blob.type));
+      $('df271027ResultView')?.addEventListener('click',async()=>{
+        try{
+          const pv=previewPdfBytes || (blob.type==='application/pdf' ? new Uint8Array(await blob.arrayBuffer()) : null);
+          if(pv && window.__dfViewFile){
+            await window.__dfViewFile(new Blob([pv],{type:'application/pdf'}),name.replace(/\.[^.]+$/,'')+'_preview.pdf');
+          }else{
+            say('A full-page preview is not available for this output type. Use Download to inspect it.',true);
+          }
+        }catch(e){console.error(e);say('Could not open the converted file in full-page View.',true);}
+      });
+    },0);
+  }
+
+  async function pdfToWordReliable(){
+    try{
+      const bytes=await ensureCurrentPdf();
+      if(!bytes){say('Choose a PDF with the Upload File button above first.',true);return;}
+      setStatus('Converting PDF to Word…'); showProgress(15);
+      const pages=await getPdfPagesTextItems();
+      const hasText=pages.some(p=>p.items.some(it=>String(it.str||'').trim()));
+      if(!hasText){
+        say('This PDF has no extractable text. Run OCR / Make this PDF searchable first, then convert to Word.',true);
+        return;
+      }
+      showProgress(35);
+      const pagesLines=pages.map(p=>groupIntoLines(p.items).map(lineToText));
+      const docxBytes=await buildDocxFromPages(pagesLines);
+      showProgress(70);
+
+      // Create a faithful, readable PDF representation for the in-app
+      // full-page review. The DOCX remains the actual output file.
+      const previewPdf=await buildTextPdf(
+        pagesLines.flatMap((lines,i)=>[
+          ...(i?['']:[]),
+          ...lines
+        ])
+      );
+      const base=(($('outName')?.value||'document').trim()||'document').replace(/\.pdf$/i,'');
+      const name=base+'.docx';
+      const blob=new Blob([docxBytes],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+      await showConversionResult(blob,name,'PDF → Word',previewPdf);
+      setStatus(`Created ${name}. Review it in View full page, then Download or Share.`);
+      if(typeof logConversion==='function') logConversion('PDF → Word',name);
+    }catch(e){
+      console.error('PDF → Word failed:',e);
+      say('Could not convert this PDF to Word: '+(e?.message||'unknown error'),true);
+    }finally{showProgress(null);}
+  }
+
+  // Reliable delegated conversion button. There was no working PDF→Word
+  // handler in the current build, so a normal tap did nothing.
+  document.addEventListener('click',async e=>{
+    const b=e.target.closest('#btnPdfToWord');
+    if(!b)return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    if(b.dataset.df271027Busy==='1')return;
+    b.dataset.df271027Busy='1';
+    try{await pdfToWordReliable();}finally{b.dataset.df271027Busy='0';}
+  },true);
+
+  // Also repair the upload-card View File control. For PDFs, always use the
+  // internal full-page viewer; never create an accidental download.
+  const oldView=$('studioUploadView');
+  if(oldView){
+    const replacement=oldView.cloneNode(true);
+    oldView.replaceWith(replacement);
+    replacement.addEventListener('click',async e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      const f=window.__docuForgeStudioFile;
+      if(!f){say('No file selected.',true);return;}
+      try{
+        if(f.type==='application/pdf' || /\.pdf$/i.test(f.name||'')){
+          if(window.__dfViewFile) await window.__dfViewFile(f,f.name);
+          else say('PDF View is not available.',true);
+        }else{
+          const url=URL.createObjectURL(f);
+          window.open(url,'_blank','noopener');
+          setTimeout(()=>URL.revokeObjectURL(url),60000);
+        }
+      }catch(err){console.error(err);say('Could not open the selected file.',true);}
+    });
+  }
+
+  // Stop accidental touch-reordering. A page card is now draggable only
+  // through a visible handle; ordinary finger scrolling never reorders pages.
+  const originalInitSortable=window.initSortable || (typeof initSortable==='function' ? initSortable : null);
+  window.initSortable=function(){
+    const g=$('grid');
+    if(!g || !window.Sortable)return;
+    if(window.sortableInstance){try{window.sortableInstance.destroy()}catch(_){}}
+    Array.from(g.querySelectorAll('.page-card')).forEach(card=>{
+      let h=card.querySelector('.df-page-drag-handle');
+      if(!h){
+        h=document.createElement('button');
+        h.type='button';
+        h.className='df-page-drag-handle';
+        h.textContent='☷';
+        h.title='Drag only from here to reorder';
+        h.setAttribute('aria-label','Drag handle — reorder this page');
+        const bar=card.querySelector('.bar');
+        if(bar) bar.insertBefore(h,bar.firstChild);
+      }
+    });
+    window.sortableInstance=Sortable.create(g,{
+      animation:150,
+      handle:'.df-page-drag-handle',
+      draggable:'.page-card',
+      delay:180,
+      delayOnTouchOnly:true,
+      touchStartThreshold:12,
+      fallbackOnBody:true,
+      forceFallback:false,
+      scroll:true,
+      filter:'button,input,canvas,.thumb-wrap',
+      preventOnFilter:true,
+      onStart:()=>g.classList.add('df-page-reordering'),
+      onEnd:async evt=>{
+        g.classList.remove('df-page-reordering');
+        if(!evt || evt.oldIndex===evt.newIndex)return;
+        const order=Array.from(g.children).map(c=>parseInt(c.dataset.index));
+        await reorderPages(order);
+      },
+      onCancel:()=>g.classList.remove('df-page-reordering')
+    });
+  };
+  // renderThumbnails calls the lexical function, so replace that binding too.
+  try{ initSortable=window.initSortable; }catch(_){}
+
+  // Hard reset helper. It clears every known source-file reference, including
+  // the hidden picker state, so a previous upload cannot reappear.
+  const reset=$('btnReset');
+  if(reset){
+    reset.addEventListener('click',()=>{
+      setTimeout(()=>{
+        try{
+          window.__docuForgeStudioFile=null;
+          window.__docuForgeStudioFiles=[];
+          window.__dfLastConversion=null;
+          ['fileInput','studioUploadInput','studioUploadInputGlobal'].forEach(id=>{
+            const x=$(id);if(x){x.value='';x.files&&void 0;}
+          });
+          if($('studioUploadName'))$('studioUploadName').textContent='No file selected';
+          if($('studioUploadView'))$('studioUploadView').disabled=true;
+          if($('studioUploadScreen'))$('studioUploadScreen').dataset.requested='';
+          if(typeof window.__docuForgeSyncStudioUpload==='function')window.__docuForgeSyncStudioUpload();
+        }catch(e){console.warn(e);}
+      },50);
+    });
+  }
+
+  const st=document.createElement('style');
+  st.id='df271027-final-css';
+  st.textContent=`
+    .df-page-drag-handle{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-width:34px;min-height:30px;margin-right:8px;
+      border:1px solid var(--line);border-radius:7px;
+      background:var(--surface);color:var(--ink-soft);
+      cursor:grab;touch-action:none;font-size:18px;font-weight:700;
+    }
+    .df-page-drag-handle:active{cursor:grabbing}
+    .page-card{touch-action:pan-y}
+    .page-card canvas,.page-card .thumb-wrap{touch-action:pan-y}
+  `;
+  document.head.appendChild(st);
+})();
+</script>
