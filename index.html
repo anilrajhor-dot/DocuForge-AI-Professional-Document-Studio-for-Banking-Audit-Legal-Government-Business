@@ -759,7 +759,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.22';</script>
+<script>const DOCUFORGE_BUILD = '27.110.26';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -770,7 +770,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.25</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.110.26</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1082,7 +1082,7 @@ window.DFStorage = (function(){
       </div>
     </div>
 
-    <div id="viewStudio" class="studio-page" style="display:none !important;">
+    <div id="viewStudio" class="studio-page" style="display:none;">
       <div class="df-view-head">
         <div><h2 style="margin:0 0 4px;">👁️ View</h2><p class="hint" style="margin:0;">Full-page document preview. Review the file before Download or Share.</p></div>
         <div class="df-view-actions">
@@ -6126,9 +6126,24 @@ $('readerToc').addEventListener('click', () => {
 $('btnUndo').addEventListener('click', undo);
 $('btnRedo').addEventListener('click', redo);
 $('btnReset').addEventListener('click', () => {
-  if(confirm('Reset the project? All pages and history will be cleared.')){
+  if(confirm('Reset the project? All loaded pages, uploaded studio files and history will be cleared.')){
     workingBytes = null; history = []; historyIndex = -1; selected.clear();
-    setToolsEnabled(false); grid.innerHTML = ''; updateSelectionUI(); setStatus('Project reset.');
+    currentProjectId = null;
+    window.__docuForgeStudioFile = null;
+    window.__docuForgeStudioFiles = [];
+    window.__docuForgeSyncStudioUpload?.();
+    ['fileInput','studioUploadInput','studioUploadInputGlobal'].forEach(id=>{
+      const el=$(id); if(el) el.value='';
+    });
+    if($('studioUploadName')) $('studioUploadName').textContent='No file selected';
+    if($('studioUploadView')) $('studioUploadView').disabled=true;
+    setToolsEnabled(false); grid.innerHTML = ''; updateSelectionUI();
+    if($('outName')) $('outName').value='document';
+    if(typeof clearConversionLog==='function') clearConversionLog();
+    if(typeof lastConversionOutput!=='undefined') lastConversionOutput=null;
+    if(window.__dfViewFile) { /* preview is reset on next View open */ }
+    setStudio('pdf');
+    setStatus('Project reset. All loaded/uploaded files have been cleared.');
   }
 });
 
@@ -6348,7 +6363,7 @@ function openExcelDashboard(){
   }
 }
 function setStudio(name){
-  // Translation Studio was intentionally retired in v27.110.25.
+  // Translation Studio was intentionally retired in v27.110.26.
   if(name === 'translate'){
     name = 'dashboard';
     if(typeof setStatus === 'function') setStatus('Translation Studio has been removed.');
@@ -6357,10 +6372,8 @@ function setStudio(name){
   const previousStudio = window.__docuForgeCurrentStudio;
   document.body.dataset.studio = name;
   window.__docuForgeCurrentStudio = name;
-  if(previousStudio && previousStudio !== name){
-    window.__docuForgeStudioFile = null;
-    window.__docuForgeStudioFiles = [];
-  }
+  // Keep the selected/uploaded source file while moving between Studios.
+  // Reset project is the explicit action that clears it.
   document.body.classList.toggle('dashboard-active', isDashboard);
 
   // The Dashboard is ONLY the main menu. The editor/ribbon appears only after
@@ -6417,6 +6430,22 @@ function setStudio(name){
 document.querySelectorAll('.studio-tab').forEach(t => {
   t.addEventListener('click', () => setStudio(t.dataset.studio));
 });
+// Reliable mobile fallback: one delegated handler keeps every Studio tab
+// clickable even if another legacy handler/overlay is present.
+document.addEventListener('click', (e) => {
+  const tab = e.target.closest('.studio-tab');
+  if(!tab) return;
+  const name = tab.dataset.studio;
+  if(!name || name === 'translate') return;
+  e.preventDefault();
+  e.stopPropagation();
+  setStudio(name);
+  setTimeout(() => {
+    const panel = document.querySelector('.ribbon-panel[data-studio-panel="'+name+'"]');
+    if(panel) panel.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 30);
+}, true);
+
 
 /* v85: Back to Main Menu — single reliable handler. */
 const backToMainMenuBtn = $('backToMainMenu');
@@ -6669,7 +6698,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.25 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.26 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -8323,6 +8352,19 @@ function df1115MetadataResult(){
     viewBytes=bytes; viewFit='page'; viewScale=1; setViewButtons(true);
     try{await renderView(); if(label)setViewStatus(label)}catch(e){console.error(e);setViewStatus('Could not render this PDF in the View tab.',true)}
   }
+  // Public bridge used by every conversion result. It opens the dedicated
+  // full-page View Studio instead of relying on a browser file preview.
+  window.__dfViewFile = async function(blob, filename){
+    try{
+      const bytes = blob instanceof Uint8Array ? blob : new Uint8Array(await blob.arrayBuffer());
+      if(typeof window.setStudio === 'function') window.setStudio('view');
+      await loadView(bytes, 'Reviewing ' + (filename || 'converted file') + ' — inspect the full page before sharing.');
+      window.scrollTo({top:0, behavior:'smooth'});
+    }catch(e){
+      console.error('Converted-file View failed:', e);
+      setViewStatus('Could not open the converted file in full-page View.', true);
+    }
+  };
   function openFile(){
     const input=document.createElement('input'); input.type='file'; input.accept='.pdf,application/pdf'; input.hidden=true; document.body.appendChild(input);
     input.onchange=async()=>{const f=input.files&&input.files[0];input.remove();if(!f)return;try{await loadView(new Uint8Array(await f.arrayBuffer()),'Viewing '+f.name+' — review before sharing.')}catch(e){setViewStatus('Could not open the selected PDF.',true)}}; input.click();
@@ -8567,7 +8609,7 @@ function df1115MetadataResult(){
 </script>
 
 <style id="df271024-retired-translation">
-/* v27.110.25 — Translation Studio retired. */
+/* v27.110.26 — Translation Studio retired. */
 .studio-tab[data-studio="translate"],
 .ribbon-panel[data-studio-panel="translate"],
 .dash-tile[data-studio="translate"]{display:none !important;}
