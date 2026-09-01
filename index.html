@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.111.0: menu/submenu repair pass — wired up ~30 previously-dead
-     tool buttons across PDF, Conversion, PowerPoint, Security, AI and Batch Studios,
-     and standardized every conversion result on a View / Download / Share flow. -->
-<meta name="application-version" content="2026.09.01.111">
+<!-- DocuForge AI 27.111.1: menu/submenu repair pass (~30 previously-dead tool
+     buttons wired up, every conversion result standardized on View / Download /
+     Share) plus a fix for page-selection checkboxes not responding to taps on
+     iPhone (SortableJS preventOnFilter was swallowing the tap). -->
+<meta name="application-version" content="2026.09.01.111.1">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -216,7 +217,13 @@ body.dark .dropzone .stamp{color:var(--pine);}
 }
 .page-card .ctrls button:hover{background:var(--surface-2); color:var(--ink);}
 .page-card .ctrls svg{width:13px;height:13px;}
-.page-card input[type=checkbox]{position:absolute; top:6px; left:6px; width:15px; height:15px; accent-color:var(--accent);}
+.page-card input[type=checkbox]{
+  position:absolute; top:4px; left:4px; z-index:5;
+  width:26px; height:26px; margin:0; padding:0;
+  accent-color:var(--accent);
+  background:rgba(255,255,255,.9); border-radius:5px;
+  box-shadow:0 1px 3px rgba(0,0,0,.35);
+}
 .page-card.sortable-ghost{opacity:.35;}
 
 /* ===== PDF page action strip — inspired by the focused page-management workflow of PDF Toolkit ===== */
@@ -760,7 +767,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.110.27';</script>
+<script>const DOCUFORGE_BUILD = '27.111.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -771,7 +778,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.110.27</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.111.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1151,7 +1158,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.110.27 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.111.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -6696,7 +6703,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.110.27 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.111.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -8617,7 +8624,7 @@ function df1115MetadataResult(){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.110.27
+ DocuForge AI 27.111.1
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -8801,7 +8808,7 @@ function df1115MetadataResult(){
       forceFallback:false,
       scroll:true,
       filter:'button,input,canvas,.thumb-wrap',
-      preventOnFilter:true,
+      preventOnFilter:false,
       onStart:()=>g.classList.add('df-page-reordering'),
       onEnd:async evt=>{
         g.classList.remove('df-page-reordering');
