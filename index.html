@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.112.2: menu/submenu repair pass (~30 previously-dead tool
+<!-- DocuForge AI 27.112.3: menu/submenu repair pass (~30 previously-dead tool
      buttons wired up, every conversion result standardized on View / Download /
      Share), a fix for page-selection checkboxes not responding to taps on
      iPhone (SortableJS preventOnFilter was swallowing the tap), a fix for
@@ -35,8 +35,13 @@
      working file picker firing on top of it — a confusing double-picker
      sequence that looked like the button did nothing; they now use their
      own picker directly. The "jump to Main Menu" guard was also broadened
-     to cover the Dashboard tab, not just the Back-to-Main-Menu button. -->
-<meta name="application-version" content="2026.09.02.112.2">
+     to cover the Dashboard tab, not just the Back-to-Main-Menu button.
+     Reset now stays on the current Studio instead of always forcing PDF
+     Studio. Read QR code / Extract table from image / Combine images into
+     PDF now reuse an already-selected image instead of prompting again.
+     A persistent bold Studio title now shows at the top of every Studio
+     (e.g. "Conversion Studio") so it's always clear where you are. -->
+<meta name="application-version" content="2026.09.02.112.3">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -807,7 +812,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.112.2';</script>
+<script>const DOCUFORGE_BUILD = '27.112.3';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -818,7 +823,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.112.2</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.112.3</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -901,6 +906,7 @@ window.DFStorage = (function(){
     </div>
 
     <button id="backToMainMenu" class="btn ghost" type="button">← Back to Main Menu</button>
+    <div id="currentStudioTitle" style="display:none;font-weight:800;font-size:15px;padding:10px 14px 0;color:var(--ink);"></div>
 
 <div id="studioUploadScreen" style="display:none;margin:10px 14px;">
   <div style="padding:15px;border:1px solid var(--line,#d8dde6);border-radius:14px;background:var(--surface,#fff);box-shadow:0 3px 10px rgba(0,0,0,.08);">
@@ -1198,7 +1204,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.112.2 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.112.3 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -6265,7 +6271,7 @@ $('btnReset').addEventListener('click', () => {
     if(typeof clearConversionLog==='function') clearConversionLog();
     if(typeof lastConversionOutput!=='undefined') lastConversionOutput=null;
     if(window.__dfViewFile) { /* preview is reset on next View open */ }
-    setStudio('pdf');
+    setStudio(window.__docuForgeCurrentStudio && window.__docuForgeCurrentStudio !== 'dashboard' ? window.__docuForgeCurrentStudio : 'pdf');
     setStatus('Project reset. All loaded/uploaded files have been cleared.');
   }
 });
@@ -6498,6 +6504,14 @@ function setStudio(name){
   // Keep the selected/uploaded source file while moving between Studios.
   // Reset project is the explicit action that clears it.
   document.body.classList.toggle('dashboard-active', isDashboard);
+  if($('currentStudioTitle')){
+    if(isDashboard){
+      $('currentStudioTitle').style.display = 'none';
+    } else {
+      $('currentStudioTitle').textContent = (typeof studioFullTitle === 'function' ? studioFullTitle(name) : name);
+      $('currentStudioTitle').style.display = 'block';
+    }
+  }
 
   // The Dashboard is ONLY the main menu. The editor/ribbon appears only after
   // a Studio is selected.
@@ -6608,10 +6622,19 @@ function openDashboardCategory(toolId){
 
 function studioLabel(name){
   const labels = {
-    pdf:'PDF', ocr:'OCR', convert:'Conversion',
-    ai:'AI', batch:'Batch', excel:'Excel'
+    pdf:'PDF', ocr:'OCR & Image', convert:'Conversion',
+    ai:'AI', batch:'Batch', excel:'Excel',
+    powerpoint:'PowerPoint', gstinvoice:'GST Invoice',
+    website:'Website', spreadsheet:'Spreadsheet',
+    security:'Security', help:'Help', settings:'Settings',
+    reader:'Reader', view:'View', export:'Export', about:'About'
   };
   return labels[name] || name;
+}
+function studioFullTitle(name){
+  const noSuffix = new Set(['help','settings','reader','view','export','about','gstinvoice','dashboard']);
+  const label = studioLabel(name);
+  return noSuffix.has(name) ? label : (label + ' Studio');
 }
 
 /* Dashboard main-menu navigation — delegated so every card works reliably on iPhone/laptop. */
@@ -6821,7 +6844,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.112.2 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.112.3 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -8561,6 +8584,10 @@ function df1115MetadataResult(){
     document.body.appendChild(i);
     i.addEventListener('change',async()=>{
       const fs=Array.from(i.files||[]); i.remove();
+      if(fs.length===1 && String(fs[0].type||'').startsWith('image/')){
+        window.__docuForgeStudioFile = fs[0];
+        if($('studioUploadName')) $('studioUploadName').textContent = '✓ ' + fs[0].name;
+      }
       if(fs.length) await cb(fs);
     },{once:true});
     i.click();
@@ -8722,14 +8749,31 @@ function df1115MetadataResult(){
     });
   }
 
+  function sharedImageFile(){
+    const f = window.__docuForgeStudioFile;
+    return (f && String(f.type||'').startsWith('image/')) ? f : null;
+  }
+
   function install(){
     const map={
-      btnImagesToPdf: async()=>pick('image/*',true,doImagesToPdf),
+      btnImagesToPdf: async()=>{
+        const f=sharedImageFile();
+        if(f) await doImagesToPdf([f]);
+        else await pick('image/*',true,doImagesToPdf);
+      },
       btnPdfToImages: async()=>pick('.pdf,application/pdf',false,async fs=>{
         const f=fs[0]; if(f) await doPdfToImages(f);
       }),
-      btnImageTable: async()=>pick('image/*',false,async fs=>{if(fs[0])await doImageTable(fs[0]);}),
-      btnQrReader: async()=>pick('image/*',false,async fs=>{if(fs[0])await doQr(fs[0]);})
+      btnImageTable: async()=>{
+        const f=sharedImageFile();
+        if(f) await doImageTable(f);
+        else await pick('image/*',false,async fs=>{if(fs[0])await doImageTable(fs[0]);});
+      },
+      btnQrReader: async()=>{
+        const f=sharedImageFile();
+        if(f) await doQr(f);
+        else await pick('image/*',false,async fs=>{if(fs[0])await doQr(fs[0]);});
+      }
     };
     Object.entries(map).forEach(([id,fn])=>{
       document.addEventListener('click',async e=>{
@@ -8754,7 +8798,7 @@ function df1115MetadataResult(){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.112.2
+ DocuForge AI 27.112.3
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -9645,7 +9689,7 @@ function df1115MetadataResult(){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.112.2 — "View" after conversion fix.
+  DocuForge AI 27.112.3 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -9757,7 +9801,7 @@ function df1115MetadataResult(){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.112.2 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.112.3 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -9839,7 +9883,7 @@ function df1115MetadataResult(){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.112.2 — "View" opens behind an open modal fix.
+  DocuForge AI 27.112.3 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -9883,7 +9927,7 @@ function df1115MetadataResult(){
 
 <script id="df-ghostclick-fix-v271121">
 /*
-  DocuForge AI 27.112.2 — "Jumps to Main Menu after picking a file" fix.
+  DocuForge AI 27.112.3 — "Jumps to Main Menu after picking a file" fix.
 
   On iOS Safari, dismissing the native file-picker sheet can produce a
   stray "ghost" click on whatever element is now sitting under the last
