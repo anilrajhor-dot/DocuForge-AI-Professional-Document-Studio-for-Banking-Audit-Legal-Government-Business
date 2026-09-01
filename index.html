@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.111.4: menu/submenu repair pass (~30 previously-dead tool
+<!-- DocuForge AI 27.111.5: menu/submenu repair pass (~30 previously-dead tool
      buttons wired up, every conversion result standardized on View / Download /
      Share), a fix for page-selection checkboxes not responding to taps on
      iPhone (SortableJS preventOnFilter was swallowing the tap), a fix for
      the post-conversion "View" button (previously tried to render every
      converted file as a PDF and silently failed for non-PDF outputs), a
-     persistent "View" button plus auto-preview after watermark/page numbers/
-     Bates/header-footer, and a fix for View File opening the full-page view
-     behind a still-open result modal (e.g. after Extract/Split), which made
-     the screen look blank — the modal is now always closed first. -->
-<meta name="application-version" content="2026.09.01.111.3">
+     persistent "View" button in the status bar (visible any time a PDF is
+     open) with a brief pulse after watermark/page numbers/Bates/header-footer,
+     a fix for View File opening the full-page view behind a still-open
+     result modal (e.g. after Extract/Split) which made the screen look
+     blank, and removal of an auto-navigate-to-View behavior that itself
+     could leave the screen blank (View now only opens on a direct tap). -->
+<meta name="application-version" content="2026.09.01.111.5">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -259,6 +261,15 @@ body.dark .dropzone .stamp{color:var(--pine);}
   padding:8px 18px; font-size:12px; color:var(--ink-soft); display:flex; align-items:center; gap:14px; z-index:30;
 }
 .statusbar .msg{flex:1;}
+#quickViewBtn.df-quickview-pulse{
+  animation: dfQuickViewPulse 0.6s ease-in-out 0s 3;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+@keyframes dfQuickViewPulse{
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 0%, transparent); }
+}
 .progress-track{width:140px; height:5px; background:var(--surface-2); border-radius:3px; overflow:hidden; display:none;}
 .progress-track.show{display:block;}
 .progress-fill{height:100%; width:0%; background:var(--pine); transition:width .15s;}
@@ -773,7 +784,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.111.4';</script>
+<script>const DOCUFORGE_BUILD = '27.111.5';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -784,7 +795,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.111.4</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.111.5</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1164,7 +1175,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.111.4 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.111.5 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -6711,7 +6722,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.111.4 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.111.5 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -8632,7 +8643,7 @@ function df1115MetadataResult(){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.111.4
+ DocuForge AI 27.111.5
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -9523,7 +9534,7 @@ function df1115MetadataResult(){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.111.4 — "View" after conversion fix.
+  DocuForge AI 27.111.5 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -9606,21 +9617,25 @@ function df1115MetadataResult(){
 </script>
 
 
-<script id="df-quickview-fix-v271113">
+<script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.111.4 — "Can't see what changed" fix for PDF Studio edits.
+  DocuForge AI 27.111.5 — "Can't see what changed" fix for PDF Studio edits,
+  revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
   successfully and updated workingBytes, but the only feedback was a status
   line and the small 0.32-scale thumbnail grid — too small to see a subtle
-  watermark or a page number in the corner. There was no easy way to jump to
-  a real, full-page look at the result. This adds:
-  1. A persistent "👁 View" button in the status bar, visible any time a PDF
-     is open, that jumps straight to the full-page View tab for the current
-     working PDF — usable after ANY PDF Studio edit, not just these four.
-  2. Automatic full-page View after watermark / page numbers / Bates /
-     header-footer specifically, since those are the operations where the
-     change is easiest to miss in the small thumbnail grid.
+  watermark or a page number in the corner. This adds a persistent "👁 View"
+  button in the status bar, visible any time a PDF is open, that jumps
+  straight to the full-page View tab for the current working PDF.
+
+  An earlier version of this fix also auto-opened the View tab immediately
+  after these operations. That triggered setStudio('view') from inside a
+  setTimeout while another render was still settling, and could leave the
+  screen blank (ribbon hidden, View content not yet drawn) instead of
+  showing the result. That auto-navigation has been removed — the button
+  below is now the only trigger, so View only ever opens from a direct,
+  normal tap, which is the path that's actually been verified to work.
 */
 (function(){
   const $ = id => document.getElementById(id);
@@ -9639,35 +9654,41 @@ function df1115MetadataResult(){
   async function goToFullView(){
     const bytes = currentPdfBytes();
     if(!bytes) return;
-    if(typeof window.setStudio === 'function') window.setStudio('view');
     if(typeof window.__dfViewFile === 'function'){
       await window.__dfViewFile(new Blob([bytes], { type:'application/pdf' }), (($('outName')?.value || 'document')) + '.pdf');
+    } else if(typeof window.setStudio === 'function'){
+      window.setStudio('view');
     }
   }
 
   $('quickViewBtn')?.addEventListener('click', goToFullView);
 
+  // A brief, harmless pulse draws the eye to the button after the
+  // operations most likely to be invisible in the thumbnail grid — no
+  // automatic navigation, so there's nothing that can leave a blank screen.
+  function pulseQuickView(){
+    const btn = $('quickViewBtn');
+    if(!btn) return;
+    btn.classList.remove('df-quickview-pulse');
+    void btn.offsetWidth; // restart the animation if it's already running
+    btn.classList.add('df-quickview-pulse');
+    setTimeout(() => btn.classList.remove('df-quickview-pulse'), 2600);
+  }
+
   // Keep the quick-View button's visibility in sync with every PDF change,
   // by wrapping commit() (the single function every PDF edit calls through).
-  if(typeof window.commit === 'undefined' && typeof commit === 'function'){
-    // commit is a top-level function declaration, so window.commit === commit already.
-  }
   const originalCommit = window.commit;
   if(typeof originalCommit === 'function'){
     window.commit = async function(newBytes, msg){
       await originalCommit(newBytes, msg);
       updateQuickViewVisibility();
-      // For the operations most likely to be invisible at thumbnail size,
-      // automatically open the full-page View so the change is obvious.
-      const autoViewMessages = [
+      const attentionMessages = [
         'Watermark added to all pages',
         'Page numbers added',
         'Bates numbering added',
         'Header/footer added to all pages'
       ];
-      if(msg && autoViewMessages.some(m => msg.indexOf(m) === 0)){
-        setTimeout(goToFullView, 250);
-      }
+      if(msg && attentionMessages.some(m => msg.indexOf(m) === 0)) pulseQuickView();
     };
     try{ commit = window.commit; }catch(_){}
   }
@@ -9680,7 +9701,7 @@ function df1115MetadataResult(){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.111.4 — "View" opens behind an open modal fix.
+  DocuForge AI 27.111.5 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
