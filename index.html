@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.111.8: menu/submenu repair pass (~30 previously-dead tool
+<!-- DocuForge AI 27.112.0: menu/submenu repair pass (~30 previously-dead tool
      buttons wired up, every conversion result standardized on View / Download /
      Share), a fix for page-selection checkboxes not responding to taps on
      iPhone (SortableJS preventOnFilter was swallowing the tap), a fix for
@@ -20,8 +20,13 @@
      confirmation now includes a View PDF button as well. The single-page
      "PDF page preview" overlay is now fully opaque instead of translucent,
      so it's a true full-screen view instead of a dimmed page bleeding
-     through behind it. -->
-<meta name="application-version" content="2026.09.01.111.8">
+     through behind it. PDF → Excel results now show an actual scrollable
+     table preview (via SheetJS) instead of just a "not available" message.
+     "Convert Files → PDF" now also accepts images (JPG/PNG/GIF/WEBP/BMP),
+     JSON, XML, RTF, ODT, EPUB, and PDF (passed through unchanged) — in
+     addition to the Word/Excel/PowerPoint/HTML/CSV/TXT/Markdown it already
+     supported. -->
+<meta name="application-version" content="2026.09.02.112.0">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -792,7 +797,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.111.8';</script>
+<script>const DOCUFORGE_BUILD = '27.112.0';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -803,7 +808,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.111.8</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.112.0</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -947,7 +952,7 @@ window.DFStorage = (function(){
 </div>
 <div class="ribbon-panel" data-studio-panel="convert">
 <div id="conversionDirectionHint" class="hint" style="margin:0 14px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);">
-      <strong>Two-way conversion:</strong> PDF → Word/Excel/CSV/Text/HTML/JSON/XML and more, and <strong>Word, Excel, PowerPoint, HTML, CSV, TXT and Markdown → PDF</strong>.
+      <strong>Two-way conversion:</strong> PDF → Word/Excel/CSV/Text/HTML/JSON/XML and more, and <strong>Word, Excel, PowerPoint, HTML, CSV, TXT, Markdown, JSON, XML, RTF, ODT, EPUB and images → PDF</strong>.
     </div>
 <div class="tool-group">
 <button class="tool-btn primary-tool" id="btnPdfFinancialAnalysisOrdinary">📊 Financial Analysis Excel — Ordinary</button>
@@ -975,11 +980,11 @@ window.DFStorage = (function(){
 
 <div class="tool-group conversion-reverse-group">
   <div class="tool-group-title">Other files → PDF</div>
-  <button class="tool-btn" id="btnPptxFileToPdf" title="Convert Word, Excel, PowerPoint, HTML, CSV, TXT or Markdown to PDF">
+  <button class="tool-btn" id="btnPptxFileToPdf" title="Convert Word, Excel, PowerPoint, HTML, CSV, TXT, Markdown, JSON, XML, RTF, ODT, EPUB or images to PDF">
     📄 Convert Files → PDF
   </button>
   <div class="hint" style="margin-top:6px;">
-    Supports Word (.docx), Excel (.xlsx/.xls), PowerPoint (.pptx), HTML, CSV, TXT and Markdown.
+    Supports Word (.docx), Excel (.xlsx/.xls), PowerPoint (.pptx), HTML, CSV, TXT, Markdown, JSON, XML, RTF, ODT, EPUB, and images (JPG/PNG/GIF/WEBP/BMP). A PDF passes through unchanged.
   </div>
 </div>
 <div class="tool-group">
@@ -1183,7 +1188,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.111.8 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.112.0 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -2979,13 +2984,44 @@ async function buildTablePdf(rows){
   }
   return await doc.save();
 }
+/* ---------- Crude RTF → plain text (for "Convert Files → PDF") ----------
+   Not a full RTF parser — strips font/colour tables and control words,
+   keeps paragraph breaks. Good enough for typically-formatted RTF text;
+   heavily nested/embedded-object RTF may lose some content. */
+function rtfToPlainText(rtf){
+  let s = String(rtf || '');
+  s = s.replace(/\{\\fonttbl[\s\S]*?\}\}/g, '');
+  s = s.replace(/\{\\colortbl[\s\S]*?\}/g, '');
+  s = s.replace(/\{\\\*[\s\S]*?\}/g, '');
+  s = s.replace(/\\par[d]?/g, '\n');
+  s = s.replace(/\\tab/g, '\t');
+  s = s.replace(/\\line/g, '\n');
+  s = s.replace(/\\u-?\d+\??/g, ''); // unicode escapes (best-effort drop)
+  s = s.replace(/\\[a-zA-Z]+-?\d* ?/g, '');
+  s = s.replace(/[{}]/g, '');
+  s = s.replace(/\\\\/g, '\\').replace(/\\\{/g, '{').replace(/\\\}/g, '}');
+  return s.trim();
+}
+/* ---------- ODT content.xml → paragraphs (for "Convert Files → PDF") ---------- */
+function odtXmlToParagraphs(xml){
+  const parts = String(xml || '').split(/<text:p[^>]*>/).slice(1);
+  return parts.map(chunk => {
+    const end = chunk.indexOf('</text:p>');
+    const inner = end >= 0 ? chunk.slice(0, end) : chunk;
+    return inner.replace(/<[^>]+>/g, '')
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"').replace(/&apos;/g, "'").trim();
+  });
+}
 async function convertFileToPdf(file){
   // Returns the converted PDF bytes. Does not download/show a result itself —
   // callers (e.g. the "Convert Files → PDF" tool buttons) handle showing a
   // consistent View/Download/Share result after this resolves.
   const ext = (file.name.split('.').pop() || '').toLowerCase();
   let bytes;
-  if(ext === 'docx'){
+  if(ext === 'pdf'){
+    bytes = new Uint8Array(await file.arrayBuffer());
+  } else if(ext === 'docx'){
     await loadLib('mammoth');
     const buf = await file.arrayBuffer();
     const result = await mammoth.extractRawText({ arrayBuffer: buf });
@@ -3005,9 +3041,48 @@ async function convertFileToPdf(file){
     const ws = wb.Sheets[wb.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:'' });
     bytes = await buildTablePdf(rows);
-  } else if(['txt','md'].includes(ext)){
+  } else if(['txt','md','markdown'].includes(ext)){
     const text = await file.text();
     const paragraphs = text.split(/\r?\n\s*\r?\n/).map(p => p.replace(/\r?\n/g, ' ').trim());
+    bytes = await buildTextPdf(paragraphs);
+  } else if(['jpg','jpeg','png','gif','webp','bmp'].includes(ext)){
+    bytes = await buildImagesPdf([file]);
+  } else if(ext === 'json'){
+    const text = await file.text();
+    let pretty;
+    try{ pretty = JSON.stringify(JSON.parse(text), null, 2); }catch(_){ pretty = text; }
+    bytes = await buildTextPdf(pretty.split(/\r?\n/));
+  } else if(ext === 'xml'){
+    const text = await file.text();
+    bytes = await buildTextPdf(text.split(/\r?\n/));
+  } else if(ext === 'rtf'){
+    const raw = await file.text();
+    const plain = rtfToPlainText(raw);
+    const paragraphs = plain.split(/\n{2,}/).map(p => p.replace(/\n/g, ' ').trim());
+    bytes = await buildTextPdf(paragraphs);
+  } else if(ext === 'odt'){
+    const buf = await file.arrayBuffer();
+    let zip;
+    try{ zip = await JSZip.loadAsync(buf); }
+    catch(_){ throw new Error('This doesn\u2019t look like a valid ODT file \u2014 could not open it as a zip archive.'); }
+    const contentFile = zip.file('content.xml');
+    if(!contentFile) throw new Error('This doesn\u2019t look like a valid ODT file (no content.xml found).');
+    const xml = await contentFile.async('string');
+    const paragraphs = odtXmlToParagraphs(xml);
+    bytes = await buildTextPdf(paragraphs);
+  } else if(ext === 'epub'){
+    const buf = await file.arrayBuffer();
+    let zip;
+    try{ zip = await JSZip.loadAsync(buf); }
+    catch(_){ throw new Error('This doesn\u2019t look like a valid EPUB file \u2014 could not open it as a zip archive.'); }
+    const chapterFiles = Object.keys(zip.files).filter(n => /\.(xhtml|html|htm)$/i.test(n)).sort();
+    if(!chapterFiles.length) throw new Error('No readable chapters were found in this EPUB.');
+    const paragraphs = [];
+    for(const f of chapterFiles){
+      const html = await zip.file(f).async('string');
+      const text = html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\s+/g, ' ').trim();
+      if(text) paragraphs.push(text);
+    }
     bytes = await buildTextPdf(paragraphs);
   } else {
     throw new Error('That file type isn\u2019t supported for PDF creation yet.');
@@ -6736,7 +6811,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.111.8 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.112.0 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7431,8 +7506,8 @@ $('dashboardAskTile')?.addEventListener('click', () => {
  let pendingToolId='';
  const accept={
   pdf:'.pdf,application/pdf,image/*',ocr:'.pdf,application/pdf,image/*',
-  convert:'.pdf,.docx,.xlsx,.xls,.csv,.pptx,.html,.txt,.md,*/*',
-  powerpoint:'.ppt,.pptx,*/*',excel:'.xlsx,.xls,.csv,*/*',
+  convert:'.pdf,.docx,.xlsx,.xls,.csv,.pptx,.html,.htm,.txt,.md,.markdown,.json,.xml,.rtf,.odt,.epub,.jpg,.jpeg,.png,.gif,.webp,.bmp,*/*',
+  powerpoint:'.ppt,.pptx,.docx,.xlsx,.xls,.csv,.html,.htm,.txt,.md,.markdown,.json,.xml,.rtf,.odt,.epub,.jpg,.jpeg,.png,.gif,.webp,.bmp,*/*',excel:'.xlsx,.xls,.csv,*/*',
   reader:'.pdf,.epub,*/*',security:'.pdf,application/pdf,*/*'
  };
  function sync(){
@@ -7675,7 +7750,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   function currentFile(){return window.__docuForgeStudioFile||null;}
   function hasWorking(){try{return !!window.workingBytes;}catch(e){return false;}}
   function fileName(){const f=currentFile();if(f&&f.name)return f.name;return hasWorking()?(($('outName')?.value||'document')+'.pdf'):'No file selected';}
-  function acceptFor(s){return ({pdf:'.pdf,application/pdf,image/*',ocr:'.pdf,application/pdf,image/*',convert:'.pdf,.docx,.xlsx,.xls,.csv,.pptx,.ppt,.html,.htm,.txt,.md,.markdown',powerpoint:'.pptx,.ppt',excel:'.xlsx,.xls,.csv',reader:'.pdf,.epub',security:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.txt,.md',batch:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.csv,.txt,.md,.html,.htm'})[s]||'*/*';}
+  function acceptFor(s){return ({pdf:'.pdf,application/pdf,image/*',ocr:'.pdf,application/pdf,image/*',convert:'.pdf,.docx,.xlsx,.xls,.csv,.pptx,.ppt,.html,.htm,.txt,.md,.markdown,.json,.xml,.rtf,.odt,.epub,.jpg,.jpeg,.png,.gif,.webp,.bmp',powerpoint:'.pptx,.ppt,.docx,.xlsx,.xls,.csv,.html,.htm,.txt,.md,.markdown,.json,.xml,.rtf,.odt,.epub,.jpg,.jpeg,.png,.gif,.webp,.bmp',excel:'.xlsx,.xls,.csv',reader:'.pdf,.epub',security:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.txt,.md',batch:'.pdf,.docx,.xlsx,.xls,.pptx,.ppt,.csv,.txt,.md,.html,.htm'})[s]||'*/*';}
   function ensureInput(){
     if(input)return input;
     input=document.createElement('input');input.type='file';input.hidden=true;document.body.appendChild(input);
@@ -8661,7 +8736,7 @@ function df1115MetadataResult(){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.111.8
+ DocuForge AI 27.112.0
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -9552,7 +9627,7 @@ function df1115MetadataResult(){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.111.8 — "View" after conversion fix.
+  DocuForge AI 27.112.0 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -9573,6 +9648,29 @@ function df1115MetadataResult(){
 
   const TEXT_MIMES = ['text/plain','text/csv','text/html','application/json','application/xml','text/xml','application/rtf','text/markdown'];
   const TEXT_EXT = /\.(txt|csv|json|xml|md|markdown|rtf|html|htm)$/i;
+  const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  const XLSX_EXT = /\.xlsx$/i;
+
+  function escHtml(s){ return String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  async function previewXlsx(blob, filename){
+    if(typeof loadLib === 'function') await loadLib('xlsx');
+    if(typeof XLSX === 'undefined'){ say('Preview is unavailable right now. Use Download to inspect the file.', true); return; }
+    const buf = await blob.arrayBuffer();
+    const wb = XLSX.read(buf, { type:'array' });
+    const sheetName = wb.SheetNames[0];
+    const ws = wb.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:'' }).slice(0, 200);
+    const table = '<table style="border-collapse:collapse;width:100%;font-size:12px;">' +
+      rows.map((r,ri) => '<tr>' + r.map(c => `<td style="border:1px solid var(--line);padding:4px 6px;${ri===0?'font-weight:700;background:var(--surface-2);':''}">${escHtml(c)}</td>`).join('') + '</tr>').join('') +
+      '</table>';
+    const extra = rows.length >= 200 ? '<p class="hint" style="margin-top:8px;">Showing the first 200 rows. Download to see the full sheet.</p>' : '';
+    openModal('Preview: ' + (filename || sheetName || 'spreadsheet'),
+      `<div style="max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:8px;">${table}</div>${extra}`,
+      async () => {});
+    $('modalConfirm').style.display = 'none';
+    $('modalCancel').textContent = 'Close';
+  }
 
   async function smartView(blob, filename){
     if(!blob){ say('No file to preview.', true); return; }
@@ -9590,6 +9688,10 @@ function df1115MetadataResult(){
         } else {
           say('Preview is unavailable right now. Use Download to inspect the file.', true);
         }
+        return;
+      }
+      if(blob.type === XLSX_MIME || XLSX_EXT.test(filename || '')){
+        await previewXlsx(blob, filename);
         return;
       }
       say('A full-page preview isn\u2019t available for this file type (' + (filename || 'this file') + '). Use Download, or Share to open it in a dedicated app.', false);
@@ -9637,7 +9739,7 @@ function df1115MetadataResult(){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.111.8 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.112.0 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -9719,7 +9821,7 @@ function df1115MetadataResult(){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.111.8 — "View" opens behind an open modal fix.
+  DocuForge AI 27.112.0 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
