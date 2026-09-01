@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- InstantDash release 27.110.22: enhanced financial dashboard -->
-<meta name="application-ver
-sion" content="2026.08.24.88">
+<!-- DocuForge AI 27.111.0: menu/submenu repair pass — wired up ~30 previously-dead
+     tool buttons across PDF, Conversion, PowerPoint, Security, AI and Batch Studios,
+     and standardized every conversion result on a View / Download / Share flow. -->
+<meta name="application-version" content="2026.09.01.111">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -933,7 +934,7 @@ window.DFStorage = (function(){
 <button class="tool-btn" id="btnPdfToOds"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16"></path></svg> PDF → ODS</button>
 <button class="tool-btn" id="btnPdfToOdp"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="18" x="3" y="5"></rect><path d="M8 21h8"></path></svg> PDF → ODP</button>
 <button class="tool-btn" id="btnPdfToEpub"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"></path></svg> PDF → EPUB</button>
-<button class="tool-btn" id="btnFileToPdf">
+<button class="tool-btn" id="btnFileToPdf" data-requires-file="true">
   <span aria-hidden="true">📄</span> Convert Files → PDF
 </button>
 </div>
@@ -1546,7 +1547,7 @@ function dfGetPdfJs(data, password){
 }
 
 const PDF_REQUIRED_IDS = ['btnInsert','btnDuplicateSel','btnRotateSel','btnReverse','btnDeleteSel','btnCrop','btnRemoveBlank','btnExtract','btnSplit',
-   'btnWatermark','btnPageNum','btnBates','btnHeaderFooter','btnFillForm','btnFlattenForm','btnSign','btnEncrypt','btnRedact',
+   'btnWatermark','btnPageNum','btnBates','btnHeaderFooter','btnFillForm','btnFlattenForm','btnSign','btnEncrypt','btnRedact','btnOpenEncrypted',
    'btnCompress','btnMetadata','btnUndo','btnRedo','btnReset','btnOcrPdf',
    'btnPdfToWord','btnPdfToPptx','btnPdfToExcel','btnPdfToCsv','btnPdfToText','btnPdfToHtml','btnPdfToJson','btnPdfToImages',
    'btnPdfToXml','btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds','btnPdfToOdp','btnPdfToEpub',
@@ -2940,42 +2941,39 @@ async function buildTablePdf(rows){
   return await doc.save();
 }
 async function convertFileToPdf(file){
+  // Returns the converted PDF bytes. Does not download/show a result itself —
+  // callers (e.g. the "Convert Files → PDF" tool buttons) handle showing a
+  // consistent View/Download/Share result after this resolves.
   const ext = (file.name.split('.').pop() || '').toLowerCase();
-  showProgress(15); setStatus(`Converting ${file.name}…`);
-  try{
-    let bytes;
-    if(ext === 'docx'){
-      await loadLib('mammoth');
-      const buf = await file.arrayBuffer();
-      const result = await mammoth.extractRawText({ arrayBuffer: buf });
-      const paragraphs = result.value.split(/\r?\n+/);
-      bytes = await buildTextPdf(paragraphs);
-    } else if(ext === 'pptx'){
-      const result = await convertPptxFileToPdf(file);
-      bytes = result.bytes;
-    } else if(['html','htm'].includes(ext)){
-      const htmlText = await file.text();
-      const blocks = extractHtmlBlocks(htmlText);
-      bytes = await buildHtmlPdf(blocks);
-    } else if(['csv','xlsx','xls'].includes(ext)){
-      await loadLib('xlsx');
-      const buf = await file.arrayBuffer();
-      const wb = XLSX.read(buf, { type:'array' });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:'' });
-      bytes = await buildTablePdf(rows);
-    } else if(['txt','md'].includes(ext)){
-      const text = await file.text();
-      const paragraphs = text.split(/\r?\n\s*\r?\n/).map(p => p.replace(/\r?\n/g, ' ').trim());
-      bytes = await buildTextPdf(paragraphs);
-    } else {
-      toast('That file type isn\u2019t supported for PDF creation yet.', true); return;
-    }
-    const name = file.name.replace(/\.[^.]+$/, '') + '.pdf';
-    downloadBlob(new Blob([bytes], { type:'application/pdf' }), name);
-    setStatus(`Created ${name}.`);
-  } catch(e){ console.error(e); toast('Could not convert that file.', true); }
-  finally { showProgress(null); }
+  let bytes;
+  if(ext === 'docx'){
+    await loadLib('mammoth');
+    const buf = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer: buf });
+    const paragraphs = result.value.split(/\r?\n+/);
+    bytes = await buildTextPdf(paragraphs);
+  } else if(ext === 'pptx'){
+    const result = await convertPptxFileToPdf(file);
+    bytes = result.bytes;
+  } else if(['html','htm'].includes(ext)){
+    const htmlText = await file.text();
+    const blocks = extractHtmlBlocks(htmlText);
+    bytes = await buildHtmlPdf(blocks);
+  } else if(['csv','xlsx','xls'].includes(ext)){
+    await loadLib('xlsx');
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type:'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:'' });
+    bytes = await buildTablePdf(rows);
+  } else if(['txt','md'].includes(ext)){
+    const text = await file.text();
+    const paragraphs = text.split(/\r?\n\s*\r?\n/).map(p => p.replace(/\r?\n/g, ' ').trim());
+    bytes = await buildTextPdf(paragraphs);
+  } else {
+    throw new Error('That file type isn\u2019t supported for PDF creation yet.');
+  }
+  return bytes;
 }
 
 /* ---------- Translation ----------
@@ -7524,6 +7522,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   setStatus(`Choose a file for ${btnLabel(id)} to continue.`);
   return true;
  }
+ window.__docuForgeRequestFileForTool = requestFileForTool;
 
  function installToolFileGate(){
   document.addEventListener('click',function(e){
@@ -8853,5 +8852,655 @@ function df1115MetadataResult(){
     .page-card canvas,.page-card .thumb-wrap{touch-action:pan-y}
   `;
   document.head.appendChild(st);
+})();
+</script>
+
+
+<script id="df-menu-repair-v27111">
+/*
+  DocuForge AI 27.111.0 — Menu & submenu repair pass.
+
+  Audit found ~30 tool-buttons across Conversion, PowerPoint, Security, AI,
+  Batch and PDF Studios with NO click handler bound anywhere (dead buttons —
+  tapping them did nothing). Almost all the underlying logic already existed
+  in this file (builders, converters, PDF operations) but was never wired to
+  its button, or the wiring was lost in an earlier edit. This script wires
+  every one of them to its existing function, and routes every result
+  through a consistent View / Download / Share flow (showConversionResult /
+  conversionOutput / shareGeneratedFile / showTextResult — whichever already
+  fits that output type) so every completed action always offers Share.
+*/
+(function(){
+  const $ = id => document.getElementById(id);
+  const say = (m, err) => (typeof toast === 'function') ? toast(m, !!err) : alert(m);
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  function studioFile(){ return window.__docuForgeStudioFile || null; }
+  function requestFile(btnId){
+    if(typeof window.__docuForgeRequestFileForTool === 'function') window.__docuForgeRequestFileForTool(btnId);
+    else say('Use the Upload File button above to choose a file, then try again.', true);
+  }
+  function outBase(fallback){
+    try{ const v = $('outName')?.value; if(v && v.trim()) return v.trim().replace(/\.[^.]+$/,''); }catch(_){}
+    const f = studioFile();
+    if(f && f.name) return f.name.replace(/\.[^.]+$/,'');
+    return fallback || 'document';
+  }
+  // Every fixed conversion routes through here so Share is always offered.
+  async function resultShare(blob, filename, label, previewPdfBytes){
+    if(typeof showConversionResult === 'function') await showConversionResult(blob, filename, label, previewPdfBytes || null);
+    else if(typeof conversionOutput === 'function') conversionOutput(blob, filename, label);
+    else downloadBlob(blob, filename);
+  }
+
+  /* ============ Conversion Studio: PDF → HTML/JSON/XML/RTF/ODT/ODS/ODP/EPUB/SVG/Excel ============ */
+  function bindSimpleExport(id, mime, ext, builder, label){
+    const btn = $(id);
+    if(!btn || btn.dataset.dfWired) return;
+    btn.dataset.dfWired = '1';
+    btn.addEventListener('click', async () => {
+      if(!workingBytes){ say('Open a PDF first.', true); return; }
+      setStatus('Building ' + label + '…'); showProgress(20);
+      try{
+        const out = await builder();
+        const blob = (out instanceof Blob) ? out : new Blob([out], { type: mime });
+        const name = outBase() + '.' + ext;
+        await resultShare(blob, name, label);
+        setStatus(label + ' created.');
+        if(typeof logConversion === 'function') logConversion(label, name);
+      }catch(e){ console.error(e); say(e?.message || ('Could not build ' + label + '.'), true); }
+      finally{ showProgress(null); }
+    });
+  }
+  bindSimpleExport('btnPdfToHtml', 'text/html', 'html', () => buildPdfHtml(), 'PDF → HTML');
+  bindSimpleExport('btnPdfToJson', 'application/json', 'json', () => buildPdfJson(), 'PDF → JSON');
+  bindSimpleExport('btnPdfToXml', 'application/xml', 'xml', () => buildPdfXml(), 'PDF → XML');
+  bindSimpleExport('btnPdfToRtf', 'application/rtf', 'rtf', () => buildPdfRtf(), 'PDF → RTF');
+  bindSimpleExport('btnPdfToOdt', 'application/vnd.oasis.opendocument.text', 'odt', () => buildPdfOdt(), 'PDF → ODT');
+  bindSimpleExport('btnPdfToOds', 'application/vnd.oasis.opendocument.spreadsheet', 'ods', () => buildPdfOds(), 'PDF → ODS');
+  bindSimpleExport('btnPdfToOdp', 'application/vnd.oasis.opendocument.presentation', 'odp', () => buildPdfOdp(), 'PDF → ODP');
+  bindSimpleExport('btnPdfToEpub', 'application/epub+zip', 'epub', () => buildPdfEpub(), 'PDF → EPUB');
+  bindSimpleExport('btnPdfToSvg', 'application/zip', 'zip', () => convertPdfToSvgZip(), 'PDF → SVG (.zip, one file per page)');
+
+  if($('btnPdfToExcel') && !$('btnPdfToExcel').dataset.dfWired){
+    $('btnPdfToExcel').dataset.dfWired = '1';
+    $('btnPdfToExcel').addEventListener('click', async () => {
+      if(!workingBytes){ say('Open a PDF first.', true); return; }
+      setStatus('Building Excel…'); showProgress(20);
+      try{
+        const { rows, hasText } = await collectPdfRows();
+        if(!hasText){ say('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
+        await loadLib('xlsx');
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        const wbBytes = XLSX.write(wb, { bookType:'xlsx', type:'array' });
+        const blob = new Blob([wbBytes], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const name = outBase() + '.xlsx';
+        await resultShare(blob, name, 'PDF → Excel');
+        setStatus('Excel file created.');
+        if(typeof logConversion === 'function') logConversion('PDF → Excel', name);
+      }catch(e){ console.error(e); say(e?.message || 'Could not build the Excel file.', true); }
+      finally{ showProgress(null); }
+    });
+  }
+
+  /* ============ Convert / PowerPoint Studio: generic "Other files → PDF" ============ */
+  async function runFilesToPdf(btnId){
+    const file = studioFile();
+    if(!file){ requestFile(btnId); return; }
+    setStatus('Converting ' + file.name + '…'); showProgress(20);
+    try{
+      const bytes = await convertFileToPdf(file);
+      const blob = new Blob([bytes], { type:'application/pdf' });
+      const name = file.name.replace(/\.[^.]+$/,'') + '.pdf';
+      await resultShare(blob, name, 'Convert to PDF', bytes);
+      setStatus('PDF created.');
+      if(typeof logConversion === 'function') logConversion('Convert to PDF', name);
+    }catch(e){ console.error(e); say(e?.message || 'Could not convert this file to PDF.', true); }
+    finally{ showProgress(null); }
+  }
+  if($('btnFileToPdf') && !$('btnFileToPdf').dataset.dfWired){
+    $('btnFileToPdf').dataset.dfWired = '1';
+    $('btnFileToPdf').addEventListener('click', () => runFilesToPdf('btnFileToPdf'));
+  }
+  if($('btnPptxFileToPdf') && !$('btnPptxFileToPdf').dataset.dfWired){
+    $('btnPptxFileToPdf').dataset.dfWired = '1';
+    $('btnPptxFileToPdf').addEventListener('click', () => runFilesToPdf('btnPptxFileToPdf'));
+  }
+
+  /* ============ PowerPoint Studio ============ */
+  if($('btnPptxToPdf') && !$('btnPptxToPdf').dataset.dfWired){
+    $('btnPptxToPdf').dataset.dfWired = '1';
+    $('btnPptxToPdf').addEventListener('click', async () => {
+      const file = studioFile();
+      if(!file){ requestFile('btnPptxToPdf'); return; }
+      setStatus('Converting PowerPoint to PDF…'); showProgress(20);
+      try{
+        const result = await convertPptxFileToPdf(file);
+        const blob = new Blob([result.bytes], { type:'application/pdf' });
+        const name = file.name.replace(/\.pptx?$/i,'') + '.pdf';
+        await resultShare(blob, name, 'PowerPoint → PDF', result.bytes);
+        setStatus('PDF created from ' + result.count + ' slide(s).');
+        if(typeof logConversion === 'function') logConversion('PowerPoint → PDF', name);
+      }catch(e){ console.error(e); say(e?.message || 'Could not convert this PowerPoint file.', true); }
+      finally{ showProgress(null); }
+    });
+  }
+
+  if($('btnPptxToMarkdown') && !$('btnPptxToMarkdown').dataset.dfWired){
+    $('btnPptxToMarkdown').dataset.dfWired = '1';
+    $('btnPptxToMarkdown').addEventListener('click', async () => {
+      const file = studioFile();
+      if(!file){ requestFile('btnPptxToMarkdown'); return; }
+      setStatus('Extracting slides…'); showProgress(20);
+      try{
+        const slides = await extractPptxSlidesData(file);
+        const md = slides.map((s,i) => `## Slide ${i+1}: ${s.title}\n` + s.bullets.map(b=>'- '+b).join('\n')).join('\n\n');
+        const name = file.name.replace(/\.pptx?$/i,'') + '.md';
+        showTextResult('PowerPoint → Markdown', md, name, true);
+        setStatus('Markdown created from ' + slides.length + ' slide(s).');
+        if(typeof logConversion === 'function') logConversion('PowerPoint → Markdown', name);
+      }catch(e){ console.error(e); say(e?.message || 'Could not read this PowerPoint file.', true); }
+      finally{ showProgress(null); }
+    });
+  }
+
+  function shareOrResult(blob, name, label){
+    if(typeof shareGeneratedFile === 'function') shareGeneratedFile(blob, name, label);
+    else resultShare(blob, name, label);
+  }
+
+  if($('btnPptxMerge') && !$('btnPptxMerge').dataset.dfWired){
+    $('btnPptxMerge').dataset.dfWired = '1';
+    $('btnPptxMerge').addEventListener('click', () => {
+      const file = studioFile();
+      if(!file){ requestFile('btnPptxMerge'); return; }
+      openModal('Merge PPTX files', `
+        <p class="hint">First file: <strong>${esc(file.name)}</strong>. Choose one or more additional .pptx files to append after it, in the order selected.</p>
+        <div class="field"><input type="file" id="dfPptxMergeMore" accept=".pptx" multiple></div>
+      `, async () => {
+        const more = Array.from($('dfPptxMergeMore')?.files || []);
+        if(!more.length){ say('Choose at least one more .pptx file to merge.', true); return; }
+        setStatus('Merging PowerPoint files…'); showProgress(15);
+        try{
+          let slides = await extractPptxSlidesData(file);
+          for(let i=0;i<more.length;i++){
+            showProgress(15 + Math.round(60*(i+1)/more.length));
+            slides = slides.concat(await extractPptxSlidesData(more[i]));
+          }
+          const bytes = await buildPptxFromSlides(slides);
+          const blob = new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+          const name = file.name.replace(/\.pptx?$/i,'') + '_merged.pptx';
+          shareOrResult(blob, name, 'Merged PowerPoint');
+          setStatus('Merged ' + slides.length + ' slide(s) from ' + (more.length+1) + ' file(s).');
+        }catch(e){ console.error(e); say(e?.message || 'Could not merge these PowerPoint files.', true); }
+        finally{ showProgress(null); }
+      });
+    });
+  }
+
+  if($('btnPptxSplit') && !$('btnPptxSplit').dataset.dfWired){
+    $('btnPptxSplit').dataset.dfWired = '1';
+    $('btnPptxSplit').addEventListener('click', async () => {
+      const file = studioFile();
+      if(!file){ requestFile('btnPptxSplit'); return; }
+      setStatus('Splitting PowerPoint…'); showProgress(15);
+      try{
+        const slides = await extractPptxSlidesData(file);
+        if(slides.length < 2){ say('This file has only one slide — nothing to split.', true); return; }
+        const zip = new JSZip();
+        const base = file.name.replace(/\.pptx?$/i,'');
+        for(let i=0;i<slides.length;i++){
+          showProgress(15 + Math.round(70*(i+1)/slides.length));
+          const bytes = await buildPptxFromSlides([slides[i]]);
+          zip.file(`${base}_slide${String(i+1).padStart(2,'0')}.pptx`, bytes);
+        }
+        const blob = await zip.generateAsync({ type:'blob' });
+        await resultShare(blob, base + '_split.zip', 'Split PowerPoint (.zip)');
+        setStatus('Split into ' + slides.length + ' file(s).');
+      }catch(e){ console.error(e); say(e?.message || 'Could not split this PowerPoint file.', true); }
+      finally{ showProgress(null); }
+    });
+  }
+
+  if($('btnPptxReorder') && !$('btnPptxReorder').dataset.dfWired){
+    $('btnPptxReorder').dataset.dfWired = '1';
+    $('btnPptxReorder').addEventListener('click', async () => {
+      const file = studioFile();
+      if(!file){ requestFile('btnPptxReorder'); return; }
+      setStatus('Loading slides…'); showProgress(15);
+      let slides;
+      try{ slides = await extractPptxSlidesData(file); }
+      catch(e){ console.error(e); say(e?.message || 'Could not read this PowerPoint file.', true); showProgress(null); return; }
+      showProgress(null);
+      const order = slides.map((_,i) => i);
+      function renderList(){
+        return order.map((idx,pos) => `
+          <div class="df-reorder-row" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);">
+            <span style="flex:1;">${pos+1}. ${esc(slides[idx].title)}</span>
+            <button type="button" class="btn ghost" data-up="${pos}" ${pos===0?'disabled':''}>↑</button>
+            <button type="button" class="btn ghost" data-down="${pos}" ${pos===order.length-1?'disabled':''}>↓</button>
+          </div>`).join('');
+      }
+      openModal('Reorder slides', `<div id="dfReorderList">${renderList()}</div>`, async () => {
+        setStatus('Rebuilding PowerPoint…'); showProgress(20);
+        try{
+          const newSlides = order.map(i => slides[i]);
+          const bytes = await buildPptxFromSlides(newSlides);
+          const blob = new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+          const name = file.name.replace(/\.pptx?$/i,'') + '_reordered.pptx';
+          shareOrResult(blob, name, 'Reordered PowerPoint');
+          setStatus('Slides reordered.');
+        }catch(e){ console.error(e); say(e?.message || 'Could not rebuild this PowerPoint file.', true); }
+        finally{ showProgress(null); }
+      });
+      setTimeout(() => {
+        const list = $('dfReorderList');
+        if(!list) return;
+        list.addEventListener('click', (e) => {
+          const up = e.target.closest('[data-up]'); const down = e.target.closest('[data-down]');
+          if(up){
+            const p = parseInt(up.dataset.up);
+            if(p>0){ const t=order[p-1]; order[p-1]=order[p]; order[p]=t; list.innerHTML = renderList(); }
+          } else if(down){
+            const p = parseInt(down.dataset.down);
+            if(p<order.length-1){ const t=order[p+1]; order[p+1]=order[p]; order[p]=t; list.innerHTML = renderList(); }
+          }
+        });
+      }, 0);
+    });
+  }
+
+  if($('btnPptxEdit') && !$('btnPptxEdit').dataset.dfWired){
+    $('btnPptxEdit').dataset.dfWired = '1';
+    $('btnPptxEdit').addEventListener('click', async () => {
+      const file = studioFile();
+      if(!file){ requestFile('btnPptxEdit'); return; }
+      setStatus('Loading slides…'); showProgress(15);
+      let slides;
+      try{ slides = await extractPptxSlidesData(file); }
+      catch(e){ console.error(e); say(e?.message || 'Could not read this PowerPoint file.', true); showProgress(null); return; }
+      showProgress(null);
+      const body = slides.map((s,i) => `
+        <div class="field"><label>Slide ${i+1} title</label><input type="text" class="df-edit-title" data-i="${i}" value="${esc(s.title)}"></div>
+        <div class="field"><label>Slide ${i+1} bullets (one per line)</label><textarea class="df-edit-bullets" data-i="${i}" style="min-height:70px;">${esc(s.bullets.join('\n'))}</textarea></div>
+      `).join('<hr style="border-color:var(--line);margin:10px 0;">');
+      openModal('Edit PowerPoint (structural — title & bullets only)', `<p class="hint">Backgrounds, images and fonts are not preserved — only text content is edited.</p>${body}`, async () => {
+        setStatus('Rebuilding PowerPoint…'); showProgress(20);
+        try{
+          const edited = slides.map((s,i) => ({
+            title: document.querySelector(`.df-edit-title[data-i="${i}"]`)?.value || s.title,
+            bullets: (document.querySelector(`.df-edit-bullets[data-i="${i}"]`)?.value || '').split('\n').map(b=>b.trim()).filter(Boolean)
+          }));
+          const bytes = await buildPptxFromSlides(edited);
+          const blob = new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+          const name = file.name.replace(/\.pptx?$/i,'') + '_edited.pptx';
+          shareOrResult(blob, name, 'Edited PowerPoint');
+          setStatus('PowerPoint updated.');
+        }catch(e){ console.error(e); say(e?.message || 'Could not rebuild this PowerPoint file.', true); }
+        finally{ showProgress(null); }
+      });
+    });
+  }
+
+  /* ============ AI Studio ============ */
+  try{
+    if(typeof AI_OPS !== 'undefined' && !AI_OPS.analyze){
+      AI_OPS.analyze = t => `Analyze the following document and produce a structured analysis covering: key points and purpose, important figures or data mentioned, notable risks or issues, and anything a reader should pay close attention to. Use clear headings:\n\n${t}`;
+    }
+  }catch(_){}
+  if($('btnAnalyze') && !$('btnAnalyze').dataset.dfWired){
+    $('btnAnalyze').dataset.dfWired = '1';
+    $('btnAnalyze').addEventListener('click', () => {
+      if(typeof openAiTaskModal === 'function') openAiTaskModal('analyze', 'Analyze document', 'Produces a structured analysis of key points, figures, and risks.', 'analysis');
+      else say('AI tools are unavailable right now.', true);
+    });
+  }
+
+  if($('btnDupPages') && !$('btnDupPages').dataset.dfWired){
+    $('btnDupPages').dataset.dfWired = '1';
+    $('btnDupPages').addEventListener('click', async () => {
+      if(!workingBytes){ say('Open a PDF first.', true); return; }
+      setStatus('Scanning for duplicate pages…'); showProgress(20);
+      try{
+        const pairs = await detectDuplicatePages();
+        showProgress(null);
+        if(!pairs.length){
+          openModal('Duplicate pages', '<p class="hint">No likely duplicate pages were found in this PDF.</p>', async () => {});
+        } else {
+          const rows = pairs.map(p => `<div style="padding:6px 0;border-bottom:1px solid var(--line);">Page ${p.a+1} ↔ Page ${p.b+1} — ${Math.round(p.sim*100)}% similar</div>`).join('');
+          openModal('Duplicate pages found', `<p class="hint">These page pairs look like likely duplicates:</p>${rows}`, async () => {});
+        }
+        $('modalConfirm').style.display = 'none'; $('modalCancel').textContent = 'Close';
+      }catch(e){ console.error(e); say(e?.message || 'Could not scan for duplicate pages.', true); showProgress(null); }
+    });
+  }
+
+  /* ============ PDF Studio: Crop, Remove blank pages ============ */
+  if($('btnCrop') && !$('btnCrop').dataset.dfWired){
+    $('btnCrop').dataset.dfWired = '1';
+    $('btnCrop').addEventListener('click', () => {
+      if(!workingBytes){ say('Open a PDF first.', true); return; }
+      const idxs = (typeof selectedIndices === 'function' && selectedIndices().length) ? selectedIndices() : null;
+      openModal('Crop pages', `
+        <p class="hint">${idxs ? `Applies to the ${idxs.length} selected page(s).` : 'No pages selected — applies to all pages.'} Margins are removed from each edge, in points (72pt = 1 inch).</p>
+        <div class="field row">
+          <div><label>Top margin (pt)</label><input type="number" id="dfCropTop" value="36" min="0"></div>
+          <div><label>Bottom margin (pt)</label><input type="number" id="dfCropBottom" value="36" min="0"></div>
+        </div>
+        <div class="field row">
+          <div><label>Left margin (pt)</label><input type="number" id="dfCropLeft" value="36" min="0"></div>
+          <div><label>Right margin (pt)</label><input type="number" id="dfCropRight" value="36" min="0"></div>
+        </div>
+      `, async () => {
+        const top = parseFloat($('dfCropTop').value)||0, bottom = parseFloat($('dfCropBottom').value)||0;
+        const left = parseFloat($('dfCropLeft').value)||0, right = parseFloat($('dfCropRight').value)||0;
+        let all = idxs;
+        if(!all){
+          const doc = await PDFDocument.load(workingBytes);
+          all = doc.getPages().map((_,i)=>i);
+        }
+        await cropPages(all, { top, bottom, left, right });
+      });
+    });
+  }
+
+  if($('btnRemoveBlank') && !$('btnRemoveBlank').dataset.dfWired){
+    $('btnRemoveBlank').dataset.dfWired = '1';
+    $('btnRemoveBlank').addEventListener('click', async () => {
+      if(!workingBytes){ say('Open a PDF first.', true); return; }
+      setStatus('Scanning for blank pages…'); showProgress(15);
+      try{
+        const pdf = await dfGetPdfJs(workingBytes).promise;
+        const blanks = [];
+        for(let i=1;i<=pdf.numPages;i++){
+          showProgress(15+Math.round(70*i/pdf.numPages));
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale:0.4 });
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1,Math.round(viewport.width));
+          canvas.height = Math.max(1,Math.round(viewport.height));
+          const ctx = canvas.getContext('2d', { willReadFrequently:true });
+          await page.render({ canvasContext:ctx, viewport }).promise;
+          const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+          let nonWhite = 0, sampled = 0;
+          for(let p=0;p<data.length;p+=4*7){
+            sampled++;
+            if(data[p] < 245 || data[p+1] < 245 || data[p+2] < 245) nonWhite++;
+          }
+          if(sampled && nonWhite/sampled < 0.002) blanks.push(i-1);
+        }
+        showProgress(null);
+        if(!blanks.length){
+          openModal('Remove blank pages', '<p class="hint">No blank pages were detected in this PDF.</p>', async () => {});
+          $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
+          return;
+        }
+        openModal('Remove blank pages', `<p class="hint">${blanks.length} likely blank page(s) detected: ${blanks.map(i=>i+1).join(', ')}. Remove them?</p>`, async () => {
+          await deletePages(blanks);
+        });
+      }catch(e){ console.error(e); say(e?.message || 'Could not scan this PDF for blank pages.', true); showProgress(null); }
+    });
+  }
+
+  /* ============ Security Studio ============ */
+  if($('btnSign') && !$('btnSign').dataset.dfWired){
+    $('btnSign').dataset.dfWired = '1';
+    $('btnSign').addEventListener('click', () => {
+      if(!workingBytes){ say('Open a PDF first.', true); return; }
+      openModal('Sign PDF (visual stamp)', `
+        <p class="hint">Draw your signature below. This stamps an image of your signature onto the page — it is not a cryptographic digital signature.</p>
+        <canvas id="dfSignPad" width="500" height="180" style="width:100%;max-width:500px;border:1px solid var(--line);border-radius:8px;touch-action:none;background:#fff;"></canvas>
+        <div style="margin:6px 0 12px;"><button type="button" class="btn ghost" id="dfSignClear">Clear</button></div>
+        <div class="field row">
+          <div><label>Page</label><input type="number" id="dfSignPage" min="1" value="1"></div>
+          <div><label>Position</label>
+            <select id="dfSignPos">
+              <option value="br">Bottom right</option>
+              <option value="bl">Bottom left</option>
+              <option value="tr">Top right</option>
+              <option value="tl">Top left</option>
+              <option value="center">Center</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Signature width (points)</label><input type="number" id="dfSignWidth" value="160" min="40" max="400"></div>
+      `, async () => {
+        const canvas = $('dfSignPad');
+        const dataUrl = canvas.toDataURL('image/png');
+        const pageNum = Math.max(1, parseInt($('dfSignPage').value)||1);
+        const position = $('dfSignPos').value;
+        const widthPt = Math.max(40, parseFloat($('dfSignWidth').value)||160);
+        const doc = await PDFDocument.load(workingBytes);
+        const total = doc.getPageCount();
+        const pageIndex = Math.min(total-1, pageNum-1);
+        await signPdf({ dataUrl, pageIndex, position, widthPt });
+      });
+      setTimeout(() => {
+        const canvas = $('dfSignPad');
+        if(canvas && typeof setupSignaturePad === 'function'){
+          const clear = setupSignaturePad(canvas);
+          $('dfSignClear')?.addEventListener('click', clear);
+        }
+      }, 0);
+    });
+  }
+
+  if($('btnFillForm') && !$('btnFillForm').dataset.dfWired){
+    $('btnFillForm').dataset.dfWired = '1';
+    $('btnFillForm').addEventListener('click', async () => {
+      if(!workingBytes){ say('Open a PDF first.', true); return; }
+      try{
+        const doc = await PDFDocument.load(workingBytes);
+        const form = doc.getForm();
+        const fields = form.getFields();
+        if(!fields.length){
+          openModal('Fill form fields', '<p class="hint">This PDF has no fillable form fields.</p>', async () => {});
+          $('modalConfirm').style.display='none'; $('modalCancel').textContent='Close';
+          return;
+        }
+        const rows = fields.map((f) => {
+          const name = f.getName();
+          const type = f.constructor.name;
+          let input;
+          if(type === 'PDFCheckBox') input = `<select data-field="${esc(name)}"><option value="false">Unchecked</option><option value="true">Checked</option></select>`;
+          else if(type === 'PDFDropdown' || type === 'PDFRadioGroup'){
+            let opts = [];
+            try{ opts = f.getOptions ? f.getOptions() : []; }catch(_){}
+            input = `<select data-field="${esc(name)}">${opts.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('')}</select>`;
+          } else input = `<input type="text" data-field="${esc(name)}">`;
+          return `<div class="field"><label>${esc(name)}</label>${input}</div>`;
+        }).join('');
+        openModal('Fill form fields', rows, async () => {
+          const values = {};
+          document.querySelectorAll('[data-field]').forEach(el => { values[el.dataset.field] = el.value; });
+          await fillForm(values);
+        });
+      }catch(e){ console.error(e); say(e?.message || 'Could not read this PDF\u2019s form fields.', true); }
+    });
+  }
+
+  if($('btnFlattenForm') && !$('btnFlattenForm').dataset.dfWired){
+    $('btnFlattenForm').dataset.dfWired = '1';
+    $('btnFlattenForm').addEventListener('click', () => {
+      if(!workingBytes){ say('Open a PDF first.', true); return; }
+      openModal('Flatten form', '<p class="hint">This makes all current form field values permanent page content. The form will no longer be editable/fillable afterward.</p>', async () => {
+        await flattenForm();
+      });
+    });
+  }
+
+  if($('btnRedact') && !$('btnRedact').dataset.dfWired){
+    $('btnRedact').dataset.dfWired = '1';
+    $('btnRedact').addEventListener('click', async () => {
+      if(!workingBytes){ say('Open a PDF first.', true); return; }
+      let pageCount = 1;
+      try{ const doc = await PDFDocument.load(workingBytes); pageCount = doc.getPageCount(); }catch(_){}
+      openModal('Redact page', `
+        <p class="hint">Choose a page, then drag on the preview to draw one or more black boxes over the areas to permanently remove. The page becomes a flattened image — original text underneath is not recoverable.</p>
+        <div class="field"><label>Page (1-${pageCount})</label><input type="number" id="dfRedactPage" min="1" max="${pageCount}" value="1"></div>
+        <div id="dfRedactWrap" style="position:relative;border:1px solid var(--line);border-radius:8px;overflow:auto;touch-action:none;">
+          <canvas id="dfRedactCanvas" style="display:block;max-width:100%;"></canvas>
+        </div>
+        <div style="margin-top:8px;"><button type="button" class="btn ghost" id="dfRedactUndo">Undo last box</button> <button type="button" class="btn ghost" id="dfRedactClear">Clear boxes</button></div>
+      `, async () => {
+        const boxes = window.__dfRedactBoxes || [];
+        if(!boxes.length){ say('Draw at least one redaction box first.', true); return; }
+        const pageNum = Math.max(1, Math.min(pageCount, parseInt($('dfRedactPage').value)||1));
+        await redactPage(pageNum-1, boxes, window.__dfRedactRenderScale||1.5);
+        window.__dfRedactBoxes = [];
+      });
+      setTimeout(async () => {
+        const canvas = $('dfRedactCanvas');
+        if(!canvas) return;
+        window.__dfRedactBoxes = [];
+        const scale = 1.5;
+        window.__dfRedactRenderScale = scale;
+        let pdf;
+        async function renderPage(keepBoxes){
+          const pageNum = Math.max(1, Math.min(pageCount, parseInt($('dfRedactPage').value)||1));
+          const page = await pdf.getPage(pageNum);
+          const viewport = page.getViewport({ scale });
+          canvas.width = viewport.width; canvas.height = viewport.height;
+          await page.render({ canvasContext:canvas.getContext('2d'), viewport }).promise;
+          if(!keepBoxes) window.__dfRedactBoxes = [];
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = 'rgba(0,0,0,0.85)';
+          window.__dfRedactBoxes.forEach(b => ctx.fillRect(b.x,b.y,b.width,b.height));
+        }
+        try{ pdf = await dfGetPdfJs(workingBytes).promise; await renderPage(false); }
+        catch(e){ console.error(e); say('Could not preview this page.', true); return; }
+        $('dfRedactPage').addEventListener('change', () => renderPage(false));
+        let drawing=false, startX=0, startY=0;
+        canvas.addEventListener('pointerdown', e => {
+          const r = canvas.getBoundingClientRect();
+          startX = (e.clientX-r.left)*(canvas.width/r.width); startY = (e.clientY-r.top)*(canvas.height/r.height);
+          drawing = true; canvas.setPointerCapture(e.pointerId);
+        });
+        canvas.addEventListener('pointerup', async e => {
+          if(!drawing) return; drawing = false;
+          const r = canvas.getBoundingClientRect();
+          const endX = (e.clientX-r.left)*(canvas.width/r.width), endY = (e.clientY-r.top)*(canvas.height/r.height);
+          const box = { x:Math.min(startX,endX), y:Math.min(startY,endY), width:Math.abs(endX-startX), height:Math.abs(endY-startY) };
+          if(box.width>4 && box.height>4){ window.__dfRedactBoxes.push(box); await renderPage(true); }
+        });
+        $('dfRedactUndo').addEventListener('click', async () => { window.__dfRedactBoxes.pop(); await renderPage(true); });
+        $('dfRedactClear').addEventListener('click', async () => { window.__dfRedactBoxes = []; await renderPage(true); });
+      }, 0);
+    });
+  }
+
+  if($('btnEncrypt') && !$('btnEncrypt').dataset.dfWired){
+    $('btnEncrypt').dataset.dfWired = '1';
+    $('btnEncrypt').addEventListener('click', () => {
+      if(!workingBytes){ say('Open a PDF first.', true); return; }
+      openModal('Set password (beta)', `
+        <p class="hint">Creates a separate, password-protected copy of this PDF for download/share. The document open in DocuForge itself is not changed.</p>
+        <div class="field"><label>Password</label><input type="password" id="dfEncPw" autocomplete="new-password"></div>
+        <div class="field"><label>Confirm password</label><input type="password" id="dfEncPw2" autocomplete="new-password"></div>
+        <div class="field row">
+          <div><label>Allow printing</label><select id="dfEncPrint"><option value="1">Yes</option><option value="0">No</option></select></div>
+          <div><label>Allow copying text</label><select id="dfEncCopy"><option value="1">Yes</option><option value="0">No</option></select></div>
+        </div>
+      `, async () => {
+        const pw = $('dfEncPw').value, pw2 = $('dfEncPw2').value;
+        if(!pw){ say('Enter a password.', true); return; }
+        if(pw !== pw2){ say('Passwords do not match.', true); return; }
+        setStatus('Encrypting PDF…'); showProgress(20);
+        try{
+          const bytes = await encryptPdfBytes(workingBytes, {
+            userPassword: pw, ownerPassword: pw,
+            allowPrinting: $('dfEncPrint').value==='1',
+            allowCopying: $('dfEncCopy').value==='1',
+            allowModifying:false, allowAnnotating:false, allowFillingForms:true
+          });
+          const blob = new Blob([bytes], { type:'application/pdf' });
+          const name = outBase() + '_protected.pdf';
+          await resultShare(blob, name, 'Password-protected PDF');
+          setStatus('Password-protected copy created.');
+        }catch(e){ console.error(e); say(e?.message || 'Could not encrypt this PDF.', true); }
+        finally{ showProgress(null); }
+      });
+    });
+  }
+  // btnOpenEncrypted needs no new handler: it's now registered in PDF_REQUIRED_IDS,
+  // so the existing file-request gate + loadFiles()/askPasswordAndOpenPdf() flow
+  // (already used automatically whenever a password-protected PDF is opened
+  // elsewhere in the app) now runs for this button too.
+
+  /* ============ Batch Studio ============ */
+  if($('btnBatch') && !$('btnBatch').dataset.dfWired){
+    $('btnBatch').dataset.dfWired = '1';
+    $('btnBatch').addEventListener('click', () => {
+      openModal('Batch process files', `
+        <p class="hint">Choose one or more PDF files and an operation to run. Results are zipped together (or merged into one PDF).</p>
+        <div class="field"><label>Files</label><input type="file" id="dfBatchFiles" accept=".pdf,application/pdf" multiple></div>
+        <div class="field"><label>Operation</label>
+          <select id="dfBatchOp">
+            <option value="compress">Compress each PDF</option>
+            <option value="word">Convert each to Word (.docx)</option>
+            <option value="text">Extract text from each (.txt)</option>
+            <option value="merge">Merge all into one PDF</option>
+          </select>
+        </div>
+      `, async () => {
+        const files = Array.from($('dfBatchFiles')?.files || []);
+        if(files.length < 1){ say('Choose at least one PDF file.', true); return; }
+        const op = $('dfBatchOp').value;
+        setStatus('Batch processing…'); showProgress(10);
+        try{
+          if(op === 'merge'){
+            const doc = await PDFDocument.create();
+            for(let i=0;i<files.length;i++){
+              showProgress(10+Math.round(80*(i+1)/files.length));
+              const buf = new Uint8Array(await files[i].arrayBuffer());
+              const src = await PDFDocument.load(buf);
+              const pages = await doc.copyPages(src, src.getPageIndices());
+              pages.forEach(p => doc.addPage(p));
+            }
+            const bytes = await doc.save();
+            const blob = new Blob([bytes], { type:'application/pdf' });
+            await resultShare(blob, 'merged_batch.pdf', 'Batch merge', bytes);
+          } else {
+            const zip = new JSZip();
+            for(let i=0;i<files.length;i++){
+              showProgress(10+Math.round(80*(i+1)/files.length));
+              const f = files[i];
+              const buf = new Uint8Array(await f.arrayBuffer());
+              const base = f.name.replace(/\.pdf$/i,'');
+              if(op === 'compress'){
+                const doc = await PDFDocument.load(buf);
+                zip.file(base + '_compressed.pdf', await doc.save({ useObjectStreams:true }));
+              } else if(op === 'word'){
+                const pdf = await dfGetPdfJs(buf).promise;
+                const pagesLines = [];
+                for(let p=1;p<=pdf.numPages;p++){
+                  const page = await pdf.getPage(p);
+                  const content = await page.getTextContent();
+                  pagesLines.push([content.items.map(it=>it.str).join(' ')]);
+                }
+                zip.file(base + '.docx', await buildDocxFromPages(pagesLines));
+              } else if(op === 'text'){
+                const pdf = await dfGetPdfJs(buf).promise;
+                let text = '';
+                for(let p=1;p<=pdf.numPages;p++){
+                  const page = await pdf.getPage(p);
+                  const content = await page.getTextContent();
+                  text += `--- Page ${p} ---\n` + content.items.map(it=>it.str).join(' ') + '\n\n';
+                }
+                zip.file(base + '.txt', text);
+              }
+            }
+            const blob = await zip.generateAsync({ type:'blob' });
+            await resultShare(blob, 'batch_results.zip', 'Batch results (.zip)');
+          }
+          setStatus('Batch processing complete.');
+        }catch(e){ console.error(e); say(e?.message || 'Batch processing failed.', true); }
+        finally{ showProgress(null); }
+      });
+    });
+  }
+
 })();
 </script>
