@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.112.0: menu/submenu repair pass (~30 previously-dead tool
+<!-- DocuForge AI 27.112.2: menu/submenu repair pass (~30 previously-dead tool
      buttons wired up, every conversion result standardized on View / Download /
      Share), a fix for page-selection checkboxes not responding to taps on
      iPhone (SortableJS preventOnFilter was swallowing the tap), a fix for
@@ -25,8 +25,18 @@
      "Convert Files → PDF" now also accepts images (JPG/PNG/GIF/WEBP/BMP),
      JSON, XML, RTF, ODT, EPUB, and PDF (passed through unchanged) — in
      addition to the Word/Excel/PowerPoint/HTML/CSV/TXT/Markdown it already
-     supported. -->
-<meta name="application-version" content="2026.09.02.112.0">
+     supported. Fixed a stray-touch bug where picking a file for "Convert
+     Files → PDF" could jump straight back to the Main Menu right as the
+     file started converting (a ghost click landing on "Back to Main Menu"
+     after the native file picker closed). Found and fixed a real conflict
+     where "Combine images into PDF", "Extract table from image" and "Read
+     QR code" were being intercepted by a generic file-request gate that
+     showed its own upload card, immediately followed by each tool's own
+     working file picker firing on top of it — a confusing double-picker
+     sequence that looked like the button did nothing; they now use their
+     own picker directly. The "jump to Main Menu" guard was also broadened
+     to cover the Dashboard tab, not just the Back-to-Main-Menu button. -->
+<meta name="application-version" content="2026.09.02.112.2">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -797,7 +807,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.112.0';</script>
+<script>const DOCUFORGE_BUILD = '27.112.2';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -808,7 +818,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.112.0</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.112.2</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1188,7 +1198,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.112.0 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.112.2 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -6811,7 +6821,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.112.0 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.112.2 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -7644,8 +7654,16 @@ $('dashboardAskTile')?.addEventListener('click', () => {
     const btn=e.target.closest('.tool-btn');
     if(!btn || !btn.id || workingBytes) return;
     const SHARED_FILE_TOOL_IDS = new Set([
-      'btnOcrImage','btnOcrPdf','btnImageTable','btnImagesToPdf','btnQrReader'
+      'btnOcrImage','btnOcrPdf'
     ]);
+    // btnImageTable, btnImagesToPdf and btnQrReader each already open their
+    // own file picker directly (see the df1116 image-tools script) and are
+    // deliberately NOT listed here. Including them caused this generic gate
+    // to intercept the first tap and show its own upload card instead, and
+    // the tool's own picker would then also fire — a confusing double-picker
+    // sequence that looked like the button simply didn't work. btnOcrImage
+    // has no picker of its own (it just errors if no file is set yet), so
+    // it still needs this gate to supply the file.
     const needsFile = PDF_REQUIRED_IDS.includes(btn.id) || SHARED_FILE_TOOL_IDS.has(btn.id) ||
       btn.dataset.requiresFile === 'true' ||
       btn.closest('.ribbon-panel[data-requires-file="true"]');
@@ -8736,7 +8754,7 @@ function df1115MetadataResult(){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.112.0
+ DocuForge AI 27.112.2
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -9627,7 +9645,7 @@ function df1115MetadataResult(){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.112.0 — "View" after conversion fix.
+  DocuForge AI 27.112.2 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -9739,7 +9757,7 @@ function df1115MetadataResult(){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.112.0 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.112.2 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -9821,7 +9839,7 @@ function df1115MetadataResult(){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.112.0 — "View" opens behind an open modal fix.
+  DocuForge AI 27.112.2 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -9859,5 +9877,52 @@ function df1115MetadataResult(){
       if(patch() || tries > 40) clearInterval(iv);
     }, 50);
   }
+})();
+</script>
+
+
+<script id="df-ghostclick-fix-v271121">
+/*
+  DocuForge AI 27.112.2 — "Jumps to Main Menu after picking a file" fix.
+
+  On iOS Safari, dismissing the native file-picker sheet can produce a
+  stray "ghost" click on whatever element is now sitting under the last
+  touch point once the page reflows back into view. Convert/PowerPoint
+  Studio's "Choose File" step scrolls "Back to Main Menu" right to the top
+  of the screen just before/while the native picker is open, so that ghost
+  click was landing on it — sending the user back to the Dashboard right
+  as their file started converting, for no reason they did on purpose.
+
+  Fix: any file <input> change is timestamped, and "Back to Main Menu" /
+  the Home icon both ignore a click that lands within a very short window
+  right after a file was picked — long enough to absorb a ghost click,
+  short enough that a deliberate tap still always works normally.
+*/
+(function(){
+  const COOLDOWN_MS = 700;
+  window.__dfLastFilePickTime = 0;
+
+  document.addEventListener('change', function(e){
+    const el = e.target;
+    if(el && el.tagName === 'INPUT' && el.type === 'file'){
+      window.__dfLastFilePickTime = Date.now();
+    }
+  }, true);
+
+  function guardAgainstGhostClick(e){
+    if(Date.now() - window.__dfLastFilePickTime < COOLDOWN_MS){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      window.__dfLastFilePickTime = 0; // one absorbed click is enough
+    }
+  }
+
+  // A capture-phase listener on document (an ancestor of both buttons) is
+  // required so this runs BEFORE each button's own click handler. Adding
+  // the guard directly on the buttons would fire in registration order at
+  // the target — i.e. after their existing handler already navigated away.
+  document.addEventListener('click', function(e){
+    if(e.target.closest('#backToMainMenu, #menuToggle, .studio-tab[data-studio="dashboard"], #dashboardTiles .main-menu-tile')) guardAgainstGhostClick(e);
+  }, true);
 })();
 </script>
