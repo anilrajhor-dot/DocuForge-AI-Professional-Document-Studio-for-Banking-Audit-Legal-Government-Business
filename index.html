@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.112.3: menu/submenu repair pass (~30 previously-dead tool
+<!-- DocuForge AI 27.112.4: menu/submenu repair pass (~30 previously-dead tool
      buttons wired up, every conversion result standardized on View / Download /
      Share), a fix for page-selection checkboxes not responding to taps on
      iPhone (SortableJS preventOnFilter was swallowing the tap), a fix for
@@ -40,8 +40,15 @@
      Studio. Read QR code / Extract table from image / Combine images into
      PDF now reuse an already-selected image instead of prompting again.
      A persistent bold Studio title now shows at the top of every Studio
-     (e.g. "Conversion Studio") so it's always clear where you are. -->
-<meta name="application-version" content="2026.09.02.112.3">
+     (e.g. "Conversion Studio") so it's always clear where you are.
+     Found and fixed a real bug where Excel Studio, GST Invoice, Settings,
+     Help, About and Reader could never actually become visible — each had
+     an inline "display:none !important" that the code only ever tried to
+     override with a CSS class, which can't beat an inline !important; they
+     now show correctly. Added a "← Back" button to the View tab that
+     returns to whichever Studio you were actually in, instead of only
+     offering Back to Main Menu (Dashboard). -->
+<meta name="application-version" content="2026.09.02.112.4">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -812,7 +819,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.112.3';</script>
+<script>const DOCUFORGE_BUILD = '27.112.4';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -823,7 +830,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.112.3</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.112.4</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1140,6 +1147,7 @@ window.DFStorage = (function(){
       <div class="df-view-head">
         <div><h2 style="margin:0 0 4px;">👁️ View</h2><p class="hint" style="margin:0;">Full-page document preview. Review the file before Download or Share.</p></div>
         <div class="df-view-actions">
+          <button class="btn ghost" id="dfViewBack" type="button">← Back</button>
           <button class="btn ghost" id="dfViewOpen" type="button">📂 Open PDF</button>
           <button class="btn ghost" id="dfViewCurrent" type="button">👁️ View current PDF</button>
           <button class="btn ghost" id="dfViewFit" type="button">Fit page</button>
@@ -1204,7 +1212,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.112.3 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.112.4 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -6499,6 +6507,9 @@ function setStudio(name){
   }
   const isDashboard = name === 'dashboard';
   const previousStudio = window.__docuForgeCurrentStudio;
+  if(previousStudio && previousStudio !== 'view' && previousStudio !== name){
+    window.__docuForgePreviousStudio = previousStudio;
+  }
   document.body.dataset.studio = name;
   window.__docuForgeCurrentStudio = name;
   // Keep the selected/uploaded source file while moving between Studios.
@@ -6540,11 +6551,19 @@ function setStudio(name){
     panel.classList.toggle('active', panel.dataset.studioPanel === name)
   );
 
+  if($('settingsStudio')) $('settingsStudio').style.display = (name === 'settings') ? 'block' : 'none';
+  if($('aboutStudio')) $('aboutStudio').style.display = (name === 'about') ? 'block' : 'none';
+  if($('helpStudio')) $('helpStudio').style.display = (name === 'help') ? 'block' : 'none';
+  if($('readerStudio')) $('readerStudio').style.display = (name === 'reader') ? 'flex' : 'none';
+  if($('exportStudio')) $('exportStudio').style.display = name === 'export' ? 'block' : 'none';
+  if($('excelStudio')) $('excelStudio').style.display = (name === 'excel') ? 'block' : 'none';
+  if($('gstInvoiceStudio')) $('gstInvoiceStudio').style.display = (name === 'gstinvoice') ? 'block' : 'none';
+  // classList is still toggled too, since some of this CSS/other code may
+  // key off the 'active' class rather than the inline style.
   if($('settingsStudio')) $('settingsStudio').classList.toggle('active', name === 'settings');
   if($('aboutStudio')) $('aboutStudio').classList.toggle('active', name === 'about');
   if($('helpStudio')) $('helpStudio').classList.toggle('active', name === 'help');
   if($('readerStudio')) $('readerStudio').classList.toggle('active', name === 'reader');
-  if($('exportStudio')) $('exportStudio').style.display = name === 'export' ? 'block' : 'none';
   if($('excelStudio')) $('excelStudio').classList.toggle('active', name === 'excel');
   if($('gstInvoiceStudio')) $('gstInvoiceStudio').classList.toggle('active', name === 'gstinvoice');
 
@@ -6844,7 +6863,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.112.3 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.112.4 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -8798,7 +8817,7 @@ function df1115MetadataResult(){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.112.3
+ DocuForge AI 27.112.4
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -9689,7 +9708,7 @@ function df1115MetadataResult(){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.112.3 — "View" after conversion fix.
+  DocuForge AI 27.112.4 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -9801,7 +9820,7 @@ function df1115MetadataResult(){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.112.3 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.112.4 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -9883,7 +9902,7 @@ function df1115MetadataResult(){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.112.3 — "View" opens behind an open modal fix.
+  DocuForge AI 27.112.4 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -9927,7 +9946,7 @@ function df1115MetadataResult(){
 
 <script id="df-ghostclick-fix-v271121">
 /*
-  DocuForge AI 27.112.3 — "Jumps to Main Menu after picking a file" fix.
+  DocuForge AI 27.112.4 — "Jumps to Main Menu after picking a file" fix.
 
   On iOS Safari, dismissing the native file-picker sheet can produce a
   stray "ghost" click on whatever element is now sitting under the last
@@ -9968,5 +9987,27 @@ function df1115MetadataResult(){
   document.addEventListener('click', function(e){
     if(e.target.closest('#backToMainMenu, #menuToggle, .studio-tab[data-studio="dashboard"], #dashboardTiles .main-menu-tile')) guardAgainstGhostClick(e);
   }, true);
+})();
+</script>
+
+
+<script id="df-backnav-fix-v271124">
+/*
+  DocuForge AI 27.112.4 — "Back" should return to where you were, not the
+  Main Menu.
+
+  The only way to leave the View tab (reached from any Studio via the
+  status-bar View button or a result popup's View File) was "Back to Main
+  Menu", which always goes all the way to the Dashboard — even if you just
+  wanted to get back to, say, Conversion Studio to keep working. This adds
+  a "← Back" button to the View tab that returns to whichever Studio you
+  were actually in before switching to View.
+*/
+(function(){
+  const $ = id => document.getElementById(id);
+  $('dfViewBack')?.addEventListener('click', () => {
+    const target = window.__docuForgePreviousStudio || 'dashboard';
+    if(typeof window.setStudio === 'function') window.setStudio(target);
+  });
 })();
 </script>
