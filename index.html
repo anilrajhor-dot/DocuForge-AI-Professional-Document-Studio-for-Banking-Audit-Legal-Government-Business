@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.111.1: menu/submenu repair pass (~30 previously-dead tool
+<!-- DocuForge AI 27.111.2: menu/submenu repair pass (~30 previously-dead tool
      buttons wired up, every conversion result standardized on View / Download /
-     Share) plus a fix for page-selection checkboxes not responding to taps on
-     iPhone (SortableJS preventOnFilter was swallowing the tap). -->
-<meta name="application-version" content="2026.09.01.111.1">
+     Share), a fix for page-selection checkboxes not responding to taps on
+     iPhone (SortableJS preventOnFilter was swallowing the tap), and a fix for
+     the post-conversion "View" button, which previously tried to render every
+     converted file as a PDF and silently failed for non-PDF outputs. -->
+<meta name="application-version" content="2026.09.01.111.2">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -767,7 +769,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.111.1';</script>
+<script>const DOCUFORGE_BUILD = '27.111.2';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -778,7 +780,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.111.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.111.2</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1158,7 +1160,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.111.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.111.2 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -3297,6 +3299,7 @@ async function buildSlideDeckPdf(slides, pageWidth, pageHeight){
 
 function shareGeneratedFile(blob, filename, label='File'){
   const item = { blob, filename, label };
+  window.__dfLastPptxShare = item;
   const safe = String(filename).replace(/</g,'&lt;').replace(/>/g,'&gt;');
   openModal('PowerPoint ready', `
     <div style="padding:4px 0 10px;"><strong>${label} ready.</strong></div>
@@ -6703,7 +6706,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.111.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.111.2 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -8624,7 +8627,7 @@ function df1115MetadataResult(){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.111.1
+ DocuForge AI 27.111.2
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -9509,5 +9512,90 @@ function df1115MetadataResult(){
     });
   }
 
+})();
+</script>
+
+
+<script id="df-view-fix-v271112">
+/*
+  DocuForge AI 27.111.2 — "View" after conversion fix.
+
+  Root cause: the View button in every conversion-result popup
+  (conversionOutput/showConversionShare's "View File", and
+  shareGeneratedFile's "View File" used by PowerPoint outputs) called
+  window.__dfViewFile() unconditionally, which always tries to render the
+  file as a PDF through pdf.js. That only works when the converted file
+  actually IS a PDF. For every other output — CSV, TXT, HTML, JSON, XML,
+  RTF, DOCX, XLSX, PPTX, ODT/ODS/ODP, EPUB, ZIP — pdf.js fails to parse it
+  and View silently shows an error instead of a preview. This intercepts
+  those View buttons, checks the real file type first, and: opens the
+  existing full-page PDF viewer for genuine PDFs, shows a readable text
+  preview for text-based formats, and gives a clear explanation (instead
+  of a dead error) for binary formats that have no in-app preview.
+*/
+(function(){
+  const $ = id => document.getElementById(id);
+  const say = (m, err) => (typeof toast === 'function') ? toast(m, !!err) : alert(m);
+
+  const TEXT_MIMES = ['text/plain','text/csv','text/html','application/json','application/xml','text/xml','application/rtf','text/markdown'];
+  const TEXT_EXT = /\.(txt|csv|json|xml|md|markdown|rtf|html|htm)$/i;
+
+  async function smartView(blob, filename){
+    if(!blob){ say('No file to preview.', true); return; }
+    try{
+      const isPdf = (blob.type === 'application/pdf') || /\.pdf$/i.test(filename || '');
+      if(isPdf){
+        if(typeof window.__dfViewFile === 'function') await window.__dfViewFile(blob, filename);
+        else say('The full-page PDF viewer is unavailable right now. Use Download instead.', true);
+        return;
+      }
+      if(TEXT_MIMES.includes(blob.type) || TEXT_EXT.test(filename || '')){
+        const text = await blob.text();
+        if(typeof showTextResult === 'function'){
+          showTextResult('Preview: ' + (filename || 'file'), text, filename || 'preview.txt', false);
+        } else {
+          say('Preview is unavailable right now. Use Download to inspect the file.', true);
+        }
+        return;
+      }
+      say('A full-page preview isn\u2019t available for this file type (' + (filename || 'this file') + '). Use Download, or Share to open it in a dedicated app.', false);
+    }catch(e){
+      console.error('smartView failed:', e);
+      say('Could not preview this file. Use Download instead.', true);
+    }
+  }
+
+  // Intercept the three known "View File" buttons before their own
+  // (PDF-only) click handlers run, and resolve the correct blob/filename
+  // for whichever result popup is currently open.
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('#convView, #pptViewFile');
+    if(!btn) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    let item = null;
+    if(btn.id === 'convView') item = (typeof lastConversionOutput !== 'undefined') ? lastConversionOutput : null;
+    else if(btn.id === 'pptViewFile') item = window.__dfLastPptxShare || null;
+    if(!item){ say('No file to preview.', true); return; }
+    smartView(item.blob, item.filename);
+  }, true);
+
+  // showConversionResult's own View button already guards for non-PDF
+  // output with a friendly message; upgrade that message case to a real
+  // text preview when the output is text-based, using the same smartView
+  // logic, while leaving its PDF-preview path untouched.
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('#df271027ResultView');
+    if(!btn) return;
+    const item = window.__dfLastConversion || null;
+    if(!item) return; // let the original handler run / report the error
+    const isPdf = item.previewPdfBytes || item.blob?.type === 'application/pdf' || /\.pdf$/i.test(item.name || '');
+    if(isPdf) return; // original handler already opens the PDF viewer correctly
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    smartView(item.blob, item.name);
+  }, true);
+
+  window.__dfSmartView = smartView;
 })();
 </script>
