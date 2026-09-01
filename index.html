@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.113.0: menu/submenu repair pass (~30 previously-dead tool
+<!-- DocuForge AI 27.113.1: menu/submenu repair pass (~30 previously-dead tool
      buttons wired up, every conversion result standardized on View / Download /
      Share), a fix for page-selection checkboxes not responding to taps on
      iPhone (SortableJS preventOnFilter was swallowing the tap), a fix for
@@ -59,8 +59,13 @@
      view (tables for spreadsheets, slide-by-slide for presentations), not
      just PDF/EPUB. Conversion result popups now open Word/PowerPoint/
      ODT/ODS/ODP results directly in Reader instead of saying "not
-     available". -->
-<meta name="application-version" content="2026.09.02.113.0">
+     available". Found and fixed a real bug: the Excel Studio iframe had
+     no width/height styling at all (unlike GST Invoice/Financial
+     Calculator), so it rendered at the browser's tiny ~300x150px default
+     size — squishing the whole InstantDash app, including its "Choose a
+     file" button, into an unusable sliver. It now sizes the same as the
+     other two. -->
+<meta name="application-version" content="2026.09.02.113.1">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -642,6 +647,8 @@ body.dark .studio-tab.active{color:var(--pine);}
   .gst-invoice-studio-page{padding:8px 8px 20px;}
   .gst-wrapper-head{align-items:flex-start;flex-direction:column;}
   #gstInvoiceFrame{height:calc(100vh - 125px)!important;min-height:1200px!important;}
+  #excelDashboardFrame{height:calc(100vh - 125px)!important;min-height:1200px!important;}
+  #finCalcFrame{height:calc(100vh - 125px)!important;min-height:1200px!important;}
 }
 
 
@@ -846,7 +853,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.113.0';</script>
+<script>const DOCUFORGE_BUILD = '27.113.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -857,7 +864,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.113.0</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.113.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1107,7 +1114,11 @@ window.DFStorage = (function(){
     </div>
 
     <div id="excelStudio" aria-label="Excel Dashboard Studio" style="display:none !important">
-      <iframe id="excelDashboardFrame" title="Excel to Dashboard" loading="lazy"></iframe>
+      <iframe id="excelDashboardFrame"
+              title="Excel to Dashboard"
+              loading="lazy"
+              style="width:100%;height:calc(100vh - 150px);min-height:900px;border:1px solid var(--line);border-radius:10px;background:#fff;display:block;"
+              allow="clipboard-read; clipboard-write"></iframe>
     </div>
 
     <div id="exportStudio" style="display:none;max-width:640px;margin:0 auto;padding:28px 24px;;display:none !important;">
@@ -1241,7 +1252,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.113.0 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.113.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -7021,7 +7032,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.113.0 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.113.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -8975,7 +8986,7 @@ function df1115MetadataResult(){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.113.0
+ DocuForge AI 27.113.1
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -9866,7 +9877,7 @@ function df1115MetadataResult(){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.113.0 — "View" after conversion fix.
+  DocuForge AI 27.113.1 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -9985,7 +9996,7 @@ function df1115MetadataResult(){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.113.0 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.113.1 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -10067,7 +10078,7 @@ function df1115MetadataResult(){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.113.0 — "View" opens behind an open modal fix.
+  DocuForge AI 27.113.1 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -10111,7 +10122,7 @@ function df1115MetadataResult(){
 
 <script id="df-ghostclick-fix-v271121">
 /*
-  DocuForge AI 27.113.0 — "Jumps to Main Menu after picking a file" fix.
+  DocuForge AI 27.113.1 — "Jumps to Main Menu after picking a file" fix.
 
   On iOS Safari, dismissing the native file-picker sheet can produce a
   stray "ghost" click on whatever element is now sitting under the last
@@ -10158,7 +10169,7 @@ function df1115MetadataResult(){
 
 <script id="df-backnav-fix-v271124">
 /*
-  DocuForge AI 27.113.0 — "Back" should return to where you were, not the
+  DocuForge AI 27.113.1 — "Back" should return to where you were, not the
   Main Menu.
 
   The only way to leave the View tab (reached from any Studio via the
