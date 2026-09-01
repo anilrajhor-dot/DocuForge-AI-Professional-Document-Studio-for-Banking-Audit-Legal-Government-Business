@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.111.5: menu/submenu repair pass (~30 previously-dead tool
+<!-- DocuForge AI 27.111.7: menu/submenu repair pass (~30 previously-dead tool
      buttons wired up, every conversion result standardized on View / Download /
      Share), a fix for page-selection checkboxes not responding to taps on
      iPhone (SortableJS preventOnFilter was swallowing the tap), a fix for
@@ -12,8 +12,13 @@
      a fix for View File opening the full-page view behind a still-open
      result modal (e.g. after Extract/Split) which made the screen look
      blank, and removal of an auto-navigate-to-View behavior that itself
-     could leave the screen blank (View now only opens on a direct tap). -->
-<meta name="application-version" content="2026.09.01.111.5">
+     could leave the screen blank (View now only opens on a direct tap).
+     Watermark and Page numbers now also show the same proven "View updated
+     PDF" confirmation (single-page zoom preview) that Bates numbering and
+     Header/footer already used, instead of only a status message. Compress
+     now shows the same "View updated PDF" confirmation too, and Metadata's
+     confirmation now includes a View PDF button as well. -->
+<meta name="application-version" content="2026.09.01.111.7">
 <meta name="application-title" content="DocuForge AI">
 <meta name="developer" content="Anil Sharma, Former General Manager, Central Bank of India">
 <meta charset="UTF-8">
@@ -784,7 +789,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.111.5';</script>
+<script>const DOCUFORGE_BUILD = '27.111.7';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -795,7 +800,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.111.5</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.111.7</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1175,7 +1180,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.111.5 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.111.7 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -2126,6 +2131,9 @@ async function addWatermark({text, opacity, size, color, xRatio, yRatio, angle})
       });
     });
   }, 'Watermark added to all pages. Preview the updated PDF before sharing.');
+  if(typeof df1115OperationResult === 'function'){
+    df1115OperationResult('Watermark applied', 'The watermark was added to all pages. Use View updated PDF to confirm it looks right.', 0);
+  }
 }
 
 /* ---------- Page numbers ---------- */
@@ -2145,6 +2153,9 @@ async function addPageNumbers({position, startNum}){
       page.drawText(label, { x, y: 22, size, font, color: rgb(0.3,0.3,0.3) });
     });
   }, 'Page numbers added.');
+  if(typeof df1115OperationResult === 'function'){
+    df1115OperationResult('Page numbers applied', 'Page numbers were added to all pages. Use View updated PDF to confirm they look right.', 0);
+  }
 }
 
 /* ---------- Compress ----------
@@ -6722,7 +6733,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.111.5 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.111.7 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -8066,7 +8077,11 @@ body:not(.dashboard-active) #df85QuickActions{display:none !important}.df85-quic
             }catch(_){}
           }
           const out=await d.save({useObjectStreams:true}),after=out.byteLength,pct=before?Math.round(Math.max(0,before-after)/before*100):0;
-          await commit(out,changed?`Compressed PDF: ${fmtBytes(before)} → ${fmtBytes(after)} (${pct}% smaller).`:`Compression completed. ${images} JPEG image${images===1?'':'s'} checked; no further JPEG reduction was possible.`);
+          const compressMsg=changed?`Compressed PDF: ${fmtBytes(before)} → ${fmtBytes(after)} (${pct}% smaller).`:`Compression completed. ${images} JPEG image${images===1?'':'s'} checked; no further JPEG reduction was possible.`;
+          await commit(out,compressMsg);
+          if(typeof df1115OperationResult==='function'){
+            df1115OperationResult('Compression applied', compressMsg + ' Use View updated PDF to check image quality is still acceptable.', 0);
+          }
         }catch(e){console.error(e);say(e?.message||'Could not compress this PDF.',true)}
       });
   }
@@ -8192,7 +8207,7 @@ function df1115OperationResult(title,message,previewPage=0){
  setTimeout(()=>{const b=$('df1115ViewUpdated');if(b)b.onclick=()=>{$('genericModal').classList.remove('show');if(window.df1114OpenPreview)window.df1114OpenPreview(previewPage);else toast('Open a page thumbnail to preview the updated PDF.',false)}},0);
 }
 function df1115MetadataResult(){
- if(!workingBytes)return;(async()=>{try{const d=await PDFDocument.load(workingBytes);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));openModal('Metadata updated — verify',`<div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px"><div style="font-weight:800;margin-bottom:8px">✓ Metadata has been written into the PDF.</div><div><strong>Title:</strong> ${esc(d.getTitle()||'—')}</div><div><strong>Author:</strong> ${esc(d.getAuthor()||'—')}</div><div><strong>Subject:</strong> ${esc(d.getSubject()||'—')}</div><div><strong>Keywords:</strong> ${esc(d.getKeywords()||'—')}</div><div><strong>Producer:</strong> ${esc(d.getProducer()||'—')}</div></div><p class="hint" style="margin-top:12px">Metadata is stored in PDF properties; it normally <strong>does not appear as text on the PDF page</strong>. Use Metadata Inspector to verify it.</p>`,async()=>{});$('modalConfirm').style.display='none';$('modalCancel').textContent='Close';}catch(e){console.error(e)}})();
+ if(!workingBytes)return;(async()=>{try{const d=await PDFDocument.load(workingBytes);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));openModal('Metadata updated — verify',`<div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px"><div style="font-weight:800;margin-bottom:8px">✓ Metadata has been written into the PDF.</div><div><strong>Title:</strong> ${esc(d.getTitle()||'—')}</div><div><strong>Author:</strong> ${esc(d.getAuthor()||'—')}</div><div><strong>Subject:</strong> ${esc(d.getSubject()||'—')}</div><div><strong>Keywords:</strong> ${esc(d.getKeywords()||'—')}</div><div><strong>Producer:</strong> ${esc(d.getProducer()||'—')}</div></div><p class="hint" style="margin-top:12px">Metadata is stored in PDF properties; it normally <strong>does not appear as text on the PDF page</strong> — the page content itself is unchanged. Use View PDF below if you'd like to double-check that.</p><button type="button" class="btn primary" id="df1115ViewMetaPdf">👁 View PDF</button>`,async()=>{});$('modalConfirm').style.display='none';$('modalCancel').textContent='Close';setTimeout(()=>{const b=$('df1115ViewMetaPdf');if(b)b.onclick=()=>{$('genericModal').classList.remove('show');if(window.df1114OpenPreview)window.df1114OpenPreview(0);else toast('Open a page thumbnail to preview the PDF.',false)}},0);}catch(e){console.error(e)}})();
 }
 </script>
 <script id="df1114-preview-js">
@@ -8643,7 +8658,7 @@ function df1115MetadataResult(){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.111.5
+ DocuForge AI 27.111.7
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -9534,7 +9549,7 @@ function df1115MetadataResult(){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.111.5 — "View" after conversion fix.
+  DocuForge AI 27.111.7 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -9619,7 +9634,7 @@ function df1115MetadataResult(){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.111.5 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.111.7 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -9701,7 +9716,7 @@ function df1115MetadataResult(){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.111.5 — "View" opens behind an open modal fix.
+  DocuForge AI 27.111.7 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
