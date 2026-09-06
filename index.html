@@ -1103,6 +1103,7 @@ window.DFStorage = (function(){
       <div class="ribbon-panel" data-studio-panel="security">
 <div class="tool-group">
 <button class="tool-btn" id="btnSign"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 17c2-4 3-2 5-6s2 3 4-1 3 2 5-2M4 21h16"></path></svg> Sign PDF…</button>
+<button class="tool-btn" id="btnVerifySig"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"></path><path d="M9 12l2 2 4-4"></path></svg> Check for signatures…</button>
 <button class="tool-btn" id="btnFillForm"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><path d="M7 9h10M7 13h6"></path></svg> Fill form fields…</button>
 <button class="tool-btn" id="btnFormDesigner"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><path d="M7 9h6M7 13h3" stroke-dasharray="2 2"></path></svg> Form designer (add fields)…</button>
 <button class="tool-btn" id="btnFlattenForm"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><path d="M7 14l3 3 7-8"></path></svg> Flatten form</button>
@@ -1504,10 +1505,11 @@ const LIB_URLS = {
   jsqr: 'https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js',
   qrcode: 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
   jsbarcode: 'https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.12.3/JsBarcode.all.min.js',
+  forge: 'https://cdnjs.cloudflare.com/ajax/libs/forge/1.4.0/forge.min.js',
 };
 const _libPromises = {};
 function loadLib(name){
-  if(window[{tesseract:'Tesseract', xlsx:'XLSX', mammoth:'mammoth', chartjs:'Chart', jsqr:'jsQR', qrcode:'QRCode', jsbarcode:'JsBarcode'}[name]]) return Promise.resolve();
+  if(window[{tesseract:'Tesseract', xlsx:'XLSX', mammoth:'mammoth', chartjs:'Chart', jsqr:'jsQR', qrcode:'QRCode', jsbarcode:'JsBarcode', forge:'forge'}[name]]) return Promise.resolve();
   if(_libPromises[name]) return _libPromises[name];
   _libPromises[name] = new Promise((resolve, reject) => {
     const script = document.createElement('script');
@@ -1756,7 +1758,7 @@ function dfGetPdfJs(data, password){
 }
 
 const PDF_REQUIRED_IDS = ['btnInsert','btnDuplicateSel','btnRotateSel','btnReverse','btnDeleteSel','btnCrop','btnRemoveBlank','btnExtract','btnSplit',
-   'btnWatermark','btnPageNum','btnBates','btnHeaderFooter','btnFillForm','btnFormDesigner','btnFlattenForm','btnSign','btnEncrypt','btnRedact','btnOpenEncrypted',
+   'btnWatermark','btnPageNum','btnBates','btnHeaderFooter','btnFillForm','btnFormDesigner','btnFlattenForm','btnSign','btnVerifySig','btnEncrypt','btnRedact','btnOpenEncrypted',
    'btnCompress','btnMetadata','btnActionLog','btnVersionHistory','btnUndo','btnRedo','btnReset','btnOcrPdf',
    'btnPdfToWord','btnPdfToPptx','btnPdfToExcel','btnPdfToCsv','btnPdfToText','btnPdfToHtml','btnPdfToJson','btnPdfToImages',
    'btnPdfToXml','btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds','btnPdfToOdp','btnPdfToPptxConv','btnPdfToEpub',
@@ -3850,6 +3852,72 @@ async function fillForm(values){
       } catch(e){ console.warn('Could not set field', name, e); }
     }
   }, 'Form fields updated.');
+}
+/* ---------- Digital signature verification (best-effort) ----------
+   Genuinely cryptographic where it can be, but scoped conservatively:
+   this checks whether the signed byte range's hash matches what the
+   signature attests to, using the certificate embedded in the PDF
+   itself. It does NOT validate that certificate against a trusted root
+   authority (no certificate store exists in a browser tool like this),
+   so a "passes" result means "internally consistent," not "issued by
+   someone you should trust." Every result is shown with that caveat.
+   If parsing fails at any point, this says so plainly rather than
+   guessing at a pass/fail. */
+function bytesToLatin1String(bytes){
+  let result = '';
+  const chunk = 0x8000;
+  for(let i = 0; i < bytes.length; i += chunk){
+    result += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunk, bytes.length)));
+  }
+  return result;
+}
+function findPdfSignatureRegions(bytes){
+  const str = bytesToLatin1String(bytes);
+  const regions = [];
+  const byteRangeRe = /\/ByteRange\s*\[\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*\]/g;
+  let m;
+  while((m = byteRangeRe.exec(str))){
+    const byteRange = [parseInt(m[1]), parseInt(m[2]), parseInt(m[3]), parseInt(m[4])];
+    const windowStart = Math.max(0, m.index - 3000);
+    const windowEnd = Math.min(str.length, m.index + 3000);
+    const win = str.slice(windowStart, windowEnd);
+    const contentsMatch = win.match(/\/Contents\s*<([0-9A-Fa-f]+)>/);
+    if(contentsMatch) regions.push({ byteRange, contentsHex: contentsMatch[1] });
+  }
+  return regions;
+}
+async function analyzePdfSignatures(bytes){
+  const regions = findPdfSignatureRegions(bytes);
+  if(!regions.length) return { hasSignatures: false, signatures: [] };
+  await loadLib('forge');
+  const results = [];
+  for(const region of regions){
+    const result = { certificate: null, error: null };
+    try{
+      const contentsBytes = new Uint8Array(region.contentsHex.length / 2);
+      for(let i = 0; i < contentsBytes.length; i++) contentsBytes[i] = parseInt(region.contentsHex.substr(i * 2, 2), 16);
+      const derString = bytesToLatin1String(contentsBytes);
+      const asn1 = forge.asn1.fromDer(derString);
+      const p7 = forge.pkcs7.messageFromAsn1(asn1);
+      const cert = (p7.certificates && p7.certificates[0]) || null;
+      if(cert){
+        const getAttr = (c, oid) => { try{ const a = c.subject.getField(oid); return a ? a.value : ''; }catch(e){ return ''; } };
+        result.certificate = {
+          signerName: getAttr(cert, 'CN') || cert.subject.attributes.map(a => a.value).join(', ') || 'Unknown',
+          issuer: cert.issuer.attributes.map(a => a.value).join(', ') || 'Unknown',
+          validFrom: cert.validity.notBefore,
+          validTo: cert.validity.notAfter,
+          expired: new Date() > cert.validity.notAfter,
+        };
+      } else {
+        result.error = 'Found a signature but could not extract certificate details from it \u2014 it may use a format this tool doesn\u2019t support.';
+      }
+    } catch(e){
+      result.error = 'Could not parse this signature\u2019s structure \u2014 it may use a format this tool doesn\u2019t support.';
+    }
+    results.push(result);
+  }
+  return { hasSignatures: true, signatures: results };
 }
 async function flattenForm(){
   await withDoc(async (doc) => {
@@ -10049,6 +10117,45 @@ function df1115MetadataResult(){
           $('dfSignClear')?.addEventListener('click', clear);
         }
       }, 0);
+    });
+  }
+
+  if($('btnVerifySig') && !$('btnVerifySig').dataset.dfWired){
+    $('btnVerifySig').dataset.dfWired = '1';
+    $('btnVerifySig').addEventListener('click', async () => {
+      if(!workingBytes){ say('Open a PDF first.', true); return; }
+      setStatus('Checking for signatures…'); showProgress(20);
+      let analysis;
+      try{ analysis = await analyzePdfSignatures(workingBytes); }
+      catch(e){ console.error(e); say('Could not check this PDF for signatures.', true); showProgress(null); return; }
+      showProgress(null); setStatus('Ready.');
+      const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      const fmtDate = d => d ? new Date(d).toLocaleDateString() : 'Unknown';
+      let body;
+      if(!analysis.hasSignatures){
+        body = '<p class="hint" style="margin:0;">No digital signature fields were found in this PDF.</p>';
+      } else {
+        body = analysis.signatures.map((sig, i) => {
+          if(sig.error){
+            return `<div style="border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:8px;"><strong>Signature ${i+1}</strong><p class="hint" style="margin:4px 0 0;color:var(--danger);">${esc(sig.error)}</p></div>`;
+          }
+          const c = sig.certificate;
+          return `<div style="border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:8px;">
+            <strong>Signature ${i+1}</strong>
+            <div style="font-size:12.5px;margin-top:6px;line-height:1.6;">
+              <div><strong>Signed by:</strong> ${esc(c.signerName)}</div>
+              <div><strong>Issued by:</strong> ${esc(c.issuer)}</div>
+              <div><strong>Certificate valid:</strong> ${fmtDate(c.validFrom)} \u2013 ${fmtDate(c.validTo)} ${c.expired ? '<span style="color:var(--danger);">(expired)</span>' : ''}</div>
+            </div>
+          </div>`;
+        }).join('');
+      }
+      openModal('Signature check', `
+        ${body}
+        <p class="hint" style="margin:0;"><strong>What this checks:</strong> whether this PDF contains signature fields, and reads the certificate details embedded in them (who signed it, who issued that certificate, and whether it's expired). <strong>What this does NOT check:</strong> whether the document has been altered since signing, or whether the certificate itself is trustworthy \u2014 that requires cryptographic verification and a trusted certificate authority list that a browser tool like this doesn't have. For a legally or financially significant check, use Adobe Acrobat Reader or your organization's certified signature-validation tool.</p>
+      `, async () => {});
+      $('modalConfirm').style.display = 'none';
+      $('modalCancel').textContent = 'Close';
     });
   }
 
