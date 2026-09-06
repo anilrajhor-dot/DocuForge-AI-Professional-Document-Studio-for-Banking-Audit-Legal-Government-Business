@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.114.1: fixed the page-selection strip (Select all/Clear/
+<!-- DocuForge AI 27.115.1: fixed the page-selection strip (Select all/Clear/
      Invert/Rotate/Duplicate/Extract/Delete) showing up in every Studio
      instead of only PDF Studio — three separate places in the code were
      checking "is this Dashboard?" instead of "is this specifically PDF
@@ -884,7 +884,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.114.1';</script>
+<script>const DOCUFORGE_BUILD = '27.115.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -895,7 +895,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.114.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.115.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1289,7 +1289,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.114.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.115.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -3049,11 +3049,11 @@ function showCompareResult(diff, nameA, nameB){
 
 /* ---------- Conversion output sharing ---------- */
 let lastConversionOutput = null;
-function conversionOutput(blob, filename, label){
+function conversionOutput(blob, filename, label, previewPdfBytes){
   // Keep the converted blob in memory. Do not auto-download it: on iPhone/iPad
   // that can open a document preview (for example Word/ODT) before the user
   // reaches the sharing controls.
-  lastConversionOutput = { blob, filename, label };
+  lastConversionOutput = { blob, filename, label, previewPdfBytes: previewPdfBytes || null };
   showConversionShare(label);
 }
 function showConversionShare(label){
@@ -3064,7 +3064,7 @@ function showConversionShare(label){
     <div style="padding:4px 0 10px;"><strong>${label || 'File'} ready.</strong></div>
     <div class="hint" style="margin-bottom:14px;">File: <strong>${safe}</strong></div>
     <div class="df-view-share-actions">
-      <button class="btn" id="convView" type="button">👁️ View File</button>
+      <button class="btn" id="convView" type="button">👁️ View full page</button>
       <button class="btn primary" id="convShare" type="button">📤 Share</button>
     </div>
     <p class="df-preview-note">Please view/check the converted file first. When satisfied, use Share to send it.</p>
@@ -3072,7 +3072,13 @@ function showConversionShare(label){
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
   setTimeout(() => {
-    $('convView')?.addEventListener('click', () => window.__dfViewFile(item.blob, item.filename));
+    $('convView')?.addEventListener('click', async () => {
+      if(item.previewPdfBytes){
+        await window.__dfViewFile(new Blob([item.previewPdfBytes], {type:'application/pdf'}), item.filename.replace(/\.[^.]+$/,'') + '_preview.pdf');
+      } else {
+        say('A full-page preview is not available for this output \u2014 use Share or Download to inspect it.', true);
+      }
+    });
     $('convShare')?.addEventListener('click', async () => {
       try{
         const file = new File([item.blob], item.filename, { type: item.blob.type || 'application/octet-stream' });
@@ -3625,15 +3631,15 @@ async function buildSlideDeckPdf(slides, pageWidth, pageHeight){
   return await doc.save();
 }
 
-function shareGeneratedFile(blob, filename, label='File'){
-  const item = { blob, filename, label };
+function shareGeneratedFile(blob, filename, label='File', previewPdfBytes){
+  const item = { blob, filename, label, previewPdfBytes: previewPdfBytes || null };
   window.__dfLastPptxShare = item;
   const safe = String(filename).replace(/</g,'&lt;').replace(/>/g,'&gt;');
   openModal('PowerPoint ready', `
     <div style="padding:4px 0 10px;"><strong>${label} ready.</strong></div>
     <div class="hint" style="margin-bottom:14px;">File: <strong>${safe}</strong></div>
     <div class="df-view-share-actions">
-      <button class="btn" id="pptViewFile" type="button">👁️ View File</button>
+      <button class="btn" id="pptViewFile" type="button">👁️ View full page</button>
       <button class="btn primary" id="pptShareFile" type="button">📤 Share</button>
     </div>
     <p class="df-preview-note">View the PowerPoint file first, then share it when you are satisfied.</p>
@@ -3641,7 +3647,13 @@ function shareGeneratedFile(blob, filename, label='File'){
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
   setTimeout(() => {
-    $('pptViewFile')?.addEventListener('click', () => window.__dfViewFile(item.blob, item.filename));
+    $('pptViewFile')?.addEventListener('click', async () => {
+      if(item.previewPdfBytes){
+        await window.__dfViewFile(new Blob([item.previewPdfBytes], {type:'application/pdf'}), item.filename.replace(/\.[^.]+$/,'') + '_preview.pdf');
+      } else {
+        say('A full-page preview is not available for this output \u2014 use Share or Download to inspect it.', true);
+      }
+    });
     $('pptShareFile')?.addEventListener('click', async () => {
       try{
         const file = new File([item.blob], item.filename, {
@@ -5835,7 +5847,7 @@ $('btnPdfToText').addEventListener('click', async () => {
     const text = pages.map(p => `--- Page ${p.pageIndex+1} ---\n` + groupIntoLines(p.items).map(lineToText).join('\n')).join('\n\n');
     const textName = ($('outName').value || 'document') + '.txt';
     showTextResult('Extracted text', text, textName);
-    conversionOutput(new Blob([text], { type:'text/plain' }), textName, 'PDF → Text');
+    conversionOutput(new Blob([text], { type:'text/plain' }), textName, 'PDF → Text', workingBytes);
   } finally { showProgress(null); }
 });
 
@@ -5845,7 +5857,7 @@ $('btnPdfToCsv').addEventListener('click', async () => {
     const { rows, hasText } = await collectPdfRows();
     if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
     const csv = rows.map(r => r.map(toCsvValue).join(',')).join('\n');
-    conversionOutput(new Blob([csv], { type:'text/csv' }), ($('outName').value || 'document') + '.csv', 'PDF → CSV');
+    conversionOutput(new Blob([csv], { type:'text/csv' }), ($('outName').value || 'document') + '.csv', 'PDF → CSV', workingBytes);
     setStatus('Exported CSV.');
   } finally { showProgress(null); }
 });
@@ -7488,7 +7500,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.114.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.115.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -9451,7 +9463,7 @@ if('serviceWorker' in navigator){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.114.1
+ DocuForge AI 27.115.1
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -9739,7 +9751,10 @@ if('serviceWorker' in navigator){
         const out = await builder();
         const blob = (out instanceof Blob) ? out : new Blob([out], { type: mime });
         const name = outBase() + '.' + ext;
-        await resultShare(blob, name, label);
+        // The source PDF accurately previews what was just converted, since
+        // none of these conversions change the underlying content, only its
+        // format — so "View full page" always has something real to show.
+        await resultShare(blob, name, label, workingBytes);
         setStatus(label + ' created.');
         if(typeof logConversion === 'function') logConversion(label, name);
       }catch(e){ console.error(e); say(e?.message || ('Could not build ' + label + '.'), true); }
@@ -9781,7 +9796,7 @@ if('serviceWorker' in navigator){
         const wbBytes = XLSX.write(wb, { bookType:'xlsx', type:'array' });
         const blob = new Blob([wbBytes], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const name = outBase() + '.xlsx';
-        await resultShare(blob, name, 'PDF → Excel');
+        await resultShare(blob, name, 'PDF → Excel', workingBytes);
         setStatus('Excel file created.');
         if(typeof logConversion === 'function') logConversion('PDF → Excel', name);
       }catch(e){ console.error(e); say(e?.message || 'Could not build the Excel file.', true); }
@@ -9836,7 +9851,7 @@ if('serviceWorker' in navigator){
         const pptxBytes = await buildPptxFromSlides(slides);
         const blob = new Blob([pptxBytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
         const name = file.name.replace(/\.pdf$/i,'') + '.pptx';
-        await resultShare(blob, name, 'PDF → PowerPoint', null);
+        await resultShare(blob, name, 'PDF → PowerPoint', bytes);
         setStatus('PowerPoint created from ' + slides.length + ' page(s).');
         if(typeof logConversion === 'function') logConversion('PDF → PowerPoint', name);
       }catch(e){ console.error(e); say(e?.message || 'Could not convert this PDF — it may be scanned with no text layer (run OCR first) or password-protected.', true); }
@@ -9879,9 +9894,9 @@ if('serviceWorker' in navigator){
     });
   }
 
-  function shareOrResult(blob, name, label){
-    if(typeof shareGeneratedFile === 'function') shareGeneratedFile(blob, name, label);
-    else resultShare(blob, name, label);
+  function shareOrResult(blob, name, label, previewPdfBytes){
+    if(typeof shareGeneratedFile === 'function') shareGeneratedFile(blob, name, label, previewPdfBytes);
+    else resultShare(blob, name, label, previewPdfBytes);
   }
 
   if($('btnPptxMerge') && !$('btnPptxMerge').dataset.dfWired){
@@ -9905,7 +9920,8 @@ if('serviceWorker' in navigator){
           const bytes = await buildPptxFromSlides(slides);
           const blob = new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
           const name = file.name.replace(/\.pptx?$/i,'') + '_merged.pptx';
-          shareOrResult(blob, name, 'Merged PowerPoint');
+          const previewPdf = await buildSlideDeckPdf(slides, 960, 540);
+          shareOrResult(blob, name, 'Merged PowerPoint', previewPdf);
           setStatus('Merged ' + slides.length + ' slide(s) from ' + (more.length+1) + ' file(s).');
         }catch(e){ console.error(e); say(e?.message || 'Could not merge these PowerPoint files.', true); }
         finally{ showProgress(null); }
@@ -9930,7 +9946,8 @@ if('serviceWorker' in navigator){
           zip.file(`${base}_slide${String(i+1).padStart(2,'0')}.pptx`, bytes);
         }
         const blob = await zip.generateAsync({ type:'blob' });
-        await resultShare(blob, base + '_split.zip', 'Split PowerPoint (.zip)');
+        const previewPdf = await buildSlideDeckPdf(slides, 960, 540);
+        await resultShare(blob, base + '_split.zip', 'Split PowerPoint (.zip)', previewPdf);
         setStatus('Split into ' + slides.length + ' file(s).');
       }catch(e){ console.error(e); say(e?.message || 'Could not split this PowerPoint file.', true); }
       finally{ showProgress(null); }
@@ -9963,7 +9980,8 @@ if('serviceWorker' in navigator){
           const bytes = await buildPptxFromSlides(newSlides);
           const blob = new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
           const name = file.name.replace(/\.pptx?$/i,'') + '_reordered.pptx';
-          shareOrResult(blob, name, 'Reordered PowerPoint');
+          const previewPdf = await buildSlideDeckPdf(newSlides, 960, 540);
+          shareOrResult(blob, name, 'Reordered PowerPoint', previewPdf);
           setStatus('Slides reordered.');
         }catch(e){ console.error(e); say(e?.message || 'Could not rebuild this PowerPoint file.', true); }
         finally{ showProgress(null); }
@@ -10009,7 +10027,8 @@ if('serviceWorker' in navigator){
           const bytes = await buildPptxFromSlides(edited);
           const blob = new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
           const name = file.name.replace(/\.pptx?$/i,'') + '_edited.pptx';
-          shareOrResult(blob, name, 'Edited PowerPoint');
+          const previewPdf = await buildSlideDeckPdf(edited, 960, 540);
+          shareOrResult(blob, name, 'Edited PowerPoint', previewPdf);
           setStatus('PowerPoint updated.');
         }catch(e){ console.error(e); say(e?.message || 'Could not rebuild this PowerPoint file.', true); }
         finally{ showProgress(null); }
@@ -10447,7 +10466,7 @@ if('serviceWorker' in navigator){
     $('btnEncrypt').addEventListener('click', () => {
       if(!workingBytes){ say('Open a PDF first.', true); return; }
       openModal('Set password (beta)', `
-        <p class="hint">Creates a separate, password-protected copy of this PDF for download/share. The document open in DocuForge itself is not changed.</p>
+        <p class="hint">Creates a separate, password-protected copy of this PDF for download/share. The document open in DocuForge itself is not changed. "View full page" shows the unencrypted content for review — the actual output file will need your password to open elsewhere.</p>
         <div class="field"><label>Password</label><input type="password" id="dfEncPw" autocomplete="new-password"></div>
         <div class="field"><label>Confirm password</label><input type="password" id="dfEncPw2" autocomplete="new-password"></div>
         <div class="field row">
@@ -10468,7 +10487,7 @@ if('serviceWorker' in navigator){
           });
           const blob = new Blob([bytes], { type:'application/pdf' });
           const name = outBase() + '_protected.pdf';
-          await resultShare(blob, name, 'Password-protected PDF');
+          await resultShare(blob, name, 'Password-protected PDF', workingBytes);
           setStatus('Password-protected copy created.');
         }catch(e){ console.error(e); say(e?.message || 'Could not encrypt this PDF.', true); }
         finally{ showProgress(null); }
@@ -10559,7 +10578,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.114.1 — "View" after conversion fix.
+  DocuForge AI 27.115.1 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -10678,7 +10697,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.114.1 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.115.1 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -10760,7 +10779,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.114.1 — "View" opens behind an open modal fix.
+  DocuForge AI 27.115.1 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -10804,7 +10823,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-ghostclick-fix-v271121">
 /*
-  DocuForge AI 27.114.1 — "Jumps to Main Menu after picking a file" fix.
+  DocuForge AI 27.115.1 — "Jumps to Main Menu after picking a file" fix.
 
   On iOS Safari, dismissing the native file-picker sheet can produce a
   stray "ghost" click on whatever element is now sitting under the last
@@ -10851,7 +10870,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-backnav-fix-v271124">
 /*
-  DocuForge AI 27.114.1 — "Back" should return to where you were, not the
+  DocuForge AI 27.115.1 — "Back" should return to where you were, not the
   Main Menu.
 
   The only way to leave the View tab (reached from any Studio via the
