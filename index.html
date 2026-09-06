@@ -1,6 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- DocuForge AI 27.114.1: fixed the page-selection strip (Select all/Clear/
+     Invert/Rotate/Duplicate/Extract/Delete) showing up in every Studio
+     instead of only PDF Studio — three separate places in the code were
+     checking "is this Dashboard?" instead of "is this specifically PDF
+     Studio?". Added PDF → PowerPoint to Conversion Studio (existed only in
+     the separate PowerPoint Studio before) and clarified that "Convert
+     Files → PDF" already accepts PowerPoint input. Added: an Action Log
+     (every action on a document, timestamped, exportable) and true Version
+     History (up to 20 restorable checkpoints per project, not just the
+     latest snapshot) in PDF Studio; a Barcode Generator (CODE128, EAN-13,
+     UPC-A, CODE39, ITF-14, MSI, Pharmacode, Codabar) next to the QR
+     generator; Batch Redaction (apply the same boxes across a page range
+     or "all", one document mutation instead of one per page); a Form
+     Designer (draws real fillable PDF form fields — text/checkbox/
+     dropdown — distinct from the existing form-filling tool, which only
+     works on forms that already exist); a Signature Check tool (detects
+     signature fields and extracts certificate details — signer, issuer,
+     validity — using node-forge; deliberately does NOT claim to verify
+     document integrity or certificate trust, since that requires
+     cryptographic verification this session couldn't fully test against a
+     real signed PDF, and a wrong "valid" claim would be worse than no
+     feature at all). Added a service worker (sw.js, must be uploaded
+     alongside this file) that caches third-party library CDN requests
+     only — never the app's own HTML — so previously-used tools keep
+     working offline in a later session, without risking the stale-version
+     confusion that caching the app shell itself would cause. Also fixed a
+     genuine bug from earlier in this same batch: an edit had accidentally
+     deleted the "async function flattenForm(){" line, turning that tool
+     into orphaned, non-functional code.
+-->
 <!-- DocuForge AI 27.113.1: menu/submenu repair pass (~30 previously-dead tool
      buttons wired up, every conversion result standardized on View / Download /
      Share), a fix for page-selection checkboxes not responding to taps on
@@ -854,7 +884,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.113.1';</script>
+<script>const DOCUFORGE_BUILD = '27.114.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -865,7 +895,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.113.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.114.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1259,11 +1289,12 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.113.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.114.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
-      <p><strong>What's not supported in this edition:</strong> cryptographic digital signatures &mdash; that genuinely requires a certificate authority, no way around it in a browser tool. Password protection (both setting one and opening an existing password-protected PDF) is supported, but marked beta: it runs on a community-maintained fork of the core library, not the well-established one everything else here relies on.</p>
+      <p><strong>Works offline after first use:</strong> once you've used a tool successfully with a network connection, the library it needs stays cached on your device &mdash; it'll keep working in a later session even without signal. This doesn't apply to Translate or AI Assistant, which always need a live connection to their provider.</p>
+      <p><strong>What's not fully supported in this edition:</strong> cryptographic digital signatures &mdash; creating one genuinely requires a certificate authority, no way around it in a browser tool. "Check for signatures" can detect a signature and read its certificate details, but does not verify document integrity or certificate trust; use Adobe Acrobat Reader for that. Password protection (both setting one and opening an existing password-protected PDF) is supported, but marked beta: it runs on a community-maintained fork of the core library, not the well-established one everything else here relies on.</p>
     </div>
 
     <!-- ===== EMBEDDED GST INVOICE APP ===== -->
@@ -7457,7 +7488,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.113.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.114.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -9179,6 +9210,15 @@ function df1115MetadataResult(){
   });
 })();
 </script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch((err) => {
+      console.warn('Service worker registration failed (offline library caching will be unavailable):', err);
+    });
+  });
+}
+</script>
 </body>
 </html>
 
@@ -9411,7 +9451,7 @@ function df1115MetadataResult(){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.113.1
+ DocuForge AI 27.114.1
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -10519,7 +10559,7 @@ function df1115MetadataResult(){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.113.1 — "View" after conversion fix.
+  DocuForge AI 27.114.1 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -10638,7 +10678,7 @@ function df1115MetadataResult(){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.113.1 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.114.1 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -10720,7 +10760,7 @@ function df1115MetadataResult(){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.113.1 — "View" opens behind an open modal fix.
+  DocuForge AI 27.114.1 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -10764,7 +10804,7 @@ function df1115MetadataResult(){
 
 <script id="df-ghostclick-fix-v271121">
 /*
-  DocuForge AI 27.113.1 — "Jumps to Main Menu after picking a file" fix.
+  DocuForge AI 27.114.1 — "Jumps to Main Menu after picking a file" fix.
 
   On iOS Safari, dismissing the native file-picker sheet can produce a
   stray "ghost" click on whatever element is now sitting under the last
@@ -10811,7 +10851,7 @@ function df1115MetadataResult(){
 
 <script id="df-backnav-fix-v271124">
 /*
-  DocuForge AI 27.113.1 — "Back" should return to where you were, not the
+  DocuForge AI 27.114.1 — "Back" should return to where you were, not the
   Main Menu.
 
   The only way to leave the View tab (reached from any Studio via the
