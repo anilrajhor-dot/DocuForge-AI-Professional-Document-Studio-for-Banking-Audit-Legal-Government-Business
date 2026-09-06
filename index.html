@@ -6060,8 +6060,33 @@ async function extractTextFromAnyFile(file){
     return result.value;
   } else if(ext === 'txt' || ext === 'md'){
     return await file.text();
+  } else if(ext === 'xlsx' || ext === 'xls' || ext === 'csv'){
+    await loadLib('xlsx');
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type:'array' });
+    const out = [];
+    wb.SheetNames.forEach(sn => {
+      out.push('Sheet: ' + sn);
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header:1, raw:false, defval:'' });
+      rows.forEach(r => {
+        const line = r.map(v => String(v ?? '').trim()).join(' | ').trim();
+        if(line) out.push(line);
+      });
+    });
+    const joined = out.join('\n');
+    if(!joined.trim()) throw new Error('No data found in that spreadsheet.');
+    return joined;
+  } else if(ext === 'pptx'){
+    const slides = await extractPptxSlidesData(file);
+    const joined = slides.map(s => [s.title, ...s.bullets].join('\n')).join('\n\n');
+    if(!joined.trim()) throw new Error('No text found in that presentation.');
+    return joined;
+  } else if(['jpg','jpeg','png','gif','webp','bmp'].includes(ext)){
+    const text = await runOcrOnImageFile(file, 'eng');
+    if(!text.trim()) throw new Error('OCR found no readable text in that image.');
+    return text;
   }
-  throw new Error('Unsupported file type — use PDF, DOCX, TXT, or MD.');
+  throw new Error('Unsupported file type — use PDF, DOCX, TXT, MD, XLSX, CSV, PPTX, or an image (JPG/PNG).');
 }
 function openAiTaskModal(taskId, title, description, filenameSuffix){
   const savedKey = DFStorage.getItem('pdfworkbench-ai-key') || '';
@@ -6075,12 +6100,12 @@ function openAiTaskModal(taskId, title, description, filenameSuffix){
     <div class="field"><label>Source text</label>
       <select id="aiTaskSource">
         <option value="pdf" ${workingBytes ? '' : 'disabled'}>This PDF's text</option>
-        <option value="upload">Upload a file (PDF, DOCX, TXT, MD)</option>
+        <option value="upload">Upload a file (PDF, DOCX, XLSX, CSV, PPTX, TXT, MD, or a photo)</option>
         <option value="paste">Paste text</option>
       </select>
     </div>
-    <div class="field" id="aiTaskUploadField" style="display:none;"><label>File</label><input type="file" id="aiTaskUploadFile" accept=".pdf,.docx,.txt,.md"></div>
-    <div class="field" id="aiTaskPasteField" style="display:none;"><label>Text</label><textarea id="aiTaskPasteText" style="min-height:120px;"></textarea></div>
+    <div class="field" id="aiTaskUploadField"><label>File (PDF, DOCX, TXT, MD, XLSX, CSV, PPTX, or a photo)</label><input type="file" id="aiTaskUploadFile" accept=".pdf,.docx,.txt,.md,.xlsx,.xls,.csv,.pptx,image/*"></div>
+    <div class="field" id="aiTaskPasteField"><label>Text (used only if "Paste text" is selected above)</label><textarea id="aiTaskPasteText" style="min-height:120px;"></textarea></div>
   `, async () => {
     const provider = document.getElementById('aiTaskProvider').value;
     const apiKey = document.getElementById('aiTaskKey').value.trim();
@@ -6112,12 +6137,6 @@ function openAiTaskModal(taskId, title, description, filenameSuffix){
     } catch(e){ console.error(e); toast('AI request failed: ' + e.message, true); }
     finally { showProgress(null); }
   });
-  setTimeout(() => {
-    document.getElementById('aiTaskSource').addEventListener('change', e => {
-      document.getElementById('aiTaskPasteField').style.display = e.target.value === 'paste' ? 'block' : 'none';
-      document.getElementById('aiTaskUploadField').style.display = e.target.value === 'upload' ? 'block' : 'none';
-    });
-  }, 0);
 }
 $('btnAiSummarize').addEventListener('click', () => openAiTaskModal('summarize', 'Summarize', 'Produces a concise summary.', 'summary'));
 $('btnAiRewrite').addEventListener('click', () => openAiTaskModal('rewrite', 'Rewrite', 'Improves clarity and flow while keeping the same meaning.', 'rewrite'));
@@ -6228,10 +6247,10 @@ $('btnChatPdf').addEventListener('click', async () => {
     <div class="field"><label>Source</label>
       <select id="chatSource">
         <option value="pdf" ${workingBytes ? '' : 'disabled'}>This PDF's text</option>
-        <option value="upload">Upload a file (PDF, DOCX, TXT, MD)</option>
+        <option value="upload">Upload a file (PDF, DOCX, XLSX, CSV, PPTX, TXT, MD, or a photo)</option>
       </select>
     </div>
-    <div class="field" id="chatUploadField" style="display:none;"><label>File</label><input type="file" id="chatUploadFile" accept=".pdf,.docx,.txt,.md"></div>
+    <div class="field" id="chatUploadField"><label>File (PDF, DOCX, TXT, MD, XLSX, CSV, PPTX, or a photo)</label><input type="file" id="chatUploadFile" accept=".pdf,.docx,.txt,.md,.xlsx,.xls,.csv,.pptx,image/*"></div>
     <button class="btn primary" id="chatLoadDoc" type="button" style="align-self:flex-start;">Load document</button>
     <div id="chatMessages" style="max-height:240px;overflow-y:auto;border:1px solid var(--line);border-radius:4px;padding:8px;background:var(--bg);display:flex;flex-direction:column;gap:8px;"></div>
     <div style="display:flex;gap:8px;">
@@ -6244,9 +6263,6 @@ $('btnChatPdf').addEventListener('click', async () => {
   $('modalCancel').textContent = 'Close';
   setTimeout(() => {
     let context = '';
-    document.getElementById('chatSource').addEventListener('change', e => {
-      document.getElementById('chatUploadField').style.display = e.target.value === 'upload' ? 'block' : 'none';
-    });
     document.getElementById('chatLoadDoc').addEventListener('click', async () => {
       const source = document.getElementById('chatSource').value;
       try{
