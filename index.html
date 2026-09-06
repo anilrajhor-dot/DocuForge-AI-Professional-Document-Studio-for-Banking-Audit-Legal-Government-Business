@@ -9416,6 +9416,35 @@ function df1115MetadataResult(){
   }
 
   /* ============ PowerPoint Studio ============ */
+  if($('btnPdfToPptx') && !$('btnPdfToPptx').dataset.dfWired){
+    $('btnPdfToPptx').dataset.dfWired = '1';
+    $('btnPdfToPptx').addEventListener('click', async () => {
+      const file = studioFile();
+      if(!file){ requestFile('btnPdfToPptx'); return; }
+      setStatus('Converting PDF to PowerPoint…'); showProgress(20);
+      try{
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const pdf = await getPdfDocumentSafely(bytes);
+        const slides = [];
+        for(let i = 1; i <= pdf.numPages; i++){
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const items = content.items.filter(it => typeof it.str === 'string')
+            .map(it => ({ str: it.str, x: it.transform[4], y: it.transform[5], width: it.width || 0 }));
+          const lines = groupIntoLines(items).map(lineToText).filter(l => l.trim().length);
+          slides.push({ title: lines[0] || `Page ${i}`, bullets: lines.slice(1) });
+          showProgress(20 + Math.round((i / pdf.numPages) * 60));
+        }
+        const pptxBytes = await buildPptxFromSlides(slides);
+        const blob = new Blob([pptxBytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+        const name = file.name.replace(/\.pdf$/i,'') + '.pptx';
+        await resultShare(blob, name, 'PDF → PowerPoint', null);
+        setStatus('PowerPoint created from ' + slides.length + ' page(s).');
+        if(typeof logConversion === 'function') logConversion('PDF → PowerPoint', name);
+      }catch(e){ console.error(e); say(e?.message || 'Could not convert this PDF — it may be scanned with no text layer (run OCR first) or password-protected.', true); }
+      finally{ showProgress(null); }
+    });
+  }
   if($('btnPptxToPdf') && !$('btnPptxToPdf').dataset.dfWired){
     $('btnPptxToPdf').dataset.dfWired = '1';
     $('btnPptxToPdf').addEventListener('click', async () => {
