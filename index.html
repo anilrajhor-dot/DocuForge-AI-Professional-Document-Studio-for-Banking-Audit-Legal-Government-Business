@@ -1107,7 +1107,7 @@ window.DFStorage = (function(){
 <button class="tool-btn" id="btnFlattenForm"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><path d="M7 14l3 3 7-8"></path></svg> Flatten form</button>
 <button class="tool-btn" id="btnOpenEncrypted"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 018 0v4"></path><path d="M12 15v2"></path></svg> Open password-protected PDF <span class="beta-badge">BETA</span></button>
 <button class="tool-btn" id="btnEncrypt"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 018 0v4"></path></svg> Set password <span class="beta-badge">BETA</span></button>
-<button class="tool-btn" id="btnRedact"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><rect x="6" y="9" width="6" height="3" fill="currentColor" stroke="none"></rect><path d="M6 15h5"></path></svg> Redact page…</button>
+<button class="tool-btn" id="btnRedact"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><rect x="6" y="9" width="6" height="3" fill="currentColor" stroke="none"></rect><path d="M6 15h5"></path></svg> Redact page(s)…</button>
 <p class="hint" style="padding:0 14px;margin:6px 0 0;">Password protection uses a community fork of the core PDF library, not the well-established one the rest of this app relies on — test that your protected file actually opens with the password before trusting it for anything sensitive. <strong>Not recommended for confidential or legally sensitive documents until more thoroughly validated.</strong> Cryptographic digital signatures still aren't supported; that genuinely requires a certificate authority.</p>
 </div>
 </div>
@@ -3930,6 +3930,57 @@ async function redactPage(pageIndex, boxes, renderScale){
     newPage.drawImage(img, { x: 0, y: 0, width: pw, height: ph });
     doc.removePage(pageIndex + 1); // the original page, now shifted one index later
   }, `Page ${pageIndex + 1} redacted — flattened to an image, original content permanently removed from that page.`);
+}
+async function batchRedactPages(pageIndices, boxes, renderScale){
+  // Render every target page to a flattened, redacted PNG first — this
+  // reads from the original document and doesn't mutate anything yet.
+  const pdf = await dfGetPdfJs(workingBytes).promise;
+  const pngByPage = {};
+  for(const pageIndex of pageIndices){
+    const page = await pdf.getPage(pageIndex + 1);
+    const viewport = page.getViewport({ scale: renderScale });
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(viewport.width));
+    canvas.height = Math.max(1, Math.round(viewport.height));
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    ctx.fillStyle = '#000';
+    boxes.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
+    pngByPage[pageIndex] = await (await fetch(canvas.toDataURL('image/png'))).arrayBuffer();
+  }
+  // Apply every replacement inside one document mutation, so this is one
+  // undo step and one version checkpoint, not one per page.
+  await withDoc(async (doc) => {
+    const sortedDesc = [...pageIndices].sort((a, b) => b - a);
+    for(const pageIndex of sortedDesc){
+      const pages = doc.getPages();
+      const orig = pages[pageIndex];
+      if(!orig) continue;
+      const img = await doc.embedPng(pngByPage[pageIndex]);
+      const { width: pw, height: ph } = orig.getSize();
+      const newPage = doc.insertPage(pageIndex, [pw, ph]);
+      newPage.drawImage(img, { x: 0, y: 0, width: pw, height: ph });
+      doc.removePage(pageIndex + 1);
+    }
+  }, `Batch redacted ${pageIndices.length} page(s) — each flattened to an image, original content permanently removed.`);
+}
+function parsePageRangeInput(input, pageCount){
+  const trimmed = String(input || '').trim().toLowerCase();
+  if(!trimmed || trimmed === 'all'){
+    return Array.from({ length: pageCount }, (_, i) => i);
+  }
+  const indices = new Set();
+  trimmed.split(',').map(s => s.trim()).filter(Boolean).forEach(part => {
+    const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(m){
+      const a = Math.max(1, parseInt(m[1])), b = Math.min(pageCount, parseInt(m[2]));
+      for(let p = a; p <= b; p++) indices.add(p - 1);
+    } else {
+      const n = parseInt(part);
+      if(!isNaN(n) && n >= 1 && n <= pageCount) indices.add(n - 1);
+    }
+  });
+  return [...indices].sort((a, b) => a - b);
 }
 
 /* ---------- Password protection (beta) ----------
@@ -10025,18 +10076,26 @@ function df1115MetadataResult(){
       if(!workingBytes){ say('Open a PDF first.', true); return; }
       let pageCount = 1;
       try{ const doc = await PDFDocument.load(workingBytes); pageCount = doc.getPageCount(); }catch(_){}
-      openModal('Redact page', `
-        <p class="hint">Choose a page, then drag on the preview to draw one or more black boxes over the areas to permanently remove. The page becomes a flattened image — original text underneath is not recoverable.</p>
-        <div class="field"><label>Page (1-${pageCount})</label><input type="number" id="dfRedactPage" min="1" max="${pageCount}" value="1"></div>
+      openModal('Redact page(s)', `
+        <p class="hint">Draw one or more black boxes on the preview page below — those exact box positions get applied to every page you list. The page becomes a flattened image; original text underneath is not recoverable.</p>
+        <div class="field"><label>Preview page (1-${pageCount})</label><input type="number" id="dfRedactPage" min="1" max="${pageCount}" value="1"></div>
         <div id="dfRedactWrap" style="position:relative;border:1px solid var(--line);border-radius:8px;overflow:auto;touch-action:none;">
           <canvas id="dfRedactCanvas" style="display:block;max-width:100%;"></canvas>
         </div>
         <div style="margin-top:8px;"><button type="button" class="btn ghost" id="dfRedactUndo">Undo last box</button> <button type="button" class="btn ghost" id="dfRedactClear">Clear boxes</button></div>
+        <div class="field" style="margin-top:10px;"><label>Apply these boxes to which pages?</label><input type="text" id="dfRedactApplyTo" placeholder="e.g. 1-5, 8, 10-12, or 'all'" value="1"></div>
+        <p class="hint" style="margin:4px 0 0;">Leave as just the preview page number to redact only that one page, or list a range/"all" to apply the same boxes everywhere — useful when the same field (e.g. an account number) sits in the same spot on every page.</p>
       `, async () => {
         const boxes = window.__dfRedactBoxes || [];
         if(!boxes.length){ say('Draw at least one redaction box first.', true); return; }
-        const pageNum = Math.max(1, Math.min(pageCount, parseInt($('dfRedactPage').value)||1));
-        await redactPage(pageNum-1, boxes, window.__dfRedactRenderScale||1.5);
+        const targetIndices = parsePageRangeInput($('dfRedactApplyTo').value, pageCount);
+        if(!targetIndices.length){ say('Enter a valid page, range, or "all".', true); return; }
+        if(!confirm(`Redact ${targetIndices.length} page(s) with these boxes? This permanently flattens each page — it can\u2019t be selectively undone per box afterward.`)) return;
+        setStatus('Redacting…'); showProgress(20);
+        try{
+          await batchRedactPages(targetIndices, boxes, window.__dfRedactRenderScale || 1.5);
+        } catch(e){ console.error(e); say('Could not complete the redaction.', true); }
+        finally { showProgress(null); }
         window.__dfRedactBoxes = [];
       });
       setTimeout(async () => {
