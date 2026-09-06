@@ -1009,6 +1009,7 @@ window.DFStorage = (function(){
 <button class="tool-btn" id="btnPdfToImages"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4"></rect><circle cx="8.5" cy="9.5" r="1.5"></circle><path d="M21 15l-5-5-4 4-3-3-4 4"></path></svg> PDF → Images…</button>
 <button class="tool-btn" id="btnQrReader"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="7" width="7" x="3" y="3"></rect><rect height="7" width="7" x="14" y="3"></rect><rect height="7" width="7" x="3" y="14"></rect><path d="M14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM19 19h2v2h-2z"></path></svg> Read QR code…</button>
 <button class="tool-btn" id="btnQrGenerate"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="7" width="7" x="3" y="3"></rect><rect height="7" width="7" x="14" y="3"></rect><rect height="7" width="7" x="3" y="14"></rect><rect height="7" width="7" x="14" y="14"></rect></svg> Generate QR code…</button>
+<button class="tool-btn" id="btnBarcodeGenerate"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 4v16M7 4v16M10 4v16M15 4v16M17 4v16M21 4v16"></path></svg> Generate barcode…</button>
 </div>
 </div>
 <div class="ribbon-panel" data-studio-panel="convert">
@@ -1501,10 +1502,11 @@ const LIB_URLS = {
   chartjs: 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js',
   jsqr: 'https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js',
   qrcode: 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
+  jsbarcode: 'https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.12.3/JsBarcode.all.min.js',
 };
 const _libPromises = {};
 function loadLib(name){
-  if(window[{tesseract:'Tesseract', xlsx:'XLSX', mammoth:'mammoth', chartjs:'Chart', jsqr:'jsQR', qrcode:'QRCode'}[name]]) return Promise.resolve();
+  if(window[{tesseract:'Tesseract', xlsx:'XLSX', mammoth:'mammoth', chartjs:'Chart', jsqr:'jsQR', qrcode:'QRCode', jsbarcode:'JsBarcode'}[name]]) return Promise.resolve();
   if(_libPromises[name]) return _libPromises[name];
   _libPromises[name] = new Promise((resolve, reject) => {
     const script = document.createElement('script');
@@ -6603,6 +6605,53 @@ $('btnQrGenerate').addEventListener('click', () => {
       if(canvas) downloadBlob(dataUrlToBlob(canvas.toDataURL('image/png')), 'qrcode.png');
       else if(img) downloadBlob(dataUrlToBlob(img.src), 'qrcode.png');
       else toast('Generate a QR code first.', true);
+    });
+  }, 0);
+});
+
+$('btnBarcodeGenerate').addEventListener('click', () => {
+  openModal('Generate barcode', `
+    <div class="field"><label>Format</label><select id="bcFormat">
+      <option value="CODE128">CODE128 (general purpose, any text)</option>
+      <option value="EAN13">EAN-13 (13-digit retail)</option>
+      <option value="UPC">UPC-A (12-digit retail)</option>
+      <option value="CODE39">CODE39</option>
+      <option value="ITF14">ITF-14 (14-digit shipping)</option>
+      <option value="MSI">MSI</option>
+      <option value="pharmacode">Pharmacode</option>
+      <option value="codabar">Codabar</option>
+    </select></div>
+    <div class="field"><label>Value to encode</label><input type="text" id="bcText" placeholder="e.g. 123456789012"></div>
+    <button class="btn primary" id="bcGenBtn" type="button" style="align-self:flex-start;">Generate</button>
+    <div id="bcGenPreview" style="display:flex;justify-content:center;padding:16px;background:#fff;border-radius:4px;min-height:80px;overflow-x:auto;"></div>
+    <button class="btn ghost" id="bcGenDownload" type="button" style="display:none;align-self:flex-start;">Download PNG</button>
+    <p class="hint">EAN-13, UPC-A, and ITF-14 require an exact digit count and a valid check digit — if generation fails, that's usually why. CODE128 accepts any text and is the safest general-purpose choice.</p>
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+  setTimeout(() => {
+    document.getElementById('bcGenBtn').addEventListener('click', async () => {
+      const format = document.getElementById('bcFormat').value;
+      const text = document.getElementById('bcText').value.trim();
+      if(!text){ toast('Enter a value to encode first.', true); return; }
+      try{
+        await loadLib('jsbarcode');
+        const preview = document.getElementById('bcGenPreview');
+        preview.innerHTML = '<canvas id="bcCanvas"></canvas>';
+        const canvas = document.getElementById('bcCanvas');
+        JsBarcode(canvas, text, { format, lineColor:'#113B34', width:2, height:90, displayValue:true, margin:10 });
+        document.getElementById('bcGenDownload').style.display = 'inline-flex';
+      } catch(e){
+        console.error(e);
+        document.getElementById('bcGenPreview').innerHTML = '';
+        document.getElementById('bcGenDownload').style.display = 'none';
+        toast('Could not generate that barcode — check the value matches what ' + format + ' expects (e.g. EAN-13 needs exactly 13 digits).', true);
+      }
+    });
+    document.getElementById('bcGenDownload').addEventListener('click', () => {
+      const canvas = document.querySelector('#bcGenPreview canvas');
+      if(canvas) downloadBlob(dataUrlToBlob(canvas.toDataURL('image/png')), 'barcode.png');
+      else toast('Generate a barcode first.', true);
     });
   }, 0);
 });
