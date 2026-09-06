@@ -6037,6 +6037,32 @@ $('btnGenWebsite').addEventListener('click', () => {
   });
 });
 
+async function extractTextFromAnyFile(file){
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if(ext === 'pdf'){
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const pdf = await getPdfDocumentSafely(bytes);
+    const parts = [];
+    for(let i = 1; i <= pdf.numPages; i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const items = content.items.filter(it => typeof it.str === 'string')
+        .map(it => ({ str: it.str, x: it.transform[4], y: it.transform[5], width: it.width || 0 }));
+      parts.push(groupIntoLines(items).map(lineToText).join('\n'));
+    }
+    const joined = parts.join('\n\n');
+    if(!joined.trim()) throw new Error('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.');
+    return joined;
+  } else if(ext === 'docx'){
+    await loadLib('mammoth');
+    const buf = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer: buf });
+    return result.value;
+  } else if(ext === 'txt' || ext === 'md'){
+    return await file.text();
+  }
+  throw new Error('Unsupported file type — use PDF, DOCX, TXT, or MD.');
+}
 function openAiTaskModal(taskId, title, description, filenameSuffix){
   const savedKey = DFStorage.getItem('pdfworkbench-ai-key') || '';
   const savedProvider = DFStorage.getItem('pdfworkbench-ai-provider') || 'anthropic';
@@ -6049,9 +6075,11 @@ function openAiTaskModal(taskId, title, description, filenameSuffix){
     <div class="field"><label>Source text</label>
       <select id="aiTaskSource">
         <option value="pdf" ${workingBytes ? '' : 'disabled'}>This PDF's text</option>
+        <option value="upload">Upload a file (PDF, DOCX, TXT, MD)</option>
         <option value="paste">Paste text</option>
       </select>
     </div>
+    <div class="field" id="aiTaskUploadField" style="display:none;"><label>File</label><input type="file" id="aiTaskUploadFile" accept=".pdf,.docx,.txt,.md"></div>
     <div class="field" id="aiTaskPasteField" style="display:none;"><label>Text</label><textarea id="aiTaskPasteText" style="min-height:120px;"></textarea></div>
   `, async () => {
     const provider = document.getElementById('aiTaskProvider').value;
@@ -6065,6 +6093,12 @@ function openAiTaskModal(taskId, title, description, filenameSuffix){
       const pages = await getPdfPagesTextItems();
       text = pages.map(p => groupIntoLines(p.items).map(lineToText).join('\n')).join('\n\n');
       if(!text.trim()){ toast('No extractable text — this PDF looks scanned. Run OCR first, then try again.', true); return; }
+    } else if(source === 'upload'){
+      const file = document.getElementById('aiTaskUploadFile').files[0];
+      if(!file){ toast('Choose a file first.', true); return; }
+      try{ text = await extractTextFromAnyFile(file); }
+      catch(e){ toast(e.message || 'Could not read that file.', true); return; }
+      if(!text.trim()){ toast('No text found in that file.', true); return; }
     } else {
       text = document.getElementById('aiTaskPasteText').value.trim();
       if(!text){ toast('Paste some text first.', true); return; }
@@ -6081,6 +6115,7 @@ function openAiTaskModal(taskId, title, description, filenameSuffix){
   setTimeout(() => {
     document.getElementById('aiTaskSource').addEventListener('change', e => {
       document.getElementById('aiTaskPasteField').style.display = e.target.value === 'paste' ? 'block' : 'none';
+      document.getElementById('aiTaskUploadField').style.display = e.target.value === 'upload' ? 'block' : 'none';
     });
   }, 0);
 }
@@ -6183,28 +6218,54 @@ $('btnImageTable').addEventListener('click', () => {
 });
 
 $('btnChatPdf').addEventListener('click', async () => {
-  const pages = await getPdfPagesTextItems();
-  const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
-  if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
-  let context = pages.map(p => groupIntoLines(p.items).map(lineToText).join('\n')).join('\n\n');
-  if(context.length > 15000) context = context.slice(0, 15000);
   const savedKey = DFStorage.getItem('pdfworkbench-ai-key') || '';
   const savedProvider = DFStorage.getItem('pdfworkbench-ai-provider') || 'anthropic';
-  openModal('Chat with this PDF', `
+  openModal('Chat with a document', `
     <div class="field row">
       <div><label>Provider</label><select id="chatProvider"><option value="anthropic" ${savedProvider==='anthropic'?'selected':''}>Anthropic (Claude)</option><option value="gemini" ${savedProvider==='gemini'?'selected':''}>Google Gemini (free tier available)</option><option value="openai" ${savedProvider==='openai'?'selected':''}>OpenAI</option></select></div>
       <div><label>API key</label><input type="password" id="chatKey" value="${savedKey}" placeholder="sk-..."></div>
     </div>
+    <div class="field"><label>Source</label>
+      <select id="chatSource">
+        <option value="pdf" ${workingBytes ? '' : 'disabled'}>This PDF's text</option>
+        <option value="upload">Upload a file (PDF, DOCX, TXT, MD)</option>
+      </select>
+    </div>
+    <div class="field" id="chatUploadField" style="display:none;"><label>File</label><input type="file" id="chatUploadFile" accept=".pdf,.docx,.txt,.md"></div>
+    <button class="btn primary" id="chatLoadDoc" type="button" style="align-self:flex-start;">Load document</button>
     <div id="chatMessages" style="max-height:240px;overflow-y:auto;border:1px solid var(--line);border-radius:4px;padding:8px;background:var(--bg);display:flex;flex-direction:column;gap:8px;"></div>
     <div style="display:flex;gap:8px;">
-      <input type="text" id="chatInput" placeholder="Ask something about this PDF…" style="flex:1;padding:8px 9px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);">
-      <button class="btn primary" id="chatSend" type="button">Send</button>
+      <input type="text" id="chatInput" placeholder="Ask something about this document…" style="flex:1;padding:8px 9px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);" disabled>
+      <button class="btn primary" id="chatSend" type="button" disabled>Send</button>
     </div>
-    <p class="hint">Sends this PDF's text plus your question to the AI provider above, using your own API key. Nothing else leaves your browser.</p>
+    <p class="hint">Sends the document's text plus your question to the AI provider above, using your own API key. Nothing else leaves your browser.</p>
   `, async () => {});
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
   setTimeout(() => {
+    let context = '';
+    document.getElementById('chatSource').addEventListener('change', e => {
+      document.getElementById('chatUploadField').style.display = e.target.value === 'upload' ? 'block' : 'none';
+    });
+    document.getElementById('chatLoadDoc').addEventListener('click', async () => {
+      const source = document.getElementById('chatSource').value;
+      try{
+        if(source === 'pdf'){
+          const pages = await getPdfPagesTextItems();
+          const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
+          if(!hasText){ toast('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.', true); return; }
+          context = pages.map(p => groupIntoLines(p.items).map(lineToText).join('\n')).join('\n\n');
+        } else {
+          const file = document.getElementById('chatUploadFile').files[0];
+          if(!file){ toast('Choose a file first.', true); return; }
+          context = await extractTextFromAnyFile(file);
+        }
+        if(context.length > 15000) context = context.slice(0, 15000);
+        document.getElementById('chatInput').disabled = false;
+        document.getElementById('chatSend').disabled = false;
+        toast('Document loaded — ask away.');
+      } catch(e){ console.error(e); toast(e.message || 'Could not read that file.', true); }
+    });
     const history = [];
     const msgsEl = document.getElementById('chatMessages');
     function addMsg(role, text){
