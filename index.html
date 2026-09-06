@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.118.1: fixed the page-selection strip (Select all/Clear/
+<!-- DocuForge AI 27.119.1: fixed the page-selection strip (Select all/Clear/
      Invert/Rotate/Duplicate/Extract/Delete) showing up in every Studio
      instead of only PDF Studio — three separate places in the code were
      checking "is this Dashboard?" instead of "is this specifically PDF
@@ -884,7 +884,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.118.1';</script>
+<script>const DOCUFORGE_BUILD = '27.119.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -895,7 +895,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.118.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.119.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1292,7 +1292,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.118.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.119.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -3182,6 +3182,7 @@ function showConversionShare(label){
   setTimeout(() => {
     $('convView')?.addEventListener('click', async () => {
       if(item.previewPdfBytes){
+        closeModal();
         await window.__dfViewFile(new Blob([item.previewPdfBytes], {type:'application/pdf'}), item.filename.replace(/\.[^.]+$/,'') + '_preview.pdf');
       } else {
         say('A full-page preview is not available for this output \u2014 use Share or Download to inspect it.', true);
@@ -3757,6 +3758,7 @@ function shareGeneratedFile(blob, filename, label='File', previewPdfBytes){
   setTimeout(() => {
     $('pptViewFile')?.addEventListener('click', async () => {
       if(item.previewPdfBytes){
+        closeModal();
         await window.__dfViewFile(new Blob([item.previewPdfBytes], {type:'application/pdf'}), item.filename.replace(/\.[^.]+$/,'') + '_preview.pdf');
       } else {
         say('A full-page preview is not available for this output \u2014 use Share or Download to inspect it.', true);
@@ -5524,6 +5526,7 @@ function showPdfResult(title, blob, filename, message){
   setTimeout(() => {
     $('pdfResultView')?.addEventListener('click', () => {
       if(isZip){ toast('ZIP files do not have a built-in browser preview. You can share the ZIP directly.', false); return; }
+      closeModal();
       window.__dfViewFile(blob, filename);
     });
     $('pdfResultShare')?.addEventListener('click', async () => {
@@ -7617,7 +7620,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.118.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.119.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -9311,8 +9314,15 @@ function df1115MetadataResult(){
     if($('viewStudio')) $('viewStudio').classList.toggle('active',view);
     if(view){
       ['ribbon','toolbar','pageActionStrip','dropzone','noPdfBanner','grid'].forEach(id=>{if($(id))$(id).style.display='none'});
-      const b=getBytes(); if(b) setTimeout(()=>loadView(b,'Viewing the current PDF — review before sharing.'),30);
-      else setViewStatus('No PDF is open. Choose a PDF first.',true);
+      // Deliberately no auto-load here. This used to call loadView() via a
+      // setTimeout for whatever PDF happens to be the "current" one, but
+      // that races with callers like __dfViewFile() that load a *specific*
+      // preview right after switching studios — two concurrent loadView()
+      // calls fight over the same shared viewBytes/canvas state, and the
+      // one that loses can leave the page blank. The manual "click the View
+      // tab" case is already handled correctly by its own listener below;
+      // every other caller (conversion results, __dfViewFile, etc.) loads
+      // its own bytes explicitly right after calling setStudio('view').
       window.scrollTo({top:0,behavior:'smooth'});
     }
   };
@@ -9580,7 +9590,7 @@ if('serviceWorker' in navigator){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.118.1
+ DocuForge AI 27.119.1
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -9653,6 +9663,7 @@ if('serviceWorker' in navigator){
         try{
           const pv=previewPdfBytes || (blob.type==='application/pdf' ? new Uint8Array(await blob.arrayBuffer()) : null);
           if(pv && window.__dfViewFile){
+            closeModal();
             await window.__dfViewFile(new Blob([pv],{type:'application/pdf'}),name.replace(/\.[^.]+$/,'')+'_preview.pdf');
           }else{
             say('A full-page preview is not available for this output type. Use Download to inspect it.',true);
@@ -10695,7 +10706,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.118.1 — "View" after conversion fix.
+  DocuForge AI 27.119.1 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -10814,7 +10825,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.118.1 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.119.1 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -10896,7 +10907,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.118.1 — "View" opens behind an open modal fix.
+  DocuForge AI 27.119.1 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -10940,7 +10951,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-ghostclick-fix-v271121">
 /*
-  DocuForge AI 27.118.1 — "Jumps to Main Menu after picking a file" fix.
+  DocuForge AI 27.119.1 — "Jumps to Main Menu after picking a file" fix.
 
   On iOS Safari, dismissing the native file-picker sheet can produce a
   stray "ghost" click on whatever element is now sitting under the last
@@ -10987,7 +10998,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-backnav-fix-v271124">
 /*
-  DocuForge AI 27.118.1 — "Back" should return to where you were, not the
+  DocuForge AI 27.119.1 — "Back" should return to where you were, not the
   Main Menu.
 
   The only way to leave the View tab (reached from any Studio via the
