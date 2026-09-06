@@ -996,6 +996,8 @@ window.DFStorage = (function(){
 <button class="tool-btn" id="btnHeaderFooter"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="18" rx="2" width="18" x="3" y="3"></rect><path d="M3 7h18M3 17h18"></path></svg> Add header/footer…</button>
 <button class="tool-btn" id="btnCompress"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 4v4H4M16 4v4h4M8 20v-4H4M16 20v-4h4"></path></svg> Compress</button>
 <button class="tool-btn" id="btnMetadata"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"></path></svg> Metadata inspector…</button>
+<button class="tool-btn" id="btnActionLog"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg> Action log…</button>
+<button class="tool-btn" id="btnVersionHistory"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="14" rx="1" width="12" x="3" y="6"></rect><rect height="14" rx="1" width="12" x="9" y="2"></rect></svg> Version history…</button>
 </div>
 </div>
       <div class="ribbon-panel" data-studio-panel="ocr">
@@ -1029,9 +1031,10 @@ window.DFStorage = (function(){
 <button class="tool-btn" id="btnPdfToOdt"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"></path><path d="M8 13h8M8 17h8"></path></svg> PDF → ODT</button>
 <button class="tool-btn" id="btnPdfToOds"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16"></path></svg> PDF → ODS</button>
 <button class="tool-btn" id="btnPdfToOdp"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="18" x="3" y="5"></rect><path d="M8 21h8"></path></svg> PDF → ODP</button>
+<button class="tool-btn" id="btnPdfToPptxConv"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="13" rx="1" width="18" x="3" y="5"></rect><path d="M8 21h8"></path></svg> PDF → PowerPoint (.pptx)</button>
 <button class="tool-btn" id="btnPdfToEpub"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"></path></svg> PDF → EPUB</button>
 <button class="tool-btn" id="btnFileToPdf" data-requires-file="true">
-  <span aria-hidden="true">📄</span> Convert Files → PDF
+  <span aria-hidden="true">📄</span> Convert Files → PDF (Word, Excel, PowerPoint, CSV, HTML &amp; more)
 </button>
 </div>
 </div>
@@ -1520,7 +1523,7 @@ function loadLib(name){
    full version history), capped to the 6 most recently touched
    projects; opening one from the Dashboard just reloads its bytes the
    same way opening any PDF does. */
-const DB_NAME = 'docuforge-db', DB_VERSION = 1, STORE_PROJECTS = 'projects';
+const DB_NAME = 'docuforge-db', DB_VERSION = 2, STORE_PROJECTS = 'projects', STORE_VERSIONS = 'versions';
 function openProjectsDb(){
   return new Promise((resolve, reject) => {
     if(!window.indexedDB){ reject(new Error('IndexedDB not available')); return; }
@@ -1528,6 +1531,10 @@ function openProjectsDb(){
     req.onupgradeneeded = () => {
       const db = req.result;
       if(!db.objectStoreNames.contains(STORE_PROJECTS)) db.createObjectStore(STORE_PROJECTS, { keyPath: 'id' });
+      if(!db.objectStoreNames.contains(STORE_VERSIONS)){
+        const vs = db.createObjectStore(STORE_VERSIONS, { keyPath: 'vid' });
+        vs.createIndex('projectId', 'projectId', { unique: false });
+      }
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -1554,6 +1561,64 @@ async function pruneOldProjects(maxCount){
       const store = tx.objectStore(STORE_PROJECTS);
       all.slice(maxCount).forEach(p => store.delete(p.id));
     }
+  } catch(e){}
+}
+async function saveVersionSnapshot(projectId, name, msg, bytes){
+  if(!projectId) return;
+  try{
+    const db = await openProjectsDb();
+    const vid = projectId + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_VERSIONS, 'readwrite');
+      tx.objectStore(STORE_VERSIONS).put({ vid, projectId, name, msg: msg || 'Checkpoint', size: bytes.byteLength, timestamp: Date.now(), bytes });
+      tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+    });
+    await pruneOldVersions(projectId);
+  } catch(e){ console.warn('Could not save version checkpoint', e); }
+}
+async function listVersionsFor(projectId){
+  try{
+    const db = await openProjectsDb();
+    const all = await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_VERSIONS, 'readonly');
+      const idx = tx.objectStore(STORE_VERSIONS).index('projectId');
+      const req = idx.getAll(IDBKeyRange.only(projectId));
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+    return all.sort((a, b) => b.timestamp - a.timestamp);
+  } catch(e){ return []; }
+}
+async function loadVersion(vid){
+  try{
+    const db = await openProjectsDb();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_VERSIONS, 'readonly');
+      const req = tx.objectStore(STORE_VERSIONS).get(vid);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  } catch(e){ return null; }
+}
+async function pruneOldVersions(projectId, maxCount){
+  maxCount = maxCount || 20;
+  try{
+    const versions = await listVersionsFor(projectId);
+    if(versions.length > maxCount){
+      const db = await openProjectsDb();
+      const tx = db.transaction(STORE_VERSIONS, 'readwrite');
+      const store = tx.objectStore(STORE_VERSIONS);
+      versions.slice(maxCount).forEach(v => store.delete(v.vid));
+    }
+  } catch(e){}
+}
+async function deleteAllVersionsFor(projectId){
+  try{
+    const versions = await listVersionsFor(projectId);
+    const db = await openProjectsDb();
+    const tx = db.transaction(STORE_VERSIONS, 'readwrite');
+    const store = tx.objectStore(STORE_VERSIONS);
+    versions.forEach(v => store.delete(v.vid));
   } catch(e){}
 }
 async function listRecentProjects(){
@@ -1583,18 +1648,22 @@ async function deleteProjectSnapshot(id){
     const tx = db.transaction(STORE_PROJECTS, 'readwrite');
     tx.objectStore(STORE_PROJECTS).delete(id);
   } catch(e){}
+  deleteAllVersionsFor(id);
 }
 async function clearAllProjectSnapshots(){
   try{
+    const all = await listRecentProjects();
     const db = await openProjectsDb();
     const tx = db.transaction(STORE_PROJECTS, 'readwrite');
     tx.objectStore(STORE_PROJECTS).clear();
+    for(const p of all) deleteAllVersionsFor(p.id);
   } catch(e){}
 }
 async function openRecentProject(id){
   const rec = await loadProjectSnapshot(id);
   if(!rec){ toast('That project is no longer available.', true); return; }
   currentProjectId = rec.id;
+  loadActionLogFor(rec.id);
   $('outName').value = rec.name || 'document';
   setToolsEnabled(true);
   await commit(new Uint8Array(rec.bytes), `Reopened "${rec.name}".`);
@@ -1685,9 +1754,9 @@ function dfGetPdfJs(data, password){
 
 const PDF_REQUIRED_IDS = ['btnInsert','btnDuplicateSel','btnRotateSel','btnReverse','btnDeleteSel','btnCrop','btnRemoveBlank','btnExtract','btnSplit',
    'btnWatermark','btnPageNum','btnBates','btnHeaderFooter','btnFillForm','btnFlattenForm','btnSign','btnEncrypt','btnRedact','btnOpenEncrypted',
-   'btnCompress','btnMetadata','btnUndo','btnRedo','btnReset','btnOcrPdf',
+   'btnCompress','btnMetadata','btnActionLog','btnVersionHistory','btnUndo','btnRedo','btnReset','btnOcrPdf',
    'btnPdfToWord','btnPdfToPptx','btnPdfToExcel','btnPdfToCsv','btnPdfToText','btnPdfToHtml','btnPdfToJson','btnPdfToImages',
-   'btnPdfToXml','btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds','btnPdfToOdp','btnPdfToEpub',
+   'btnPdfToXml','btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds','btnPdfToOdp','btnPdfToPptxConv','btnPdfToEpub',
    'btnAnalyze','btnDupPages','btnChatPdf'];
 
 function updatePdfUploadAction(){
@@ -1711,7 +1780,7 @@ function updatePdfUploadAction(){
   $('dropzone').style.display = 'none';
   $('noPdfBanner').style.display = (isDashboard || activeStudioName !== 'pdf' || on) ? 'none' : 'block';
   $('ribbon').style.display = isDashboard ? 'none' : '';
-  $('pageActionStrip').style.display = isDashboard ? 'none' : '';
+  $('pageActionStrip').style.display = (isDashboard || activeStudioName !== 'pdf') ? 'none' : '';
   updatePdfUploadAction();
   updateDashboardTilesVisibility();
 }
@@ -1723,6 +1792,19 @@ function updatePdfUploadAction(){
 
 /* ---------- History ---------- */
 let currentProjectId = null;
+let actionLog = [];
+function logAction(msg){
+  if(!msg) return;
+  actionLog.push({ t: Date.now(), msg });
+  if(actionLog.length > 500) actionLog.shift();
+  try{ localStorage.setItem('pdfworkbench-actionlog-' + (currentProjectId || 'session'), JSON.stringify(actionLog)); }catch(e){}
+}
+function loadActionLogFor(projectId){
+  try{
+    const raw = localStorage.getItem('pdfworkbench-actionlog-' + projectId);
+    actionLog = raw ? JSON.parse(raw) : [];
+  } catch(e){ actionLog = []; }
+}
 async function commit(newBytes, msg){
   history = history.slice(0, historyIndex + 1);
   history.push(newBytes);
@@ -1731,9 +1813,12 @@ async function commit(newBytes, msg){
   workingBytes = newBytes;
   selected.clear();
   await renderThumbnails();
-  if(msg) setStatus(msg);
+  if(msg){ setStatus(msg); logAction(msg); }
   updateUndoRedoButtons();
-  if(currentProjectId) saveProjectSnapshot(currentProjectId, $('outName').value || 'document', newBytes);
+  if(currentProjectId){
+    saveProjectSnapshot(currentProjectId, $('outName').value || 'document', newBytes);
+    if(msg) saveVersionSnapshot(currentProjectId, $('outName').value || 'document', msg, newBytes);
+  }
 }
 async function undo(){
   if(historyIndex <= 0) return;
@@ -1869,6 +1954,7 @@ async function askPasswordAndOpenPdf(file, originalBytes, message){
         const bytes = await rasterizePdfToWorkingPdf(originalBytes, pw, file.name);
         $('outName').value = file.name.replace(/\.pdf$/i,'') || 'document';
         currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+        actionLog = [];
         setToolsEnabled(true);
         await commit(bytes, `Opened password-protected PDF "${file.name}".`);
         setStudio('pdf');
@@ -1896,6 +1982,7 @@ async function loadFiles(fileList){
     if(!workingBytes){
       $('outName').value = allFiles[0].name.replace(/\.[^.]+$/,'') || 'document';
       currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+      actionLog = [];
 
       if(isPdfFile(allFiles[0])){
         const firstBuf = new Uint8Array(await allFiles[0].arrayBuffer());
@@ -1971,7 +2058,8 @@ function updateSelectionUI(){
   const label = $('selectionCount');
   if(label) label.textContent = `${count} selected${total ? ` of ${total}` : ""}`;
   const strip = $('pageActionStrip');
-  if(strip) strip.style.display = workingBytes ? 'flex' : 'none';
+  const isPdfStudio = (window.__docuForgeCurrentStudio || document.body.dataset.studio || 'pdf') === 'pdf';
+  if(strip) strip.style.display = (workingBytes && isPdfStudio) ? 'flex' : 'none';
   ['pageRotateLeft','pageDuplicate','pageExtract','pageDelete'].forEach(id=>{
     const el=$(id); if(el) el.disabled = count===0;
   });
@@ -5446,6 +5534,70 @@ $('btnMetadata').addEventListener('click', async () => {
   });
 });
 
+$('btnActionLog').addEventListener('click', () => {
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const fmt = t => new Date(t).toLocaleString();
+  const rowsHtml = actionLog.length
+    ? [...actionLog].reverse().map(e => `<div style="padding:6px 8px;border-bottom:1px solid var(--line);font-size:12px;"><span class="mono" style="color:var(--ink-soft);">${esc(fmt(e.t))}</span><br>${esc(e.msg)}</div>`).join('')
+    : '<p class="hint" style="margin:0;">No actions recorded yet for this document.</p>';
+  openModal('Action log', `
+    <p class="hint" style="margin:0;">Every action taken on this document in this session, most recent first. This is a convenience record for your own reference, not a tamper-proof audit trail — treat it as informational.</p>
+    <div style="max-height:360px;overflow-y:auto;border:1px solid var(--line);border-radius:4px;">${rowsHtml}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn ghost" id="actionLogCsv" type="button">Download as CSV</button>
+      <button class="btn ghost" id="actionLogTxt" type="button">Download as text</button>
+    </div>
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+  setTimeout(() => {
+    document.getElementById('actionLogCsv').addEventListener('click', () => {
+      const rows = [['Timestamp','Action'], ...actionLog.map(e => [fmt(e.t), e.msg])];
+      downloadBlob(new Blob([rows.map(r => r.map(toCsvValue).join(',')).join('\n')], {type:'text/csv'}), 'action_log.csv');
+    });
+    document.getElementById('actionLogTxt').addEventListener('click', () => {
+      const lines = actionLog.map(e => `${fmt(e.t)} — ${e.msg}`);
+      downloadBlob(new Blob([lines.join('\n')], {type:'text/plain'}), 'action_log.txt');
+    });
+  }, 0);
+});
+
+$('btnVersionHistory').addEventListener('click', async () => {
+  if(!currentProjectId){ toast('This project has no saved versions yet.', true); return; }
+  const versions = await listVersionsFor(currentProjectId);
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const fmt = t => new Date(t).toLocaleString();
+  const fmtSize = b => b < 1024 ? b + ' B' : b < 1048576 ? (b/1024).toFixed(1) + ' KB' : (b/1048576).toFixed(2) + ' MB';
+  const rowsHtml = versions.length
+    ? versions.map((v, i) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--line);">
+          <div style="font-size:12px;">
+            <span class="mono" style="color:var(--ink-soft);">${esc(fmt(v.timestamp))}</span> · ${fmtSize(v.size)}
+            ${i === 0 ? ' <strong>(current)</strong>' : ''}<br>${esc(v.msg)}
+          </div>
+          ${i === 0 ? '' : `<button class="btn ghost version-restore-btn" data-vid="${esc(v.vid)}" type="button" style="flex-shrink:0;">Restore</button>`}
+        </div>`).join('')
+    : '<p class="hint" style="margin:0;">No checkpoints saved yet — they build up as you use tools on this document.</p>';
+  openModal('Version history', `
+    <p class="hint" style="margin:0;">Up to the last 20 checkpoints for this document, most recent first. Restoring loads that version back as the current working copy — it doesn't delete anything, and you can undo afterward like any other change.</p>
+    <div style="max-height:380px;overflow-y:auto;border:1px solid var(--line);border-radius:4px;">${rowsHtml}</div>
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+  setTimeout(() => {
+    document.querySelectorAll('.version-restore-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const vid = btn.dataset.vid;
+        if(!confirm('Restore this version as the current working copy?')) return;
+        const v = await loadVersion(vid);
+        if(!v){ toast('That version is no longer available.', true); return; }
+        closeModal();
+        await commit(new Uint8Array(v.bytes), `Restored version from ${fmt(v.timestamp)}.`);
+      });
+    });
+  }, 0);
+});
+
 $('btnOcrImage').addEventListener('click', () => {
   const f = window.__docuForgeStudioFile;
   if(!f || !String(f.type||'').startsWith('image/')){
@@ -6510,6 +6662,7 @@ $('btnReset').addEventListener('click', () => {
   if(confirm('Reset the project? All loaded pages, uploaded studio files and history will be cleared.')){
     workingBytes = null; history = []; historyIndex = -1; selected.clear();
     currentProjectId = null;
+    actionLog = [];
     window.__docuForgeStudioFile = null;
     window.__docuForgeStudioFiles = [];
     window.__docuForgeSyncStudioUpload?.();
@@ -6782,7 +6935,7 @@ function setStudio(name){
   if(studioTabs) studioTabs.style.display = isDashboard ? 'none' : 'flex';
   if(ribbon) ribbon.style.display = isDashboard ? 'none' : '';
   if(toolbar) toolbar.style.display = isDashboard ? 'none' : (workingBytes ? 'flex' : 'none');
-  if(pageStrip) pageStrip.style.display = isDashboard ? 'none' : '';
+  if(pageStrip) pageStrip.style.display = (isDashboard || name !== 'pdf') ? 'none' : '';
   if(dropzone) dropzone.style.display = (isDashboard || name !== 'pdf') ? 'none' : (workingBytes ? 'none' : 'block');
   if(banner) banner.style.display = isDashboard ? 'none' : (workingBytes ? 'none' : 'block');
   if(gridEl) gridEl.style.display = isDashboard ? 'none' : '';
@@ -9366,6 +9519,16 @@ function df1115MetadataResult(){
   bindSimpleExport('btnPdfToOdt', 'application/vnd.oasis.opendocument.text', 'odt', () => buildPdfOdt(), 'PDF → ODT');
   bindSimpleExport('btnPdfToOds', 'application/vnd.oasis.opendocument.spreadsheet', 'ods', () => buildPdfOds(), 'PDF → ODS');
   bindSimpleExport('btnPdfToOdp', 'application/vnd.oasis.opendocument.presentation', 'odp', () => buildPdfOdp(), 'PDF → ODP');
+  bindSimpleExport('btnPdfToPptxConv', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'pptx', async () => {
+    const pages = await getPdfPagesTextItems();
+    const hasText = pages.some(p => p.items.some(it => it.str.trim().length));
+    if(!hasText) throw new Error('No extractable text layer — this PDF looks scanned. Run OCR first, then try again.');
+    const slides = pages.map(p => {
+      const lines = groupIntoLines(p.items).map(lineToText).filter(l => l.trim().length);
+      return { title: lines[0] || `Page ${p.pageIndex + 1}`, bullets: lines.slice(1) };
+    });
+    return await buildPptxFromSlides(slides);
+  }, 'PDF → PowerPoint');
   bindSimpleExport('btnPdfToEpub', 'application/epub+zip', 'epub', () => buildPdfEpub(), 'PDF → EPUB');
   bindSimpleExport('btnPdfToSvg', 'application/zip', 'zip', () => convertPdfToSvgZip(), 'PDF → SVG (.zip, one file per page)');
 
