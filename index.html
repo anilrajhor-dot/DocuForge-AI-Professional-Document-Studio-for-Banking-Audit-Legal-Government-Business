@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.121.1: fixed the page-selection strip (Select all/Clear/
+<!-- DocuForge AI 27.122.1: fixed the page-selection strip (Select all/Clear/
      Invert/Rotate/Duplicate/Extract/Delete) showing up in every Studio
      instead of only PDF Studio — three separate places in the code were
      checking "is this Dashboard?" instead of "is this specifically PDF
@@ -884,7 +884,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.121.1';</script>
+<script>const DOCUFORGE_BUILD = '27.122.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -895,7 +895,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.121.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.122.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1292,7 +1292,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.121.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.122.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -3156,16 +3156,23 @@ function showCompareResult(diff, nameA, nameB){
 }
 
 /* ---------- Conversion output sharing ---------- */
-let lastConversionOutput = null;
+// Single namespaced bag for every "last converted result" the app keeps
+// around for its View/Share popups (Word/HTML/etc conversions, PowerPoint,
+// and any future one). Reset project clears this ONE object, so a newly
+// added result type can never be missed the way __dfLastPptxShare was —
+// there's no separate global to remember to add to a reset handler.
+// Any new conversion feature should store its result here rather than in
+// a new top-level window.__df... variable.
+window.__dfLastResults = window.__dfLastResults || {};
 function conversionOutput(blob, filename, label, previewPdfBytes){
   // Keep the converted blob in memory. Do not auto-download it: on iPhone/iPad
   // that can open a document preview (for example Word/ODT) before the user
   // reaches the sharing controls.
-  lastConversionOutput = { blob, filename, label, previewPdfBytes: previewPdfBytes || null };
+  window.__dfLastResults.legacyConversion = { blob, filename, label, previewPdfBytes: previewPdfBytes || null };
   showConversionShare(label);
 }
 function showConversionShare(label){
-  const item = lastConversionOutput;
+  const item = window.__dfLastResults.legacyConversion;
   if(!item) return;
   const safe = String(item.filename).replace(/</g,'&lt;').replace(/>/g,'&gt;');
   openModal('Conversion complete', `
@@ -3742,7 +3749,7 @@ async function buildSlideDeckPdf(slides, pageWidth, pageHeight){
 
 function shareGeneratedFile(blob, filename, label='File', previewPdfBytes){
   const item = { blob, filename, label, previewPdfBytes: previewPdfBytes || null };
-  window.__dfLastPptxShare = item;
+  window.__dfLastResults.pptx = item;
   const safe = String(filename).replace(/</g,'&lt;').replace(/>/g,'&gt;');
   openModal('PowerPoint ready', `
     <div style="padding:4px 0 10px;"><strong>${label} ready.</strong></div>
@@ -7029,8 +7036,7 @@ $('btnReset').addEventListener('click', () => {
     setToolsEnabled(false); grid.innerHTML = ''; updateSelectionUI();
     if($('outName')) $('outName').value='document';
     if(typeof clearConversionLog==='function') clearConversionLog();
-    if(typeof lastConversionOutput!=='undefined') lastConversionOutput=null;
-    window.__dfLastPptxShare = null;
+    window.__dfLastResults = {}; // clears every known result type in one step
     if(window.__dfViewFile) { /* preview is reset on next View open */ }
     setStudio(window.__docuForgeCurrentStudio && window.__docuForgeCurrentStudio !== 'dashboard' ? window.__docuForgeCurrentStudio : 'pdf');
     setStatus('Project reset. All loaded/uploaded files have been cleared.');
@@ -7628,7 +7634,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.121.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.122.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -9598,7 +9604,7 @@ if('serviceWorker' in navigator){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.121.1
+ DocuForge AI 27.122.1
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -9650,7 +9656,7 @@ if('serviceWorker' in navigator){
   }
 
   async function showConversionResult(blob,name,label,previewPdfBytes){
-    window.__dfLastConversion={blob,name,label,previewPdfBytes:previewPdfBytes||null};
+    window.__dfLastResults.conversion={blob,name,label,previewPdfBytes:previewPdfBytes||null};
     const safe=String(name).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     openModal('Conversion complete',`
       <div style="padding:4px 0 10px"><strong>${label||'Conversion'} completed.</strong></div>
@@ -9806,8 +9812,7 @@ if('serviceWorker' in navigator){
         try{
           window.__docuForgeStudioFile=null;
           window.__docuForgeStudioFiles=[];
-          window.__dfLastConversion=null;
-          window.__dfLastPptxShare=null;
+          window.__dfLastResults = {}; // clears every known result type in one step
           ['fileInput','studioUploadInput','studioUploadInputGlobal'].forEach(id=>{
             const x=$(id);if(x){x.value='';x.files&&void 0;}
           });
@@ -10715,7 +10720,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.121.1 — "View" after conversion fix.
+  DocuForge AI 27.122.1 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -10805,8 +10810,8 @@ if('serviceWorker' in navigator){
     e.preventDefault();
     e.stopImmediatePropagation();
     let item = null;
-    if(btn.id === 'convView') item = (typeof lastConversionOutput !== 'undefined') ? lastConversionOutput : null;
-    else if(btn.id === 'pptViewFile') item = window.__dfLastPptxShare || null;
+    if(btn.id === 'convView') item = window.__dfLastResults.legacyConversion || null;
+    else if(btn.id === 'pptViewFile') item = window.__dfLastResults.pptx || null;
     if(!item){ say('No file to preview.', true); return; }
     smartView(item.blob, item.filename);
   }, true);
@@ -10818,7 +10823,7 @@ if('serviceWorker' in navigator){
   document.addEventListener('click', function(e){
     const btn = e.target.closest('#df271027ResultView');
     if(!btn) return;
-    const item = window.__dfLastConversion || null;
+    const item = window.__dfLastResults.conversion || null;
     if(!item) return; // let the original handler run / report the error
     const isPdf = item.previewPdfBytes || item.blob?.type === 'application/pdf' || /\.pdf$/i.test(item.name || '');
     if(isPdf) return; // original handler already opens the PDF viewer correctly
@@ -10834,7 +10839,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.121.1 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.122.1 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -10916,7 +10921,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.121.1 — "View" opens behind an open modal fix.
+  DocuForge AI 27.122.1 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -10960,7 +10965,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-ghostclick-fix-v271121">
 /*
-  DocuForge AI 27.121.1 — "Jumps to Main Menu after picking a file" fix.
+  DocuForge AI 27.122.1 — "Jumps to Main Menu after picking a file" fix.
 
   On iOS Safari, dismissing the native file-picker sheet can produce a
   stray "ghost" click on whatever element is now sitting under the last
@@ -11007,7 +11012,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-backnav-fix-v271124">
 /*
-  DocuForge AI 27.121.1 — "Back" should return to where you were, not the
+  DocuForge AI 27.122.1 — "Back" should return to where you were, not the
   Main Menu.
 
   The only way to leave the View tab (reached from any Studio via the
