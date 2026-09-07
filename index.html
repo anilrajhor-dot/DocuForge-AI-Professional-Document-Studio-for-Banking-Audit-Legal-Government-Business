@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.123.1: fixed the page-selection strip (Select all/Clear/
+<!-- DocuForge AI 27.124.1: fixed the page-selection strip (Select all/Clear/
      Invert/Rotate/Duplicate/Extract/Delete) showing up in every Studio
      instead of only PDF Studio — three separate places in the code were
      checking "is this Dashboard?" instead of "is this specifically PDF
@@ -884,7 +884,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.123.1';</script>
+<script>const DOCUFORGE_BUILD = '27.124.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -895,7 +895,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.123.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.124.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1031,6 +1031,7 @@ window.DFStorage = (function(){
 <button class="tool-btn" id="btnMetadata"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"></path></svg> Metadata inspector…</button>
 <button class="tool-btn" id="btnBookmarks"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"></path></svg> Bookmarks / Outline…</button>
 <button class="tool-btn" id="btnPdfA"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="16" x="4" y="4"></rect><text fill="currentColor" font-size="7" stroke="none" text-anchor="middle" x="12" y="15">A</text></svg> Convert to PDF/A…</button>
+<button class="tool-btn" id="btnAccessCheck"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="5" r="2"></circle><path d="M12 7v6M6 10l6-1 6 1M8 21l4-6 4 6"></path></svg> Accessibility check…</button>
 <button class="tool-btn" id="btnDupPagesBatch"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="14" rx="1" width="12" x="3" y="6"></rect><rect height="14" rx="1" width="12" x="9" y="2"></rect></svg> Find duplicate pages across files…</button>
 <button class="tool-btn" id="btnActionLog"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg> Action log…</button>
 <button class="tool-btn" id="btnVersionHistory"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="14" rx="1" width="12" x="3" y="6"></rect><rect height="14" rx="1" width="12" x="9" y="2"></rect></svg> Version history…</button>
@@ -1134,6 +1135,8 @@ window.DFStorage = (function(){
 <button class="tool-btn" id="btnExcelChart"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7"></path></svg> Excel / CSV → Chart…</button>
 <button class="tool-btn" id="btnChartDigitizer"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7"></path><circle cx="4" cy="10" r="1.5"></circle><circle cx="10" cy="4" r="1.5"></circle><circle cx="16" cy="13" r="1.5"></circle></svg> Digitize chart image…</button>
 <button class="tool-btn" id="btnMilestoneTracker"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"></path></svg> Project milestone tracker…</button>
+<button class="tool-btn" id="btnDataValidator"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path></svg> Validate CSV / Excel data…</button>
+<button class="tool-btn" id="btnPensionPlanner"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg> Retirement / pension corpus planner…</button>
 </div>
 </div>
       <div class="ribbon-panel" data-studio-panel="security">
@@ -1295,7 +1298,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.123.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.124.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -1901,7 +1904,7 @@ function dfGetPdfJs(data, password){
 
 const PDF_REQUIRED_IDS = ['btnInsert','btnDuplicateSel','btnRotateSel','btnReverse','btnDeleteSel','btnCrop','btnRemoveBlank','btnExtract','btnSplit',
    'btnWatermark','btnPageNum','btnBates','btnHeaderFooter','btnFillForm','btnFormDesigner','btnFlattenForm','btnSign','btnVerifySig','btnEncrypt','btnRedact','btnOpenEncrypted',
-   'btnCompress','btnMetadata','btnBookmarks','btnPdfA','btnActionLog','btnVersionHistory','btnUndo','btnRedo','btnReset','btnOcrPdf',
+   'btnCompress','btnMetadata','btnBookmarks','btnPdfA','btnAccessCheck','btnActionLog','btnVersionHistory','btnUndo','btnRedo','btnReset','btnOcrPdf',
    'btnPdfToWord','btnPdfToPptx','btnPdfToExcel','btnPdfToCsv','btnPdfToText','btnPdfToHtml','btnPdfToJson','btnPdfToImages',
    'btnPdfToXml','btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds','btnPdfToOdp','btnPdfToPptxConv','btnPdfToEpub',
    'btnAnalyze','btnDupPages','btnChatPdf'];
@@ -2851,6 +2854,110 @@ async function convertToPdfA(){
   } finally { showProgress(null); }
 }
 
+/* ---------- Accessibility checker (best-effort) ----------
+   Checks what's mechanically verifiable from the PDF's own structure —
+   this is NOT a substitute for a full WCAG/PDF-UA audit, which also
+   needs human judgement about reading order, colour contrast, and
+   meaningful link/alt text. Flags: whether the document is tagged at
+   all (the single biggest accessibility gap in most PDFs), a set
+   document language, a real descriptive title, font embedding, image
+   alt-text feasibility, and untitled form fields. Read-only — it
+   reports issues but doesn't attempt to fix tagging, since real tags
+   need to come from the authoring application (Word, InDesign, etc.). */
+async function checkPdfAccessibility(doc){
+  const context = doc.context;
+  const PN = PDFLib.PDFName.of.bind(PDFLib.PDFName);
+  const findings = [];
+
+  let isTagged = false;
+  try{
+    const markInfoRef = doc.catalog.get(PN('MarkInfo'));
+    if(markInfoRef){
+      const markInfo = context.lookup(markInfoRef);
+      const marked = markInfo && markInfo.get(PN('Marked'));
+      isTagged = marked === PDFLib.PDFBool.True || (marked && marked.toString && marked.toString() === 'true');
+    }
+  }catch(_){}
+  findings.push({
+    ok: isTagged, label: 'Tagged PDF structure',
+    detail: isTagged
+      ? 'This PDF has a tagged structure tree, which is the foundation for screen-reader accessibility.'
+      : 'This PDF is not tagged. Without tags, screen readers cannot reliably determine reading order, headings, or image alt text — this is the most common accessibility failure in PDFs. Real tagging has to be done in the source application (Word, InDesign, etc.) before export; this tool cannot retroactively add genuine structure tags.'
+  });
+
+  let lang = '';
+  try{
+    const langObj = doc.catalog.get(PN('Lang'));
+    if(langObj) lang = langObj.toString().replace(/^\(|\)$/g,'');
+  }catch(_){}
+  findings.push({
+    ok: !!lang, label: 'Document language',
+    detail: lang ? `Set to "${lang}".` : 'No document language is set — screen readers may mispronounce content or use the wrong pronunciation rules.'
+  });
+
+  const title = doc.getTitle() || '';
+  findings.push({
+    ok: !!title.trim(), label: 'Descriptive title',
+    detail: title.trim() ? `Title metadata is set: "${title}".` : 'No title is set in document metadata — screen readers and browser tabs will show the filename instead of a meaningful title.'
+  });
+
+  const fontInfo = await checkPdfAReadiness(doc);
+  findings.push({
+    ok: fontInfo.totalFonts === 0 || fontInfo.unembeddedNames.length === 0,
+    label: 'Font embedding',
+    detail: fontInfo.totalFonts === 0
+      ? 'No fonts detected (e.g. an image-only/scanned PDF).'
+      : (fontInfo.unembeddedNames.length
+          ? `${fontInfo.embeddedFonts}/${fontInfo.totalFonts} fonts embedded. Missing: ${fontInfo.unembeddedNames.slice(0,5).join(', ')}${fontInfo.unembeddedNames.length>5?', …':''}.`
+          : `All ${fontInfo.totalFonts} font(s) are embedded.`)
+  });
+
+  let imageCount = 0;
+  try{
+    for(const [ref, obj] of context.enumerateIndirectObjects()){
+      if(!(obj instanceof PDFLib.PDFStream)) continue;
+      const subtype = obj.dict.get(PN('Subtype'));
+      if(subtype && subtype.toString() === '/Image') imageCount++;
+    }
+  }catch(_){}
+  findings.push({
+    ok: imageCount === 0 || isTagged, label: 'Image alt text',
+    detail: imageCount === 0
+      ? 'No embedded images found.'
+      : (isTagged
+          ? `${imageCount} image(s) found. This PDF is tagged, but this tool can't verify each one actually has real alt text — check manually in a dedicated accessibility tool.`
+          : `${imageCount} image(s) found, and this PDF isn't tagged, so none of them have accessible alt text a screen reader can use.`)
+  });
+
+  let untitledFields = 0, totalFields = 0;
+  try{
+    const acroFormRef = doc.catalog.get(PN('AcroForm'));
+    if(acroFormRef){
+      const acroForm = context.lookup(acroFormRef);
+      const fieldsArr = acroForm && context.lookup(acroForm.get(PN('Fields')));
+      if(fieldsArr instanceof PDFLib.PDFArray){
+        for(let i = 0; i < fieldsArr.size(); i++){
+          const f = context.lookup(fieldsArr.get(i));
+          if(!f) continue;
+          totalFields++;
+          if(!f.get(PN('TU'))) untitledFields++;
+        }
+      }
+    }
+  }catch(_){}
+  if(totalFields > 0){
+    findings.push({
+      ok: untitledFields === 0, label: 'Form field labels',
+      detail: untitledFields
+        ? `${untitledFields}/${totalFields} form field(s) have no tooltip/description (/TU) for screen readers.`
+        : `All ${totalFields} form field(s) have a tooltip/description set.`
+    });
+  }
+
+  return findings;
+}
+
+
 /* ---------- Bookmarks / Outline editor ----------
    v1 supports a single flat list (no nested sub-bookmarks). If the PDF
    already has a nested outline, opening this editor shows every entry
@@ -3380,19 +3487,19 @@ function wordDiff(a,b){
   const A=compareTokenise(a), B=compareTokenise(b);
   const n=A.length,m=B.length;
   // Guard against pathological lines.
-  if(n>600 || m>600) return {aHtml:escCompare(a,'removed'),bHtml:escCompare(b,'added'),changed:true,added:m,removed:n};
+  if(n>600 || m>600) return {aHtml:escCompare(a,'removed'),bHtml:escCompare(b,'added'),changed:true,added:m,removed:n,merged:[{t:a,cls:'removed'},{t:b,cls:'added'}]};
   const dp=Array.from({length:n+1},()=>new Array(m+1).fill(0));
   for(let i=n-1;i>=0;i--) for(let j=m-1;j>=0;j--) dp[i][j]=A[i]===B[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
-  const aa=[],bb=[]; let i=0,j=0,added=0,removed=0;
+  const aa=[],bb=[],merged=[]; let i=0,j=0,added=0,removed=0;
   const push=(arr,t,cls)=>arr.push({t,cls});
   while(i<n&&j<m){
-    if(A[i]===B[j]){push(aa,A[i],'same');push(bb,B[j],'same');i++;j++;}
-    else if(dp[i+1][j]>=dp[i][j+1]){push(aa,A[i],'removed');if(/[\p{L}\p{N}_]/u.test(A[i])) removed++;i++;}
-    else{push(bb,B[j],'added');if(/[\p{L}\p{N}_]/u.test(B[j])) added++;j++;}
+    if(A[i]===B[j]){push(aa,A[i],'same');push(bb,B[j],'same');push(merged,A[i],'same');i++;j++;}
+    else if(dp[i+1][j]>=dp[i][j+1]){push(aa,A[i],'removed');push(merged,A[i],'removed');if(/[\p{L}\p{N}_]/u.test(A[i])) removed++;i++;}
+    else{push(bb,B[j],'added');push(merged,B[j],'added');if(/[\p{L}\p{N}_]/u.test(B[j])) added++;j++;}
   }
-  while(i<n){const t=A[i++];push(aa,t,'removed');if(/[\p{L}\p{N}_]/u.test(t)) removed++;}
-  while(j<m){const t=B[j++];push(bb,t,'added');if(/[\p{L}\p{N}_]/u.test(t)) added++;}
-  return {aHtml:renderTokenRuns(aa),bHtml:renderTokenRuns(bb),changed:true,added,removed};
+  while(i<n){const t=A[i++];push(aa,t,'removed');push(merged,t,'removed');if(/[\p{L}\p{N}_]/u.test(t)) removed++;}
+  while(j<m){const t=B[j++];push(bb,t,'added');push(merged,t,'added');if(/[\p{L}\p{N}_]/u.test(t)) added++;}
+  return {aHtml:renderTokenRuns(aa),bHtml:renderTokenRuns(bb),changed:true,added,removed,merged};
 }
 function escCompare(s,cls=''){
   const e=String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -3416,6 +3523,64 @@ function groupCompareDiff(diff){
     for(let k=0;k<count;k++) out.push({type:'change',a:removed[k]??'',b:added[k]??''});
   }
   return out;
+}
+/* ---------- Redline PDF export ----------
+   Renders the same diff groupCompareDiff() already computes into an
+   actual PDF: unchanged text in black, removed text struck through in
+   red, added text underlined in green — in reading order on one
+   continuous line per original line, wrapping as needed. This is a
+   visual redline for review, not a PDF/A- or Word-track-changes-file;
+   it can't be re-opened and "accepted/rejected" like real tracked
+   changes, only read and shared. */
+async function buildRedlinePdf(diff, nameA, nameB){
+  const groups = groupCompareDiff(diff);
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const pageWidth = 595.28, pageHeight = 841.89, margin = 48;
+  const usableWidth = pageWidth - margin*2, fontSize = 9.5, lineHeight = 14;
+  let page = doc.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - margin;
+  const newPage = () => { page = doc.addPage([pageWidth, pageHeight]); y = pageHeight - margin; };
+  const drawHeader = () => {
+    page.drawText('Document Redline', { x: margin, y, size: 14, font: fontBold, color: rgb(0.1,0.1,0.1) });
+    y -= 18;
+    page.drawText(`${nameA}  vs  ${nameB}`, { x: margin, y, size: 9, font, color: rgb(0.35,0.35,0.35) });
+    y -= 13;
+    page.drawText('Strikethrough = removed    Underline = added', { x: margin, y, size: 8, font, color: rgb(0.35,0.35,0.35) });
+    y -= 18;
+  };
+  drawHeader();
+  const removedColor = rgb(0.72,0.15,0.15), addedColor = rgb(0.1,0.5,0.2), sameColor = rgb(0.12,0.12,0.12);
+  function drawToken(text, cls){
+    if(!text) return;
+    const color = cls==='removed' ? removedColor : cls==='added' ? addedColor : sameColor;
+    const w = font.widthOfTextAtSize(text, fontSize);
+    if(x + w > margin + usableWidth){
+      x = margin; y -= lineHeight;
+      if(y < margin){ newPage(); x = margin; }
+    }
+    page.drawText(text, { x, y, size: fontSize, font, color });
+    if(cls === 'removed'){
+      page.drawLine({ start:{x, y: y+fontSize*0.32}, end:{x: x+w, y: y+fontSize*0.32}, thickness:0.7, color });
+    } else if(cls === 'added'){
+      page.drawLine({ start:{x, y: y-1.5}, end:{x: x+w, y: y-1.5}, thickness:0.7, color });
+    }
+    x += w;
+  }
+  let x = margin;
+  for(const g of groups){
+    x = margin;
+    if(y < margin + lineHeight) newPage();
+    if(g.type === 'same'){
+      for(const tok of compareTokenise(g.a)) drawToken(tok, 'same');
+    } else {
+      const wd = wordDiff(g.a, g.b);
+      for(const tok of wd.merged) drawToken(tok.t, tok.cls);
+    }
+    y -= lineHeight * 1.4; // extra gap between original lines/paragraphs
+  }
+  return await doc.save();
 }
 function showCompareResult(diff, nameA, nameB){
   const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -3461,6 +3626,7 @@ function showCompareResult(diff, nameA, nameB){
       <button class="btn primary" id="cmpPrev" type="button">↑ Previous difference</button>
       <button class="btn primary" id="cmpNext" type="button">↓ Next difference</button>
       <button class="btn ghost" id="cmpDownload" type="button">Download comparison (.html)</button>
+      <button class="btn ghost" id="cmpRedlinePdf" type="button">🖊 Download redline PDF</button>
     </div>
   `, async()=>{});
   $('modalConfirm').style.display='none';
@@ -3471,6 +3637,18 @@ function showCompareResult(diff, nameA, nameB){
     const jump=(dir)=>{ if(!changes.length)return; pos=(pos+dir+changes.length)%changes.length; changes[pos].scrollIntoView({block:'center'}); };
     document.getElementById('cmpPrev')?.addEventListener('click',()=>jump(-1));
     document.getElementById('cmpNext')?.addEventListener('click',()=>jump(1));
+    document.getElementById('cmpRedlinePdf')?.addEventListener('click', async () => {
+      const btn = document.getElementById('cmpRedlinePdf');
+      if(btn) btn.disabled = true;
+      try{
+        const bytes = await buildRedlinePdf(diff, nameA, nameB);
+        const blob = new Blob([bytes], { type:'application/pdf' });
+        const name = 'redline_' + nameA.replace(/\.[^.]+$/,'') + '_vs_' + nameB.replace(/\.[^.]+$/,'') + '.pdf';
+        if(typeof resultShare === 'function'){ closeModal(); await resultShare(blob, name, 'Redline PDF', bytes); }
+        else downloadBlob(blob, name);
+      }catch(e){ console.error(e); toast('Could not build the redline PDF.', true); }
+      finally{ if(btn) btn.disabled = false; }
+    });
     document.getElementById('cmpDownload')?.addEventListener('click',()=>{
       const body=groups.map((g,idx)=>{
         if(g.type==='same') return `<tr><td>${idx+1}</td><td>${esc(g.a)}</td><td>${esc(g.b)}</td></tr>`;
@@ -6298,6 +6476,26 @@ $('btnPdfA').addEventListener('click', async () => {
   $('modalConfirm').textContent = 'Convert';
 });
 
+$('btnAccessCheck').addEventListener('click', async () => {
+  let findings = [];
+  try{ findings = await checkPdfAccessibility(await PDFDocument.load(workingBytes)); }catch(e){ console.error(e); }
+  const passCount = findings.filter(f => f.ok).length;
+  const rows = findings.map(f => `
+    <div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);">
+      <div style="font-size:16px;">${f.ok ? '✅' : '⚠️'}</div>
+      <div><strong>${f.label}</strong><div class="hint" style="margin-top:2px;">${f.detail}</div></div>
+    </div>`).join('');
+  openModal('Accessibility check', `
+    <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12.5px;line-height:1.5;margin-bottom:10px;">
+      <strong>Honest scope:</strong> this checks what's mechanically verifiable from the PDF's structure — it is <strong>not</strong> a full WCAG/PDF-UA audit, which also needs human judgement about reading order, colour contrast, and meaningful alt/link text. It reports issues; it doesn't fix tagging, since real tags need to come from the authoring application (Word, InDesign, etc.).
+    </div>
+    <div class="hint" style="margin-bottom:8px;"><strong>${passCount}/${findings.length}</strong> checks passed.</div>
+    ${rows}
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+});
+
 $('btnDupPagesBatch').addEventListener('click', () => {
   openModal('Find duplicate pages across files', `
     <p class="hint">Choose two or more PDFs (or one large PDF you suspect has repeated pages). Pages are matched by their text where possible, or by a coarse visual comparison for scanned/image pages — not a true image-similarity match, so only near-identical scans will be caught.</p>
@@ -8133,7 +8331,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.123.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.124.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -8182,6 +8380,94 @@ function detectFinancialWorkbook(wb){
   const hasFinancialCompanions=['executive summary','p&l analysis','margins & growth','balance sheet','ratios','cash flow'].filter(n=>names.includes(n)).length>=3;
   return hasFinancialSheet && hasFinancialCompanions;
 }
+
+/* ---------- CSV/Excel data validator ----------
+   Runs user-defined rules against every data row of a spreadsheet.
+   Each rule targets one column: required (non-empty), exact length
+   (e.g. Aadhaar = 12 digits), numeric, positive number, regex pattern,
+   unique values, or a basic date-format check. Returns every failure
+   with its row/column so it can be reviewed or exported. */
+function validateSpreadsheetRows(headers, rows, rules){
+  const errors = [];
+  const seenByRule = new Map(); // for 'unique' rules: ruleIdx -> Map(value -> firstRowIdx)
+  rules.forEach((rule, ri) => { if(rule.type === 'unique') seenByRule.set(ri, new Map()); });
+  rows.forEach((row, rIdx) => {
+    rules.forEach((rule, ri) => {
+      const raw = row[rule.column];
+      const val = (raw === undefined || raw === null) ? '' : String(raw).trim();
+      let msg = null;
+      switch(rule.type){
+        case 'required':
+          if(!val) msg = 'Empty value';
+          break;
+        case 'length':
+          if(val.length !== rule.param) msg = `Expected exactly ${rule.param} characters, got ${val.length}`;
+          break;
+        case 'numeric':
+          if(val && isNaN(Number(val))) msg = 'Not a number';
+          break;
+        case 'positive':
+          if(val && (isNaN(Number(val)) || Number(val) <= 0)) msg = 'Not a positive number';
+          break;
+        case 'regex':
+          try{ if(val && !(new RegExp(rule.param)).test(val)) msg = `Doesn't match pattern ${rule.param}`; }catch(_){}
+          break;
+        case 'unique':
+          if(val){
+            const seen = seenByRule.get(ri);
+            if(seen.has(val)) msg = `Duplicate of row ${seen.get(val)+1}`;
+            else seen.set(val, rIdx);
+          }
+          break;
+        case 'date':
+          if(val && isNaN(Date.parse(val))) msg = 'Not a recognisable date';
+          break;
+      }
+      if(msg) errors.push({ row: rIdx + 2, column: headers[rule.column] ?? `Column ${rule.column+1}`, rule: rule.type, message: msg, value: val });
+    });
+  });
+  return errors;
+}
+
+/* ---------- Retirement / pension corpus planner ----------
+   Accumulation: standard ordinary-annuity future-value formula (monthly
+   contributions, monthly compounding) plus a lump sum starting corpus.
+   Drawdown: month-by-month simulation — corpus grows at the given
+   post-retirement rate, withdrawal (inflation-adjusted every 12 months)
+   is subtracted, repeated up to a 60-year cap. Both are standard
+   textbook formulas/simulations, not personalised financial advice —
+   the tool says so in its own UI. */
+function computeAccumulation({ startingCorpus, monthlyContribution, annualReturnPct, years }){
+  const r = (annualReturnPct/100) / 12;
+  const n = Math.round(years * 12);
+  const fvLumpSum = startingCorpus * Math.pow(1 + r, n);
+  const fvContributions = r === 0 ? monthlyContribution * n : monthlyContribution * ((Math.pow(1+r, n) - 1) / r);
+  const rows = [];
+  let balance = startingCorpus;
+  for(let y = 1; y <= years; y++){
+    for(let m = 0; m < 12; m++){ balance = balance * (1+r) + monthlyContribution; }
+    rows.push({ year: y, balance });
+  }
+  return { finalCorpus: fvLumpSum + fvContributions, yearly: rows };
+}
+function computeDrawdown({ corpus, monthlyWithdrawal, annualReturnPct, inflationPct, maxYears = 60 }){
+  const r = (annualReturnPct/100) / 12;
+  let balance = corpus, withdrawal = monthlyWithdrawal;
+  const rows = [];
+  let monthsLasted = 0, depleted = false;
+  for(let y = 1; y <= maxYears; y++){
+    for(let m = 0; m < 12; m++){
+      balance = balance * (1+r) - withdrawal;
+      monthsLasted++;
+      if(balance <= 0){ balance = 0; depleted = true; break; }
+    }
+    rows.push({ year: y, balance, monthlyWithdrawal: withdrawal });
+    if(depleted) break;
+    withdrawal *= (1 + inflationPct/100); // step up withdrawal with inflation each year
+  }
+  return { depleted, yearsLasted: monthsLasted / 12, yearly: rows };
+}
+
 function dataUrlToBlob(dataUrl){
   const [meta, b64] = dataUrl.split(',');
   const mime = meta.match(/:(.*?);/)[1];
@@ -8515,6 +8801,211 @@ function digCanvasClick(e){
     digRedraw(); digRenderTable();
   }
 }
+$('btnDataValidator').addEventListener('click', () => {
+  openModal('Validate CSV / Excel data', `
+    <div class="field"><label>Spreadsheet file</label><input type="file" id="dvFile" accept=".xlsx,.xls,.csv"></div>
+    <div id="dvRulesArea" style="display:none;">
+      <div id="dvRulesList"></div>
+      <button type="button" class="btn ghost" id="dvAddRule" style="margin-top:6px;">+ Add rule</button>
+      <button type="button" class="btn primary" id="dvRun" style="margin-top:10px;">Run validation</button>
+    </div>
+    <div id="dvResults"></div>
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+  let headers = [], rows = [];
+  const ruleTypeOptions = `
+    <option value="required">Required (not empty)</option>
+    <option value="length">Exact length</option>
+    <option value="numeric">Numeric</option>
+    <option value="positive">Positive number</option>
+    <option value="regex">Matches pattern (regex)</option>
+    <option value="unique">Unique (no duplicates)</option>
+    <option value="date">Valid date</option>`;
+  function addRuleRow(){
+    const list = document.getElementById('dvRulesList');
+    const row = document.createElement('div');
+    row.className = 'field row dv-rule-row';
+    row.style.cssText = 'align-items:center;gap:6px;';
+    row.innerHTML = `
+      <select class="dv-col" style="flex:1.4;">${headers.map((h,i) => `<option value="${i}">${escapeXml(String(h))}</option>`).join('')}</select>
+      <select class="dv-type" style="flex:1.4;">${ruleTypeOptions}</select>
+      <input type="text" class="dv-param" placeholder="e.g. 12" style="flex:1;display:none;">
+      <button type="button" class="btn ghost dv-del">✕</button>`;
+    list.appendChild(row);
+    const typeSel = row.querySelector('.dv-type');
+    const paramInput = row.querySelector('.dv-param');
+    const syncParam = () => {
+      const needsParam = typeSel.value === 'length' || typeSel.value === 'regex';
+      paramInput.style.display = needsParam ? '' : 'none';
+      paramInput.placeholder = typeSel.value === 'length' ? 'e.g. 12' : (typeSel.value === 'regex' ? 'e.g. ^[A-Z]{2}\\d{4}$' : '');
+    };
+    typeSel.addEventListener('change', syncParam);
+    syncParam();
+    row.querySelector('.dv-del').addEventListener('click', () => row.remove());
+  }
+  setTimeout(() => {
+    document.getElementById('dvFile').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if(!file) return;
+      try{
+        await loadLib('xlsx');
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, { type:'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const allRows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:'' });
+        if(!allRows.length){ toast('Could not read any data from that file.', true); return; }
+        headers = allRows[0];
+        rows = allRows.slice(1).filter(r => r.some(c => String(c).trim() !== ''));
+        document.getElementById('dvRulesArea').style.display = '';
+        document.getElementById('dvRulesList').innerHTML = '';
+        document.getElementById('dvResults').innerHTML = '';
+        addRuleRow();
+      }catch(err){ console.error(err); toast('Could not read that spreadsheet.', true); }
+    });
+    document.getElementById('dvAddRule').addEventListener('click', addRuleRow);
+    document.getElementById('dvRun').addEventListener('click', () => {
+      const ruleRows = [...document.querySelectorAll('.dv-rule-row')];
+      if(!ruleRows.length){ toast('Add at least one rule first.', true); return; }
+      const rules = ruleRows.map(r => {
+        const type = r.querySelector('.dv-type').value;
+        const paramRaw = r.querySelector('.dv-param').value;
+        return { column: parseInt(r.querySelector('.dv-col').value), type, param: type === 'length' ? (parseInt(paramRaw)||0) : paramRaw };
+      });
+      const errors = validateSpreadsheetRows(headers, rows, rules);
+      const resultsEl = document.getElementById('dvResults');
+      const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      if(!errors.length){
+        resultsEl.innerHTML = `<p class="hint">✅ All ${rows.length} row(s) passed every rule.</p>`;
+        return;
+      }
+      const shown = errors.slice(0, 200);
+      resultsEl.innerHTML = `
+        <p class="hint"><strong>${errors.length}</strong> issue(s) found across ${new Set(errors.map(e=>e.row)).size} row(s)${errors.length>200 ? ' (showing first 200)' : ''}.</p>
+        <div style="max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:8px;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr><th style="text-align:left;padding:6px;border-bottom:1px solid var(--line);">Row</th><th style="text-align:left;padding:6px;border-bottom:1px solid var(--line);">Column</th><th style="text-align:left;padding:6px;border-bottom:1px solid var(--line);">Issue</th></tr></thead>
+            <tbody>${shown.map(e => `<tr><td style="padding:5px 6px;border-bottom:1px solid var(--line);">${e.row}</td><td style="padding:5px 6px;border-bottom:1px solid var(--line);">${esc(e.column)}</td><td style="padding:5px 6px;border-bottom:1px solid var(--line);">${esc(e.message)} ${e.value ? `(value: "${esc(e.value)}")` : ''}</td></tr>`).join('')}</tbody>
+          </table>
+        </div>
+        <button type="button" class="btn ghost" id="dvDownloadReport" style="margin-top:8px;">Download full report (.csv)</button>`;
+      document.getElementById('dvDownloadReport')?.addEventListener('click', () => {
+        const csvRows = [['Row','Column','Rule','Issue','Value'], ...errors.map(e => [e.row, e.column, e.rule, e.message, e.value])];
+        downloadBlob(new Blob([csvRows.map(r => r.map(toCsvValue).join(',')).join('\n')], {type:'text/csv'}), 'validation_report.csv');
+      });
+    });
+  }, 0);
+});
+
+$('btnPensionPlanner').addEventListener('click', () => {
+  openModal('Retirement / pension corpus planner', `
+    <p class="hint">Standard compound-growth formulas, not personalised financial advice — check assumptions against your own plan before relying on this.</p>
+    <div class="field"><label>Mode</label>
+      <select id="ppMode"><option value="accum">Accumulation — build up a corpus</option><option value="drawdown">Drawdown — how long will a corpus last</option></select>
+    </div>
+    <div id="ppAccumFields">
+      <div class="field row">
+        <div><label>Starting corpus (₹)</label><input type="number" id="ppStart" value="0" min="0"></div>
+        <div><label>Monthly contribution (₹)</label><input type="number" id="ppContrib" value="10000" min="0"></div>
+      </div>
+      <div class="field row">
+        <div><label>Expected annual return (%)</label><input type="number" id="ppReturn" value="10" step="0.1"></div>
+        <div><label>Years to retirement</label><input type="number" id="ppYears" value="20" min="1"></div>
+      </div>
+    </div>
+    <div id="ppDrawdownFields" style="display:none;">
+      <div class="field row">
+        <div><label>Corpus at retirement (₹)</label><input type="number" id="ppCorpus" value="5000000" min="0"></div>
+        <div><label>Desired monthly withdrawal, today's value (₹)</label><input type="number" id="ppWithdraw" value="30000" min="0"></div>
+      </div>
+      <div class="field row">
+        <div><label>Expected post-retirement return (%)</label><input type="number" id="ppPostReturn" value="7" step="0.1"></div>
+        <div><label>Expected inflation (%)</label><input type="number" id="ppInflation" value="6" step="0.1"></div>
+      </div>
+    </div>
+    <div id="ppResults"></div>
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+  let lastResult = null, lastMode = 'accum';
+  function renderResults(){
+    const resultsEl = document.getElementById('ppResults');
+    if(!lastResult){ resultsEl.innerHTML = ''; return; }
+    const fmt = n => '₹' + Math.round(n).toLocaleString('en-IN');
+    if(lastMode === 'accum'){
+      resultsEl.innerHTML = `
+        <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px;">
+          <strong>Projected corpus at retirement: ${fmt(lastResult.finalCorpus)}</strong>
+        </div>
+        <div style="max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:8px;margin-top:8px;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr><th style="text-align:left;padding:6px;border-bottom:1px solid var(--line);">Year</th><th style="text-align:right;padding:6px;border-bottom:1px solid var(--line);">Balance</th></tr></thead>
+            <tbody>${lastResult.yearly.map(r => `<tr><td style="padding:5px 6px;border-bottom:1px solid var(--line);">${r.year}</td><td style="text-align:right;padding:5px 6px;border-bottom:1px solid var(--line);">${fmt(r.balance)}</td></tr>`).join('')}</tbody>
+          </table>
+        </div>
+        <button type="button" class="btn ghost" id="ppDownloadPdf" style="margin-top:8px;">Download projection (.pdf)</button>`;
+    } else {
+      resultsEl.innerHTML = `
+        <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px;">
+          <strong>${lastResult.depleted ? `Corpus lasts approximately ${lastResult.yearsLasted.toFixed(1)} years.` : `Corpus is not projected to deplete within 60 years under these assumptions.`}</strong>
+        </div>
+        <div style="max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:8px;margin-top:8px;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr><th style="text-align:left;padding:6px;border-bottom:1px solid var(--line);">Year</th><th style="text-align:right;padding:6px;border-bottom:1px solid var(--line);">Monthly withdrawal</th><th style="text-align:right;padding:6px;border-bottom:1px solid var(--line);">Year-end balance</th></tr></thead>
+            <tbody>${lastResult.yearly.map(r => `<tr><td style="padding:5px 6px;border-bottom:1px solid var(--line);">${r.year}</td><td style="text-align:right;padding:5px 6px;border-bottom:1px solid var(--line);">${fmt(r.monthlyWithdrawal)}</td><td style="text-align:right;padding:5px 6px;border-bottom:1px solid var(--line);">${fmt(r.balance)}</td></tr>`).join('')}</tbody>
+          </table>
+        </div>
+        <button type="button" class="btn ghost" id="ppDownloadPdf" style="margin-top:8px;">Download projection (.pdf)</button>`;
+    }
+    document.getElementById('ppDownloadPdf')?.addEventListener('click', async () => {
+      try{
+        const fmtPlain = n => Math.round(n).toLocaleString('en-IN');
+        const rows = lastMode === 'accum'
+          ? [['Year','Balance (₹)'], ...lastResult.yearly.map(r => [String(r.year), fmtPlain(r.balance)])]
+          : [['Year','Monthly withdrawal (₹)','Year-end balance (₹)'], ...lastResult.yearly.map(r => [String(r.year), fmtPlain(r.monthlyWithdrawal), fmtPlain(r.balance)])];
+        const bytes = await buildTablePdf(rows);
+        const blob = new Blob([bytes], { type:'application/pdf' });
+        const name = lastMode === 'accum' ? 'pension_accumulation_projection.pdf' : 'pension_drawdown_projection.pdf';
+        if(typeof resultShare === 'function') await resultShare(blob, name, 'Pension projection', bytes);
+        else downloadBlob(blob, name);
+      }catch(e){ console.error(e); toast('Could not build the projection PDF.', true); }
+    });
+  }
+  setTimeout(() => {
+    const modeSel = document.getElementById('ppMode');
+    const accumFields = document.getElementById('ppAccumFields');
+    const drawdownFields = document.getElementById('ppDrawdownFields');
+    modeSel.addEventListener('change', () => {
+      lastMode = modeSel.value;
+      accumFields.style.display = lastMode === 'accum' ? '' : 'none';
+      drawdownFields.style.display = lastMode === 'drawdown' ? '' : 'none';
+      lastResult = null; renderResults();
+    });
+    const recompute = () => {
+      if(lastMode === 'accum'){
+        lastResult = computeAccumulation({
+          startingCorpus: parseFloat(document.getElementById('ppStart').value) || 0,
+          monthlyContribution: parseFloat(document.getElementById('ppContrib').value) || 0,
+          annualReturnPct: parseFloat(document.getElementById('ppReturn').value) || 0,
+          years: parseInt(document.getElementById('ppYears').value) || 1,
+        });
+      } else {
+        lastResult = computeDrawdown({
+          corpus: parseFloat(document.getElementById('ppCorpus').value) || 0,
+          monthlyWithdrawal: parseFloat(document.getElementById('ppWithdraw').value) || 0,
+          annualReturnPct: parseFloat(document.getElementById('ppPostReturn').value) || 0,
+          inflationPct: parseFloat(document.getElementById('ppInflation').value) || 0,
+        });
+      }
+      renderResults();
+    };
+    ['ppStart','ppContrib','ppReturn','ppYears','ppCorpus','ppWithdraw','ppPostReturn','ppInflation'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', recompute);
+    });
+    recompute();
+  }, 0);
+});
+
 $('btnChartDigitizer').addEventListener('click', () => {
   digImg = null; digCanvas = null; digCtx = null;
   digState = 'idle'; digCalPoints = []; digDataPoints = []; digPendingPixel = null;
@@ -10107,7 +10598,7 @@ if('serviceWorker' in navigator){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.123.1
+ DocuForge AI 27.124.1
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -11223,7 +11714,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.123.1 — "View" after conversion fix.
+  DocuForge AI 27.124.1 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -11342,7 +11833,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.123.1 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.124.1 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -11424,7 +11915,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.123.1 — "View" opens behind an open modal fix.
+  DocuForge AI 27.124.1 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -11468,7 +11959,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-ghostclick-fix-v271121">
 /*
-  DocuForge AI 27.123.1 — "Jumps to Main Menu after picking a file" fix.
+  DocuForge AI 27.124.1 — "Jumps to Main Menu after picking a file" fix.
 
   On iOS Safari, dismissing the native file-picker sheet can produce a
   stray "ghost" click on whatever element is now sitting under the last
@@ -11515,7 +12006,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-backnav-fix-v271124">
 /*
-  DocuForge AI 27.123.1 — "Back" should return to where you were, not the
+  DocuForge AI 27.124.1 — "Back" should return to where you were, not the
   Main Menu.
 
   The only way to leave the View tab (reached from any Studio via the
