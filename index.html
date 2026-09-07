@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.122.1: fixed the page-selection strip (Select all/Clear/
+<!-- DocuForge AI 27.123.1: fixed the page-selection strip (Select all/Clear/
      Invert/Rotate/Duplicate/Extract/Delete) showing up in every Studio
      instead of only PDF Studio — three separate places in the code were
      checking "is this Dashboard?" instead of "is this specifically PDF
@@ -884,7 +884,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.122.1';</script>
+<script>const DOCUFORGE_BUILD = '27.123.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -895,7 +895,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.122.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.123.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1029,6 +1029,9 @@ window.DFStorage = (function(){
 <button class="tool-btn" id="btnHeaderFooter"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="18" rx="2" width="18" x="3" y="3"></rect><path d="M3 7h18M3 17h18"></path></svg> Add header/footer…</button>
 <button class="tool-btn" id="btnCompress"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 4v4H4M16 4v4h4M8 20v-4H4M16 20v-4h4"></path></svg> Compress</button>
 <button class="tool-btn" id="btnMetadata"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"></path></svg> Metadata inspector…</button>
+<button class="tool-btn" id="btnBookmarks"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"></path></svg> Bookmarks / Outline…</button>
+<button class="tool-btn" id="btnPdfA"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="16" x="4" y="4"></rect><text fill="currentColor" font-size="7" stroke="none" text-anchor="middle" x="12" y="15">A</text></svg> Convert to PDF/A…</button>
+<button class="tool-btn" id="btnDupPagesBatch"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="14" rx="1" width="12" x="3" y="6"></rect><rect height="14" rx="1" width="12" x="9" y="2"></rect></svg> Find duplicate pages across files…</button>
 <button class="tool-btn" id="btnActionLog"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg> Action log…</button>
 <button class="tool-btn" id="btnVersionHistory"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="14" rx="1" width="12" x="3" y="6"></rect><rect height="14" rx="1" width="12" x="9" y="2"></rect></svg> Version history…</button>
 </div>
@@ -1252,7 +1255,7 @@ window.DFStorage = (function(){
       <p>Every tool lives under a Studio tab at the top. Most PDF tools need a file open first — that's why buttons look greyed out until you do. Here's what each Studio covers:</p>
 
       <h3 style="margin-top:18px;font-size:14px;">📄 PDF Studio</h3>
-      <p><strong>Add pages:</strong> Open/merge PDFs, insert a PDF at a specific position. <strong>Arrange:</strong> duplicate, rotate, reverse, delete, crop, and remove blank pages (checks actual pixels, so it works on scans too). <strong>Extract &amp; split:</strong> pull selected pages into a new file, or split into many files by range or every N pages. <strong>Enhance:</strong> watermark, page numbers, Bates numbering, headers/footers, compress, and the metadata inspector.</p>
+      <p><strong>Add pages:</strong> Open/merge PDFs, insert a PDF at a specific position. <strong>Arrange:</strong> duplicate, rotate, reverse, delete, crop, and remove blank pages (checks actual pixels, so it works on scans too). <strong>Extract &amp; split:</strong> pull selected pages into a new file, or split into many files by range or every N pages. <strong>Enhance:</strong> watermark, page numbers (Arabic, Roman, custom prefix, with per-section restart), Bates numbering, headers/footers, compress, metadata inspector (with a one-tap full scrub including photo EXIF/GPS), bookmarks/outline editor, PDF/A-oriented conversion, and cross-file duplicate-page detection.</p>
 
       <h3 style="margin-top:18px;font-size:14px;">🖼 OCR &amp; Image Tools</h3>
       <p>Extract text from a photo, make a scanned PDF genuinely searchable (a real invisible text layer, not just a label), pull a table out of an image into CSV/Excel, combine images into a PDF, or export PDF pages as images.</p>
@@ -1292,7 +1295,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.122.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.123.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -1898,7 +1901,7 @@ function dfGetPdfJs(data, password){
 
 const PDF_REQUIRED_IDS = ['btnInsert','btnDuplicateSel','btnRotateSel','btnReverse','btnDeleteSel','btnCrop','btnRemoveBlank','btnExtract','btnSplit',
    'btnWatermark','btnPageNum','btnBates','btnHeaderFooter','btnFillForm','btnFormDesigner','btnFlattenForm','btnSign','btnVerifySig','btnEncrypt','btnRedact','btnOpenEncrypted',
-   'btnCompress','btnMetadata','btnActionLog','btnVersionHistory','btnUndo','btnRedo','btnReset','btnOcrPdf',
+   'btnCompress','btnMetadata','btnBookmarks','btnPdfA','btnActionLog','btnVersionHistory','btnUndo','btnRedo','btnReset','btnOcrPdf',
    'btnPdfToWord','btnPdfToPptx','btnPdfToExcel','btnPdfToCsv','btnPdfToText','btnPdfToHtml','btnPdfToJson','btnPdfToImages',
    'btnPdfToXml','btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds','btnPdfToOdp','btnPdfToPptxConv','btnPdfToEpub',
    'btnAnalyze','btnDupPages','btnChatPdf'];
@@ -2476,13 +2479,28 @@ async function addWatermark({text, opacity, size, color, xRatio, yRatio, angle})
 }
 
 /* ---------- Page numbers ---------- */
-async function addPageNumbers({position, startNum}){
+function toRoman(num, lower){
+  const map = [[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+  let n = Math.max(1, Math.floor(num)), out = '';
+  for(const [val, sym] of map){ while(n >= val){ out += sym; n -= val; } }
+  return lower ? out.toLowerCase() : out;
+}
+async function addPageNumbers({position, startNum, style='arabic', prefix='', restartPages=[]}){
   await withDoc(async (doc) => {
     const font = await doc.embedFont(StandardFonts.Helvetica);
     const pages = doc.getPages();
+    // 0-based page indices where a new section begins and numbering
+    // restarts at 1 (page 1 itself never "restarts" — it's already the start).
+    const restartSet = new Set((restartPages||[]).map(n => n - 1).filter(n => n > 0));
+    let counter = startNum;
     pages.forEach((page, i) => {
+      if(restartSet.has(i)) counter = 1;
+      let label;
+      if(style === 'roman-upper') label = toRoman(counter, false);
+      else if(style === 'roman-lower') label = toRoman(counter, true);
+      else if(style === 'custom') label = (prefix||'') + counter;
+      else label = String(counter);
       const { width } = page.getSize();
-      const label = String(startNum + i);
       const size = 10;
       const textWidth = font.widthOfTextAtSize(label, size);
       let x;
@@ -2490,6 +2508,7 @@ async function addPageNumbers({position, startNum}){
       else if(position === 'right') x = width - 28 - textWidth;
       else x = width/2 - textWidth/2;
       page.drawText(label, { x, y: 22, size, font, color: rgb(0.3,0.3,0.3) });
+      counter++;
     });
   }, 'Page numbers added.');
   if(typeof df1115OperationResult === 'function'){
@@ -2610,8 +2629,330 @@ async function getMetadata(){
   };
 }
 
+/* ---------- Metadata scrubber ----------
+   Clears the standard Info-dict fields (title/author/subject/keywords/
+   creator/producer/dates), deletes the embedded XMP metadata packet if
+   present (the Info dict fields above don't touch it, and XMP can carry
+   its own independent author/software fields), and strips EXIF/IPTC
+   segments from every embedded JPEG image without re-encoding it — this
+   is the one realistic place GPS coordinates end up inside a PDF (a photo
+   taken on a phone and inserted via Images → PDF keeps its EXIF GPS tag
+   unless something strips it). Non-JPEG images (Flate/CCITT/JPX) don't
+   carry EXIF in the same way and are left untouched. */
+function scrubJpegExif(bytes){
+  if(bytes.length < 4 || bytes[0] !== 0xFF || bytes[1] !== 0xD8) return bytes; // not a JPEG we understand — leave unchanged
+  const out = [0xFF, 0xD8];
+  let i = 2, changed = false;
+  while(i < bytes.length - 1){
+    if(bytes[i] !== 0xFF){ for(let j = i; j < bytes.length; j++) out.push(bytes[j]); break; }
+    const marker = bytes[i+1];
+    if(marker === 0xD8 || marker === 0xD9 || (marker >= 0xD0 && marker <= 0xD7)){
+      out.push(bytes[i], bytes[i+1]); i += 2; continue;
+    }
+    if(marker === 0xDA){ for(let j = i; j < bytes.length; j++) out.push(bytes[j]); break; }
+    if(i + 3 >= bytes.length){ for(let j = i; j < bytes.length; j++) out.push(bytes[j]); break; }
+    const segLen = (bytes[i+2] << 8) | bytes[i+3];
+    const isExif = marker === 0xE1; // APP1 — EXIF and/or XMP
+    const isIptc = marker === 0xED; // APP13 — Photoshop/IPTC
+    if(isExif || isIptc){
+      changed = true; // drop this whole segment
+    } else {
+      for(let j = i; j < i + 2 + segLen; j++) out.push(bytes[j]);
+    }
+    i += 2 + segLen;
+  }
+  return changed ? new Uint8Array(out) : bytes;
+}
+async function scrubPdfMetadata(){
+  showProgress(10);
+  try{
+    const doc = await PDFDocument.load(workingBytes);
+    doc.setTitle(''); doc.setAuthor(''); doc.setSubject(''); doc.setKeywords([]);
+    doc.setCreator(''); doc.setProducer('');
+    const neutralDate = new Date('2000-01-01T00:00:00Z');
+    try{ doc.setCreationDate(neutralDate); doc.setModificationDate(neutralDate); }catch(_){}
+    const context = doc.context;
+    const PN = PDFLib.PDFName.of.bind(PDFLib.PDFName);
+    try{ doc.catalog.delete(PN('Metadata')); }catch(_){}
+    const objects = context.enumerateIndirectObjects();
+    let imagesScrubbed = 0;
+    for(const [ref, obj] of objects){
+      if(!(obj instanceof PDFLib.PDFStream)) continue;
+      const dict = obj.dict;
+      const subtype = dict.get(PN('Subtype'));
+      if(!subtype || subtype.toString() !== '/Image') continue;
+      const filter = dict.get(PN('Filter'));
+      if(!filter || filter.toString() !== '/DCTDecode') continue;
+      try{
+        const rawBytes = obj.getContents();
+        const cleaned = scrubJpegExif(rawBytes);
+        if(cleaned !== rawBytes){
+          const newStream = PDFLib.PDFRawStream.of(dict, cleaned);
+          context.assign(ref, newStream);
+          imagesScrubbed++;
+        }
+      }catch(_){}
+    }
+    showProgress(80);
+    const bytes = await doc.save();
+    await commit(bytes, 'Metadata scrubbed: title/author/subject/keywords/creator/producer cleared' + (imagesScrubbed ? `, EXIF removed from ${imagesScrubbed} embedded photo${imagesScrubbed>1?'s':''}.` : '.'));
+    return { imagesScrubbed };
+  } catch(e){
+    console.error(e); toast('Could not scrub metadata from this PDF.', true);
+    throw e;
+  } finally { showProgress(null); }
+}
+
+/* ---------- Duplicate-page detector (across a batch of PDFs) ----------
+   Text-bearing pages are fingerprinted from their normalised extracted
+   text (fast, reliable for born-digital PDFs). Pages with little or no
+   extractable text (scans, images) fall back to a coarse 8x8 brightness-
+   grid visual fingerprint — not a true perceptual hash, so it will only
+   catch near-identical scans, not similar-but-different ones. */
+function dfSimpleHash(str){
+  let h = 5381;
+  for(let i = 0; i < str.length; i++){ h = ((h << 5) + h) + str.charCodeAt(i); h = h & h; }
+  return (h >>> 0).toString(36);
+}
+async function fingerprintPdfPage(pdf, pageNum){
+  const page = await pdf.getPage(pageNum);
+  const content = await page.getTextContent();
+  const text = content.items.map(it => it.str).join(' ');
+  const norm = text.toLowerCase().replace(/\s+/g,' ').trim();
+  if(norm.length >= 24) return 'text:' + dfSimpleHash(norm) + ':' + norm.length;
+  const viewport = page.getViewport({ scale: 0.15 });
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(8, Math.round(viewport.width));
+  canvas.height = Math.max(8, Math.round(viewport.height));
+  const ctx = canvas.getContext('2d');
+  await page.render({ canvasContext: ctx, viewport }).promise;
+  const gridSize = 8;
+  const cellW = canvas.width / gridSize, cellH = canvas.height / gridSize;
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  const cells = [];
+  for(let gy = 0; gy < gridSize; gy++){
+    for(let gx = 0; gx < gridSize; gx++){
+      let sum = 0, count = 0;
+      const x0 = Math.floor(gx*cellW), x1 = Math.floor((gx+1)*cellW);
+      const y0 = Math.floor(gy*cellH), y1 = Math.floor((gy+1)*cellH);
+      for(let y = y0; y < y1; y++){
+        for(let x = x0; x < x1; x++){
+          const idx = (y*canvas.width + x) * 4;
+          sum += 0.299*imgData[idx] + 0.587*imgData[idx+1] + 0.114*imgData[idx+2];
+          count++;
+        }
+      }
+      cells.push(count ? Math.round(sum/count/16) : 0);
+    }
+  }
+  return 'visual:' + cells.join(',');
+}
+async function findDuplicatePages(files, onProgress){
+  const groups = new Map();
+  for(let fi = 0; fi < files.length; fi++){
+    const file = files[fi];
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const pdf = await dfGetPdfJs(bytes).promise;
+    for(let p = 1; p <= pdf.numPages; p++){
+      const fp = await fingerprintPdfPage(pdf, p);
+      if(!groups.has(fp)) groups.set(fp, []);
+      groups.get(fp).push({ fileName: file.name, pageNum: p });
+      if(onProgress) onProgress(fi, files.length, p, pdf.numPages);
+    }
+  }
+  return [...groups.values()].filter(g => g.length > 1);
+}
+
+/* ---------- PDF/A-oriented conversion (best-effort) ----------
+   Honest scope: this checks font embedding and adds XMP metadata
+   declaring PDF/A-1b intent. It does NOT add an OutputIntent with an
+   embedded ICC colour profile, and it cannot embed fonts that weren't
+   already embedded in the source PDF — both are required for genuine,
+   verifiable PDF/A-1b conformance. Treat this as "PDF/A-oriented", not
+   certified-compliant; verifying real compliance needs a dedicated tool
+   such as veraPDF. The in-app result always states this plainly. */
+async function checkPdfAReadiness(doc){
+  const context = doc.context;
+  const PN = PDFLib.PDFName.of.bind(PDFLib.PDFName);
+  const objects = context.enumerateIndirectObjects();
+  let totalFonts = 0, embeddedFonts = 0;
+  const unembeddedNames = [];
+  for(const [ref, obj] of objects){
+    if(!(obj instanceof PDFLib.PDFDict)) continue;
+    const type = obj.get(PN('Type'));
+    if(!type || type.toString() !== '/Font') continue;
+    totalFonts++;
+    const descriptor = obj.get(PN('FontDescriptor'));
+    let hasFile = false;
+    if(descriptor){
+      const descDict = context.lookup(descriptor);
+      if(descDict && (descDict.get(PN('FontFile')) || descDict.get(PN('FontFile2')) || descDict.get(PN('FontFile3')))) hasFile = true;
+    }
+    if(hasFile) embeddedFonts++;
+    else{
+      const baseFont = obj.get(PN('BaseFont'));
+      unembeddedNames.push(baseFont ? baseFont.toString().replace(/^\//,'') : 'unknown font');
+    }
+  }
+  return { totalFonts, embeddedFonts, unembeddedNames: [...new Set(unembeddedNames)] };
+}
+async function convertToPdfA(){
+  showProgress(10);
+  try{
+    const doc = await PDFDocument.load(workingBytes);
+    const readiness = await checkPdfAReadiness(doc);
+    showProgress(30);
+    const title = doc.getTitle() || '';
+    const author = doc.getAuthor() || '';
+    const now = new Date().toISOString();
+    const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    const xmp = `<?xpacket begin="\uFEFF" id="W5M0MpCehiHzreSzNTczkc9d"?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/">
+ <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about="" xmlns:pdfaid="http://www.aiim.org/pdfa/ns/id/">
+   <pdfaid:part>1</pdfaid:part>
+   <pdfaid:conformance>B</pdfaid:conformance>
+  </rdf:Description>
+  <rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <dc:title><rdf:Alt><rdf:li xml:lang="x-default">${esc(title)}</rdf:li></rdf:Alt></dc:title>
+   <dc:creator><rdf:Seq><rdf:li>${esc(author)}</rdf:li></rdf:Seq></dc:creator>
+  </rdf:Description>
+  <rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+   <xmp:CreatorTool>DocuForge AI</xmp:CreatorTool>
+   <xmp:ModifyDate>${now}</xmp:ModifyDate>
+  </rdf:Description>
+ </rdf:RDF>
+</x:xmpmeta>
+<?xpacket end="w"?>`;
+    let xmpEmbedded = false;
+    try{
+      const context = doc.context;
+      const PN = PDFLib.PDFName.of.bind(PDFLib.PDFName);
+      const xmpDict = PDFLib.PDFDict.withContext(context);
+      xmpDict.set(PN('Type'), PN('Metadata'));
+      xmpDict.set(PN('Subtype'), PN('XML'));
+      const xmpBytes = new TextEncoder().encode(xmp);
+      const xmpStream = PDFLib.PDFRawStream.of(xmpDict, xmpBytes);
+      const xmpRef = context.register(xmpStream);
+      doc.catalog.set(PN('Metadata'), xmpRef);
+      xmpEmbedded = true;
+    }catch(e){ console.error('XMP embed failed:', e); }
+    doc.setProducer('DocuForge AI (browser-only, PDF/A-oriented)');
+    showProgress(80);
+    const bytes = await doc.save();
+    const unembeddedNote = readiness.unembeddedNames.length
+      ? ` ${readiness.embeddedFonts}/${readiness.totalFonts} fonts are embedded — ${readiness.unembeddedNames.slice(0,4).join(', ')}${readiness.unembeddedNames.length>4?', …':''} are not, which a strict PDF/A validator would flag.`
+      : (readiness.totalFonts ? ` All ${readiness.totalFonts} font(s) are already embedded.` : '');
+    await commit(bytes, `PDF/A-oriented conversion applied${xmpEmbedded ? ' (XMP metadata added)' : ''}.` + unembeddedNote);
+    return readiness;
+  } catch(e){
+    console.error(e); toast('Could not run the PDF/A conversion.', true);
+    throw e;
+  } finally { showProgress(null); }
+}
+
+/* ---------- Bookmarks / Outline editor ----------
+   v1 supports a single flat list (no nested sub-bookmarks). If the PDF
+   already has a nested outline, opening this editor shows every entry
+   with its nesting shown only as a visual indent for awareness — saving
+   any change flattens the whole outline into one flat list. That trade-
+   off is stated in the tool's own UI, not hidden. */
+async function readPdfOutline(doc){
+  const context = doc.context;
+  const PN = PDFLib.PDFName.of.bind(PDFLib.PDFName);
+  const items = [];
+  try{
+    const outlinesRef = doc.catalog.get(PN('Outlines'));
+    if(!outlinesRef) return items;
+    const outlines = context.lookup(outlinesRef);
+    if(!outlines) return items;
+    const pages = doc.getPages();
+    const pageRefToIndex = new Map();
+    pages.forEach((p, idx) => { pageRefToIndex.set(p.ref.toString(), idx); });
+    function resolveDestPageIndex(item){
+      try{
+        let dest = item.get(PN('Dest'));
+        if(dest){
+          dest = context.lookup(dest);
+          if(dest instanceof PDFLib.PDFArray){
+            const pageRef = dest.get(0);
+            if(pageRef) return pageRefToIndex.get(pageRef.toString());
+          }
+        }
+        const action = item.get(PN('A'));
+        if(action){
+          const actionDict = context.lookup(action);
+          const d = actionDict && actionDict.get(PN('D'));
+          if(d){
+            const destArr = context.lookup(d);
+            if(destArr instanceof PDFLib.PDFArray){
+              const pageRef = destArr.get(0);
+              if(pageRef) return pageRefToIndex.get(pageRef.toString());
+            }
+          }
+        }
+      }catch(_){}
+      return undefined;
+    }
+    function walk(dict, depth){
+      let childRef = dict.get(PN('First'));
+      let guard = 0;
+      while(childRef && guard++ < 2000){
+        const child = context.lookup(childRef);
+        if(!child) break;
+        const titleObj = child.get(PN('Title'));
+        let title = '';
+        try{ title = titleObj ? titleObj.decodeText() : ''; }catch(_){ title = titleObj ? String(titleObj) : ''; }
+        const pageIndex = resolveDestPageIndex(child);
+        items.push({ title: title || '(untitled)', pageIndex: (typeof pageIndex === 'number') ? pageIndex : 0, depth });
+        walk(child, depth+1);
+        childRef = child.get(PN('Next'));
+      }
+    }
+    walk(outlines, 0);
+  }catch(e){ console.error('readPdfOutline failed:', e); }
+  return items;
+}
+async function writePdfOutline(doc, items){
+  const context = doc.context;
+  const PN = PDFLib.PDFName.of.bind(PDFLib.PDFName);
+  const pages = doc.getPages();
+  if(!items.length){
+    try{ doc.catalog.delete(PN('Outlines')); }catch(_){}
+    return;
+  }
+  const outlinesDict = PDFLib.PDFDict.withContext(context);
+  outlinesDict.set(PN('Type'), PN('Outlines'));
+  const outlinesRef = context.register(outlinesDict);
+  const itemDicts = items.map(() => PDFLib.PDFDict.withContext(context));
+  const itemRefs = itemDicts.map(d => context.register(d));
+  items.forEach((it, i) => {
+    const page = pages[Math.max(0, Math.min(pages.length-1, it.pageIndex))];
+    const dict = itemDicts[i];
+    dict.set(PN('Title'), PDFLib.PDFHexString.fromText(it.title || 'Untitled'));
+    dict.set(PN('Parent'), outlinesRef);
+    const destArr = PDFLib.PDFArray.withContext(context);
+    destArr.push(page.ref);
+    destArr.push(PN('Fit'));
+    dict.set(PN('Dest'), destArr);
+    if(i > 0) dict.set(PN('Prev'), itemRefs[i-1]);
+    if(i < items.length-1) dict.set(PN('Next'), itemRefs[i+1]);
+  });
+  outlinesDict.set(PN('First'), itemRefs[0]);
+  outlinesDict.set(PN('Last'), itemRefs[items.length-1]);
+  outlinesDict.set(PN('Count'), PDFLib.PDFNumber.of(items.length));
+  doc.catalog.set(PN('Outlines'), outlinesRef);
+  try{ doc.catalog.set(PN('PageMode'), PN('UseOutlines')); }catch(_){}
+}
+async function saveBookmarks(items){
+  await withDoc(async (doc) => {
+    await writePdfOutline(doc, items);
+  }, items.length ? `Bookmarks updated (${items.length} entr${items.length===1?'y':'ies'}).` : 'All bookmarks removed.');
+}
+
 /* ---------- OCR ----------
    Two flows:
+
    1. OCR a standalone image file → plain text, via Tesseract.js directly.
    2. OCR every (or selected) page of the working PDF at high render scale,
       then overlay the recognized words back onto the page as invisible,
@@ -5795,12 +6136,34 @@ $('btnPageNum').addEventListener('click', () => {
     <div class="field"><label>Position</label>
       <select id="pnPos"><option value="center">Bottom center</option><option value="right">Bottom right</option><option value="left">Bottom left</option></select>
     </div>
+    <div class="field"><label>Numbering style</label>
+      <select id="pnStyle">
+        <option value="arabic">1, 2, 3…</option>
+        <option value="roman-upper">I, II, III…</option>
+        <option value="roman-lower">i, ii, iii…</option>
+        <option value="custom">Custom prefix (e.g. "Page 1")</option>
+      </select>
+    </div>
+    <div class="field" id="pnPrefixField" style="display:none;"><label>Prefix</label><input type="text" id="pnPrefix" placeholder="Page " value="Page "></div>
     <div class="field"><label>Start numbering at</label><input type="number" id="pnStart" min="1" value="1"></div>
+    <div class="field"><label>Restart at page(s) (optional)</label><input type="text" id="pnRestart" placeholder="e.g. 5, 12 — numbering resets to 1 there"></div>
+    <p class="hint">Use "Restart at page(s)" for documents with distinct sections (e.g. front matter, then chapters) that should each begin their own numbering.</p>
   `, async () => {
     const position = document.getElementById('pnPos').value;
+    const style = document.getElementById('pnStyle').value;
+    const prefix = document.getElementById('pnPrefix').value;
     const startNum = parseInt(document.getElementById('pnStart').value) || 1;
-    await addPageNumbers({ position, startNum });
+    const restartPages = (document.getElementById('pnRestart').value||'')
+      .split(',').map(s => parseInt(s.trim())).filter(n => Number.isFinite(n) && n > 0);
+    await addPageNumbers({ position, startNum, style, prefix, restartPages });
   });
+  setTimeout(() => {
+    const styleSel = document.getElementById('pnStyle');
+    const prefixField = document.getElementById('pnPrefixField');
+    styleSel?.addEventListener('change', () => {
+      prefixField.style.display = styleSel.value === 'custom' ? '' : 'none';
+    });
+  }, 0);
 });
 
 $('btnCompress').addEventListener('click', () => {
@@ -5832,6 +6195,8 @@ $('btnMetadata').addEventListener('click', async () => {
     <div class="field"><label>Author</label><input type="text" id="mdAuthor" value="${meta.author.replace(/"/g,'&quot;')}"></div>
     <div class="field"><label>Subject</label><input type="text" id="mdSubject" value="${meta.subject.replace(/"/g,'&quot;')}"></div>
     <div class="field"><label>Keywords (comma separated)</label><input type="text" id="mdKeywords" value="${meta.keywords.replace(/"/g,'&quot;')}"></div>
+    <button type="button" class="btn ghost" id="mdScrubBtn" style="align-self:flex-start;">🧹 Scrub all metadata &amp; EXIF now</button>
+    <p class="hint" style="margin-top:4px;">Clears every field above plus the creator/producer/dates, removes any embedded XMP data, and strips EXIF (including GPS) from embedded photos. Runs immediately — separate from Save below.</p>
   `, async () => {
     await editMetadata({
       title: document.getElementById('mdTitle').value,
@@ -5840,6 +6205,140 @@ $('btnMetadata').addEventListener('click', async () => {
       keywords: document.getElementById('mdKeywords').value,
     });
   });
+  setTimeout(() => {
+    document.getElementById('mdScrubBtn')?.addEventListener('click', async () => {
+      if(!confirm('Scrub all metadata and photo EXIF data from this PDF? This clears title, author, subject, keywords, creator, producer, dates, embedded XMP, and EXIF/GPS data from embedded photos.')) return;
+      closeModal();
+      await scrubPdfMetadata();
+    });
+  }, 0);
+});
+
+$('btnBookmarks').addEventListener('click', async () => {
+  let items = [];
+  try{
+    const doc = await PDFDocument.load(workingBytes);
+    items = (await readPdfOutline(doc)).map(it => ({ title: it.title, pageIndex: it.pageIndex }));
+  }catch(e){ console.error(e); }
+  const pageCount = (await PDFDocument.load(workingBytes)).getPageCount();
+  const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  const renderRows = () => items.map((it,i) => `
+    <div class="field row" data-bm-row="${i}" style="align-items:center;gap:6px;">
+      <input type="text" class="bm-title" value="${esc(it.title)}" style="flex:2;">
+      <input type="number" class="bm-page" min="1" max="${pageCount}" value="${it.pageIndex+1}" style="width:70px;">
+      <button type="button" class="btn ghost bm-up" ${i===0?'disabled':''}>↑</button>
+      <button type="button" class="btn ghost bm-down" ${i===items.length-1?'disabled':''}>↓</button>
+      <button type="button" class="btn ghost bm-del">✕</button>
+    </div>`).join('') || '<p class="hint" id="bmEmptyMsg">No bookmarks yet. Use "Add bookmark" below.</p>';
+  openModal('Bookmarks / Outline', `
+    <p class="hint">One flat list — pointing each entry at a page. ${items.some(it=>it.depth>0) ? 'This PDF has nested bookmarks; saving will flatten them into this single list.' : ''}</p>
+    <div id="bmList">${renderRows()}</div>
+    <button type="button" class="btn ghost" id="bmAdd" style="margin-top:8px;">+ Add bookmark</button>
+  `, async () => {
+    const rows = [...document.querySelectorAll('#bmList [data-bm-row]')];
+    const newItems = rows.map(row => ({
+      title: row.querySelector('.bm-title').value.trim() || 'Untitled',
+      pageIndex: Math.max(0, Math.min(pageCount-1, (parseInt(row.querySelector('.bm-page').value)||1) - 1)),
+    }));
+    await saveBookmarks(newItems);
+  });
+  $('modalConfirm').textContent = 'Save bookmarks';
+  function wireRows(){
+    document.querySelectorAll('#bmList [data-bm-row]').forEach(row => {
+      const i = parseInt(row.dataset.bmRow);
+      row.querySelector('.bm-up')?.addEventListener('click', () => {
+        if(i===0) return; [items[i-1],items[i]] = [items[i],items[i-1]]; refresh();
+      });
+      row.querySelector('.bm-down')?.addEventListener('click', () => {
+        if(i===items.length-1) return; [items[i+1],items[i]] = [items[i],items[i+1]]; refresh();
+      });
+      row.querySelector('.bm-del')?.addEventListener('click', () => { items.splice(i,1); refresh(); });
+    });
+  }
+  function syncFromDom(){
+    document.querySelectorAll('#bmList [data-bm-row]').forEach(row => {
+      const i = parseInt(row.dataset.bmRow);
+      if(items[i]){
+        items[i].title = row.querySelector('.bm-title').value;
+        items[i].pageIndex = Math.max(0, Math.min(pageCount-1, (parseInt(row.querySelector('.bm-page').value)||1) - 1));
+      }
+    });
+  }
+  function refresh(){
+    syncFromDom();
+    document.getElementById('bmList').innerHTML = renderRows();
+    wireRows();
+  }
+  setTimeout(() => {
+    wireRows();
+    document.getElementById('bmAdd')?.addEventListener('click', () => {
+      syncFromDom();
+      items.push({ title: 'New bookmark', pageIndex: 0 });
+      refresh();
+    });
+  }, 0);
+});
+
+$('btnPdfA').addEventListener('click', async () => {
+  let readiness = { totalFonts: 0, embeddedFonts: 0, unembeddedNames: [] };
+  try{ readiness = await checkPdfAReadiness(await PDFDocument.load(workingBytes)); }catch(e){ console.error(e); }
+  const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  openModal('Convert to PDF/A', `
+    <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12.5px;line-height:1.5;">
+      <strong>Honest scope:</strong> this adds XMP metadata declaring PDF/A-1b intent and checks font embedding — it does <strong>not</strong> add an embedded ICC colour profile (OutputIntent), which real PDF/A-1b conformance also requires. Treat the result as "PDF/A-oriented," not certified-compliant. Verifying true compliance needs a dedicated tool such as veraPDF.
+    </div>
+    <div class="hint" style="margin-top:10px;">
+      ${readiness.totalFonts
+        ? (readiness.unembeddedNames.length
+            ? `⚠️ ${readiness.embeddedFonts}/${readiness.totalFonts} fonts embedded. Not embedded: ${esc(readiness.unembeddedNames.slice(0,6).join(', '))}${readiness.unembeddedNames.length>6?', …':''} — a strict validator would flag this PDF.`
+            : `✓ All ${readiness.totalFonts} font(s) in this PDF are already embedded.`)
+        : 'No fonts detected to check (e.g. an image-only/scanned PDF).'}
+    </div>
+  `, async () => { await convertToPdfA(); });
+  $('modalConfirm').textContent = 'Convert';
+});
+
+$('btnDupPagesBatch').addEventListener('click', () => {
+  openModal('Find duplicate pages across files', `
+    <p class="hint">Choose two or more PDFs (or one large PDF you suspect has repeated pages). Pages are matched by their text where possible, or by a coarse visual comparison for scanned/image pages — not a true image-similarity match, so only near-identical scans will be caught.</p>
+    <div class="field"><input type="file" id="dupFiles" accept=".pdf,application/pdf" multiple></div>
+    <div id="dupProgress" class="hint" style="display:none;"></div>
+    <div id="dupResults"></div>
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+  setTimeout(() => {
+    document.getElementById('dupFiles')?.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []);
+      if(files.length < 1){ return; }
+      const progressEl = document.getElementById('dupProgress');
+      const resultsEl = document.getElementById('dupResults');
+      progressEl.style.display = '';
+      resultsEl.innerHTML = '';
+      progressEl.textContent = 'Scanning…';
+      try{
+        const dupGroups = await findDuplicatePages(files, (fi, ftotal, p, ptotal) => {
+          progressEl.textContent = `Scanning ${files[fi].name} — page ${p}/${ptotal} (file ${fi+1}/${ftotal})…`;
+        });
+        progressEl.style.display = 'none';
+        if(!dupGroups.length){
+          resultsEl.innerHTML = '<p class="hint">No duplicate pages found across the selected file(s).</p>';
+          return;
+        }
+        const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+        resultsEl.innerHTML = `<p class="hint"><strong>${dupGroups.length}</strong> group(s) of duplicate pages found:</p>` +
+          dupGroups.map((g,gi) => `
+            <div style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:12.5px;">
+              <strong>Group ${gi+1}</strong> (${g.length} copies)<br>
+              ${g.map(x => `${esc(x.fileName)} — page ${x.pageNum}`).join('<br>')}
+            </div>`).join('');
+      }catch(err){
+        console.error(err);
+        progressEl.style.display = 'none';
+        resultsEl.innerHTML = '<p class="hint" style="color:#b64b3c;">Could not scan these files. Make sure they are all valid PDFs.</p>';
+      }
+    });
+  }, 0);
 });
 
 $('btnActionLog').addEventListener('click', () => {
@@ -7634,7 +8133,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.122.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.123.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -8161,6 +8660,10 @@ const HELP_FAQ = [
   { q: ['crop'], a: 'PDF Studio → Arrange → "Crop pages…" — trims the visible area without deleting content, so it\u2019s reversible with Undo.' },
   { q: ['blank page'], a: 'PDF Studio → Arrange → "Remove blank pages…" checks actual page pixels, so it works on scanned blank pages too, not just text-empty ones.' },
   { q: ['bates'], a: 'PDF Studio → Enhance → "Bates numbering…" — a prefix plus sequential zero-padded numbers across every page.' },
+  { q: ['bookmark','outline','toc','table of contents'], a: 'PDF Studio → Enhance → "Bookmarks / Outline…" — add, rename, reorder or delete entries, each pointing at a page. Saving replaces any existing outline with this flat list.' },
+  { q: ['pdf/a','pdfa','archival','archive'], a: 'PDF Studio → Enhance → "Convert to PDF/A…" — adds PDF/A-1b XMP metadata and checks font embedding. It is honestly labelled "PDF/A-oriented," not certified-compliant — it does not embed an ICC colour profile, which true conformance also needs.' },
+  { q: ['duplicate page','duplicate pages'], a: '"Detect duplicate pages" (PDF Studio, needs a PDF open) checks pages within one document. "Find duplicate pages across files…" is separate and compares pages across several PDFs you select at once.' },
+  { q: ['scrub','exif','gps','strip metadata'], a: 'PDF Studio → Enhance → "Metadata inspector…" → "Scrub all metadata & EXIF now" — clears title/author/subject/keywords/creator/producer/dates, removes embedded XMP, and strips EXIF (including GPS) from embedded photos.' },
   { q: ['digitize','chart image','extract chart'], a: 'Spreadsheet Studio → "Digitize chart image…" — calibrate two known axis points, then click each data point; no software can read an arbitrary chart automatically.' },
   { q: ['website','generate site'], a: 'Website Studio → "Generate a website…" — describe your site, get a complete single-file HTML site to preview, download, and deploy the same way as this app.' },
   { q: ['powerpoint','pptx','ppt','slide'], a: 'PowerPoint Studio: convert PDF ⇄ PowerPoint, edit slide titles/bullets directly, add or delete slides, merge several .pptx files, split one into parts, or drag to reorder slides. All structural — titles and bullets carry over, original design doesn\u2019t.' },
@@ -8193,7 +8696,7 @@ async function fhHandleQuestion(question){
   if(savedKey){
     const thinking = fhAddMsg('bot', '…thinking…');
     try{
-      const prompt = `You are a help assistant for "DocuForge AI," a browser-based PDF/document toolkit with these tools organized into Studios: PDF (merge/split/rotate/crop/watermark/page numbers/Bates numbering/headers-footers/forms/compress/blank-page removal/metadata), OCR & Images (searchable PDFs, text/table extraction from images, images-to-PDF, QR reading), Translation (38 languages), Conversion (PDF to/from Word, Excel, PowerPoint, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB, images), AI (summarize/rewrite/chat with PDF/meeting minutes/contract review/website generation, using the user's own API key), Spreadsheet (Excel/CSV to chart, chart digitizer), Security (visual signature stamps, form fill/flatten, beta password protection), Batch processing, and a Reader for PDF/EPUB. Everything runs in the browser except Translate and AI features, which send only chosen text (never files) to external providers. Answer the following question about how to use the app, concisely, in 2-3 sentences:\n\n${question}`;
+      const prompt = `You are a help assistant for "DocuForge AI," a browser-based PDF/document toolkit with these tools organized into Studios: PDF (merge/split/rotate/crop/watermark/page numbers with Roman/custom-prefix/section-restart styles/Bates numbering/headers-footers/forms/compress/blank-page removal/metadata inspector with a full scrub-and-EXIF-strip option/bookmarks-outline editor/PDF-A-oriented conversion/duplicate-page detection across files), OCR & Images (searchable PDFs, text/table extraction from images, images-to-PDF, QR reading), Translation (38 languages), Conversion (PDF to/from Word, Excel, PowerPoint, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB, images), AI (summarize/rewrite/chat with PDF/meeting minutes/contract review/website generation, using the user's own API key), Spreadsheet (Excel/CSV to chart, chart digitizer), Security (visual signature stamps, form fill/flatten, beta password protection), Batch processing, and a Reader for PDF/EPUB. Everything runs in the browser except Translate and AI features, which send only chosen text (never files) to external providers. Answer the following question about how to use the app, concisely, in 2-3 sentences:\n\n${question}`;
       const answer = await callAI(savedProvider, savedKey, '', prompt, 400);
       thinking.textContent = answer;
     } catch(e){ thinking.textContent = "I couldn't get an answer just now. Try the Help tab for a full guide, or check your AI API key in AI Studio."; }
@@ -9604,7 +10107,7 @@ if('serviceWorker' in navigator){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.122.1
+ DocuForge AI 27.123.1
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -10720,7 +11223,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.122.1 — "View" after conversion fix.
+  DocuForge AI 27.123.1 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -10839,7 +11342,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.122.1 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.123.1 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -10921,7 +11424,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.122.1 — "View" opens behind an open modal fix.
+  DocuForge AI 27.123.1 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -10965,7 +11468,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-ghostclick-fix-v271121">
 /*
-  DocuForge AI 27.122.1 — "Jumps to Main Menu after picking a file" fix.
+  DocuForge AI 27.123.1 — "Jumps to Main Menu after picking a file" fix.
 
   On iOS Safari, dismissing the native file-picker sheet can produce a
   stray "ghost" click on whatever element is now sitting under the last
@@ -11012,7 +11515,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-backnav-fix-v271124">
 /*
-  DocuForge AI 27.122.1 — "Back" should return to where you were, not the
+  DocuForge AI 27.123.1 — "Back" should return to where you were, not the
   Main Menu.
 
   The only way to leave the View tab (reached from any Studio via the
