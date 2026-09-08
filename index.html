@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.124.1: fixed the page-selection strip (Select all/Clear/
+<!-- DocuForge AI 27.125.1: fixed the page-selection strip (Select all/Clear/
      Invert/Rotate/Duplicate/Extract/Delete) showing up in every Studio
      instead of only PDF Studio — three separate places in the code were
      checking "is this Dashboard?" instead of "is this specifically PDF
@@ -884,7 +884,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.124.1';</script>
+<script>const DOCUFORGE_BUILD = '27.125.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -895,7 +895,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.124.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.125.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1196,6 +1196,10 @@ window.DFStorage = (function(){
         <button class="tool-btn danger" id="btnClearConversionsSettings" style="width:auto;">Delete conversion history</button>
         <p class="hint" style="margin:0;">To remove a single recent file instead of everything, go to the Dashboard tab — each entry in "Recent files" has its own ✕ button.</p>
       </div>
+      <h2 style="margin-top:22px;">Appearance</h2>
+      <div class="tool-group" style="flex-direction:column; align-items:flex-start; gap:10px;">
+        <label style="display:flex;align-items:center;gap:8px;font-weight:400;margin:0;"><input type="checkbox" id="toggleDarkMode" style="width:auto;"> Dark mode</label>
+      </div>
       <h2 style="margin-top:22px;">Accessibility</h2>
       <div class="tool-group" style="flex-direction:column; align-items:flex-start; gap:10px;">
         <label style="display:flex;align-items:center;gap:8px;font-weight:400;margin:0;"><input type="checkbox" id="toggleHighContrast" style="width:auto;"> High contrast mode</label>
@@ -1298,7 +1302,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.124.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.125.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -7792,10 +7796,18 @@ dz.addEventListener('drop', (e) => { e.preventDefault(); dz.classList.remove('dr
 /* ---------- Dark mode ---------- */
 const darkPref = DFStorage.getItem('pdfworkbench-dark');
 if(darkPref === '1') document.body.classList.add('dark');
+function setDarkMode(on){
+  document.body.classList.toggle('dark', on);
+  DFStorage.setItem('pdfworkbench-dark', on ? '1' : '0');
+  if($('toggleDarkMode')) $('toggleDarkMode').checked = on;
+}
 $('darkToggle').addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-  DFStorage.setItem('pdfworkbench-dark', document.body.classList.contains('dark') ? '1' : '0');
+  setDarkMode(!document.body.classList.contains('dark'));
 });
+if($('toggleDarkMode')){
+  $('toggleDarkMode').checked = document.body.classList.contains('dark');
+  $('toggleDarkMode').addEventListener('change', (e) => setDarkMode(e.target.checked));
+}
 
 /* ---------- Mobile menu ---------- */
 $('menuToggle').addEventListener('click', () => setStudio('dashboard'));
@@ -8331,7 +8343,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.124.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.125.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -10598,7 +10610,7 @@ if('serviceWorker' in navigator){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.124.1
+ DocuForge AI 27.125.1
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -11714,7 +11726,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.124.1 — "View" after conversion fix.
+  DocuForge AI 27.125.1 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -11833,7 +11845,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.124.1 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.125.1 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -11915,7 +11927,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.124.1 — "View" opens behind an open modal fix.
+  DocuForge AI 27.125.1 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -11959,7 +11971,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-ghostclick-fix-v271121">
 /*
-  DocuForge AI 27.124.1 — "Jumps to Main Menu after picking a file" fix.
+  DocuForge AI 27.125.1 — "Jumps to Main Menu after picking a file" fix.
 
   On iOS Safari, dismissing the native file-picker sheet can produce a
   stray "ghost" click on whatever element is now sitting under the last
@@ -12006,7 +12018,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-backnav-fix-v271124">
 /*
-  DocuForge AI 27.124.1 — "Back" should return to where you were, not the
+  DocuForge AI 27.125.1 — "Back" should return to where you were, not the
   Main Menu.
 
   The only way to leave the View tab (reached from any Studio via the
