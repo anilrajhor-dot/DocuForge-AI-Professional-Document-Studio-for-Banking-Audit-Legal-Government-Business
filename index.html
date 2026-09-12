@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- DocuForge AI 27.126.1: fixed the page-selection strip (Select all/Clear/
+<!-- DocuForge AI 27.127.1: fixed the page-selection strip (Select all/Clear/
      Invert/Rotate/Duplicate/Extract/Delete) showing up in every Studio
      instead of only PDF Studio — three separate places in the code were
      checking "is this Dashboard?" instead of "is this specifically PDF
@@ -884,7 +884,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.126.1';</script>
+<script>const DOCUFORGE_BUILD = '27.127.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -895,7 +895,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.126.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.127.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1303,7 +1303,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.126.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.127.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
@@ -8382,7 +8382,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.126.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.127.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -10649,7 +10649,7 @@ if('serviceWorker' in navigator){
 
 <script id="df271027-final-reliability-fixes">
 /*
- DocuForge AI 27.126.1
+ DocuForge AI 27.127.1
  Final reliability pass:
  1. PDF -> Word is actually wired and produces a valid .docx.
  2. Every conversion result gets View / Download / Share.
@@ -10732,35 +10732,76 @@ if('serviceWorker' in navigator){
     },0);
   }
 
+  function withTimeout(promise, ms, label){
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} is taking too long`)), ms))
+    ]);
+  }
+
+  // Dedicated PDF → Word result modal. Deliberately separate from the
+  // shared showConversionResult() used by every other conversion type,
+  // because Word gets its own real DOCX preview (via the same Mammoth
+  // path Reader Studio already uses) instead of a PDF stand-in — so its
+  // buttons and behaviour can't be accidentally changed by edits meant
+  // for the other conversions, and vice versa.
+  function showWordConversionResult(blob, name){
+    window.__dfLastResults.word = { blob, name };
+    const safe = String(name).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    openModal('Conversion complete', `
+      <div style="padding:4px 0 10px"><strong>PDF → Word completed.</strong></div>
+      <div class="hint" style="margin-bottom:14px">Output: <strong>${safe}</strong></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn primary" id="wordResultView" type="button">👁️ View Word – Full Page</button>
+        <button class="btn primary" id="wordResultDownload" type="button">⬇️ Download Word</button>
+        <button class="btn primary" id="wordResultShare" type="button">📤 Share Word</button>
+      </div>
+      <p class="hint" style="margin-top:12px">View opens the actual Word content (not a PDF conversion). Download and Share always use the real .docx file.</p>
+    `, async () => {});
+    $('modalConfirm').style.display = 'none';
+    $('modalCancel').textContent = 'Close';
+    setTimeout(() => {
+      $('wordResultDownload')?.addEventListener('click', () => downloadBlob(blob, name));
+      $('wordResultShare')?.addEventListener('click', () => dfShareBlob(blob, name, blob.type));
+      $('wordResultView')?.addEventListener('click', async () => {
+        try{
+          closeModal();
+          const file = new File([blob], name, { type: blob.type });
+          if(typeof window.setStudio === 'function') window.setStudio('reader');
+          await openReaderDoc(file);
+        }catch(e){ console.error(e); toast('Could not open the Word document for preview.', true); }
+      });
+    }, 0);
+  }
+
   async function pdfToWordReliable(){
     try{
+      setStatus('Reading PDF…'); showProgress(10);
       const bytes=await ensureCurrentPdf();
       if(!bytes){say('Choose a PDF with the Upload File button above first.',true);return;}
-      setStatus('Converting PDF to Word…'); showProgress(15);
-      const pages=await getPdfPagesTextItems();
+      setStatus('Extracting text…'); showProgress(30);
+      const pages=await withTimeout(getPdfPagesTextItems(), 30000, 'Text extraction');
       const hasText=pages.some(p=>p.items.some(it=>String(it.str||'').trim()));
       if(!hasText){
-        say('This PDF has no extractable text. Run OCR / Make this PDF searchable first, then convert to Word.',true);
+        openModal('No extractable text', `
+          <p>This PDF has no extractable text — it's likely a scan or image-only PDF, so there's nothing here yet to convert into a Word document.</p>
+          <p class="hint">Run OCR to add a text layer, then come back and convert to Word.</p>
+        `, async () => {
+          if(typeof window.setStudio === 'function') window.setStudio('ocr');
+          setTimeout(() => $('btnOcrPdf')?.click(), 50);
+        });
+        $('modalConfirm').textContent = 'Run OCR now';
+        $('modalCancel').textContent = 'Cancel';
         return;
       }
-      showProgress(35);
+      setStatus('Creating Word…'); showProgress(60);
       const pagesLines=pages.map(p=>groupIntoLines(p.items).map(lineToText));
-      const docxBytes=await buildDocxFromPages(pagesLines);
-      showProgress(70);
-
-      // Create a faithful, readable PDF representation for the in-app
-      // full-page review. The DOCX remains the actual output file.
-      const previewPdf=await buildTextPdf(
-        pagesLines.flatMap((lines,i)=>[
-          ...(i?['']:[]),
-          ...lines
-        ])
-      );
+      const docxBytes=await withTimeout(buildDocxFromPages(pagesLines), 30000, 'Word creation');
       const base=(($('outName')?.value||'document').trim()||'document').replace(/\.pdf$/i,'');
       const name=base+'.docx';
       const blob=new Blob([docxBytes],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
-      await showConversionResult(blob,name,'PDF → Word',previewPdf);
-      setStatus(`Created ${name}. Review it in View full page, then Download or Share.`);
+      showProgress(100); setStatus('Word ready.');
+      showWordConversionResult(blob, name);
       if(typeof logConversion==='function') logConversion('PDF → Word',name);
     }catch(e){
       console.error('PDF → Word failed:',e);
@@ -10768,8 +10809,8 @@ if('serviceWorker' in navigator){
     }finally{showProgress(null);}
   }
 
-  // Reliable delegated conversion button. There was no working PDF→Word
-  // handler in the current build, so a normal tap did nothing.
+  // One reliable delegated PDF→Word click handler — this is the only
+  // listener bound to #btnPdfToWord in the app.
   document.addEventListener('click',async e=>{
     const b=e.target.closest('#btnPdfToWord');
     if(!b)return;
@@ -11765,7 +11806,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-view-fix-v271112">
 /*
-  DocuForge AI 27.126.1 — "View" after conversion fix.
+  DocuForge AI 27.127.1 — "View" after conversion fix.
 
   Root cause: the View button in every conversion-result popup
   (conversionOutput/showConversionShare's "View File", and
@@ -11884,7 +11925,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-quickview-fix-v271115">
 /*
-  DocuForge AI 27.126.1 — "Can't see what changed" fix for PDF Studio edits,
+  DocuForge AI 27.127.1 — "Can't see what changed" fix for PDF Studio edits,
   revised.
 
   Watermark, page numbers, Bates numbering and header/footer all completed
@@ -11966,7 +12007,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-modal-view-fix-v271114">
 /*
-  DocuForge AI 27.126.1 — "View" opens behind an open modal fix.
+  DocuForge AI 27.127.1 — "View" opens behind an open modal fix.
 
   Extract, Split, and every other "View File" button that lives inside a
   result popup (Extract result, Split result, conversion-complete popups,
@@ -12010,7 +12051,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-ghostclick-fix-v271121">
 /*
-  DocuForge AI 27.126.1 — "Jumps to Main Menu after picking a file" fix.
+  DocuForge AI 27.127.1 — "Jumps to Main Menu after picking a file" fix.
 
   On iOS Safari, dismissing the native file-picker sheet can produce a
   stray "ghost" click on whatever element is now sitting under the last
@@ -12057,7 +12098,7 @@ if('serviceWorker' in navigator){
 
 <script id="df-backnav-fix-v271124">
 /*
-  DocuForge AI 27.126.1 — "Back" should return to where you were, not the
+  DocuForge AI 27.127.1 — "Back" should return to where you were, not the
   Main Menu.
 
   The only way to leave the View tab (reached from any Studio via the
