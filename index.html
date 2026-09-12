@@ -884,7 +884,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.129.1';</script>
+<script>const DOCUFORGE_BUILD = '27.130.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -895,7 +895,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.129.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.130.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -922,7 +922,7 @@ window.DFStorage = (function(){
     </div>
     <p class="hint" style="max-width:640px;margin:0 auto 8px;text-align:center;">Most PDF tools activate once you open a PDF in the editor &mdash; that's why some buttons start out greyed&nbsp;out.</p>
     <div class="landing-privacy">
-      <strong>Privacy, plainly:</strong> most document processing runs entirely in your browser — nothing is uploaded. AI and Translation send only the text you choose to process, never your original file, to the provider you pick or supply your own key for.
+      <strong>Privacy, plainly:</strong> most document processing runs entirely in your browser — nothing is uploaded. AI tools send only the text you choose to process, never your original file, to the provider you pick or supply your own key for.
     </div>
   </div>
   
@@ -977,7 +977,7 @@ window.DFStorage = (function(){
       <button class="studio-tab" data-studio="about"><span class="st-icon">ℹ️</span> About</button>
 </div>
 
-<div id="offlineCapabilityNote" style="display:none;background:#113B34;color:#F4F2EA;padding:7px 14px;font-size:11px;text-align:center;border-bottom:1px solid rgba(255,255,255,.15);">Offline mode: menus, local file selection and on-device tools remain available. Internet-dependent AI/online translation services may require a connection.</div>
+<div id="offlineCapabilityNote" style="display:none;background:#113B34;color:#F4F2EA;padding:7px 14px;font-size:11px;text-align:center;border-bottom:1px solid rgba(255,255,255,.15);">Offline mode: menus, local file selection and on-device tools remain available. Internet-dependent AI features may require a connection.</div>
 
     <div id="noPdfBanner" style="display:none;background:var(--accent);color:var(--accent-ink);padding:8px 16px;font-size:12.5px;font-weight:600;text-align:center;;display:none">
       📄 Most tools below need a PDF open first — tap <strong>Open / Merge PDFs</strong> in PDF Studio, or a Dashboard tile, to get started.
@@ -1271,7 +1271,7 @@ window.DFStorage = (function(){
 
 
       <h3 style="margin-top:18px;font-size:14px;">🌍 Translation</h3>
-      <p>Translate pasted text, an uploaded PDF/DOCX/TXT/MD file directly, or whatever PDF is currently open in the editor — across 38 languages, side by side. This sends the text you choose (never the file itself) to a translation service — the only exception to "everything stays on your device" besides AI tools.</p>
+      <p><em>Currently unavailable</em> — the Translation Studio tab is switched off in this build, so there's no way to reach it from the menu right now. (The underlying code that used to power it is still in the app, just not connected to anything you can tap.)</p>
 
       <h3 style="margin-top:18px;font-size:14px;">🔄 Document Conversion</h3>
       <p>PDF to and from Word, Excel, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB, and images. These carry over structure and text, not always exact original formatting — that's an honest limit of any browser-only conversion, not just this one.</p>
@@ -1304,11 +1304,11 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.129.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.130.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
-      <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, translation, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
-      <p><strong>The two exceptions:</strong> <em>Translate</em> and <em>AI Assistant</em> send only the text you choose to a translation service or to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours.</p>
-      <p><strong>Works offline after first use:</strong> once you've used a tool successfully with a network connection, the library it needs stays cached on your device &mdash; it'll keep working in a later session even without signal. This doesn't apply to Translate or AI Assistant, which always need a live connection to their provider.</p>
+      <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
+      <p><strong>The one exception:</strong> <em>AI Assistant</em> sends only the text you choose to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours. (A Translation feature exists in the code but its menu tab is currently switched off — see Help for details.)</p>
+      <p><strong>Works offline after first use:</strong> once you've used a tool successfully with a network connection, the library it needs stays cached on your device &mdash; it'll keep working in a later session even without signal. This doesn't apply to AI Assistant, which always needs a live connection to its provider.</p>
       <p><strong>What's not fully supported in this edition:</strong> cryptographic digital signatures &mdash; creating one genuinely requires a certificate authority, no way around it in a browser tool. "Check for signatures" can detect a signature and read its certificate details, but does not verify document integrity or certificate trust; use Adobe Acrobat Reader for that. Password protection (both setting one and opening an existing password-protected PDF) is supported, but marked beta: it runs on a community-maintained fork of the core library, not the well-established one everything else here relies on.</p>
     </div>
 
@@ -7383,7 +7383,7 @@ $('btnAiTools').addEventListener('click', () => {
   const savedKey = DFStorage.getItem('pdfworkbench-ai-key') || '';
   const savedProvider = DFStorage.getItem('pdfworkbench-ai-provider') || 'anthropic';
   openModal('AI text tools', `
-    <p class="hint" style="margin:0;">This is one of two tools (besides Translate) that goes over the internet — your text is sent directly from your browser to the AI provider you choose, using your own API key. Nothing passes through any server of ours.</p>
+    <p class="hint" style="margin:0;">This is the only tool in the app that goes over the internet — your text is sent directly from your browser to the AI provider you choose, using your own API key. Nothing passes through any server of ours.</p>
     <div class="field"><label>Provider</label><select id="aiProvider"><option value="anthropic" ${savedProvider==='anthropic'?'selected':''}>Anthropic (Claude)</option><option value="gemini" ${savedProvider==='gemini'?'selected':''}>Google Gemini (free tier available)</option><option value="openai" ${savedProvider==='openai'?'selected':''}>OpenAI</option></select></div>
     <div class="field"><label>API key</label><input type="password" id="aiKey" value="${savedKey}" placeholder="sk-..."></div>
     <div class="field" style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="aiRemember" style="width:auto;" ${savedKey?'checked':''}><label style="margin:0;font-weight:400;" for="aiRemember">Remember this key in this browser only</label></div>
@@ -8421,7 +8421,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.129.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.130.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -9224,7 +9224,7 @@ const HELP_FAQ = [
   { q: ['watermark'], a: 'PDF Studio → Enhance → Add watermark. Choose a common watermark or enter your own text, select colour, opacity, font size and rotation, then drag the watermark on the page preview to place it. Always view the updated PDF before sharing.' },
   { q: ['compress','reduce size','file size','smaller'], a: 'PDF Studio → Enhance → "Compress" — recompresses embedded JPEGs. Works best on scanned/photo-heavy PDFs; text-only PDFs won\u2019t shrink much.' },
   { q: ['ocr','scan','searchable'], a: 'OCR Studio → "Make this PDF searchable…" — adds a real, invisible text layer so scans become searchable and copyable.' },
-  { q: ['translate'], a: 'Translation Studio → "Translate text…" (paste), "Translate a document…" (upload PDF/DOCX/TXT/MD directly), or "Translate this open PDF" (whatever\u2019s loaded in the editor). Covers 38 languages. Sends the text you choose (never the file) to a translation service.' },
+  { q: ['translate'], a: 'Translation isn\u2019t currently available \u2014 its Studio tab is switched off in this build, so there\u2019s no menu path to it right now.' },
   { q: ['word','docx'], a: 'Conversion Studio → choose the required PDF conversion, or use "Convert Files → PDF" for Word, Excel, PowerPoint, HTML, CSV, TXT and Markdown.' },
   { q: ['powerpoint','ppt','pptx','markdown'], a: 'PowerPoint Studio → "PowerPoint → Markdown (.md)…" to extract slide titles and text/bullets into a clean Markdown file. You can then use the Conversion complete window to share it via Email/WhatsApp.' },
   { q: ['excel','xlsx','spreadsheet'], a: 'Conversion Studio → "PDF → Excel" for tables inside a PDF, or Spreadsheet Studio → "Excel / CSV → Chart…" to visualize spreadsheet data you already have.' },
@@ -9233,7 +9233,7 @@ const HELP_FAQ = [
   { q: ['chat','ask question','summarize','summarise'], a: 'AI Studio has Summarize, Chat with this PDF, and more — needs your own Anthropic, OpenAI, or Google Gemini API key. No budget? Gemini\u2019s API (aistudio.google.com) has a genuinely free tier, no card needed.' },
   { q: ['free','no cost','without paying','api key cost'], a: 'AI Studio needs an API key from Anthropic, OpenAI, or Google Gemini. Gemini\u2019s (aistudio.google.com) has a real free tier \u2014 no credit card, no expiration \u2014 so you can use Summarize, Chat with PDF, and the other AI tools at no cost.' },
   { q: ['batch'], a: 'Batch Studio → "Batch process files…" — run one operation across many PDFs at once, download as a single .zip.' },
-  { q: ['upload','privacy','safe','leave device','internet'], a: 'Everything runs in your browser — nothing is uploaded. The exceptions are Translate and AI tools, which send just the text you choose (never your files).' },
+  { q: ['upload','privacy','safe','leave device','internet'], a: 'Everything runs in your browser — nothing is uploaded. The exception is AI tools, which send just the text you choose (never your files).' },
   { q: ['reader','epub','read a book'], a: 'The Reader tab is a dedicated reading view for PDF and EPUB, separate from editing — with themes, zoom, and a table of contents for EPUB.' },
   { q: ['dark mode','theme','contrast'], a: 'Toggle dark mode from the header icon. Settings also has High Contrast and Larger Text modes.' },
   { q: ['undo','redo'], a: 'Ctrl/Cmd+Z to undo, Ctrl/Cmd+Y to redo — pinned at the left of the ribbon regardless of which tab you\u2019re on.' },
@@ -9277,7 +9277,7 @@ async function fhHandleQuestion(question){
   if(savedKey){
     const thinking = fhAddMsg('bot', '…thinking…');
     try{
-      const prompt = `You are a help assistant for "DocuForge AI," a browser-based PDF/document toolkit with these tools organized into Studios: PDF (merge/split/rotate/crop/watermark/page numbers with Roman/custom-prefix/section-restart styles/Bates numbering/headers-footers/forms/compress/blank-page removal/metadata inspector with a full scrub-and-EXIF-strip option/bookmarks-outline editor/PDF-A-oriented conversion/duplicate-page detection across files), OCR & Images (searchable PDFs, text/table extraction from images, images-to-PDF, QR reading), Translation (38 languages), Conversion (PDF to/from Word, Excel, PowerPoint, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB, images), AI (summarize/rewrite/chat with PDF/meeting minutes/contract review/website generation, using the user's own API key), Spreadsheet (Excel/CSV to chart, chart digitizer), Security (visual signature stamps, form fill/flatten, beta password protection), Batch processing, and a Reader for PDF/EPUB. Everything runs in the browser except Translate and AI features, which send only chosen text (never files) to external providers. Answer the following question about how to use the app, concisely, in 2-3 sentences:\n\n${question}`;
+      const prompt = `You are a help assistant for "DocuForge AI," a browser-based PDF/document toolkit with these tools organized into Studios: PDF (merge/split/rotate/crop/watermark/page numbers with Roman/custom-prefix/section-restart styles/Bates numbering/headers-footers/forms/compress/blank-page removal/metadata inspector with a full scrub-and-EXIF-strip option/bookmarks-outline editor/PDF-A-oriented conversion/duplicate-page detection across files), OCR & Images (searchable PDFs, text/table extraction from images, images-to-PDF, QR reading), Conversion (PDF to/from Word, Excel, PowerPoint, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB, images), AI (summarize/rewrite/chat with PDF/meeting minutes/contract review/website generation, using the user's own API key), Spreadsheet (Excel/CSV to chart, chart digitizer, CSV/Excel data validator, retirement/pension corpus planner), Security (visual signature stamps, form fill/flatten, beta password protection), Batch processing, and a Reader for PDF/EPUB. There is also a Translation feature in the codebase, but its Studio tab is currently switched off, so it is NOT reachable from the menu right now — if asked about translating, say so plainly rather than giving instructions for a feature that isn't currently accessible. Everything runs in the browser except AI features, which send only chosen text (never files) to external providers. Answer the following question about how to use the app, concisely, in 2-3 sentences:\n\n${question}`;
       const answer = await callAI(savedProvider, savedKey, '', prompt, 400);
       thinking.textContent = answer;
     } catch(e){ thinking.textContent = "I couldn't get an answer just now. Try the Help tab for a full guide, or check your AI API key in AI Studio."; }
@@ -9712,7 +9712,7 @@ $('dashboardAskTile')?.addEventListener('click', () => {
   function install(){
     const dash=document.getElementById('dashboardTiles');if(!dash||document.getElementById('df85QuickActions'))return;
     const box=document.createElement('div');box.id='df85QuickActions';box.className='df85-quick';
-    box.innerHTML='<h2>Quick Actions</h2><div class="df85-quick-grid"><button type="button" data-q="upload">📂 Upload File</button><button type="button" data-q="compare">🔍 Compare Files</button><button type="button" data-q="ppt">📽️ PPT → Markdown</button><button type="button" data-q="recent">🕘 Recent Files</button></div><p>Core navigation, file selection and local document handling remain available offline; AI/online translation may require internet.</p>';
+    box.innerHTML='<h2>Quick Actions</h2><div class="df85-quick-grid"><button type="button" data-q="upload">📂 Upload File</button><button type="button" data-q="compare">🔍 Compare Files</button><button type="button" data-q="ppt">📽️ PPT → Markdown</button><button type="button" data-q="recent">🕘 Recent Files</button></div><p>Core navigation, file selection and local document handling remain available offline; AI features may require internet.</p>';
     dash.parentNode.insertBefore(box,dash);
     box.addEventListener('click',e=>{const b=e.target.closest('button[data-q]');if(!b)return;const q=b.dataset.q;if(q==='recent'){document.getElementById('dashboardRecent')?.scrollIntoView({behavior:'smooth',block:'start'});return;}if(q==='compare'){window.setStudio?.('convert');if(typeof window.setStatus==='function')window.setStatus('Open Compare Files in Conversion Studio.');return;}if(q==='ppt'){window.setStudio?.('powerpoint');if(typeof window.setStatus==='function')window.setStatus('Open PowerPoint → Markdown.');return;}if(q==='upload'){const el=document.querySelector('#dashboardUploadFileTile');if(el){el.click();return;}if(typeof window.setStatus==='function')window.setStatus('Choose a Studio to upload a file.');}});
   }
@@ -11761,10 +11761,29 @@ if('serviceWorker' in navigator){
       });
     });
   }
-  // btnOpenEncrypted needs no new handler: it's now registered in PDF_REQUIRED_IDS,
-  // so the existing file-request gate + loadFiles()/askPasswordAndOpenPdf() flow
-  // (already used automatically whenever a password-protected PDF is opened
-  // elsewhere in the app) now runs for this button too.
+  // btnOpenEncrypted: the generic file-request gate above only intercepts
+  // this button when no PDF is loaded yet (workingBytes is falsy) — once
+  // any PDF is open, that gate steps aside for every button, and this one
+  // had no handler of its own to pick up the click, so a second tap (with
+  // a PDF already loaded, to open a *different* encrypted file) did
+  // nothing. This gives it an explicit handler that always asks for a
+  // file, regardless of what's currently loaded.
+  if($('btnOpenEncrypted') && !$('btnOpenEncrypted').dataset.dfWired){
+    $('btnOpenEncrypted').dataset.dfWired = '1';
+    $('btnOpenEncrypted').addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file'; input.accept = '.pdf,application/pdf'; input.hidden = true;
+      document.body.appendChild(input);
+      input.addEventListener('change', async () => {
+        const file = input.files[0];
+        input.remove();
+        if(!file) return;
+        try{ await loadFiles([file]); }
+        catch(e){ console.error(e); toast(e?.message || 'Could not open that PDF.', true); }
+      });
+      input.click();
+    });
+  }
 
   /* ============ Batch Studio ============ */
   if($('btnBatch') && !$('btnBatch').dataset.dfWired){
