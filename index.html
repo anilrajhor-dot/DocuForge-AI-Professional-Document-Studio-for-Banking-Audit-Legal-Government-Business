@@ -884,7 +884,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.130.1';</script>
+<script>const DOCUFORGE_BUILD = '27.131.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -895,7 +895,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.130.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.131.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1049,6 +1049,8 @@ window.DFStorage = (function(){
 <button class="tool-btn" id="btnQrReader"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="7" width="7" x="3" y="3"></rect><rect height="7" width="7" x="14" y="3"></rect><rect height="7" width="7" x="3" y="14"></rect><path d="M14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM19 19h2v2h-2z"></path></svg> Read QR code…</button>
 <button class="tool-btn" id="btnQrGenerate"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="7" width="7" x="3" y="3"></rect><rect height="7" width="7" x="14" y="3"></rect><rect height="7" width="7" x="3" y="14"></rect><rect height="7" width="7" x="14" y="14"></rect></svg> Generate QR code…</button>
 <button class="tool-btn" id="btnBarcodeGenerate"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 4v16M7 4v16M10 4v16M15 4v16M17 4v16M21 4v16"></path></svg> Generate barcode…</button>
+<button class="tool-btn" id="btnImageResize"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg> Resize / convert image…</button>
+<button class="tool-btn" id="btnBgRemove"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="4" stroke-dasharray="3 3"></rect><circle cx="12" cy="12" r="4"></circle></svg> Remove plain background…</button>
 </div>
 </div>
 <div class="ribbon-panel" data-studio-panel="convert">
@@ -1157,6 +1159,7 @@ window.DFStorage = (function(){
       <div class="ribbon-panel" data-studio-panel="batch">
 <div class="tool-group">
 <button class="tool-btn" id="btnBatch"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="7" rx="1" width="7" x="3" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="3"></rect><rect height="7" rx="1" width="7" x="3" y="14"></rect><rect height="7" rx="1" width="7" x="14" y="14"></rect></svg> Batch process files…</button>
+<button class="tool-btn" id="btnFilenameClean"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6M9 15l1.5 1.5L9 18M13 15l-1.5 1.5L13 18"></path></svg> Clean up filenames…</button>
 </div>
 </div>
     </div>
@@ -1304,7 +1307,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.130.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.131.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The one exception:</strong> <em>AI Assistant</em> sends only the text you choose to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours. (A Translation feature exists in the code but its menu tab is currently switched off — see Help for details.)</p>
@@ -2840,6 +2843,99 @@ async function findDuplicatePages(files, onProgress){
     }
   }
   return [...groups.values()].filter(g => g.length > 1);
+}
+
+/* ---------- Image resize / format conversion ---------- */
+async function resizeImageFile(file, { mode, width, height, maxDim, scalePct, format, quality }){
+  const url = URL.createObjectURL(file);
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = () => reject(new Error('Could not read that image.'));
+    i.src = url;
+  });
+  let targetW, targetH;
+  if(mode === 'exact'){
+    targetW = Math.max(1, Math.round(width));
+    targetH = Math.max(1, Math.round(height));
+  } else if(mode === 'scale'){
+    targetW = Math.max(1, Math.round(img.naturalWidth * scalePct / 100));
+    targetH = Math.max(1, Math.round(img.naturalHeight * scalePct / 100));
+  } else { // 'maxdim' — fit within a box, preserving aspect ratio, never upscale
+    const ratio = Math.min(maxDim / img.naturalWidth, maxDim / img.naturalHeight, 1);
+    targetW = Math.max(1, Math.round(img.naturalWidth * ratio));
+    targetH = Math.max(1, Math.round(img.naturalHeight * ratio));
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = targetW; canvas.height = targetH;
+  const ctx = canvas.getContext('2d');
+  if(format !== 'png') { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, targetW, targetH); } // flatten transparency for JPEG/WebP
+  ctx.drawImage(img, 0, 0, targetW, targetH);
+  URL.revokeObjectURL(url);
+  const mime = format === 'png' ? 'image/png' : format === 'webp' ? 'image/webp' : 'image/jpeg';
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, mime, quality/100));
+  return { blob, width: targetW, height: targetH, mime };
+}
+
+/* ---------- Plain-background removal ----------
+   Honest scope: this is edge-seeded flood fill by colour similarity, not
+   AI subject detection. It works well for a photo shot against a plain
+   wall, backdrop, or solid colour (product shots, ID/passport photos,
+   logos on white) — it will NOT cleanly separate a person or object from
+   a busy, textured, or multi-coloured background the way an ML-based
+   tool would. Runs entirely on-device; nothing is uploaded anywhere. */
+function removeSolidBackground(imageData, tolerance){
+  const { data, width, height } = imageData;
+  const visited = new Uint8Array(width * height);
+  const stack = [];
+  let r = 0, g = 0, b = 0, count = 0;
+  const sampleStep = Math.max(1, Math.floor(width / 60));
+  for(let x = 0; x < width; x += sampleStep){
+    let idx = (0 * width + x) * 4; r += data[idx]; g += data[idx+1]; b += data[idx+2]; count++;
+    idx = ((height-1) * width + x) * 4; r += data[idx]; g += data[idx+1]; b += data[idx+2]; count++;
+    stack.push([x, 0], [x, height-1]);
+  }
+  const sampleStepY = Math.max(1, Math.floor(height / 60));
+  for(let y = 0; y < height; y += sampleStepY){
+    let idx = (y * width + 0) * 4; r += data[idx]; g += data[idx+1]; b += data[idx+2]; count++;
+    idx = (y * width + (width-1)) * 4; r += data[idx]; g += data[idx+1]; b += data[idx+2]; count++;
+    stack.push([0, y], [width-1, y]);
+  }
+  r /= count; g /= count; b /= count;
+  const tol = tolerance * tolerance; // compare squared distance, avoid sqrt in the hot loop
+  while(stack.length){
+    const [x, y] = stack.pop();
+    if(x < 0 || y < 0 || x >= width || y >= height) continue;
+    const pIdx = y * width + x;
+    if(visited[pIdx]) continue;
+    visited[pIdx] = 1;
+    const idx = pIdx * 4;
+    const dr = data[idx]-r, dg = data[idx+1]-g, db = data[idx+2]-b;
+    if(dr*dr + dg*dg + db*db > tol) continue;
+    data[idx+3] = 0;
+    stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+  }
+  return { r: Math.round(r), g: Math.round(g), b: Math.round(b) };
+}
+
+/* ---------- Filename cleanup ----------
+   Browsers can't rename a file in place on the user's device — there is
+   no such API. This can only offer cleaned-up copies to download (singly
+   or zipped), never an in-place rename of the originals. */
+function cleanFilename(name, opts){
+  const dotIdx = name.lastIndexOf('.');
+  const hasExt = dotIdx > 0 && dotIdx < name.length - 1;
+  const base = hasExt ? name.slice(0, dotIdx) : name;
+  const ext = hasExt ? name.slice(dotIdx) : '';
+  let cleaned = base;
+  if(opts.removeSpecial) cleaned = cleaned.replace(/[^\w\s.-]/g, '');
+  if(opts.spaceReplacement === 'underscore') cleaned = cleaned.replace(/\s+/g, '_');
+  else if(opts.spaceReplacement === 'dash') cleaned = cleaned.replace(/\s+/g, '-');
+  else cleaned = cleaned.replace(/\s+/g, ' ');
+  if(opts.lowercase) cleaned = cleaned.toLowerCase();
+  cleaned = cleaned.replace(/([_-])\1+/g, '$1').replace(/^[\s._-]+|[\s._-]+$/g, '');
+  if(!cleaned) cleaned = 'file';
+  return cleaned + ext.toLowerCase();
 }
 
 /* ---------- PDF/A-oriented conversion (best-effort) ----------
@@ -7735,6 +7831,115 @@ $('btnBarcodeGenerate').addEventListener('click', () => {
   }, 0);
 });
 
+$('btnImageResize').addEventListener('click', () => {
+  openModal('Resize / convert image', `
+    <div class="field"><label>Image file(s)</label><input type="file" id="irFiles" accept="image/*" multiple></div>
+    <div class="field"><label>Resize mode</label>
+      <select id="irMode">
+        <option value="maxdim">Fit within max dimension (won't upscale)</option>
+        <option value="scale">Scale by percentage</option>
+        <option value="exact">Exact width × height</option>
+      </select>
+    </div>
+    <div class="field" id="irMaxDimField"><label>Max dimension (px)</label><input type="number" id="irMaxDim" value="1600" min="1"></div>
+    <div class="field" id="irScaleField" style="display:none;"><label>Scale (%)</label><input type="number" id="irScale" value="50" min="1" max="400"></div>
+    <div class="field row" id="irExactField" style="display:none;">
+      <div><label>Width (px)</label><input type="number" id="irWidth" value="800" min="1"></div>
+      <div><label>Height (px)</label><input type="number" id="irHeight" value="600" min="1"></div>
+    </div>
+    <div class="field"><label>Output format</label>
+      <select id="irFormat"><option value="jpeg">JPEG</option><option value="png">PNG</option><option value="webp">WebP</option></select>
+    </div>
+    <div class="field" id="irQualityField"><label>Quality</label><input type="range" id="irQuality" min="30" max="100" value="85"></div>
+    <p class="hint">Multiple files are zipped together automatically.</p>
+  `, async () => {
+    const files = Array.from(document.getElementById('irFiles').files || []);
+    if(!files.length){ toast('Choose at least one image.', true); return; }
+    const mode = document.getElementById('irMode').value;
+    const maxDim = parseInt(document.getElementById('irMaxDim').value) || 1600;
+    const scalePct = parseFloat(document.getElementById('irScale').value) || 50;
+    const width = parseInt(document.getElementById('irWidth').value) || 800;
+    const height = parseInt(document.getElementById('irHeight').value) || 600;
+    const format = document.getElementById('irFormat').value;
+    const quality = parseInt(document.getElementById('irQuality').value) || 85;
+    try{
+      const results = [];
+      for(const file of files){
+        const r = await resizeImageFile(file, { mode, width, height, maxDim, scalePct, format, quality });
+        const base = file.name.replace(/\.[^.]+$/, '');
+        results.push({ blob: r.blob, name: `${base}_resized.${format === 'jpeg' ? 'jpg' : format}` });
+      }
+      if(results.length === 1){
+        downloadBlob(results[0].blob, results[0].name);
+      } else {
+        await loadLib('jszip');
+        const zip = new JSZip();
+        results.forEach(r => zip.file(r.name, r.blob));
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        downloadBlob(zipBlob, 'resized_images.zip');
+      }
+      toast(`Resized ${results.length} image${results.length>1?'s':''}.`, false);
+    } catch(e){ console.error(e); toast('Could not resize one or more images: ' + (e?.message||''), true); }
+  });
+  setTimeout(() => {
+    const modeSel = document.getElementById('irMode');
+    const maxDimF = document.getElementById('irMaxDimField'), scaleF = document.getElementById('irScaleField'), exactF = document.getElementById('irExactField');
+    const formatSel = document.getElementById('irFormat');
+    const qualityF = document.getElementById('irQualityField');
+    modeSel.addEventListener('change', () => {
+      maxDimF.style.display = modeSel.value === 'maxdim' ? '' : 'none';
+      scaleF.style.display = modeSel.value === 'scale' ? '' : 'none';
+      exactF.style.display = modeSel.value === 'exact' ? '' : 'none';
+    });
+    formatSel.addEventListener('change', () => {
+      qualityF.style.display = formatSel.value === 'png' ? 'none' : '';
+    });
+  }, 0);
+});
+
+$('btnBgRemove').addEventListener('click', () => {
+  openModal('Remove plain background', `
+    <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12.5px;line-height:1.5;margin-bottom:4px;">
+      <strong>Honest scope:</strong> this removes a plain/solid background (a wall, backdrop, or solid colour) by flood-filling from the edges — it does not do AI-based subject detection. It works well for product shots, ID/passport photos, or logos on a plain background. It will not cleanly separate a subject from a busy or textured background.
+    </div>
+    <div class="field"><label>Image file</label><input type="file" id="bgFile" accept="image/*"></div>
+    <div class="field"><label>Tolerance (how similar a colour must be to count as background)</label><input type="range" id="bgTolerance" min="5" max="100" value="30"></div>
+    <button type="button" class="btn primary" id="bgRunBtn" style="align-self:flex-start;">Remove background</button>
+    <div id="bgPreviewWrap" style="display:none;margin-top:10px;">
+      <canvas id="bgCanvas" style="max-width:100%;border:1px solid var(--line);border-radius:8px;background-image:linear-gradient(45deg,#ccc 25%,transparent 25%),linear-gradient(-45deg,#ccc 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ccc 75%),linear-gradient(-45deg,transparent 75%,#ccc 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;"></canvas>
+      <button type="button" class="btn ghost" id="bgDownloadBtn" style="margin-top:8px;">Download PNG</button>
+    </div>
+  `, async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+  setTimeout(() => {
+    document.getElementById('bgRunBtn').addEventListener('click', async () => {
+      const file = document.getElementById('bgFile').files[0];
+      if(!file){ toast('Choose an image first.', true); return; }
+      const tolerance = parseInt(document.getElementById('bgTolerance').value) || 30;
+      try{
+        const url = URL.createObjectURL(file);
+        const img = await new Promise((resolve, reject) => {
+          const i = new Image(); i.onload = () => resolve(i); i.onerror = () => reject(new Error('Could not read that image.')); i.src = url;
+        });
+        const canvas = document.getElementById('bgCanvas');
+        canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        removeSolidBackground(imageData, tolerance);
+        ctx.putImageData(imageData, 0, 0);
+        document.getElementById('bgPreviewWrap').style.display = '';
+      } catch(e){ console.error(e); toast('Could not process that image: ' + (e?.message||''), true); }
+    });
+    document.getElementById('bgDownloadBtn').addEventListener('click', () => {
+      const canvas = document.getElementById('bgCanvas');
+      canvas.toBlob(blob => downloadBlob(blob, 'background_removed.png'), 'image/png');
+    });
+  }, 0);
+});
+
 /* ---------- Reader controls ---------- */
 $('readerOpenBtn').addEventListener('click', () => {
   // Must be attached to the DOM (and hidden, not just left detached) for
@@ -8421,7 +8626,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.130.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.131.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -9277,7 +9482,7 @@ async function fhHandleQuestion(question){
   if(savedKey){
     const thinking = fhAddMsg('bot', '…thinking…');
     try{
-      const prompt = `You are a help assistant for "DocuForge AI," a browser-based PDF/document toolkit with these tools organized into Studios: PDF (merge/split/rotate/crop/watermark/page numbers with Roman/custom-prefix/section-restart styles/Bates numbering/headers-footers/forms/compress/blank-page removal/metadata inspector with a full scrub-and-EXIF-strip option/bookmarks-outline editor/PDF-A-oriented conversion/duplicate-page detection across files), OCR & Images (searchable PDFs, text/table extraction from images, images-to-PDF, QR reading), Conversion (PDF to/from Word, Excel, PowerPoint, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB, images), AI (summarize/rewrite/chat with PDF/meeting minutes/contract review/website generation, using the user's own API key), Spreadsheet (Excel/CSV to chart, chart digitizer, CSV/Excel data validator, retirement/pension corpus planner), Security (visual signature stamps, form fill/flatten, beta password protection), Batch processing, and a Reader for PDF/EPUB. There is also a Translation feature in the codebase, but its Studio tab is currently switched off, so it is NOT reachable from the menu right now — if asked about translating, say so plainly rather than giving instructions for a feature that isn't currently accessible. Everything runs in the browser except AI features, which send only chosen text (never files) to external providers. Answer the following question about how to use the app, concisely, in 2-3 sentences:\n\n${question}`;
+      const prompt = `You are a help assistant for "DocuForge AI," a browser-based PDF/document toolkit with these tools organized into Studios: PDF (merge/split/rotate/crop/watermark/page numbers with Roman/custom-prefix/section-restart styles/Bates numbering/headers-footers/forms/compress/blank-page removal/metadata inspector with a full scrub-and-EXIF-strip option/bookmarks-outline editor/PDF-A-oriented conversion/duplicate-page detection across files), OCR & Images (searchable PDFs, text/table extraction from images, images-to-PDF, QR reading, image resize/format conversion, plain-background removal), Conversion (PDF to/from Word, Excel, PowerPoint, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB, images), AI (summarize/rewrite/chat with PDF/meeting minutes/contract review/website generation, using the user's own API key), Spreadsheet (Excel/CSV to chart, chart digitizer, CSV/Excel data validator, retirement/pension corpus planner), Security (visual signature stamps, form fill/flatten, beta password protection), Batch processing (including a filename-cleanup tool), and a Reader for PDF/EPUB. There is also a Translation feature in the codebase, but its Studio tab is currently switched off, so it is NOT reachable from the menu right now — if asked about translating, say so plainly rather than giving instructions for a feature that isn't currently accessible. Everything runs in the browser except AI features, which send only chosen text (never files) to external providers. Answer the following question about how to use the app, concisely, in 2-3 sentences:\n\n${question}`;
       const answer = await callAI(savedProvider, savedKey, '', prompt, 400);
       thinking.textContent = answer;
     } catch(e){ thinking.textContent = "I couldn't get an answer just now. Try the Help tab for a full guide, or check your AI API key in AI Studio."; }
@@ -11855,6 +12060,67 @@ if('serviceWorker' in navigator){
         }catch(e){ console.error(e); say(e?.message || 'Batch processing failed.', true); }
         finally{ showProgress(null); }
       });
+    });
+  }
+
+  if($('btnFilenameClean') && !$('btnFilenameClean').dataset.dfWired){
+    $('btnFilenameClean').dataset.dfWired = '1';
+    $('btnFilenameClean').addEventListener('click', () => {
+      openModal('Clean up filenames', `
+        <p class="hint">Browsers can't rename files in place on your device — this gives you cleaned-up copies to download (individually, or all together as a zip), not a rename of the originals.</p>
+        <div class="field"><label>Files</label><input type="file" id="fcFiles" multiple></div>
+        <div class="field row">
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="fcRemoveSpecial" checked style="width:auto;"> Remove special characters</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="fcLowercase" style="width:auto;"> Lowercase</label>
+        </div>
+        <div class="field"><label>Replace spaces with</label>
+          <select id="fcSpaceReplacement"><option value="underscore">Underscore ( _ )</option><option value="dash">Dash ( - )</option><option value="keep">Keep spaces</option></select>
+        </div>
+        <div id="fcPreview" style="margin-top:8px;"></div>
+      `, async () => {
+        const files = Array.from(document.getElementById('fcFiles').files || []);
+        if(!files.length){ toast('Choose at least one file.', true); return; }
+        const opts = {
+          removeSpecial: document.getElementById('fcRemoveSpecial').checked,
+          lowercase: document.getElementById('fcLowercase').checked,
+          spaceReplacement: document.getElementById('fcSpaceReplacement').value,
+        };
+        if(files.length === 1){
+          const newName = cleanFilename(files[0].name, opts);
+          downloadBlob(files[0], newName);
+        } else {
+          await loadLib('jszip');
+          const zip = new JSZip();
+          const usedNames = new Set();
+          files.forEach(f => {
+            let newName = cleanFilename(f.name, opts);
+            let n = newName, i = 1;
+            while(usedNames.has(n)){ const dot = newName.lastIndexOf('.'); n = dot > 0 ? `${newName.slice(0,dot)}_${i}${newName.slice(dot)}` : `${newName}_${i}`; i++; }
+            usedNames.add(n);
+            zip.file(n, f);
+          });
+          const blob = await zip.generateAsync({ type: 'blob' });
+          downloadBlob(blob, 'cleaned_filenames.zip');
+        }
+        toast(`Cleaned ${files.length} filename${files.length>1?'s':''}.`, false);
+      });
+      setTimeout(() => {
+        const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+        function renderPreview(){
+          const files = Array.from(document.getElementById('fcFiles').files || []);
+          const opts = {
+            removeSpecial: document.getElementById('fcRemoveSpecial').checked,
+            lowercase: document.getElementById('fcLowercase').checked,
+            spaceReplacement: document.getElementById('fcSpaceReplacement').value,
+          };
+          const rows = files.map(f => `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--line);">${esc(f.name)} → <strong>${esc(cleanFilename(f.name, opts))}</strong></div>`).join('');
+          document.getElementById('fcPreview').innerHTML = rows;
+        }
+        ['fcFiles','fcRemoveSpecial','fcLowercase','fcSpaceReplacement'].forEach(id => {
+          document.getElementById(id)?.addEventListener('change', renderPreview);
+          document.getElementById(id)?.addEventListener('input', renderPreview);
+        });
+      }, 0);
     });
   }
 
