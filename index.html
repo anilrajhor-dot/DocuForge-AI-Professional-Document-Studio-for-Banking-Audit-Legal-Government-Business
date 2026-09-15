@@ -830,6 +830,10 @@ body:not(.dashboard-active) #workspaceLayout{display:block !important;}
 }
 body:not(.dashboard-active) #backToMainMenu{display:block;}
 
+.ra-word{cursor:pointer;border-radius:3px;padding:0 1px;}
+.ra-word:hover{background:var(--surface-2);}
+.ra-word.active{background:var(--accent);color:#fff;}
+
 </style>
 <style id="docuforge-v87-studio-isolation">
 /* v87: the generic PDF drop zone belongs ONLY to PDF Studio.
@@ -885,7 +889,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.133.1';</script>
+<script>const DOCUFORGE_BUILD = '27.137.1';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -896,7 +900,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.133.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.137.1</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -1067,6 +1071,8 @@ window.DFStorage = (function(){
 <button class="tool-btn" id="btnPdfToCsv"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="1" width="18" x="3" y="4"></rect><path d="M3 10h18M9 4v16M15 4v16"></path></svg> PDF → CSV</button>
 <button class="tool-btn" id="btnPdfToText"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h13"></path></svg> PDF → Text (.txt)</button>
 <button class="tool-btn" id="btnPdfToHtml"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 3L4 12l4 9M16 3l4 9-4 9"></path></svg> PDF → HTML</button>
+<button class="tool-btn" id="btnPdfToMd"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 5h18v14H3z"></path><path d="M6 15V9l3 3 3-3v6M17 9v6M14.5 12.5L17 15l2.5-2.5"></path></svg> PDF → Markdown (.md)</button>
+<button class="tool-btn" id="btnAnyToMd"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6"></path><path d="M9 15l3-3 3 3M12 12v6"></path></svg> Any file → Markdown…</button>
 <button class="tool-btn" id="btnPdfToJson"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 3a3 3 0 00-3 3v3a2 2 0 01-2 2 2 2 0 012 2v3a3 3 0 003 3M18 3a3 3 0 013 3v3a2 2 0 002 2 2 2 0 00-2 2v3a3 3 0 01-3 3"></path></svg> PDF → JSON</button>
 <button class="tool-btn" id="btnPdfToXml"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 3L2 12l6 9M16 3l6 9-6 9M10 21l4-18"></path></svg> PDF → XML</button>
 <button class="tool-btn" id="btnPdfToSvg"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M8 12h8M12 8v8"></path></svg> PDF → SVG…</button>
@@ -1308,7 +1314,7 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.133.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.137.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
       <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
       <p><strong>The one exception:</strong> <em>AI Assistant</em> sends only the text you choose to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours. (A Translation feature exists in the code but its menu tab is currently switched off — see Help for details.)</p>
@@ -1985,7 +1991,7 @@ function dfGetPdfJs(data, password){
 const PDF_REQUIRED_IDS = ['btnInsert','btnDuplicateSel','btnRotateSel','btnReverse','btnDeleteSel','btnCrop','btnRemoveBlank','btnExtract','btnSplit',
    'btnWatermark','btnPageNum','btnBates','btnHeaderFooter','btnFillForm','btnFormDesigner','btnFlattenForm','btnSign','btnVerifySig','btnEncrypt','btnRedact','btnOpenEncrypted',
    'btnCompress','btnMetadata','btnBookmarks','btnPdfA','btnAccessCheck','btnActionLog','btnVersionHistory','btnUndo','btnRedo','btnReset','btnOcrPdf',
-   'btnPdfToWord','btnPdfToPptx','btnPdfToExcel','btnPdfToCsv','btnPdfToText','btnPdfToHtml','btnPdfToJson','btnPdfToImages',
+   'btnPdfToWord','btnPdfToPptx','btnPdfToExcel','btnPdfToCsv','btnPdfToText','btnPdfToHtml','btnPdfToMd','btnPdfToJson','btnPdfToImages',
    'btnPdfToXml','btnPdfToSvg','btnPdfToRtf','btnPdfToOdt','btnPdfToOds','btnPdfToOdp','btnPdfToPptxConv','btnPdfToEpub',
    'btnAnalyze','btnDupPages','btnChatPdf'];
 
@@ -3625,13 +3631,82 @@ async function getUniversalFileLines(file){
     return out;
   }
   if(ext==='pptx') return await getPptxTextLines(bytes);
-  if(['txt','md','markdown','html','htm','xml','json','rtf'].includes(ext)){
+  if(ext==='rtf'){
+    const raw=new TextDecoder('utf-8').decode(bytes);
+    return normaliseCompareLines(rtfToPlainText(raw));
+  }
+  if(['txt','md','markdown','html','htm','xml','json'].includes(ext)){
     const text=new TextDecoder('utf-8').decode(bytes);
     return normaliseCompareLines(['html','htm'].includes(ext)?stripHtmlForCompare(text):text);
   }
   throw new Error('Unsupported file type. Use PDF, DOCX, XLSX/XLS, CSV, PPTX, TXT, Markdown or HTML.');
 }
 function universalCompareAccept(){ return '.pdf,.docx,.xlsx,.xls,.csv,.pptx,.txt,.md,.markdown,.html,.htm,.xml,.json,.rtf'; }
+
+/* ---------- Any file → Markdown (batch supported) ----------
+   Reuses the same universal text-extraction Compare Files already uses
+   for PDF/DOCX/XLSX/XLS/CSV/PPTX/TXT/MD/HTML/XML, and uses the existing
+   rtfToPlainText() (originally built for "Convert Files → PDF") for
+   proper RTF handling — Compare Files' own RTF path has also been
+   switched to it below, since it previously just decoded raw RTF bytes
+   as text, leaving control codes in.
+   Legacy binary .doc (pre-2007 Word) isn't supported: the DOCX reader
+   only understands the modern XML-based format, and there's no
+   lightweight way to parse the old binary format client-side — legacy
+   .xls IS supported, since SheetJS reads both old and new Excel
+   formats. Token-usage estimates are a rough chars/4 approximation (a
+   common rule of thumb for English text), not a real tokenizer for any
+   specific model — stated as an estimate in the UI, not exact. */
+function xlsxLinesToMarkdown(lines){
+  const escCell = s => String(s).replace(/\|/g, '\\|');
+  const out = []; let inTable = false;
+  for(const line of lines){
+    if(line.startsWith('Sheet: ')){
+      out.push('## ' + line.slice(7));
+      inTable = false;
+      continue;
+    }
+    const cells = line.split(' | ').map(escCell);
+    out.push('| ' + cells.join(' | ') + ' |');
+    if(!inTable){ out.push('|' + cells.map(() => '---').join('|') + '|'); inTable = true; }
+  }
+  return out.join('\n');
+}
+function pptxLinesToMarkdown(lines){
+  return lines.map(line => {
+    const m = line.match(/^Slide (\d+): ([\s\S]*)$/);
+    return m ? `## Slide ${m[1]}\n\n${m[2]}` : line;
+  }).join('\n\n');
+}
+function genericLinesToMarkdown(lines){
+  return lines.map(line => {
+    const trimmed = line.trim();
+    if(!trimmed) return '';
+    if(looksLikeHeading(trimmed)) return '## ' + trimmed.replace(/^#/, '\\#');
+    return pdfLineToMarkdown(line);
+  }).join('\n\n');
+}
+async function anyFileToMarkdown(file){
+  const ext = compareExt(file.name);
+  const title = file.name.replace(/\.[^.]+$/, '');
+  let body;
+  if(ext === 'json'){
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const raw = new TextDecoder('utf-8').decode(bytes);
+    let pretty = raw;
+    try{ pretty = JSON.stringify(JSON.parse(raw), null, 2); }catch(e){}
+    body = '```json\n' + pretty + '\n```';
+  } else {
+    const lines = await getUniversalFileLines(file);
+    if(['xlsx','xls','csv'].includes(ext)) body = xlsxLinesToMarkdown(lines);
+    else if(ext === 'pptx') body = pptxLinesToMarkdown(lines);
+    else body = genericLinesToMarkdown(lines);
+  }
+  return `# ${title}\n\n${body}`;
+}
+function estimateTokens(text){
+  return Math.round(String(text || '').length / 4);
+}
 function diffLines(linesA, linesB){
   const n = linesA.length, m = linesB.length;
   const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
@@ -5346,15 +5421,6 @@ async function buildPdfHtml(){
 <style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#222;}
 .pdf-page{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid #ddd;}
 h2{color:#113B34;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
-/* v2026.08.20.60 — single main menu; file requested by operation */
-#studioTabs{display:none !important;}
-body.dashboard-active #ribbon,
-body.dashboard-active #toolbar,
-body.dashboard-active #pageActionStrip,
-body.dashboard-active #dropzone,
-body.dashboard-active #grid,
-body.dashboard-active #noPdfBanner{display:none !important;}
-
 </style>
 </head><body><h1>${title}</h1>${body}
 </body></html>`;
@@ -5363,6 +5429,57 @@ async function buildPdfJson(){
   const pages = await getPdfPagesTextItems();
   const data = pages.map(p => ({ page: p.pageIndex + 1, lines: groupIntoLines(p.items).map(lineToText) }));
   return JSON.stringify({ document: $('outName').value || 'document', pageCount: data.length, pages: data }, null, 2);
+}
+
+/* ---------- PDF → Markdown ----------
+   Honest scope: this PDF has no captured font-size/style metadata (the
+   shared text-extraction pipeline used by every PDF converter doesn't
+   record it, and extending it would risk every other export), so
+   headings and bullets are detected from text patterns only — a short,
+   punctuation-free line becomes a heading; a line starting with a
+   bullet/number marker becomes a list item. It will not always match
+   the PDF's real visual structure, but it produces clean, lightweight
+   Markdown with far less token overhead than pasting raw PDF text or
+   HTML into an AI chat. */
+function pdfLineToMarkdown(line){
+  const trimmed = line.trim();
+  if(!trimmed) return '';
+  const bulletMatch = trimmed.match(/^[•●○◦‣·*-]\s+(.*)$/);
+  if(bulletMatch) return '- ' + bulletMatch[1];
+  const numberedMatch = trimmed.match(/^(\d{1,3})[.)]\s+(.*)$/);
+  if(numberedMatch) return numberedMatch[1] + '. ' + numberedMatch[2];
+  // Escape a literal leading '#' so it can't be mistaken for a heading marker we didn't intend.
+  return trimmed.replace(/^#/, '\\#');
+}
+function looksLikeHeading(trimmed, nextIsBlankish){
+  if(!trimmed || trimmed.length > 70) return false;
+  if(/[.;,]$/.test(trimmed)) return false;
+  if(/^[•●○◦‣·*-]\s+/.test(trimmed) || /^\d{1,3}[.)]\s+/.test(trimmed)) return false;
+  const words = trimmed.split(/\s+/);
+  const isAllCaps = trimmed === trimmed.toUpperCase() && /[A-Z]/.test(trimmed);
+  const isTitleCaseShort = words.length <= 8 && words.every(w => /^[A-Z0-9]/.test(w) || w.length <= 3);
+  return isAllCaps || isTitleCaseShort;
+}
+async function buildPdfMarkdown(){
+  const pages = await getPdfPagesTextItems();
+  const title = ($('outName')?.value || 'Document').replace(/\.[^.]+$/, '');
+  const sections = pages.map(p => {
+    const rawLines = groupIntoLines(p.items).map(lineToText);
+    const mdLines = [];
+    rawLines.forEach((line, i) => {
+      const trimmed = line.trim();
+      if(!trimmed){ mdLines.push(''); return; }
+      if(looksLikeHeading(trimmed)){
+        mdLines.push('## ' + trimmed.replace(/^#/, '\\#'));
+      } else {
+        mdLines.push(pdfLineToMarkdown(line));
+      }
+    });
+    // Collapse runs of blank lines and trim.
+    const body = mdLines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+    return pages.length > 1 ? `<!-- Page ${p.pageIndex + 1} -->\n${body}` : body;
+  });
+  return `# ${title}\n\n` + sections.join('\n\n---\n\n');
 }
 
 /* ---------- PDF → XML ---------- */
@@ -7686,44 +7803,217 @@ $('btnVoiceToText').addEventListener('click', () => {
   }, 0);
 });
 
+/* ---------- Read Aloud: text extraction, chunked playback, word tracking ----------
+   Honest scope: this cannot export a downloadable audio file -- the
+   browser's built-in speech synthesis (the same API both this and the
+   reference app use) doesn't expose its audio output for saving; a real
+   export would need a much heavier in-browser neural TTS model or
+   fragile system-audio capture, neither of which belongs here. What IS
+   achievable and included: direct PDF/DOCX/EPUB ingestion (not just the
+   currently-open PDF or pasted text), no length cap (long text is
+   chunked into sentence-sized utterances so speech synthesis stays
+   reliable), and word-by-word highlighting with click-to-seek. Word
+   boundary events are a real but browser-dependent API -- Chrome/Edge
+   fire them reliably; some browsers may highlight less precisely. */
+async function raExtractTextFromFile(file){
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if(ext === 'pdf'){
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const pdf = await dfGetPdfJs(bytes).promise;
+    const parts = [];
+    for(let i = 1; i <= pdf.numPages; i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      parts.push(content.items.map(it => it.str).join(' '));
+    }
+    return parts.join('\n\n');
+  }
+  if(ext === 'docx'){
+    await loadLib('mammoth');
+    const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+    return result.value;
+  }
+  if(ext === 'epub'){
+    const zip = await JSZip.loadAsync(await file.arrayBuffer());
+    const containerFile = zip.file('META-INF/container.xml');
+    if(!containerFile) throw new Error('Not a valid EPUB -- missing container.xml.');
+    const containerXml = await containerFile.async('string');
+    const opfPathMatch = containerXml.match(/full-path="([^"]+)"/);
+    if(!opfPathMatch) throw new Error('Could not find the EPUB package file.');
+    const opfPath = opfPathMatch[1];
+    const opfDir = opfPath.includes('/') ? opfPath.slice(0, opfPath.lastIndexOf('/') + 1) : '';
+    const opfXml = await zip.file(opfPath).async('string');
+    const opfDoc = new DOMParser().parseFromString(opfXml, 'application/xml');
+    const manifestItems = {};
+    opfDoc.querySelectorAll('manifest > item').forEach(item => { manifestItems[item.getAttribute('id')] = item.getAttribute('href'); });
+    const spineIds = Array.from(opfDoc.querySelectorAll('spine > itemref')).map(el => el.getAttribute('idref'));
+    const parts = [];
+    for(const id of spineIds){
+      const href = manifestItems[id]; if(!href) continue;
+      const fullPath = opfDir + href;
+      const zf = zip.file(fullPath) || zip.file(decodeURIComponent(fullPath));
+      if(!zf) continue;
+      const xhtml = await zf.async('string');
+      const bodyMatch = xhtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+      const bodyHtml = bodyMatch ? bodyMatch[1] : xhtml;
+      const tmp = document.createElement('div');
+      tmp.innerHTML = bodyHtml;
+      parts.push(tmp.textContent || tmp.innerText || '');
+    }
+    if(!parts.length) throw new Error('No readable chapters found in this EPUB.');
+    return parts.join('\n\n');
+  }
+  throw new Error('Unsupported file type for Read Aloud. Use a PDF, DOCX or EPUB file.');
+}
+function raSplitIntoChunks(text, maxLen){
+  maxLen = maxLen || 600;
+  const chunks = [];
+  const sentenceRe = /[^.!?\n]+[.!?]*\s*|\n+/g;
+  let match, buffer = '', bufferStart = 0, offset = 0;
+  while((match = sentenceRe.exec(text))){
+    const piece = match[0];
+    if(buffer.length && buffer.length + piece.length > maxLen){
+      chunks.push({ text: buffer, start: bufferStart });
+      buffer = '';
+    }
+    if(!buffer.length) bufferStart = offset;
+    buffer += piece;
+    offset += piece.length;
+  }
+  if(buffer.trim()) chunks.push({ text: buffer, start: bufferStart });
+  return chunks.length ? chunks : [{ text: text, start: 0 }];
+}
+let raWordEls = [], raCursor = 0, raChunks = [], raPlaying = false, raVoice = null, raRate = 1;
+function raBuildView(container, text){
+  container.innerHTML = '';
+  raWordEls = []; raCursor = 0;
+  const re = /\S+/g;
+  let lastEnd = 0, m;
+  const frag = document.createDocumentFragment();
+  while((m = re.exec(text))){
+    if(m.index > lastEnd) frag.appendChild(document.createTextNode(text.slice(lastEnd, m.index)));
+    const span = document.createElement('span');
+    span.className = 'ra-word';
+    span.textContent = m[0];
+    span.dataset.start = m.index;
+    frag.appendChild(span);
+    raWordEls.push({ start: m.index, end: m.index + m[0].length, el: span });
+    lastEnd = m.index + m[0].length;
+  }
+  if(lastEnd < text.length) frag.appendChild(document.createTextNode(text.slice(lastEnd)));
+  container.appendChild(frag);
+}
+function raHighlightWordAt(globalIdx){
+  if(!raWordEls.length) return;
+  const prevEl = raWordEls[raCursor] ? raWordEls[raCursor].el : null;
+  while(raCursor < raWordEls.length - 1 && raWordEls[raCursor].end <= globalIdx) raCursor++;
+  while(raCursor > 0 && raWordEls[raCursor].start > globalIdx) raCursor--;
+  if(prevEl) prevEl.classList.remove('active');
+  const w = raWordEls[raCursor];
+  if(w){ w.el.classList.add('active'); w.el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+}
+function raStopAll(){
+  raPlaying = false;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  raWordEls.forEach(function(w){ w.el.classList.remove('active'); });
+}
+function raPlayFromChunk(idx){
+  if(idx < 0 || idx >= raChunks.length){ raPlaying = false; return; }
+  const chunk = raChunks[idx];
+  const utter = new SpeechSynthesisUtterance(chunk.text);
+  if(raVoice) utter.voice = raVoice;
+  utter.rate = raRate;
+  utter.onboundary = function(e){ if(typeof e.charIndex === 'number') raHighlightWordAt(chunk.start + e.charIndex); };
+  utter.onend = function(){ if(raPlaying) raPlayFromChunk(idx + 1); };
+  raPlaying = true;
+  speechSynthesis.speak(utter);
+}
+function raSeekToWord(globalIdx){
+  const chunkIdx = raChunks.findIndex(function(c){ return globalIdx >= c.start && globalIdx < c.start + c.text.length; });
+  if(chunkIdx === -1) return;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  const chunk = raChunks[chunkIdx];
+  const relOffset = Math.max(0, globalIdx - chunk.start);
+  const remainder = chunk.text.slice(relOffset);
+  const utter = new SpeechSynthesisUtterance(remainder);
+  if(raVoice) utter.voice = raVoice;
+  utter.rate = raRate;
+  utter.onboundary = function(e){ if(typeof e.charIndex === 'number') raHighlightWordAt(chunk.start + relOffset + e.charIndex); };
+  utter.onend = function(){ if(raPlaying) raPlayFromChunk(chunkIdx + 1); };
+  raPlaying = true;
+  speechSynthesis.speak(utter);
+}
 $('btnReadAloud').addEventListener('click', async () => {
   if(!('speechSynthesis' in window)){ toast('Text-to-speech isn\u2019t supported in this browser.', true); return; }
+  raStopAll();
   let text = '';
   if(workingBytes){
-    const pages = await getPdfPagesTextItems();
-    text = pages.map(p => groupIntoLines(p.items).map(lineToText).join(' ')).join(' ').slice(0, 8000);
+    try{
+      const pages = await getPdfPagesTextItems();
+      text = pages.map(p => groupIntoLines(p.items).map(lineToText).join(' ')).join('\n\n');
+    }catch(e){}
   }
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   openModal('Read aloud', `
-    <div class="field"><label>Text</label><textarea id="ttsText" style="min-height:130px;">${esc(text)}</textarea></div>
+    <div class="field"><label>Open a PDF, DOCX or EPUB (or use the currently-open PDF / paste text below)</label><input type="file" id="raFile" accept=".pdf,.docx,.epub"></div>
+    <div class="field"><label>Text</label><textarea id="ttsText" style="min-height:100px;">${esc(text)}</textarea></div>
+    <button type="button" class="btn ghost" id="raRebuild" style="align-self:flex-start;">Load this text into the reading view \u2193</button>
     <div class="field row">
       <div><label>Voice</label><select id="ttsVoice"></select></div>
       <div><label>Rate</label><input type="number" id="ttsRate" min="0.5" max="2" step="0.1" value="1"></div>
     </div>
     <div style="display:flex;gap:8px;">
-      <button class="btn primary" id="ttsPlay" type="button">▶ Play</button>
-      <button class="btn ghost" id="ttsPause" type="button">⏸ Pause</button>
-      <button class="btn ghost" id="ttsStop" type="button">⏹ Stop</button>
+      <button class="btn primary" id="ttsPlay" type="button">\u25b6 Play</button>
+      <button class="btn ghost" id="ttsPause" type="button">\u23f8 Pause</button>
+      <button class="btn ghost" id="ttsStop" type="button">\u23f9 Stop</button>
     </div>
+    <p class="hint">Click any word below to jump the reading there. No downloadable audio file -- this reads live using your browser's built-in voice, which doesn't expose an export option.</p>
+    <div id="raTextView" style="max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:10px;margin-top:6px;line-height:1.7;"></div>
   `, async () => {});
   $('modalConfirm').style.display = 'none';
   $('modalCancel').textContent = 'Close';
   setTimeout(() => {
+    const view = document.getElementById('raTextView');
+    raBuildView(view, text);
+    raChunks = raSplitIntoChunks(text);
+    view.addEventListener('click', (e) => {
+      const span = e.target.closest('.ra-word');
+      if(!span) return;
+      raSeekToWord(parseInt(span.dataset.start));
+    });
+    document.getElementById('raRebuild').addEventListener('click', () => {
+      raStopAll();
+      text = document.getElementById('ttsText').value;
+      raBuildView(view, text);
+      raChunks = raSplitIntoChunks(text);
+    });
     const voiceSel = document.getElementById('ttsVoice');
     function loadVoices(){ voiceSel.innerHTML = speechSynthesis.getVoices().map((v,i) => `<option value="${i}">${v.name} (${v.lang})</option>`).join(''); }
     loadVoices();
     speechSynthesis.onvoiceschanged = loadVoices;
     document.getElementById('ttsPlay').addEventListener('click', () => {
-      speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(document.getElementById('ttsText').value);
+      raStopAll();
       const voices = speechSynthesis.getVoices();
       const idx = parseInt(voiceSel.value);
-      if(voices[idx]) utter.voice = voices[idx];
-      utter.rate = parseFloat(document.getElementById('ttsRate').value) || 1;
-      speechSynthesis.speak(utter);
+      raVoice = voices[idx] || null;
+      raRate = parseFloat(document.getElementById('ttsRate').value) || 1;
+      raPlayFromChunk(0);
     });
     document.getElementById('ttsPause').addEventListener('click', () => speechSynthesis.pause());
-    document.getElementById('ttsStop').addEventListener('click', () => speechSynthesis.cancel());
+    document.getElementById('ttsStop').addEventListener('click', raStopAll);
+    document.getElementById('raFile').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if(!file) return;
+      try{
+        setStatus('Reading ' + file.name + '\u2026');
+        text = await raExtractTextFromFile(file);
+        document.getElementById('ttsText').value = text;
+        raStopAll();
+        raBuildView(view, text);
+        raChunks = raSplitIntoChunks(text);
+        setStatus('Loaded ' + file.name + ' for Read Aloud.');
+      }catch(err){ console.error(err); toast((err && err.message) || 'Could not read that file.', true); }
+    });
   }, 0);
 });
 
@@ -8627,7 +8917,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.133.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.137.1 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -9483,7 +9773,7 @@ async function fhHandleQuestion(question){
   if(savedKey){
     const thinking = fhAddMsg('bot', '…thinking…');
     try{
-      const prompt = `You are a help assistant for "DocuForge AI," a browser-based PDF/document toolkit with these tools organized into Studios: PDF (merge/split/rotate/crop/watermark/page numbers with Roman/custom-prefix/section-restart styles/Bates numbering/headers-footers/forms/compress/blank-page removal/metadata inspector with a full scrub-and-EXIF-strip option/bookmarks-outline editor/PDF-A-oriented conversion/duplicate-page detection across files), OCR & Images (searchable PDFs, text/table extraction from images, images-to-PDF, QR reading, image resize/format conversion, plain-background removal), Conversion (PDF to/from Word, Excel, PowerPoint, CSV, HTML, JSON, XML, RTF, ODT/ODS/ODP, EPUB, images), AI (summarize/rewrite/chat with PDF/meeting minutes/contract review/website generation, using the user's own API key), Spreadsheet (Excel/CSV to chart, chart digitizer, CSV/Excel data validator, retirement/pension corpus planner), Security (visual signature stamps, form fill/flatten, beta password protection), Batch processing (including a filename-cleanup tool), and a Reader for PDF/EPUB. There is also a Translation feature in the codebase, but its Studio tab is currently switched off, so it is NOT reachable from the menu right now — if asked about translating, say so plainly rather than giving instructions for a feature that isn't currently accessible. Everything runs in the browser except AI features, which send only chosen text (never files) to external providers. Answer the following question about how to use the app, concisely, in 2-3 sentences:\n\n${question}`;
+      const prompt = `You are a help assistant for "DocuForge AI," a browser-based PDF/document toolkit with these tools organized into Studios: PDF (merge/split/rotate/crop/watermark/page numbers with Roman/custom-prefix/section-restart styles/Bates numbering/headers-footers/forms/compress/blank-page removal/metadata inspector with a full scrub-and-EXIF-strip option/bookmarks-outline editor/PDF-A-oriented conversion/duplicate-page detection across files), OCR & Images (searchable PDFs, text/table extraction from images, images-to-PDF, QR reading, image resize/format conversion, plain-background removal), Conversion (PDF to/from Word, Excel, PowerPoint, CSV, HTML, Markdown, JSON, XML, RTF, ODT/ODS/ODP, EPUB, images, plus a universal Any-file-to-Markdown batch converter with rough token-usage estimates), AI (summarize/rewrite/chat with PDF/meeting minutes/contract review/website generation, using the user's own API key), Spreadsheet (Excel/CSV to chart, chart digitizer, CSV/Excel data validator, retirement/pension corpus planner), Security (visual signature stamps, form fill/flatten, beta password protection), Batch processing (including a filename-cleanup tool), and a Reader for PDF/EPUB. There is also a Translation feature in the codebase, but its Studio tab is currently switched off, so it is NOT reachable from the menu right now — if asked about translating, say so plainly rather than giving instructions for a feature that isn't currently accessible. Everything runs in the browser except AI features, which send only chosen text (never files) to external providers. Answer the following question about how to use the app, concisely, in 2-3 sentences:\n\n${question}`;
       const answer = await callAI(savedProvider, savedKey, '', prompt, 400);
       thinking.textContent = answer;
     } catch(e){ thinking.textContent = "I couldn't get an answer just now. Try the Help tab for a full guide, or check your AI API key in AI Studio."; }
@@ -11235,6 +11525,63 @@ if('serviceWorker' in navigator){
     });
   }
   bindSimpleExport('btnPdfToHtml', 'text/html', 'html', () => buildPdfHtml(), 'PDF → HTML');
+  bindSimpleExport('btnPdfToMd', 'text/markdown', 'md', () => buildPdfMarkdown(), 'PDF → Markdown');
+
+  $('btnAnyToMd').addEventListener('click', () => {
+    openModal('Any file → Markdown', `
+      <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12.5px;line-height:1.5;margin-bottom:4px;">
+        Supports PDF, Word (.docx), Excel/CSV (.xlsx/.xls/.csv), PowerPoint (.pptx), TXT/MD/HTML/XML/JSON/RTF. Legacy binary Word (.doc) isn't supported — only the modern .docx format can be read client-side.
+      </div>
+      <div class="field"><label>File(s)</label><input type="file" id="a2mFiles" accept=".pdf,.docx,.xlsx,.xls,.csv,.pptx,.txt,.md,.markdown,.html,.htm,.xml,.json,.rtf" multiple></div>
+      <div class="field"><label>Or convert a whole folder</label><input type="file" id="a2mFolder" webkitdirectory multiple></div>
+      <div id="a2mList" style="font-size:12px;margin-top:4px;"></div>
+    `, async () => {
+      const files = [...(document.getElementById('a2mFiles').files || []), ...(document.getElementById('a2mFolder').files || [])]
+        .filter(f => /\.(pdf|docx|xlsx|xls|csv|pptx|txt|md|markdown|html|htm|xml|json|rtf)$/i.test(f.name));
+      if(!files.length){ toast('Choose at least one supported file.', true); return; }
+      try{
+        const results = [];
+        for(const file of files){
+          try{ results.push({ name: file.name.replace(/\.[^.]+$/, '') + '.md', md: await anyFileToMarkdown(file) }); }
+          catch(err){ console.error(err); toast(`Could not convert ${file.name}: ${err?.message || 'unknown error'}`, true); }
+        }
+        if(!results.length) return;
+        if(results.length === 1){
+          const blob = new Blob([results[0].md], { type: 'text/markdown' });
+          if(typeof resultShare === 'function') await resultShare(blob, results[0].name, 'File → Markdown');
+          else downloadBlob(blob, results[0].name);
+        } else {
+          await loadLib('jszip');
+          const zip = new JSZip();
+          results.forEach(r => zip.file(r.name, r.md));
+          const zipBlob = await zip.generateAsync({ type: 'blob' });
+          downloadBlob(zipBlob, 'markdown_files.zip');
+        }
+        toast(`Converted ${results.length} file${results.length>1?'s':''} to Markdown.`, false);
+      }catch(e){ console.error(e); toast('Could not complete the conversion.', true); }
+    });
+    setTimeout(() => {
+      const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      async function renderList(){
+        const files = [...(document.getElementById('a2mFiles').files || []), ...(document.getElementById('a2mFolder').files || [])];
+        const listEl = document.getElementById('a2mList');
+        if(!files.length){ listEl.innerHTML = ''; return; }
+        listEl.innerHTML = 'Estimating token usage\u2026';
+        const rows = [];
+        for(const f of files){
+          let estimate = '\u2014';
+          try{
+            const md = await anyFileToMarkdown(f);
+            estimate = '~' + estimateTokens(md).toLocaleString() + ' tokens (rough estimate)';
+          }catch(e){ estimate = 'could not read this file'; }
+          rows.push(`<div>${esc(f.name)} \u2014 <span class="hint">${estimate}</span></div>`);
+        }
+        listEl.innerHTML = rows.join('');
+      }
+      document.getElementById('a2mFiles').addEventListener('change', renderList);
+      document.getElementById('a2mFolder').addEventListener('change', renderList);
+    }, 0);
+  });
   bindSimpleExport('btnPdfToJson', 'application/json', 'json', () => buildPdfJson(), 'PDF → JSON');
   bindSimpleExport('btnPdfToXml', 'application/xml', 'xml', () => buildPdfXml(), 'PDF → XML');
   bindSimpleExport('btnPdfToRtf', 'application/rtf', 'rtf', () => buildPdfRtf(), 'PDF → RTF');
