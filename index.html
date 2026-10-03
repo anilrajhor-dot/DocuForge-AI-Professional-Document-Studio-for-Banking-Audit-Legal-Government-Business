@@ -892,7 +892,7 @@ window.DFStorage = (function(){
   };
 })();
 </script>
-<script>const DOCUFORGE_BUILD = '27.139.1';</script>
+<script>const DOCUFORGE_BUILD = '27.140.0';</script>
 
 <div id="docuForgeTopBrand" style="
   position:sticky;top:0;z-index:99999;
@@ -903,7 +903,7 @@ window.DFStorage = (function(){
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   text-align:center;">
   <div style="font-size:17px;font-weight:800;letter-spacing:.2px;">DocuForge AI</div>
-  <div style="font-size:13px;font-weight:700;">Version 27.139.1</div>
+  <div style="font-size:13px;font-weight:700;">Version 27.140.0</div>
   <div style="font-size:12px;font-weight:500;opacity:.9;">Developed by Anil Sharma</div>
   <div style="font-size:11px;font-weight:500;opacity:.78;">Former General Manager, Central Bank of India</div>
 </div>
@@ -916,7 +916,7 @@ window.DFStorage = (function(){
   <div class="landing-hero">
     <svg class="landing-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="#0D2A25"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="#F2A65A" font-family="Georgia">D</text></svg>
     <h1>DocuForge AI</h1>
-    <p class="tagline">Create &bull; Convert &bull; Extract &bull; Protect &mdash; all your documents, one toolkit. Everything runs in your browser; your files are never uploaded anywhere.</p>
+    <p class="tagline">Create &bull; Convert &bull; Extract &bull; Protect &mdash; all your documents, one toolkit. Most document processing happens on your device. AI features may send selected text to your chosen AI provider.</p>
   </div>
   <div style="padding:40px 20px 50px;">
     <div class="feature-grid">
@@ -925,12 +925,12 @@ window.DFStorage = (function(){
       <div class="feature-card"><span class="fc-icon">🔄</span><h3>Document Conversion</h3><p>Convert PDF content into editable Word, Excel, PowerPoint, CSV, HTML, JSON, and images &mdash; and back again. Structure and text carry over; exact original formatting may not.</p></div>
       <div class="feature-card"><span class="fc-icon">🤖</span><h3>AI Assistant</h3><p>Summarize, rewrite, simplify, chat with a PDF, extract action items and dates &mdash; using your own API key.</p></div>
       <div class="feature-card"><span class="fc-icon">📊</span><h3>Spreadsheet Tools</h3><p>Turn a spreadsheet or CSV straight into a chart, no other software needed.</p></div>
-      <div class="feature-card"><span class="fc-icon">🔐</span><h3>Security</h3><p>Visual signature stamps, form fill &amp; flatten. Password-protected PDFs aren't currently supported &mdash; see below for why.</p></div>
+      <div class="feature-card"><span class="fc-icon">🔐</span><h3>Security</h3><p>Visual signature stamps, form fill &amp; flatten. Password protection is available as <strong>BETA</strong> &mdash; always test the protected file before relying on it.</p></div>
       <div class="feature-card"><span class="fc-icon">📂</span><h3>Batch Processing</h3><p>Run one operation across many files at once and download everything as a single .zip.</p></div>
     </div>
     <p class="hint" style="max-width:640px;margin:0 auto 8px;text-align:center;">Most PDF tools activate once you open a PDF in the editor &mdash; that's why some buttons start out greyed&nbsp;out.</p>
     <div class="landing-privacy">
-      <strong>Privacy, plainly:</strong> most document processing runs entirely in your browser — nothing is uploaded. AI tools send only the text you choose to process, never your original file, to the provider you pick or supply your own key for.
+      <strong>Privacy, plainly:</strong> most document processing happens on your device. AI features may send selected text to your chosen AI provider &mdash; never your original file.
     </div>
   </div>
   
@@ -946,9 +946,9 @@ window.DFStorage = (function(){
     <h1>DocuForge AI</h1>
     <span class="tag">Intelligent Document Studio</span>
   </div>
-  <div class="privacy-pill">
+  <div class="privacy-pill" title="Most document processing happens on your device. AI features may send selected text to your chosen AI provider.">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
-    Your documents never leave this device
+    <span class="pp-long">Most processing happens on your device</span><span class="pp-short">On-device</span>
   </div>
   <div id="offlineStatus" title="Local/offline browser mode" style="font-size:10px;font-weight:700;letter-spacing:.2px;padding:5px 8px;border:1px solid rgba(255,255,255,.28);border-radius:999px;color:#F4F2EA;white-space:nowrap;">● Local</div>
   <button class="icon-btn" id="darkToggle" aria-label="Toggle dark mode">
@@ -1317,9 +1317,9 @@ window.DFStorage = (function(){
     <div id="aboutStudio" class="studio-page" style="display:none !important">
       <h2>About DocuForge AI</h2>
       <div style="background:var(--surface-2);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-family:var(--font-mono);font-size:12px;">
-        <strong>Version:</strong> 27.139.1 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
+        <strong>Version:</strong> 27.140.0 &mdash; if this doesn't match what you expect right after uploading a new version, your browser is showing a cached copy: try closing and reopening the tab, a hard refresh, or clearing Safari's site cache.
       </div>
-      <p>A privacy-first document toolkit that runs entirely in your browser &mdash; PDF editing, OCR, conversion, and AI-assisted tools, with no backend and no document ever uploaded anywhere.</p>
+      <p>A privacy-first document toolkit &mdash; PDF editing, OCR, conversion, and AI-assisted tools. Most document processing happens on your device. AI features may send selected text to your chosen AI provider.</p>
       <p><strong>The one exception:</strong> <em>AI Assistant</em> sends only the text you choose to the AI provider you supply your own key for &mdash; never your files, and never through any server of ours. (A Translation feature exists in the code but its menu tab is currently switched off — see Help for details.)</p>
       <p><strong>Works offline after first use:</strong> once you've used a tool successfully with a network connection, the library it needs stays cached on your device &mdash; it'll keep working in a later session even without signal. This doesn't apply to AI Assistant, which always needs a live connection to its provider.</p>
       <p><strong>What's not fully supported in this edition:</strong> cryptographic digital signatures &mdash; creating one genuinely requires a certificate authority, no way around it in a browser tool. "Check for signatures" can detect a signature and read its certificate details, but does not verify document integrity or certificate trust; use Adobe Acrobat Reader for that. Password protection (both setting one and opening an existing password-protected PDF) is supported, but marked beta: it runs on a community-maintained fork of the core library, not the well-established one everything else here relies on.</p>
@@ -8920,7 +8920,7 @@ async function showFinancialDashboard(fin, filename){
   if(nwc!==null && prevNwc!==null) insights.push(`Net working capital changed from ${financialFmt(prevNwc,'₹ lakh')} to ${financialFmt(nwc,'₹ lakh')}.`);
   openModal('Financial Analysis Dashboard',`
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.139.1 · calculations use Financials by Year source values</div></div>
+      <div><strong>Financial workbook detected</strong><div class="hint" style="margin:3px 0 0;">${esc(filename)} · specialised financial view · Version 27.140.0 · calculations use Financials by Year source values</div></div>
       <button class="btn ghost" id="financialResetView" type="button">Reset view</button>
     </div>
     <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:12px;"><strong>Management snapshot</strong><ul style="margin:7px 0 0 18px;padding:0;line-height:1.5;">${insights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -9756,7 +9756,7 @@ const HELP_FAQ = [
   { q: ['chat','ask question','summarize','summarise'], a: 'AI Studio has Summarize, Chat with this PDF, and more — needs your own Anthropic, OpenAI, or Google Gemini API key. No budget? Gemini\u2019s API (aistudio.google.com) has a genuinely free tier, no card needed.' },
   { q: ['free','no cost','without paying','api key cost'], a: 'AI Studio needs an API key from Anthropic, OpenAI, or Google Gemini. Gemini\u2019s (aistudio.google.com) has a real free tier \u2014 no credit card, no expiration \u2014 so you can use Summarize, Chat with PDF, and the other AI tools at no cost.' },
   { q: ['batch'], a: 'Batch Studio → "Batch process files…" — run one operation across many PDFs at once, download as a single .zip.' },
-  { q: ['upload','privacy','safe','leave device','internet'], a: 'Everything runs in your browser — nothing is uploaded. The exception is AI tools, which send just the text you choose (never your files).' },
+  { q: ['upload','privacy','safe','leave device','internet'], a: 'Most document processing happens on your device. AI features may send selected text to your chosen AI provider (never your original files).' },
   { q: ['reader','epub','read a book'], a: 'The Reader tab is a dedicated reading view for PDF and EPUB, separate from editing — with themes, zoom, and a table of contents for EPUB.' },
   { q: ['dark mode','theme','contrast'], a: 'Toggle dark mode from the header icon. Settings also has High Contrast and Larger Text modes.' },
   { q: ['undo','redo'], a: 'Ctrl/Cmd+Z to undo, Ctrl/Cmd+Y to redo — pinned at the left of the ribbon regardless of which tab you\u2019re on.' },
@@ -12389,7 +12389,7 @@ if('serviceWorker' in navigator){
           if(op === 'merge'){
             const doc = await PDFDocument.create();
             for(let i=0;i<files.length;i++){
-              showProgress(10+Math.round(80*(i+1)/files.length));
+              setStatus(`Batch processing — file ${i+1} of ${files.length}`); showProgress(10+Math.round(80*(i+1)/files.length));
               const buf = new Uint8Array(await files[i].arrayBuffer());
               const src = await PDFDocument.load(buf);
               const pages = await doc.copyPages(src, src.getPageIndices());
@@ -12401,7 +12401,7 @@ if('serviceWorker' in navigator){
           } else {
             const zip = new JSZip();
             for(let i=0;i<files.length;i++){
-              showProgress(10+Math.round(80*(i+1)/files.length));
+              setStatus(`Batch processing — file ${i+1} of ${files.length}`); showProgress(10+Math.round(80*(i+1)/files.length));
               const f = files[i];
               const buf = new Uint8Array(await f.arrayBuffer());
               const base = f.name.replace(/\.pdf$/i,'');
@@ -12814,4 +12814,1155 @@ if('serviceWorker' in navigator){
     if(typeof window.setStudio === 'function') window.setStudio(target);
   });
 })();
+</script>
+
+<style id="df-simplify-v27140-css">
+/* ===================================================================
+   DocuForge AI 27.140.0 — "Simple on the surface" layer (dfx-*)
+   Purely additive: nothing above is removed or renamed.
+   =================================================================== */
+#dfxHome,#dfxSteps{display:none}
+body.dashboard-active #dfxHome{display:block}
+body:not(.dashboard-active) #dfxSteps.dfx-on{display:flex}
+
+/* More Tools: the original tile grid stays intact, just tucked away. */
+body.dashboard-active:not(.dfx-more-open) #dashboardTiles,
+body.dashboard-active:not(.dfx-more-open) #dashboardNavigationHint{display:none !important}
+
+#dfxHome{max-width:980px;margin:0 auto;padding:18px 14px 6px;color:var(--ink,#16211d);font-family:var(--font-body,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif)}
+#dfxHome .dfx-h{font-size:26px;line-height:1.2;margin:0 0 4px;font-weight:800;text-align:center}
+#dfxHome .dfx-sub{margin:0 0 14px;text-align:center;color:var(--ink-soft,#5b6b66);font-size:13.5px}
+
+.dfx-search{position:relative;max-width:640px;margin:0 auto 16px}
+.dfx-search input{width:100%;box-sizing:border-box;min-height:52px;padding:12px 16px 12px 46px;font-size:16px;border:2px solid var(--line,#d8dde6);border-radius:14px;background:var(--surface,#fff);color:var(--ink,#16211d);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.dfx-search input:focus{outline:none;border-color:var(--accent,#F2A65A);box-shadow:0 0 0 3px rgba(242,166,90,.28)}
+.dfx-search .dfx-mag{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;opacity:.7}
+#dfxSuggest{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:60;background:var(--surface,#fff);border:1px solid var(--line,#d8dde6);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);overflow:hidden;display:none}
+#dfxSuggest.show{display:block}
+#dfxSuggest button{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:10px 14px;border:0;border-bottom:1px solid var(--line,#d8dde6);background:transparent;color:inherit;text-align:left;font:inherit;font-size:14.5px;cursor:pointer}
+#dfxSuggest button:last-child{border-bottom:0}
+#dfxSuggest button:hover,#dfxSuggest button.dfx-active{background:var(--surface-2,#f1f4f2)}
+#dfxSuggest .dfx-s-main{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+#dfxSuggest .dfx-s-where{font-size:11px;color:var(--ink-soft,#5b6b66);font-family:var(--font-mono,monospace);white-space:nowrap}
+#dfxSuggest .dfx-s-none{padding:14px;font-size:13.5px;color:var(--ink-soft,#5b6b66)}
+
+.dfx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}
+.dfx-card{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-height:104px;padding:16px;text-align:left;border:1px solid var(--line,#d8dde6);border-radius:14px;background:var(--surface,#fff);color:var(--ink,#16211d);cursor:pointer;box-shadow:var(--shadow,0 2px 8px rgba(0,0,0,.06));font-family:inherit;-webkit-tap-highlight-color:transparent}
+.dfx-card:hover{border-color:var(--accent,#F2A65A);transform:translateY(-1px)}
+.dfx-card .dfx-ic{font-size:28px;line-height:1}
+.dfx-card .dfx-t{font-size:16px;font-weight:800}
+.dfx-card .dfx-d{font-size:12.5px;color:var(--ink-soft,#5b6b66);line-height:1.35}
+.dfx-chip{display:inline-block;margin-top:auto;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:700;letter-spacing:.2px;background:rgba(17,59,52,.10);color:var(--pine,#113B34)}
+.dfx-chip.ai{background:rgba(242,166,90,.25);color:#8a4b00}
+body.dark .dfx-chip,[data-theme="dark"] .dfx-chip{background:rgba(255,255,255,.12);color:#cfe8e1}
+body.dark .dfx-chip.ai,[data-theme="dark"] .dfx-chip.ai{background:rgba(242,166,90,.25);color:#ffd9a8}
+
+.dfx-quick{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 14px}
+.dfx-quick button,.dfx-more{min-height:44px;padding:10px 16px;border:1px solid var(--line,#d8dde6);border-radius:999px;background:var(--surface,#fff);color:var(--ink,#16211d);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+.dfx-quick button:hover,.dfx-more:hover{border-color:var(--accent,#F2A65A)}
+.dfx-privacy{max-width:640px;margin:0 auto 14px;padding:10px 14px;border:1px solid var(--line,#d8dde6);border-radius:12px;background:var(--surface-2,#f1f4f2);font-size:12.5px;line-height:1.5;text-align:center}
+.dfx-more-wrap{text-align:center;margin:6px 0 12px}
+#dfxLast{max-width:640px;margin:0 auto 12px}
+.dfx-last-head{display:flex;justify-content:space-between;align-items:center;margin:0 0 6px}
+.dfx-last-head h3{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft,#5b6b66);font-family:var(--font-mono,monospace)}
+.dfx-link{background:none;border:0;color:var(--ink-soft,#5b6b66);text-decoration:underline;cursor:pointer;font-size:12px;padding:6px}
+.dfx-row{display:flex;align-items:center;gap:10px;padding:9px 12px;margin-bottom:6px;border:1px solid var(--line,#d8dde6);border-radius:10px;background:var(--surface,#fff);font-size:13px}
+.dfx-row .dfx-r-main{flex:1;min-width:0}
+.dfx-row .dfx-r-main b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dfx-row .dfx-r-main span{font-size:11.5px;color:var(--ink-soft,#5b6b66)}
+.dfx-row button{min-height:36px;padding:6px 12px;border:1px solid var(--line,#d8dde6);border-radius:8px;background:transparent;color:var(--pine,#113B34);font-weight:700;font-size:12.5px;cursor:pointer}
+.dfx-note-mem{font-size:11px;color:var(--ink-soft,#5b6b66);margin-top:2px}
+
+/* Workflow strip: Select → Options → Process → Result */
+#dfxSteps{gap:6px;align-items:center;margin:6px 14px 0;font-size:11.5px;font-weight:700;color:var(--ink-soft,#5b6b66);flex-wrap:wrap}
+#dfxSteps .dfx-st{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;border:1px solid var(--line,#d8dde6);background:var(--surface,#fff)}
+#dfxSteps .dfx-st i{font-style:normal;display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;background:var(--surface-2,#e8ece9);font-size:10px}
+#dfxSteps .dfx-st.on{border-color:var(--accent,#F2A65A);color:var(--ink,#16211d);background:rgba(242,166,90,.18)}
+#dfxSteps .dfx-st.on i{background:var(--accent,#F2A65A);color:var(--accent-ink,#1a1a1a)}
+#dfxSteps .dfx-st.done i{background:var(--pine,#113B34);color:#fff}
+
+/* Unified result bar: View | Download | Share | Start Another */
+.dfx-resultbar,.dfx-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+.dfx-resultbar .btn,.dfx-resultbar button,.dfx-actions .btn{flex:1 1 130px;min-height:46px;justify-content:center}
+.dfx-resultcap{font-size:11.5px;color:var(--ink-soft,#5b6b66);margin:2px 0 0}
+.dfx-ok{font-weight:800;font-size:15px;margin:0 0 6px}
+
+/* Processing card */
+#dfxProgress{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(64px + env(safe-area-inset-bottom,0px));width:min(92vw,420px);z-index:100001;background:var(--surface,#fff);color:var(--ink,#16211d);border:1px solid var(--line,#d8dde6);border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.28);padding:12px 14px;display:none;pointer-events:none}
+#dfxProgress.show{display:block}
+#dfxProgress .dfx-p-op{font-weight:800;font-size:14px;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#dfxProgress .dfx-p-bar{height:8px;border-radius:99px;background:var(--surface-2,#e8ece9);overflow:hidden}
+#dfxProgress .dfx-p-fill{height:100%;width:0;background:var(--accent,#F2A65A);transition:width .25s}
+#dfxProgress .dfx-p-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft,#5b6b66);margin-top:6px}
+#dfxProgress .dfx-p-wait{font-size:12px;color:var(--ink-soft,#5b6b66);margin-top:4px}
+body.dfx-busy .tool-btn,body.dfx-busy #btnDownload{cursor:progress}
+
+/* Friendly error card */
+#dfxErr{position:fixed;inset:0;z-index:100003;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.45)}
+#dfxErr.show{display:flex}
+#dfxErr .dfx-e-box{width:min(94vw,440px);background:var(--surface,#fff);color:var(--ink,#16211d);border-radius:16px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+#dfxErr h3{margin:0 0 10px;font-size:17px}
+#dfxErr dl{margin:0 0 12px}
+#dfxErr dt{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft,#5b6b66);font-weight:800;margin-top:8px}
+#dfxErr dd{margin:2px 0 0;font-size:14px;line-height:1.45}
+#dfxErr .dfx-e-btns{display:flex;gap:8px;flex-wrap:wrap}
+#dfxErr .dfx-e-btns button{flex:1 1 120px;min-height:46px;border-radius:10px;border:1px solid var(--line,#d8dde6);background:var(--surface-2,#f1f4f2);color:inherit;font:inherit;font-weight:700;cursor:pointer}
+#dfxErr .dfx-e-btns button.p{background:var(--accent,#F2A65A);color:var(--accent-ink,#1a1a1a);border-color:transparent}
+
+/* Basic / Advanced */
+details.dfx-adv{margin:10px 0;border:1px solid var(--line,#d8dde6);border-radius:10px;padding:0 12px;background:var(--surface-2,#f1f4f2)}
+details.dfx-adv>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700;font-size:13.5px}
+details.dfx-adv .dfx-adv-body{padding:2px 0 10px}
+
+/* Warnings */
+#dfxNotes .dfx-warn{display:none}
+body[data-studio="security"] #dfxNotes .dfx-n-security{display:block}
+body[data-studio="ai"] #dfxNotes .dfx-n-ai{display:block}
+.privacy-pill .pp-short{display:none}
+@media (max-width:560px){
+  .privacy-pill{white-space:nowrap}
+  .privacy-pill .pp-long{display:none}
+  .privacy-pill .pp-short{display:inline}
+}
+.dfx-warn{margin:8px 14px;padding:10px 12px;border-radius:10px;border:1px solid #e0b34f;background:#fff6dc;color:#4a3500;font-size:12.5px;line-height:1.5}
+.dfx-warn.ai{border-color:#e6a566;background:#fff0e0;color:#5b3200}
+.dfx-warn b{font-weight:800}
+body.dark .dfx-warn,[data-theme="dark"] .dfx-warn{background:#3a2f12;color:#ffe9b0;border-color:#8a6d1c}
+body.dark .dfx-warn.ai,[data-theme="dark"] .dfx-warn.ai{background:#3d2a14;color:#ffd9b0}
+.dfx-modalwarn{margin:0 0 10px}
+
+/* Health check */
+.dfx-hc{list-style:none;margin:0 0 10px;padding:0}
+.dfx-hc li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line,#d8dde6)}
+.dfx-hc .dfx-dot{font-size:16px;line-height:1.3}
+.dfx-hc .dfx-hc-n{font-weight:700;font-size:13.5px}
+.dfx-hc .dfx-hc-d{font-size:12px;color:var(--ink-soft,#5b6b66);line-height:1.4}
+.dfx-log{max-height:180px;overflow:auto;font:11px/1.45 var(--font-mono,monospace);background:var(--surface-2,#f1f4f2);padding:8px;border-radius:8px;white-space:pre-wrap;word-break:break-word}
+
+/* Tour */
+#dfxTour{position:fixed;inset:0;z-index:100004;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.55)}
+#dfxTour.show{display:flex}
+#dfxTour .dfx-t-box{width:min(94vw,420px);background:var(--surface,#fff);color:var(--ink,#16211d);border-radius:18px;padding:22px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+#dfxTour .dfx-t-ic{font-size:44px}
+#dfxTour h3{margin:8px 0 6px;font-size:19px}
+#dfxTour p{margin:0 0 14px;font-size:14px;line-height:1.5;color:var(--ink-soft,#5b6b66)}
+#dfxTour .dfx-dots{display:flex;gap:6px;justify-content:center;margin-bottom:14px}
+#dfxTour .dfx-dots span{width:8px;height:8px;border-radius:50%;background:var(--line,#d8dde6)}
+#dfxTour .dfx-dots span.on{background:var(--accent,#F2A65A)}
+#dfxTour .dfx-t-btns{display:flex;gap:8px}
+#dfxTour .dfx-t-btns button{flex:1;min-height:46px;border-radius:10px;border:1px solid var(--line,#d8dde6);background:var(--surface-2,#f1f4f2);color:inherit;font:inherit;font-weight:700;cursor:pointer}
+#dfxTour .dfx-t-btns button.p{background:var(--accent,#F2A65A);color:var(--accent-ink,#1a1a1a);border-color:transparent}
+#dfxTour .dfx-skip{margin-top:10px;background:none;border:0;color:var(--ink-soft,#5b6b66);text-decoration:underline;cursor:pointer;font-size:13px;min-height:40px}
+
+/* Flash a tool found through search */
+@keyframes dfxFlash{0%,100%{box-shadow:0 0 0 0 rgba(242,166,90,0)}50%{box-shadow:0 0 0 6px rgba(242,166,90,.55)}}
+.dfx-flash{animation:dfxFlash .8s ease-in-out 3;border-color:var(--accent,#F2A65A) !important}
+
+/* Camera button only where photos make sense */
+#dfxCamBtn{margin-left:6px}
+body:not([data-studio="ocr"]):not([data-studio="pdf"]) #dfxCamBtn{display:none}
+
+/* Mobile-first touch comfort */
+@media (max-width:720px){
+  .tool-btn,.btn,.studio-tab,.icon-btn{min-height:44px}
+  .modal{max-width:100vw}
+  .modal-body{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .modal-foot{position:sticky;bottom:0;z-index:2;background:var(--surface,#fff);padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));gap:8px}
+  .modal-foot .btn{flex:1;min-height:48px}
+  #dfxHome .dfx-h{font-size:22px}
+  .dfx-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .dfx-card{min-height:96px;padding:14px}
+  #studioUploadScreen{position:sticky;top:0;z-index:30}
+}
+@media (max-width:380px){.dfx-grid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.dfx-flash{animation:none}#dfxProgress .dfx-p-fill{transition:none}}
+</style>
+<script id="df-simplify-v27140">
+(function(){
+'use strict';
+if(window.__dfxLoaded) return; window.__dfxLoaded = true;
+
+/* ---------- tiny helpers ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = {
+  get(k){ try{ return (window.DFStorage||window.localStorage).getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ (window.DFStorage||window.localStorage).setItem(k,v); }catch(e){} },
+  del(k){ try{ (window.DFStorage||window.localStorage).removeItem(k); }catch(e){} }
+};
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function withTimeout(p, ms, label){
+  return Promise.race([p, new Promise((_,rej) => setTimeout(() => rej(new Error((label||'step')+' timed out')), ms))]);
+}
+function rel(ts){
+  const m = Math.floor((Date.now()-ts)/60000);
+  if(m < 1) return 'just now'; if(m < 60) return m+'m ago';
+  const h = Math.floor(m/60); if(h < 24) return h+'h ago';
+  return Math.floor(h/24)+'d ago';
+}
+
+/* ---------- Developer log (hidden; shown only inside Health Check) ---------- */
+const devLog = [];
+function logDev(kind, msg){
+  try{
+    devLog.push({ t:Date.now(), kind, msg:String((msg && msg.stack) || (msg && msg.message) || msg).slice(0,700) });
+    if(devLog.length > 200) devLog.shift();
+  }catch(e){}
+}
+window.__dfxDevLog = devLog;
+['error','warn'].forEach(level => {
+  const orig = console[level];
+  console[level] = function(){
+    try{ logDev('console.'+level, Array.prototype.map.call(arguments, a => (a && a.stack) || (a && a.message) || (typeof a==='object' ? JSON.stringify(a) : String(a))).join(' ')); }catch(e){}
+    return orig.apply(console, arguments);
+  };
+});
+
+/* ====================================================================
+   1. TASK-BASED HOME + 2. UNIVERSAL SEARCH
+   ==================================================================== */
+const TASKS = [
+  { ic:'📄', t:'Work with PDF',          d:'Merge, split, compress, rotate, edit',          studio:'pdf',      chip:'local' },
+  { ic:'🔄', t:'Convert a File',         d:'PDF ⇄ Word, Excel, PowerPoint, images & more', studio:'convert',  chip:'local' },
+  { ic:'🔎', t:'OCR / Extract Text',     d:'Turn scans and photos into text',               studio:'ocr',      chip:'local' },
+  { ic:'📊', t:'Excel / CSV',            d:'Charts, dashboards and data checks',            studio:'excel',    chip:'local' },
+  { ic:'🤖', t:'AI Tools',               d:'Summarise, rewrite, chat with a document',      studio:'ai',       chip:'ai' },
+  { ic:'🧾', t:'Create Invoice',         d:'GST-ready invoices in minutes',                 studio:'gstinvoice', chip:'local' },
+  { ic:'✍️', t:'Sign / Fill / Protect',  d:'Sign, fill forms, password-protect (beta)',     studio:'security', chip:'local' },
+  { ic:'📂', t:'Process Multiple Files', d:'Run one task on many files, get one .zip',      studio:'batch',    chip:'local' }
+];
+
+const SYN = {
+  btnOpen:'merge combine join together open upload add pdf',
+  btnInsert:'insert add pages into',
+  btnSplit:'split separate divide break apart',
+  btnExtract:'extract pick pages select',
+  btnCompress:'compress reduce shrink smaller size optimize optimise',
+  btnRemoveBlank:'blank empty remove delete pages',
+  btnRotateSel:'rotate turn flip',
+  btnDeleteSel:'delete remove pages',
+  btnCrop:'crop trim margins',
+  btnOcrPdf:'ocr scan scanned searchable recognise recognize document',
+  btnOcrImage:'ocr photo image picture extract text read',
+  btnImagesToPdf:'photo image picture jpg png scan camera to pdf',
+  btnPdfToImages:'pdf to jpg png images pictures',
+  btnPdfToWord:'word docx doc editable',
+  btnPdfToExcel:'excel xlsx spreadsheet table',
+  btnPdfToPptx:'powerpoint pptx slides presentation',
+  btnPdfToText:'text txt plain',
+  btnFileToPdf:'convert word excel powerpoint html to pdf make create',
+  btnSign:'sign signature stamp',
+  btnEncrypt:'password protect encrypt lock secure',
+  btnOpenEncrypted:'unlock open password protected encrypted',
+  btnWatermark:'watermark stamp confidential draft',
+  btnPageNum:'page numbers numbering',
+  btnRedact:'redact hide blackout censor black out',
+  btnFillForm:'fill form fields',
+  btnAiSummarize:'summarize summarise summary ai tldr',
+  btnMetadata:'metadata properties author title scrub',
+  btnQrGenerate:'qr code make create',
+  btnQrReader:'qr code scan read'
+};
+const STUDIO_EXTRA = {
+  gstinvoice:'invoice bill gst tax', fincalc:'loan emi interest calculator deposit fd', matchpoint:'resume cv job interview',
+  statementiq:'bank statement credit card analyse analyze', salarylens:'salary ctc offer pay', networth:'assets liabilities wealth',
+  reader:'read ebook epub book', batch:'many multiple bulk', excel:'excel csv spreadsheet chart dashboard', security:'sign protect password',
+  snaptext:'photo image text ocr batch', help:'help guide how', settings:'settings dark mode', about:'about version'
+};
+const STOP = new Set(['a','an','the','to','my','this','that','of','for','and','in','on','it','i','want','please','can','you','how','do','file','files','document','documents']);
+
+function tokenize(q){
+  return String(q||'').toLowerCase().replace(/[→\-_/()…]/g,' ').split(/[^a-z0-9]+/).filter(Boolean)
+    .filter(w => !STOP.has(w)).map(w => (w.length>3 && w.endsWith('s')) ? w.slice(0,-1) : w);
+}
+let INDEX = null;
+function studioName(s){
+  try{ return (typeof studioLabel === 'function') ? studioLabel(s) : s; }catch(e){ return s; }
+}
+function buildIndex(){
+  const out = [];
+  document.querySelectorAll('.ribbon-panel[data-studio-panel] .tool-btn[id]').forEach(btn => {
+    const panel = btn.closest('.ribbon-panel');
+    const studio = panel && panel.dataset.studioPanel;
+    if(!studio || studio === 'translate') return;
+    if(/^btn(Undo|Redo|Reset)$/.test(btn.id)) return;
+    const label = (btn.textContent||'').replace(/\s+/g,' ').replace(/BETA/,'').trim();
+    if(!label) return;
+    out.push({ kind:'tool', id:btn.id, studio, label, extra:(SYN[btn.id]||''), where:studioName(studio)+' Studio' });
+  });
+  document.querySelectorAll('#dashboardTiles .main-menu-tile[data-studio]').forEach(tile => {
+    const studio = tile.dataset.studio;
+    if(studio === 'translate') return;
+    const label = (tile.querySelector('span:not(.dt-icon)')||tile).textContent.trim();
+    const sub = (tile.querySelector('small')||{}).textContent || '';
+    out.push({ kind:'studio', studio, label, extra:(sub+' '+(STUDIO_EXTRA[studio]||'')), where:'Studio' });
+  });
+  return out;
+}
+const CANON = { docx:'word', doc:'word', word:'word', xlsx:'excel', xls:'excel', excel:'excel', spreadsheet:'excel', csv:'csv',
+  ppt:'powerpoint', pptx:'powerpoint', powerpoint:'powerpoint', slide:'powerpoint', slides:'powerpoint',
+  image:'image', images:'image', img:'image', jpg:'image', jpeg:'image', png:'image', picture:'image', pictures:'image', photo:'image', photos:'image', scan:'image',
+  txt:'text', text:'text', htm:'html', html:'html', pdf:'pdf', pdfs:'pdf', md:'markdown', markdown:'markdown' };
+const canon = w => CANON[w] || w;
+function parseDir(txt){
+  const t = String(txt||'').toLowerCase().replace(/\(.*?\)/g,' ');
+  const m = /([a-z0-9]+)\s*(?:→|->|\bto\b|\binto\b|\bas\b|\b2\b)\s*([a-z0-9]+)/.exec(t);
+  return m ? { src:canon(m[1]), tgt:canon(m[2]) } : null;
+}
+function scoreEntry(e, toks, rawQ){
+  const lab = ' '+e.label.toLowerCase().replace(/[^a-z0-9]+/g,' ')+' ';
+  const ex  = ' '+(e.extra||'').toLowerCase().replace(/[^a-z0-9]+/g,' ')+' ';
+  const st  = ' '+(e.studio||'')+' '+studioName(e.studio).toLowerCase()+' ';
+  let s = 0, hits = 0;
+  toks.forEach(t => {
+    let h = 0;
+    if(lab.includes(' '+t+' ') || lab.includes(' '+t+'s ')) h = 3;
+    else if(lab.includes(t)) h = 1.6;
+    if(ex.includes(' '+t+' ') || ex.includes(' '+t+'s ')) h = Math.max(h, 2);
+    else if(t.length>3 && ex.includes(t)) h = Math.max(h, 1);
+    if(st.includes(' '+t+' ')) h += 0.6;
+    if(h > 0) hits++;
+    s += h;
+  });
+  if(!hits) return 0;
+  s += (hits/toks.length) * 2;
+  if(e.kind === 'tool') s += 0.4;
+  const qd = parseDir(rawQ);
+  if(qd && e.kind === 'tool'){
+    const ld = parseDir(e.label);
+    if(ld){
+      if(ld.tgt === qd.tgt){ s += 5; if(ld.src === qd.src) s += 2; }
+      else if(ld.tgt === qd.src && ld.src === qd.tgt) s -= 4;
+    }
+  }
+  return s;
+}
+function search(q){
+  const toks = tokenize(q);
+  if(!toks.length) return [];
+  if(!INDEX) INDEX = buildIndex();
+  return INDEX.map(e => ({ e, s:scoreEntry(e, toks, q) })).filter(x => x.s >= 2.2)
+    .sort((a,b) => b.s - a.s).slice(0,6).map(x => x.e);
+}
+function scrollToStudio(studio){
+  setTimeout(() => {
+    const p = document.querySelector('.ribbon-panel[data-studio-panel="'+studio+'"]');
+    if(p) p.scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 60);
+}
+function goStudio(studio){
+  if(typeof setStudio !== 'function') return;
+  setStudio(studio);
+  scrollToStudio(studio);
+  try{ setStatus('Opened '+studioName(studio)+'. Choose what to do next.'); }catch(e){}
+}
+function goTool(entry){
+  if(entry.kind === 'studio'){ goStudio(entry.studio); return; }
+  if(typeof setStudio !== 'function') return;
+  setStudio(entry.studio);
+  setTimeout(() => {
+    const btn = $(entry.id);
+    if(!btn) return;
+    btn.scrollIntoView({ behavior:'smooth', block:'center' });
+    btn.classList.add('dfx-flash');
+    setTimeout(() => btn.classList.remove('dfx-flash'), 2600);
+    try{ setStatus('Tap the highlighted “'+entry.label+'” button to continue.'); }catch(e){}
+  }, 90);
+}
+
+function buildHome(){
+  const main = document.querySelector('#workspaceLayout main');
+  const anchor = $('dashboardNavigationHint');
+  if(!main || !anchor || $('dfxHome')) return;
+  const sec = document.createElement('section');
+  sec.id = 'dfxHome';
+  sec.setAttribute('aria-label','Start here');
+  sec.innerHTML =
+    '<h2 class="dfx-h">What would you like to do?</h2>'+
+    '<p class="dfx-sub">Pick a task, or just type what you need.</p>'+
+    '<div class="dfx-search"><span class="dfx-mag" aria-hidden="true">🔍</span>'+
+      '<input id="dfxSearch" type="search" inputmode="search" enterkeyhint="go" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="What do you want to do?  e.g. “merge PDFs”" aria-label="What do you want to do?" aria-controls="dfxSuggest">'+
+      '<div id="dfxSuggest" role="listbox" aria-label="Matching tools"></div></div>'+
+    '<div class="dfx-grid" id="dfxGrid">'+
+      TASKS.map((t,i) => '<button type="button" class="dfx-card" data-dfx-task="'+i+'"><span class="dfx-ic" aria-hidden="true">'+t.ic+'</span><span class="dfx-t">'+esc(t.t)+'</span><span class="dfx-d">'+esc(t.d)+'</span><span class="dfx-chip'+(t.chip==='ai'?' ai':'')+'">'+(t.chip==='ai'?'☁️ Uses your AI provider':'🔒 On your device')+'</span></button>').join('')+
+    '</div>'+
+    '<div class="dfx-quick">'+
+      '<button type="button" id="dfxQPhotoOcr">📷 Photo → Text (OCR)</button>'+
+      '<button type="button" id="dfxQPhotoPdf">📷 Photo → PDF</button>'+
+      '<button type="button" id="dfxQHealth">🩺 Health Check</button>'+
+      '<button type="button" id="dfxQTour">🎓 Quick tour</button>'+
+      '<button type="button" id="dfxQAsk">💬 Ask Me</button>'+
+    '</div>'+
+    '<div class="dfx-privacy"><b>🔒 Privacy:</b> Most document processing happens on your device. AI features may send selected text to your chosen AI provider.</div>'+
+    '<div id="dfxLast"></div>'+
+    '<div class="dfx-more-wrap"><button type="button" class="dfx-more" id="dfxMoreBtn" aria-expanded="false" aria-controls="dashboardTiles">More Tools ▾ <span style="font-weight:400;opacity:.75">(all studios)</span></button></div>'+
+    '<input type="file" id="dfxPhotoIn" accept="image/*" hidden>';
+  main.insertBefore(sec, anchor);
+  if(store.get('dfx-more-open') === '1') setMore(true);
+
+  sec.addEventListener('click', e => {
+    const card = e.target.closest('[data-dfx-task]');
+    if(card){ goStudio(TASKS[+card.dataset.dfxTask].studio); return; }
+  });
+  $('dfxMoreBtn').addEventListener('click', () => setMore(!document.body.classList.contains('dfx-more-open')));
+  $('dfxQHealth').addEventListener('click', openHealth);
+  $('dfxQTour').addEventListener('click', () => startTour(true));
+  $('dfxQAsk').addEventListener('click', () => { const t = $('dashboardAskTile'); if(t) t.click(); });
+  let photoMode = 'ocr';
+  $('dfxQPhotoOcr').addEventListener('click', () => { photoMode = 'ocr'; $('dfxPhotoIn').value=''; $('dfxPhotoIn').click(); });
+  $('dfxQPhotoPdf').addEventListener('click', () => { photoMode = 'pdf'; $('dfxPhotoIn').value=''; $('dfxPhotoIn').click(); });
+  $('dfxPhotoIn').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    runWithPhoto(f, photoMode);
+  });
+  wireSearch();
+}
+function setMore(open){
+  document.body.classList.toggle('dfx-more-open', !!open);
+  const b = $('dfxMoreBtn');
+  if(b){ b.setAttribute('aria-expanded', open ? 'true':'false'); b.firstChild.textContent = open ? 'More Tools ▴ ' : 'More Tools ▾ '; }
+  store.set('dfx-more-open', open ? '1':'0');
+}
+function runWithPhoto(file, mode){
+  window.__docuForgeStudioFile = file;
+  window.__docuForgeStudioFiles = [file];
+  const toolId = mode === 'pdf' ? 'btnImagesToPdf' : 'btnOcrImage';
+  setStudio('ocr');
+  const nm = $('studioUploadName'); if(nm) nm.textContent = '✓ '+file.name;
+  setTimeout(() => {
+    const b = $(toolId);
+    if(!b){ try{ toast('That tool is not available right now.', true); }catch(e){} return; }
+    b.dataset.studioFileReady = '1';
+    b.click();
+  }, 160);
+}
+
+function wireSearch(){
+  const inp = $('dfxSearch'), box = $('dfxSuggest');
+  let cur = [], idx = -1;
+  const ICON = { tool:'🛠️', studio:'📁' };
+  function render(){
+    const q = inp.value.trim();
+    if(!q){ box.classList.remove('show'); box.innerHTML=''; cur=[]; return; }
+    cur = search(q); idx = cur.length ? 0 : -1;
+    if(!cur.length){
+      box.innerHTML = '<div class="dfx-s-none">No exact match. Try words like <b>merge</b>, <b>compress</b>, <b>OCR</b>, <b>convert to Word</b> or <b>invoice</b> — or open <b>More Tools</b>.</div>';
+    } else {
+      box.innerHTML = cur.map((e,i) => '<button type="button" role="option" data-i="'+i+'" class="'+(i===0?'dfx-active':'')+'"><span aria-hidden="true">'+ICON[e.kind]+'</span><span class="dfx-s-main">'+esc(e.label)+'</span><span class="dfx-s-where">'+esc(e.where)+'</span></button>').join('');
+    }
+    box.classList.add('show');
+  }
+  function pick(i){
+    const e = cur[i]; if(!e) return;
+    box.classList.remove('show'); inp.value=''; inp.blur();
+    goTool(e);
+  }
+  inp.addEventListener('input', render);
+  inp.addEventListener('focus', () => { if(inp.value.trim()) render(); });
+  inp.addEventListener('keydown', ev => {
+    if(ev.key === 'Enter'){ ev.preventDefault(); if(!cur.length) render(); pick(Math.max(0,idx)); }
+    else if(ev.key === 'ArrowDown' && cur.length){ ev.preventDefault(); idx=(idx+1)%cur.length; mark(); }
+    else if(ev.key === 'ArrowUp' && cur.length){ ev.preventDefault(); idx=(idx-1+cur.length)%cur.length; mark(); }
+    else if(ev.key === 'Escape'){ inp.value=''; render(); }
+  });
+  function mark(){ box.querySelectorAll('button').forEach((b,i) => b.classList.toggle('dfx-active', i===idx)); }
+  box.addEventListener('click', ev => { const b = ev.target.closest('button[data-i]'); if(b) pick(+b.dataset.i); });
+  document.addEventListener('click', ev => { if(!ev.target.closest('.dfx-search')) box.classList.remove('show'); });
+}
+
+/* ====================================================================
+   WORKFLOW STRIP  Select → Options → Process → Result
+   ==================================================================== */
+const FLOW_STUDIOS = new Set(['pdf','ocr','convert','powerpoint','ai','security','batch','spreadsheet']);
+let busy = false;
+function buildSteps(){
+  const anchor = $('currentStudioTitle');
+  if(!anchor || $('dfxSteps')) return;
+  const d = document.createElement('div');
+  d.id = 'dfxSteps';
+  d.setAttribute('aria-label','Progress: select, options, process, result');
+  d.innerHTML = ['Select','Options','Process','Result'].map((n,i) => '<span class="dfx-st" data-n="'+i+'"><i>'+(i+1)+'</i>'+n+'</span>').join('');
+  anchor.insertAdjacentElement('afterend', d);
+}
+function modalOpen(){ const m = $('genericModal'); return !!(m && m.classList.contains('show')); }
+function resultModalOpen(){ return modalOpen() && !!document.querySelector('#modalBody .dfx-resultbar'); }
+function currentStep(){
+  if(resultModalOpen()) return 3;
+  if(busy) return 2;
+  if(modalOpen()) return 1;
+  const hasFile = (typeof workingBytes !== 'undefined' && workingBytes) || window.__docuForgeStudioFile;
+  return hasFile ? 1 : 0;
+}
+let lastStepKey = '';
+function updateSteps(){
+  const el = $('dfxSteps'); if(!el) return;
+  const st = window.__docuForgeCurrentStudio || document.body.dataset.studio || '';
+  const on = FLOW_STUDIOS.has(st);
+  el.classList.toggle('dfx-on', on);
+  if(!on) return;
+  const cs = currentStep(), key = st+':'+cs;
+  if(key === lastStepKey) return;
+  lastStepKey = key;
+  el.querySelectorAll('.dfx-st').forEach((s,i) => { s.classList.toggle('on', i===cs); s.classList.toggle('done', i<cs); });
+}
+
+/* ====================================================================
+   3. RESULT BAR  View | Download | Share | Start Another
+   ==================================================================== */
+const results = new Map();     // id -> {blob,name,label,ts}   (memory only)
+let lastResultEntry = null;
+let pinned = null;
+function wrapLastResults(){
+  let cur = window.__dfLastResults || {};
+  const wrap = o => new Proxy(o, { set(t,k,v){ t[k] = v; try{ if(v && v.blob instanceof Blob) onResultSet(v); }catch(e){} return true; } });
+  cur = wrap(cur);
+  try{
+    Object.defineProperty(window, '__dfLastResults', { configurable:true, get(){ return cur; }, set(v){ cur = wrap(v && typeof v==='object' ? v : {}); } });
+  }catch(e){ logDev('init','could not wrap __dfLastResults: '+e.message); }
+}
+function onResultSet(v){
+  const name = v.name || v.filename || v.fileName || 'result';
+  const label = v.label || 'Result';
+  for(const r of results.values()){ if(r.blob === v.blob) return; }
+  const id = 'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const entry = { id, blob:v.blob, name, label, previewPdfBytes:v.previewPdfBytes||null, ts:Date.now(), studio:window.__docuForgeCurrentStudio||'' };
+  results.set(id, entry);
+  if(results.size > 8) results.delete(results.keys().next().value);
+  lastResultEntry = entry;
+  addRecent({ id, label, name, studio:entry.studio, ts:entry.ts });
+}
+function dlEntry(en){
+  if(!en) return;
+  try{ downloadBlob(en.blob, en.name); }
+  catch(e){ const a=document.createElement('a'); a.href=URL.createObjectURL(en.blob); a.download=en.name; document.body.appendChild(a); a.click(); a.remove(); }
+}
+async function shareEntry(en){
+  if(!en) return;
+  try{
+    const file = new File([en.blob], en.name, { type:en.blob.type || 'application/octet-stream' });
+    if(navigator.share && (!navigator.canShare || navigator.canShare({ files:[file] }))){
+      await navigator.share({ files:[file], title:en.label||'DocuForge', text:en.name });
+      return;
+    }
+    dlEntry(en);
+    toast('Sharing isn’t supported in this browser, so the file was downloaded. Attach it in email or WhatsApp.');
+  }catch(e){ if(e && e.name === 'AbortError') return; logDev('share', e); toast('Could not share the file. Try Download instead.', true); }
+}
+async function viewEntry(en){
+  if(!en) return;
+  try{
+    const isPdf = en.blob.type === 'application/pdf' || /\.pdf$/i.test(en.name);
+    const pv = en.previewPdfBytes || (isPdf ? new Uint8Array(await en.blob.arrayBuffer()) : null);
+    if(pv && window.__dfViewFile){ closeModal(); await window.__dfViewFile(new Blob([pv],{type:'application/pdf'}), en.name.replace(/\.[^.]+$/,'')+'_preview.pdf'); return; }
+    toast('A full-page preview isn’t available for this file type. Use Download to open it.', true);
+  }catch(e){ logDev('view', e); toast('Could not open the preview.', true); }
+}
+function startAnother(){
+  try{ closeModal(); }catch(e){}
+  pinned = null;
+  const st = window.__docuForgeCurrentStudio;
+  setTimeout(() => {
+    if(st && st !== 'dashboard'){ const r = $('ribbon'); if(r) r.scrollIntoView({ behavior:'smooth', block:'start' }); }
+    try{ setStatus('Ready for another file.'); }catch(e){}
+  }, 40);
+}
+function mkBtn(txt, cls, fn, id){
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'btn '+(cls||''); b.innerHTML = txt; if(id) b.id = id;
+  b.addEventListener('click', fn);
+  return b;
+}
+const RX_VIEW = /view|preview|open/i, RX_DL = /download|save/i, RX_SHARE = /share/i;
+function decorateResult(body){
+  if(!body || body.querySelector('.dfx-resultbar')) return;
+  const btns = Array.from(body.querySelectorAll('button'));
+  const cand = btns.filter(b => RX_VIEW.test(b.textContent) || RX_DL.test(b.textContent) || RX_SHARE.test(b.textContent));
+  const hasShare = cand.some(b => RX_SHARE.test(b.textContent));
+  const hasOther = cand.some(b => !RX_SHARE.test(b.textContent));
+  const mc = $('modalConfirm');
+  const confirmIsDownload = !!(mc && mc.style.display !== 'none' && RX_DL.test(mc.textContent));
+  if(!(hasShare && (hasOther || confirmIsDownload))) return;
+  const bar = document.createElement('div');
+  bar.className = 'dfx-resultbar';
+  const rank = b => RX_SHARE.test(b.textContent) ? 2 : RX_DL.test(b.textContent) ? 1 : 0;
+  const sorted = cand.slice().sort((a,b) => rank(a)-rank(b));
+  const wrappers = new Set(sorted.map(b => b.parentElement));
+  const hasDl = sorted.some(b => RX_DL.test(b.textContent));
+  const hasView = sorted.some(b => !RX_DL.test(b.textContent) && !RX_SHARE.test(b.textContent));
+  const target = () => pinned || lastResultEntry;
+  const out = [];
+  if(!hasView) out.push({ r:0, el:mkBtn('👁️ View','primary', () => viewEntry(target())) });
+  sorted.forEach(b => out.push({ r:rank(b), el:b }));
+  if(!hasDl){
+    if(confirmIsDownload){
+      out.push({ r:1, el:mkBtn('⬇️ Download','primary', () => { const c = $('modalConfirm'); if(c) c.click(); }) });
+      mc.style.display = 'none';
+    } else out.push({ r:1, el:mkBtn('⬇️ Download','primary', () => dlEntry(target())) });
+  }
+  out.sort((a,b) => a.r-b.r);
+  out.forEach(x => { x.el.classList.add('dfx-act'); bar.appendChild(x.el); });
+  bar.appendChild(mkBtn('➕ Start Another','', startAnother, 'dfxStartAnother'));
+  // place bar where the first moved button's group used to be (or at the end)
+  const firstWrap = Array.from(wrappers)[0];
+  if(firstWrap && firstWrap !== body && body.contains(firstWrap)) firstWrap.insertAdjacentElement('afterend', bar); else body.appendChild(bar);
+  wrappers.forEach(w => { if(w && w !== body && w !== bar && !w.children.length && !w.textContent.trim()) w.remove(); });
+  const cap = document.createElement('p');
+  cap.className = 'dfx-resultcap';
+  cap.textContent = 'View · Download · Share · Start Another';
+  bar.insertAdjacentElement('afterend', cap);
+}
+function reopenResult(id){
+  const en = results.get(id);
+  if(!en){ toast('That file is no longer in memory. Please run the task again.', true); return; }
+  pinned = en;
+  openModal('Result ready', '<div class="dfx-ok">✓ '+esc(en.label)+'</div><div class="hint">File: <strong>'+esc(en.name)+'</strong></div>', async () => {});
+  $('modalConfirm').style.display = 'none';
+  $('modalCancel').textContent = 'Close';
+  const body = $('modalBody');
+  const bar = document.createElement('div'); bar.className = 'dfx-resultbar';
+  const mk = (t,c,f) => { const b = mkBtn(t,c,f); b.classList.add('dfx-act'); bar.appendChild(b); };
+  mk('👁️ View','primary', () => viewEntry(en));
+  mk('⬇️ Download','primary', () => dlEntry(en));
+  mk('📤 Share','primary', () => shareEntry(en));
+  bar.appendChild(mkBtn('➕ Start Another','', startAnother, 'dfxStartAnother'));
+  body.appendChild(bar);
+}
+
+/* ====================================================================
+   11. RECENT WORK  (metadata only; files stay in memory for this tab)
+   ==================================================================== */
+const RKEY = 'dfx-recent-work';
+function getRecent(){ try{ return JSON.parse(store.get(RKEY)||'[]'); }catch(e){ return []; } }
+function addRecent(r){
+  const a = getRecent().filter(x => x.id !== r.id);
+  a.unshift(r);
+  store.set(RKEY, JSON.stringify(a.slice(0,12)));
+  renderRecent();
+}
+function renderRecent(){
+  const el = $('dfxLast'); if(!el) return;
+  const a = getRecent().slice(0,4);
+  if(!a.length){ el.innerHTML = ''; return; }
+  const last = a[0];
+  el.innerHTML =
+    '<div class="dfx-last-head"><h3>Recent work</h3><button type="button" class="dfx-link" id="dfxClearHist">Clear history</button></div>'+
+    a.map(r => {
+      const live = results.has(r.id);
+      return '<div class="dfx-row"><div class="dfx-r-main"><b>'+esc(r.label)+(r===last?' <span style="font-weight:400;opacity:.7">· last operation</span>':'')+'</b><span>'+esc(r.name)+' · '+rel(r.ts)+'</span></div>'+
+        (live ? '<button type="button" data-dfx-reopen="'+esc(r.id)+'">Reopen result</button>' : '<span class="dfx-note-mem">Re-run to get it again</span>')+'</div>';
+    }).join('')+
+    '<div class="dfx-note-mem">Only file names and times are remembered, on this device. Result files are kept in memory until you close this tab.</div>';
+  el.querySelectorAll('[data-dfx-reopen]').forEach(b => b.addEventListener('click', () => reopenResult(b.dataset.dfxReopen)));
+  $('dfxClearHist').addEventListener('click', async () => {
+    if(!confirm('Clear recent work, conversion history and recent files from this device? Files you already downloaded are not affected.')) return;
+    store.del(RKEY); results.clear(); lastResultEntry = null;
+    try{ if(typeof clearConversionLog === 'function') clearConversionLog(); }catch(e){}
+    try{ if(typeof clearAllProjectSnapshots === 'function') await clearAllProjectSnapshots(); }catch(e){}
+    try{ if(typeof renderDashboardRecent === 'function') renderDashboardRecent(); }catch(e){}
+    renderRecent();
+    toast('History cleared.');
+  });
+}
+
+/* ====================================================================
+   4. PROGRESS & DUPLICATE-CLICK GUARD
+   ==================================================================== */
+let curOp = '', progTimer = 0, endTimer = 0, lastBlockToast = 0;
+function buildProgress(){
+  if($('dfxProgress')) return;
+  const d = document.createElement('div');
+  d.id = 'dfxProgress'; d.setAttribute('role','status'); d.setAttribute('aria-live','polite');
+  d.innerHTML = '<div class="dfx-p-op" id="dfxPOp">Working…</div><div class="dfx-p-bar"><div class="dfx-p-fill" id="dfxPFill"></div></div>'+
+    '<div class="dfx-p-meta"><span id="dfxPDone"></span><span id="dfxPPct">0%</span></div>'+
+    '<div class="dfx-p-wait">⏳ Please wait — this can take a moment. Keep this page open.</div>';
+  document.body.appendChild(d);
+}
+function parseCounts(txt){
+  const m = /(\d+)\s*(?:\/|of)\s*(\d+)/i.exec(txt||'');
+  if(!m) return null;
+  const done = +m[1], tot = +m[2];
+  if(!tot || done > tot) return null;
+  const unit = /file/i.test(txt) ? 'File' : /page/i.test(txt) ? 'Page' : /image/i.test(txt) ? 'Image' : /slide/i.test(txt) ? 'Slide' : 'Step';
+  return { done, tot, unit };
+}
+function setBusy(on){
+  busy = on;
+  document.body.classList.toggle('dfx-busy', on);
+  const p = $('dfxProgress'); if(p) p.classList.toggle('show', on);
+  lastStepKey = '';
+  updateSteps();
+  clearTimeout(progTimer);
+  if(on) progTimer = setTimeout(() => setBusy(false), 90000);  // watchdog: never leave the UI locked
+}
+function onProgress(pct){
+  buildProgress();
+  clearTimeout(endTimer);
+  if(pct === null || pct === undefined){ setBusy(false); return; }
+  const n = Math.max(0, Math.min(100, Math.round(+pct || 0)));
+  if(!busy) setBusy(true); else { clearTimeout(progTimer); progTimer = setTimeout(() => setBusy(false), 90000); }
+  $('dfxPFill').style.width = n+'%';
+  $('dfxPPct').textContent = n+'%';
+  $('dfxPOp').textContent = curOp || 'Working…';
+  const c = parseCounts(curOp);
+  $('dfxPDone').textContent = c ? (c.unit+' '+c.done+' of '+c.tot) : '';
+  if(n >= 100) endTimer = setTimeout(() => setBusy(false), 5000);
+}
+function installBusyGuard(){
+  window.addEventListener('click', e => {
+    if(!busy) return;
+    const t = e.target.closest && e.target.closest('.tool-btn, #btnDownload, #btnShareCurrentPdf, .dfx-card, .dash-tile, #dfxQPhotoOcr, #dfxQPhotoPdf');
+    if(!t) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    if(Date.now() - lastBlockToast > 2500){ lastBlockToast = Date.now(); try{ toast('Still working — please wait for the current task to finish.'); }catch(_){} }
+  }, true);
+}
+
+/* ====================================================================
+   5. FRIENDLY ERRORS (raw details go to the hidden developer log)
+   ==================================================================== */
+const TECH = /(TypeError|ReferenceError|SyntaxError|RangeError|EvalError|URIError|InvalidStateError|DOMException|NetworkError|Cannot (?:read|set|destructure)|is not a (?:function|constructor)|is not defined|is not iterable|undefined|\bnull\b|Unexpected (?:token|end)|\[object|Failed to (?:execute|fetch|construct)|\bat\s+\S+:\d+|Invalid (?:PDF|array|typed)|XRef|Missing PDF|UnknownError|FormatError|\bNaN\b|Uncaught)/i;
+const KINDS = [
+  { rx:/password/i, what:'This file is protected by a password.', why:'The file needs its password before it can be opened or changed.', next:'Open it with “Open password-protected PDF” in Security Studio and enter the password.' },
+  { rx:/(network|fetch|internet|offline|required library|could not load|failed to load|script)/i, what:'A tool this task needs could not be loaded.', why:'You may be offline, or the connection dropped. Some tools download a small component the first time you use them.', next:'Check your internet connection and try again. Once loaded, the tool also works offline.' },
+  { rx:/(memory|allocation|too large|too big|quota|out of)/i, what:'The file was too big to handle on this device.', why:'Phones and tablets have limited memory for very large or high-resolution files.', next:'Try a smaller file or fewer pages, or use Compress first.' },
+  { rx:/(taking too long|timed? ?out|timeout)/i, what:'This is taking longer than expected.', why:'Large or scanned files can be slow, especially on phones.', next:'Try fewer pages or a smaller file, keep the screen on, and try again.' },
+  { rx:/(invalid pdf|xref|missing pdf|pdf structure|format ?error|corrupt|damaged|parse|unknownerror|decod|unsupported|not a pdf)/i, what:'The file could not be read.', why:'It may be damaged, saved in an unusual format, or protected.', next:'Try another copy of the file, or open and re-save it in its original program, then try again.' }
+];
+function classify(raw){
+  const s = String(raw||'');
+  for(const k of KINDS){ if(k.rx.test(s)) return k; }
+  return { what:'Something went wrong while doing that.', why:'The file or the option chosen may not be supported by this tool.', next:'Try again. If it keeps happening, try a different file or different options.' };
+}
+let lastTool = null, lastClick = 0, errShownAt = 0;
+function trackClicks(){
+  document.addEventListener('click', e => {
+    lastClick = Date.now();
+    const b = e.target.closest && e.target.closest('.tool-btn[id]');
+    if(b) lastTool = b.id;
+  }, true);
+}
+function buildErr(){
+  if($('dfxErr')) return;
+  const d = document.createElement('div');
+  d.id = 'dfxErr'; d.setAttribute('role','alertdialog'); d.setAttribute('aria-modal','true'); d.setAttribute('aria-labelledby','dfxEH');
+  d.innerHTML = '<div class="dfx-e-box"><h3 id="dfxEH">⚠️ That didn’t work</h3><dl>'+
+    '<dt>What happened</dt><dd id="dfxEWhat"></dd><dt>Why it may have happened</dt><dd id="dfxEWhy"></dd><dt>What to do next</dt><dd id="dfxENext"></dd></dl>'+
+    '<div class="dfx-e-btns"><button type="button" class="p" id="dfxERetry">↻ Try Again</button><button type="button" id="dfxEClose">Close</button></div></div>';
+  document.body.appendChild(d);
+  $('dfxEClose').addEventListener('click', () => d.classList.remove('show'));
+  d.addEventListener('click', e => { if(e.target === d) d.classList.remove('show'); });
+  $('dfxERetry').addEventListener('click', () => {
+    d.classList.remove('show');
+    const b = lastTool && $(lastTool);
+    if(b) setTimeout(() => b.click(), 60); else { try{ toast('Choose the tool again to retry.'); }catch(_){} }
+  });
+}
+function showFriendly(raw){
+  logDev('error', raw);
+  const now = Date.now();
+  if(now - errShownAt < 1500) return;
+  errShownAt = now;
+  setBusy(false);
+  try{ if(typeof showProgress === 'function') origShowProgress(null); }catch(e){}
+  buildErr();
+  const k = classify(raw);
+  $('dfxEWhat').textContent = k.what; $('dfxEWhy').textContent = k.why; $('dfxENext').textContent = k.next;
+  $('dfxERetry').style.display = (lastTool && $(lastTool)) ? '' : 'none';
+  $('dfxErr').classList.add('show');
+  try{ $('dfxERetry').style.display === 'none' ? $('dfxEClose').focus() : $('dfxERetry').focus(); }catch(e){}
+}
+function installErrorHandling(){
+  const origToast = window.toast;
+  window.toast = function(msg, isErr){
+    if(isErr && TECH.test(String(msg||''))){ showFriendly(msg); return; }
+    return origToast.apply(this, arguments);
+  };
+  window.addEventListener('error', ev => {
+    const m = (ev && ev.message) || '';
+    logDev('window.error', (ev && ev.error && ev.error.stack) || m);
+    if(/ResizeObserver|Script error\.?$/i.test(m) || (ev && !ev.error && ev.target && ev.target !== window)) return;
+    if(busy || Date.now() - lastClick < 8000) showFriendly(m);
+  });
+  window.addEventListener('unhandledrejection', ev => {
+    const r = ev && ev.reason;
+    const m = (r && (r.message || r.name)) || String(r);
+    logDev('unhandledrejection', (r && r.stack) || m);
+    if(r && r.name === 'AbortError') return;
+    if(busy || Date.now() - lastClick < 8000) showFriendly(m);
+  });
+}
+
+/* ====================================================================
+   7. BASIC / ADVANCED OPTIONS (+ 8/9 modal-level notices)
+   ==================================================================== */
+const ADV = {
+  'Compress PDF':               { ids:['df1111CQ','df1111CD','cmpQuality','cmpMaxDim'], preset:true },
+  'Add page numbers':           { ids:['pnStyle','pnPrefixField','pnRestart'] },
+  'Add Header / Footer':        { ids:['df1111HT','df1111FB'] },
+  'Bates Numbering':            { ids:['df1111BD','df1111BM','df1111BSz'] },
+  'Resize / convert image':     { ids:['irMode','irMaxDimField','irScaleField','irExactField'] }
+};
+function unitOf(el){
+  if(!el) return null;
+  const direct = el.closest('.df1111-field, .field');
+  if(direct && direct.classList.contains('row')){ return el.parentElement; }
+  return direct || el.parentElement;
+}
+function applyAdvanced(body, title){
+  const cfg = ADV[title];
+  if(!cfg || body.querySelector('details.dfx-adv')) return;
+  const units = [];
+  cfg.ids.forEach(id => { const u = unitOf($(id)); if(u && body.contains(u) && !units.includes(u)) units.push(u); });
+  if(!units.length) return;
+  const det = document.createElement('details');
+  det.className = 'dfx-adv';
+  det.innerHTML = '<summary>Advanced options</summary><div class="dfx-adv-body"></div>';
+  const inner = det.querySelector('.dfx-adv-body');
+  const first = units[0];
+  first.parentNode.insertBefore(det, first);
+  units.forEach(u => inner.appendChild(u));
+  // remove now-empty .field.row shells
+  body.querySelectorAll('.field.row').forEach(r => { if(!r.children.length) r.remove(); });
+  if(cfg.preset){
+    const wrap = document.createElement('div');
+    wrap.className = 'field';
+    wrap.innerHTML = '<label>Compression level</label><select id="dfxCmpPreset"><option value="bal">Balanced (recommended)</option><option value="small">Smaller file</option><option value="best">Best quality</option></select>';
+    det.parentNode.insertBefore(wrap, det);
+    const P = { bal:[0.65,1600], small:[0.5,1200], best:[0.85,2400] };
+    wrap.querySelector('select').addEventListener('change', e => {
+      const v = P[e.target.value]; if(!v) return;
+      const q = $('df1111CQ') || $('cmpQuality'), d = $('df1111CD') || $('cmpMaxDim');
+      if(q){ q.value = v[0]; q.dispatchEvent(new Event('input',{bubbles:true})); }
+      if(d){ d.value = v[1]; d.dispatchEvent(new Event('input',{bubbles:true})); }
+    });
+  }
+}
+const NOTE_PW   = '<div class="dfx-warn dfx-modalwarn"><b>BETA feature.</b> After saving, open the protected file with its password to make sure it works before you rely on it. Not recommended for confidential or legal documents yet.</div>';
+const NOTE_SIGN = '<div class="dfx-warn dfx-modalwarn"><b>Visual signature only.</b> This stamps a picture of your signature on the page. It is not a cryptographic digital signature and has no legal certificate behind it.</div>';
+const NOTE_AI   = '<div class="dfx-warn ai dfx-modalwarn">☁️ <b>External AI.</b> The text you select is sent to your chosen AI provider. Your original file is not uploaded.</div>';
+const MODAL_NOTES = [
+  [/^Set password/i, NOTE_PW], [/^Sign PDF/i, NOTE_SIGN],
+  [/^(AI text tools|Chat with a document|Document analysis)$/i, NOTE_AI]
+];
+let lastBodyNode = null;
+function onModalChange(){
+  const m = $('genericModal'); if(!m || !m.classList.contains('show')) return;
+  const body = $('modalBody'); if(!body) return;
+  const node = body.firstChild;
+  if(node === lastBodyNode && body.querySelector('.dfx-processed')) return;
+  lastBodyNode = node;
+  const title = ($('modalTitle')||{}).textContent || '';
+  try{
+    if(!body.querySelector('.dfx-modalwarn')){
+      for(const [rx, html] of MODAL_NOTES){ if(rx.test(title)){ body.insertAdjacentHTML('afterbegin', html); break; } }
+    }
+    applyAdvanced(body, title);
+    decorateResult(body);
+  }catch(e){ logDev('modal-decorate', e); }
+  if(!body.querySelector('.dfx-processed')){ const s = document.createElement('span'); s.className='dfx-processed'; s.hidden = true; body.appendChild(s); }
+  lastStepKey = ''; updateSteps();
+}
+function observeModal(){
+  const m = $('genericModal'), b = $('modalBody');
+  if(!m || !b) return;
+  let queued = false;
+  const run = () => { if(queued) return; queued = true; Promise.resolve().then(() => { queued = false; onModalChange(); }); };
+  new MutationObserver(run).observe(b, { childList:true });
+  new MutationObserver(() => { run(); lastStepKey=''; updateSteps(); }).observe(m, { attributes:true, attributeFilter:['class'] });
+}
+
+/* ====================================================================
+   6. CAMERA BUTTON (Photo → OCR / Photo → PDF from upload card)
+   ==================================================================== */
+function addCameraButton(){
+  const card = $('studioUploadScreen'); const choose = $('studioUploadChoose');
+  if(!card || !choose || $('dfxCamBtn')) return;
+  const b = document.createElement('button');
+  b.type = 'button'; b.id = 'dfxCamBtn'; b.className = 'btn ghost'; b.textContent = '📷 Take Photo';
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*'; inp.setAttribute('capture','environment'); inp.hidden = true; inp.id = 'dfxCamInput';
+  choose.insertAdjacentElement('afterend', b);
+  b.insertAdjacentElement('afterend', inp);
+  b.addEventListener('click', () => { inp.value=''; inp.click(); });
+  inp.addEventListener('change', () => {
+    const f = inp.files && inp.files[0]; if(!f) return;
+    const target = $('studioUploadInput');
+    try{
+      const dt = new DataTransfer(); dt.items.add(f);
+      target.files = dt.files;
+      target.dispatchEvent(new Event('change', { bubbles:true }));
+    }catch(e){
+      logDev('camera', e);
+      window.__docuForgeStudioFile = f; window.__docuForgeStudioFiles = [f];
+      const nm = $('studioUploadName'); if(nm) nm.textContent = '✓ '+f.name;
+      toast('Photo ready — now tap the tool you want to use.');
+    }
+  });
+}
+
+/* ====================================================================
+   8/9. STATIC NOTICES: Security Studio + AI Studio banners
+   ==================================================================== */
+function addPanelNotices(){
+  if(!$('dfxNotes')){
+    const anchor = $('dfxSteps') || $('currentStudioTitle');
+    if(anchor){
+      const d = document.createElement('div');
+      d.id = 'dfxNotes';
+      d.innerHTML =
+        '<div class="dfx-warn dfx-n-security"><b>⚠️ Password protection is BETA.</b> It uses a less-tested library. After protecting a file, open it with the password to confirm it works. Not recommended for confidential or legal documents yet.</div>'+
+        '<div class="dfx-warn dfx-n-security"><b>✍️ Signature = visual stamp.</b> “Sign PDF” places a picture of your signature on the page. It is <b>not</b> a cryptographic digital signature.</div>'+
+        '<div class="dfx-warn ai dfx-n-ai">☁️ <b>AI Studio uses an external AI provider.</b> Only the text you choose is sent to the provider you set up — never your original file. Everything else in DocuForge happens on your device.</div>';
+      anchor.insertAdjacentElement('afterend', d);
+    }
+  }
+  const sign = $('btnSign');
+  if(sign && !sign.querySelector('.beta-badge')){ sign.insertAdjacentHTML('beforeend',' <span class="beta-badge">VISUAL ONLY</span>'); }
+}
+
+/* ====================================================================
+   10. HEALTH CHECK / SELF-TEST
+   ==================================================================== */
+const DOT = { ok:'🟢', warn:'🟡', bad:'🔴' };
+function quickChecks(){
+  const online = navigator.onLine !== false;
+  const r = [];
+  const pdfOk = !!(window.PDFLib && window.PDFLib.PDFDocument) && !!window.pdfjsLib;
+  r.push({ k:'pdf', n:'PDF engine', s:pdfOk?'ok':'bad', d:pdfOk ? 'pdf-lib and PDF.js are loaded.' : 'The PDF libraries did not load. Reload the page while online.' });
+  r.push({ k:'ocr', n:'OCR engine', s:window.Tesseract?'ok':(online?'warn':'bad'), d:window.Tesseract ? 'Tesseract is loaded.' : (online?'Loads the first time you use OCR (needs internet once).':'Not loaded and you are offline — OCR needs a one-time download.') });
+  const zip = !!window.JSZip;
+  r.push({ k:'conv', n:'Conversion engines', s:zip?(window.mammoth?'ok':'warn'):'bad', d:zip ? (window.mammoth ? 'ZIP, Word reader and builders are ready.' : 'ZIP and builders are ready. The Word reader loads on first use.') : 'The ZIP engine is missing; Word/PowerPoint/EPUB output may fail.' });
+  r.push({ k:'office', n:'Excel / PowerPoint libraries', s:(zip&&window.XLSX)?'ok':(zip?'warn':'bad'), d:window.XLSX ? 'Excel library loaded; PowerPoint builder ready.' : (zip ? 'PowerPoint builder is ready. The Excel library loads on first use (needs internet once).' : 'ZIP engine missing.') });
+  let ls = false; try{ localStorage.setItem('__dfx','1'); localStorage.removeItem('__dfx'); ls = true; }catch(e){}
+  const idb = !!window.indexedDB;
+  r.push({ k:'store', n:'Browser storage', s:(ls&&idb)?'ok':'warn', d:(ls&&idb) ? 'Settings and recent files can be saved on this device.' : 'Limited: '+(!ls?'settings are kept for this session only. ':'')+(!idb?'recent files cannot be saved.':'') });
+  const dl = ('download' in HTMLAnchorElement.prototype) && typeof Blob !== 'undefined' && !!(URL && URL.createObjectURL);
+  r.push({ k:'dl', n:'File download', s:dl?'ok':'bad', d:dl ? ('Downloads work. Sharing: '+(navigator.share?'available.':'not available (files are downloaded instead).')) : 'This browser cannot save generated files.' });
+  const key = store.get('pdfworkbench-ai-key');
+  r.push({ k:'ai', n:'AI configuration', s:key?'ok':'warn', d:key ? 'An API key is saved ('+(store.get('pdfworkbench-ai-provider')||'provider')+'). AI features send selected text to that provider.' : 'No API key saved yet — AI tools stay idle until you add one in AI Studio.' });
+  r.push({ k:'pw', n:'Password protection', s:(window.PDFLibEncrypt||online)?'warn':'bad', d:window.PDFLibEncrypt ? 'BETA — library loaded. Always test the protected file.' : (online ? 'BETA — loads on first use (needs internet once). Always test the protected file.' : 'BETA — not loaded and you are offline.') });
+  return r;
+}
+async function selfTest(update){
+  const res = {};
+  const set = (k, s, d) => { res[k] = { s, d }; try{ update && update(k, s, d); }catch(e){} };
+  // PDF
+  let pdfBytes = null;
+  try{
+    const { PDFDocument, StandardFonts } = window.PDFLib;
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([300,200]);
+    const font = await doc.embedFont(StandardFonts.Helvetica);
+    page.drawText('DocuForge self test', { x:20, y:100, size:14, font });
+    pdfBytes = await doc.save();
+    const re = await PDFDocument.load(pdfBytes);
+    if(re.getPageCount() !== 1) throw new Error('page count mismatch');
+    const task = dfGetPdfJs(pdfBytes);
+    const pdf = await withTimeout(task.promise, 15000, 'PDF.js load');
+    const pg = await pdf.getPage(1);
+    const tc = await pg.getTextContent();
+    if(!tc.items.some(i => /DocuForge/.test(i.str))) throw new Error('text not found');
+    const vp = pg.getViewport({ scale:1 }); const cv = document.createElement('canvas'); cv.width = vp.width; cv.height = vp.height;
+    await withTimeout(pg.render({ canvasContext:cv.getContext('2d'), viewport:vp }).promise, 15000, 'render');
+    set('pdf','ok','Created, saved, re-opened, read text and rendered a test page.');
+  }catch(e){ logDev('selftest.pdf', e); set('pdf','bad','The PDF engine did not pass its test. Reload the page while online.'); }
+  // conversion engines
+  try{
+    const z = new JSZip(); z.file('a.txt','hello');
+    const u8 = await z.generateAsync({ type:'uint8array' });
+    const z2 = await JSZip.loadAsync(u8);
+    if(await z2.file('a.txt').async('string') !== 'hello') throw new Error('zip round trip');
+    let extra = '';
+    if(typeof buildDocxFromPages === 'function'){
+      const dx = await buildDocxFromPages([['Hello world']]);
+      const bytes = dx instanceof Blob ? new Uint8Array(await dx.arrayBuffer()) : new Uint8Array(dx);
+      if(!(bytes[0]===0x50 && bytes[1]===0x4B)) throw new Error('docx not a zip');
+      extra = ' Word builder OK.';
+    }
+    set('conv', window.mammoth ? 'ok':'warn', 'ZIP round-trip OK.'+extra+(window.mammoth?'':' Word reader loads on first use.'));
+  }catch(e){ logDev('selftest.conv', e); set('conv','bad','The conversion engine did not pass its test.'); }
+  // office libs
+  try{
+    let pp = '';
+    if(typeof buildPptxFromSlides === 'function'){
+      const px = await buildPptxFromSlides([{ title:'Test', bullets:['one'] }]);
+      const bytes = px instanceof Blob ? new Uint8Array(await px.arrayBuffer()) : new Uint8Array(px);
+      if(!(bytes[0]===0x50 && bytes[1]===0x4B)) throw new Error('pptx not a zip');
+      pp = 'PowerPoint builder OK. ';
+    }
+    await withTimeout(loadLib('xlsx'), 12000, 'Excel library');
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['a',1]]), 'S');
+    const out = XLSX.write(wb, { bookType:'xlsx', type:'array' });
+    const back = XLSX.read(out, { type:'array' });
+    if(back.SheetNames[0] !== 'S') throw new Error('xlsx round trip');
+    set('office','ok', pp+'Excel library loaded and wrote/read a test workbook.');
+  }catch(e){ logDev('selftest.office', e); set('office', window.JSZip ? 'warn':'bad', 'Limited: the Excel library could not be loaded (it needs internet once). PowerPoint builder status is in the technical log.'); }
+  // OCR
+  try{
+    await withTimeout(loadLib('tesseract'), 12000, 'OCR library');
+    if(!window.Tesseract || typeof Tesseract.createWorker !== 'function') throw new Error('no createWorker');
+    set('ocr','ok','OCR library loaded. (Reading a real scan still needs a sample-file test — language data downloads on first use.)');
+  }catch(e){ logDev('selftest.ocr', e); set('ocr', navigator.onLine===false?'bad':'warn', 'OCR library could not be loaded now. It needs internet once.'); }
+  // storage
+  try{
+    const k = '__dfx_self'; store.set(k,'ok'); if(store.get(k) !== 'ok') throw new Error('storage rt'); store.del(k);
+    let idb = 'IndexedDB unavailable';
+    if(window.indexedDB && typeof openProjectsDb === 'function'){ const db = await withTimeout(openProjectsDb(), 5000, 'IndexedDB'); try{ db.close(); }catch(e){} idb = 'IndexedDB OK'; }
+    let ls = false; try{ localStorage.setItem('__dfx','1'); localStorage.removeItem('__dfx'); ls = true; }catch(e){}
+    set('store', (ls && /OK/.test(idb)) ? 'ok':'warn', 'Settings storage round-trip OK. '+idb+'.'+(ls?'':' Browser blocks persistent storage.'));
+  }catch(e){ logDev('selftest.store', e); set('store','warn','Storage is limited on this device; settings may not be remembered.'); }
+  // download
+  try{
+    const b = new Blob(['x'],{type:'text/plain'}); const u = URL.createObjectURL(b); URL.revokeObjectURL(u);
+    if(!('download' in HTMLAnchorElement.prototype)) throw new Error('no download attr');
+    set('dl','ok','Can create files and offer them for download (no file was actually saved during this test).');
+  }catch(e){ logDev('selftest.dl', e); set('dl','bad','This browser cannot save generated files.'); }
+  // AI config
+  { const q = quickChecks().find(x => x.k==='ai'); set('ai', q.s, q.d); }
+  // password protection round-trip
+  try{
+    if(!pdfBytes) throw new Error('no test pdf');
+    const enc = await withTimeout(encryptPdfBytes(pdfBytes, { userPassword:'dfx-test', ownerPassword:'dfx-test', allowPrinting:true, allowCopying:true, allowModifying:false, allowAnnotating:false, allowFillingForms:true }), 20000, 'Encryption');
+    const asText = new TextDecoder('latin1').decode(enc.slice(Math.max(0, enc.length-4000)));
+    if(!/\/Encrypt/.test(asText) && !/\/Encrypt/.test(new TextDecoder('latin1').decode(enc))) throw new Error('no /Encrypt dictionary');
+    let needed = false;
+    try{ const t = dfGetPdfJs(enc); t.onPassword = (up, reason) => { needed = true; }; await withTimeout(Promise.race([t.promise.catch(()=>{}), sleep(4000)]), 6000, 'open check'); }catch(e){ needed = needed || /password/i.test(e.name+e.message); }
+    const t2 = dfGetPdfJs(enc, 'dfx-test'); const p2 = await withTimeout(t2.promise, 15000, 'open with password');
+    if(p2.numPages !== 1) throw new Error('page count after decrypt');
+    set('pw','warn','BETA — a test file was encrypted and re-opened with its password'+(needed?', and it asked for the password without it':'')+'. Still test your real files.');
+  }catch(e){ logDev('selftest.pw', e); set('pw', navigator.onLine===false?'bad':'warn', 'BETA — the encryption test could not finish (it needs internet once to load its library). Do not rely on it until a test passes.'); }
+  return res;
+}
+function reportText(rows){
+  return 'DocuForge AI '+(window.DOCUFORGE_BUILD||'')+' health report — '+new Date().toLocaleString()+'\n'+
+    rows.map(r => (DOT[r.s]||'?')+' '+r.n+': '+r.d).join('\n');
+}
+function openHealth(){
+  let rows = quickChecks();
+  const html = () => '<ul class="dfx-hc">'+rows.map(r => '<li data-k="'+r.k+'"><span class="dfx-dot">'+DOT[r.s]+'</span><div><div class="dfx-hc-n">'+esc(r.n)+'</div><div class="dfx-hc-d">'+esc(r.d)+'</div></div></li>').join('')+'</ul>';
+  openModal('Health Check',
+    '<div class="hint" style="margin-bottom:8px">🟢 Ready &nbsp; 🟡 Limited / Beta &nbsp; 🔴 Unavailable</div>'+
+    '<div id="dfxHcList">'+html()+'</div>'+
+    '<div class="dfx-actions"><button type="button" class="btn primary" id="dfxHcRun">▶ Run Full Self-Test</button><button type="button" class="btn" id="dfxHcCopy">📋 Copy report</button></div>'+
+    '<div id="dfxHcMsg" class="hint"></div>'+
+    '<details style="margin-top:8px"><summary style="cursor:pointer;min-height:40px;display:flex;align-items:center;font-weight:700;font-size:13px">Developer log (technical)</summary><div class="dfx-log" id="dfxHcLog"></div><button type="button" class="dfx-link" id="dfxHcClearLog">Clear log</button></details>',
+    async () => {});
+  $('modalConfirm').style.display = 'none'; $('modalCancel').textContent = 'Close';
+  const renderLog = () => { const el = $('dfxHcLog'); if(el) el.textContent = devLog.length ? devLog.slice(-60).map(l => new Date(l.t).toLocaleTimeString()+' ['+l.kind+'] '+l.msg).join('\n') : '(empty)'; };
+  renderLog();
+  $('dfxHcClearLog').addEventListener('click', () => { devLog.length = 0; renderLog(); });
+  $('dfxHcCopy').addEventListener('click', async () => {
+    const t = reportText(rows);
+    try{ await navigator.clipboard.writeText(t); toast('Report copied.'); }catch(e){ try{ prompt('Copy this report:', t); }catch(_){} }
+  });
+  $('dfxHcRun').addEventListener('click', async () => {
+    const btn = $('dfxHcRun'); btn.disabled = true; btn.textContent = '⏳ Testing…';
+    $('dfxHcMsg').textContent = 'Running tests — a few of them may need internet the first time.';
+    try{
+      await selfTest((k, s, d) => {
+        const r = rows.find(x => x.k === k); if(r){ r.s = s; r.d = d; }
+        const el = $('dfxHcList'); if(el) el.innerHTML = html();
+      });
+      const bad = rows.filter(r => r.s==='bad').length, warn = rows.filter(r => r.s==='warn').length;
+      $('dfxHcMsg').textContent = bad ? ('Done: '+bad+' item(s) unavailable, '+warn+' limited/beta.') : ('Done: nothing unavailable'+(warn?' ('+warn+' limited/beta).':'.'));
+    }catch(e){ logDev('selftest', e); $('dfxHcMsg').textContent = 'The self-test could not finish. See the developer log.'; }
+    finally{ btn.disabled = false; btn.textContent = '▶ Run Full Self-Test'; renderLog(); }
+  });
+}
+function addHealthLinks(){
+  [['settingsStudio','dfxSetHealth'],['helpStudio','dfxHelpHealth']].forEach(([pid,bid]) => {
+    const p = $(pid); if(!p || $(bid)) return;
+    const b = document.createElement('button');
+    b.type='button'; b.id=bid; b.className='btn'; b.style.margin='14px 0 0'; b.textContent='🩺 Health Check / Self-Test';
+    b.addEventListener('click', openHealth);
+    p.appendChild(b);
+  });
+}
+
+/* ====================================================================
+   12. FIRST-TIME TOUR
+   ==================================================================== */
+const TOUR = [
+  { ic:'🎯', t:'1. Choose what you want to do', p:'Tap a big task card, or type what you need in the search box — for example “merge PDFs”.' },
+  { ic:'📎', t:'2. Select or upload a file',   p:'Pick a file from your device. On a phone you can also take a photo.' },
+  { ic:'⚙️', t:'3. Process it',                p:'Keep the simple options, or open “Advanced options” if you need more control. Please wait while it works.' },
+  { ic:'✅', t:'4. View, download or share',   p:'Check the result, then download or share it. Tap “Start Another” to keep going.' }
+];
+let tourI = 0;
+function buildTour(){
+  if($('dfxTour')) return;
+  const d = document.createElement('div');
+  d.id = 'dfxTour'; d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true'); d.setAttribute('aria-label','Quick tour');
+  d.innerHTML = '<div class="dfx-t-box"><div class="dfx-t-ic" id="dfxTIc"></div><h3 id="dfxTH"></h3><p id="dfxTP"></p><div class="dfx-dots" id="dfxTD"></div>'+
+    '<div class="dfx-t-btns"><button type="button" id="dfxTBack">Back</button><button type="button" class="p" id="dfxTNext">Next</button></div>'+
+    '<button type="button" class="dfx-skip" id="dfxTSkip">Skip tutorial</button></div>';
+  document.body.appendChild(d);
+  $('dfxTSkip').addEventListener('click', endTour);
+  $('dfxTBack').addEventListener('click', () => { if(tourI>0){ tourI--; drawTour(); } });
+  $('dfxTNext').addEventListener('click', () => { if(tourI < TOUR.length-1){ tourI++; drawTour(); } else endTour(); });
+  document.addEventListener('keydown', e => { if(e.key==='Escape' && $('dfxTour').classList.contains('show')) endTour(); });
+}
+function drawTour(){
+  const s = TOUR[tourI];
+  $('dfxTIc').textContent = s.ic; $('dfxTH').textContent = s.t; $('dfxTP').textContent = s.p;
+  $('dfxTD').innerHTML = TOUR.map((_,i) => '<span class="'+(i===tourI?'on':'')+'"></span>').join('');
+  $('dfxTBack').style.display = tourI ? '' : 'none';
+  $('dfxTNext').textContent = tourI === TOUR.length-1 ? 'Got it' : 'Next';
+}
+function startTour(force){
+  buildTour(); tourI = 0; drawTour();
+  $('dfxTour').classList.add('show');
+  try{ $('dfxTNext').focus(); }catch(e){}
+}
+function endTour(){
+  const t = $('dfxTour'); if(t) t.classList.remove('show');
+  store.set('dfx-tour-done','1');
+}
+
+/* ====================================================================
+   WIRING
+   ==================================================================== */
+let origShowProgress = window.showProgress;
+function wrapGlobals(){
+  if(typeof window.showProgress === 'function'){
+    origShowProgress = window.showProgress;
+    window.showProgress = function(p){ try{ onProgress(p); }catch(e){ logDev('progress', e); } return origShowProgress.apply(this, arguments); };
+  }
+  if(typeof window.setStatus === 'function'){
+    const o = window.setStatus;
+    window.setStatus = function(m){ try{ if(m) curOp = String(m); }catch(e){} return o.apply(this, arguments); };
+  }
+  if(typeof window.logConversion === 'function'){
+    const o = window.logConversion;
+    window.logConversion = function(a, f){ try{ if(lastResultEntry && Date.now()-lastResultEntry.ts < 4000 && a){ lastResultEntry.label = a; const r = getRecent(); if(r[0] && r[0].id===lastResultEntry.id){ r[0].label = a; store.set(RKEY, JSON.stringify(r)); renderRecent(); } } }catch(e){} return o.apply(this, arguments); };
+  }
+}
+function init(){
+  try{
+    wrapLastResults();
+    wrapGlobals();
+    installErrorHandling();
+    installBusyGuard();
+    trackClicks();
+    buildHome();
+    buildSteps();
+    buildProgress();
+    addCameraButton();
+    addPanelNotices();
+    addHealthLinks();
+    observeModal();
+    renderRecent();
+    setInterval(updateSteps, 500);
+    document.body.classList.add('dfx-ready');
+    if(!store.get('dfx-tour-done')) setTimeout(() => { if(!modalOpen()) startTour(false); }, 900);
+  }catch(e){
+    logDev('init', e);
+    try{ console.warn('DocuForge simplify layer failed to start:', e && e.message); }catch(_){}
+  }
+}
+window.dfx = { search, tokenize, runSelfTest:() => selfTest(), quickChecks, showFriendly, classify, openHealth, startTour, goTool, goStudio, results, getRecent };
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once:true }); else init();
+})();
+
 </script>
