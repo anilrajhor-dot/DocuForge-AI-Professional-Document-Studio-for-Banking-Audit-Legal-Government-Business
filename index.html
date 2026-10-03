@@ -13227,15 +13227,77 @@ function setMore(open){
 function runWithPhoto(file, mode){
   window.__docuForgeStudioFile = file;
   window.__docuForgeStudioFiles = [file];
-  const toolId = mode === 'pdf' ? 'btnImagesToPdf' : 'btnOcrImage';
-  setStudio('ocr');
-  const nm = $('studioUploadName'); if(nm) nm.textContent = '✓ '+file.name;
-  setTimeout(() => {
-    const b = $(toolId);
-    if(!b){ try{ toast('That tool is not available right now.', true); }catch(e){} return; }
-    b.dataset.studioFileReady = '1';
-    b.click();
-  }, 160);
+  runTool(mode === 'pdf' ? 'btnImagesToPdf' : 'btnOcrImage', file);
+}
+/* Run an existing tool directly with a chosen file — no studio/sub-menu hop. */
+function runTool(btnId, file){
+  window.__docuForgeStudioFile = file;
+  window.__docuForgeStudioFiles = [file];
+  const b = $(btnId);
+  if(!b){ try{ toast('That tool is not available right now.', true); }catch(e){} return; }
+  b.dataset.studioFileReady = '1';
+  b.click();
+  setTimeout(() => { if(b.dataset.studioFileReady === '1') delete b.dataset.studioFileReady; }, 800);
+}
+function chooseAction(file, title, actions){
+  openModal(title, '<p class="hint">File: <strong>'+esc(file.name)+'</strong></p><div class="dfx-resultbar" id="dfxChoose"></div>', async () => {});
+  $('modalConfirm').style.display = 'none'; $('modalCancel').textContent = 'Cancel';
+  const bar = $('dfxChoose');
+  actions.forEach(a => {
+    const b = mkBtn(a.label, 'primary', () => { closeModal(); setTimeout(a.run, 60); });
+    bar.appendChild(b);
+  });
+}
+function routeUploadedFile(file){
+  const n = (file.name||'').toLowerCase(), t = file.type||'';
+  const isPdf = t === 'application/pdf' || /\.pdf$/.test(n);
+  const isImg = t.startsWith('image/') || /\.(jpe?g|png|gif|webp|bmp)$/.test(n);
+  if(isPdf){
+    (async () => {
+      try{ await loadFiles([file]); }catch(e){ logDev('upload', e); toast((e && e.message) || 'Could not open that PDF.', true); return; }
+      if(typeof workingBytes !== 'undefined' && workingBytes) setStudio('pdf');
+    })();
+    return;
+  }
+  if(isImg){
+    chooseAction(file, 'What do you want to do with this photo?', [
+      { label:'🔎 Extract text (OCR)', run:() => runTool('btnOcrImage', file) },
+      { label:'📄 Make a PDF', run:() => runTool('btnImagesToPdf', file) }
+    ]);
+    return;
+  }
+  if(/\.(pptx?|odp)$/.test(n)){
+    chooseAction(file, 'What do you want to do with this presentation?', [
+      { label:'📝 Convert to Markdown', run:() => runTool('btnPptxToMarkdown', file) },
+      { label:'📄 Convert to PDF', run:() => runTool('btnPptxToPdf', file) }
+    ]);
+    return;
+  }
+  chooseAction(file, 'What do you want to do with this file?', [
+    { label:'📄 Convert to PDF', run:() => runTool('btnFileToPdf', file) }
+  ].concat(/\.(xlsx?|csv)$/.test(n) ? [{ label:'📊 Open in Excel Studio', run:() => { window.__docuForgeStudioFile = file; window.__docuForgeStudioFiles = [file]; goStudio('excel'); } }] : []));
+}
+function quickAction(q){
+  if(q === 'upload'){ const i = $('dfxQuickIn'); i.value = ''; i.click(); return; }
+  if(q === 'compare'){ const b = $('btnPdfCompare'); if(b) b.click(); else toast('Compare is not available right now.', true); return; }
+  if(q === 'ppt'){ const i = $('dfxQuickPpt'); i.value = ''; i.click(); return; }
+}
+function wireQuickActions(){
+  if($('dfxQuickIn')) return;
+  const mk = (id, accept) => { const i = document.createElement('input'); i.type='file'; i.id=id; i.accept=accept; i.hidden=true; document.body.appendChild(i); return i; };
+  const up = mk('dfxQuickIn', '.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.rtf,.odt,.ppt,.pptx,.odp,.html,.htm,image/*');
+  const pp = mk('dfxQuickPpt', '.pptx,.ppt,.odp');
+  up.addEventListener('change', () => { const f = up.files && up.files[0]; if(f) routeUploadedFile(f); });
+  pp.addEventListener('change', () => { const f = pp.files && pp.files[0]; if(f) runTool('btnPptxToMarkdown', f); });
+  // Runs before the original Quick Actions handler (which only hopped to a studio sub-menu).
+  window.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('#df85QuickActions button[data-q]');
+    if(!b) return;
+    const q = b.dataset.q;
+    if(q === 'recent') return;           // original behaviour (scroll to Recent files) is fine
+    e.preventDefault(); e.stopImmediatePropagation();
+    quickAction(q);
+  }, true);
 }
 
 function wireSearch(){
@@ -13946,6 +14008,7 @@ function init(){
     installBusyGuard();
     trackClicks();
     buildHome();
+    wireQuickActions();
     buildSteps();
     buildProgress();
     addCameraButton();
